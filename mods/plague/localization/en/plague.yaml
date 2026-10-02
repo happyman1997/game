@@ -1,0 +1,24 @@
+disease:
+  bubonic_plague: Bubonic Plague
+  camp_fever: Camp Fever
+modifier:
+  quarantine: Quarantine
+  plague_aftermath: Aftermath of Pestilence
+decision:
+  close_city_gates: Close the City Gates
+decision_desc:
+  close_city_gates: Pestilence in the capital! Close the gates to slow the spread of the disease.
+ev:
+  plague.0001:
+    t: Pestilence in the Capital!
+    desc: "More and more dead are found in the streets of the capital. Physicians are helpless and priests cannot keep up with the funerals."
+    a: Declare a quarantine (−40 gold)
+    b: Trust in the Lord
+plague:
+  quarantine_tip: A year of quarantine lowers mortality and slows the spread.
+  widget_tip: "Provinces struck by epidemics: {n}"
+  months: "{n} mo."
+  outbreaks: "Outbreaks since the start: {n}"
+  panel_hint: "Epidemics break out at random and spread to neighbouring provinces. Quarantine slows them down."
+  none: No epidemics right now.
+  msg_outbreak: "Outbreak ({disease}): {place}"

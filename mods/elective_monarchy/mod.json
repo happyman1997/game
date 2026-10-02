@@ -1,0 +1,14 @@
+{
+  "id": "elective_monarchy",
+  "name": { "ru": "Выборная монархия", "en": "Elective Monarchy" },
+  "version": "1.0.0",
+  "author": "Пример мода",
+  "description": {
+    "ru": "Пример расширения реестров движка: новый алгоритм наследования, где наследника выбирают вассалы по мнению и престижу кандидатов.",
+    "en": "Engine registry extension example: a new succession algorithm where vassals elect the heir based on opinion and prestige."
+  },
+  "dependencies": ["core"],
+  "load_after": ["tournaments"],
+  "scripts": ["scripts/main.js"],
+  "tags": ["mechanics", "example", "js"]
+}

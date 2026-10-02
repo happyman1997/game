@@ -1,0 +1,30 @@
+# Скопируйте папку в mods/, переименуйте id в mod.json и начинайте.
+# Формат: тип контента → id → определение. Подробно — docs/MODDING.md.
+
+traits:
+  falconer:
+    category: lifestyle
+    icon: "🦅"
+    modifiers: { prowess: 1, monthly_prestige: 0.2 }
+
+decisions:
+  train_falcon:
+    icon: "🦅"
+    is_shown: { is_adult: yes, NOT: { has_trait: falconer } }
+    cost: { gold: 30 }
+    cooldown: { years: 3 }
+    effect:
+      - trigger_event: my_mod.0001
+    ai_will_do: 5
+
+events:
+  my_mod.0001:
+    theme: hunt
+    icon: "🦅"
+    triggered_only: true
+    options:
+      - effect:
+          random_list:
+            - { weight: 70, add_trait: falconer }
+            - { weight: 30, add_stress: 10 }
+      - effect: { add_gold: 15 }

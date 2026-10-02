@@ -1,0 +1,14 @@
+trait:
+  falconer: Falconer
+trait_desc:
+  falconer: A master of falconry.
+decision:
+  train_falcon: Raise a Falcon
+decision_desc:
+  train_falcon: Patience and raw meat — and you will have the finest falcon around.
+ev:
+  my_mod.0001:
+    t: Falconry
+    desc: "A young falcon sits on your glove, eyeing you with a yellow eye."
+    a: Release it into the sky!
+    b: Sell it to a passing merchant

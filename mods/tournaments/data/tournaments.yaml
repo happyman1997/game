@@ -1,0 +1,125 @@
+# ---------------------------------------------------------------- новые черты
+traits:
+  tourney_champion:
+    category: fame
+    icon: "🏇"
+    modifiers: { prowess: 3, monthly_prestige: 0.5, attraction_opinion: 10 }
+    compatibility: { brave: 5 }
+  knight_errant:
+    category: lifestyle
+    icon: "🛡"
+    modifiers: { prowess: 2, martial: 1, general_opinion: 5 }
+
+  # Правка черты основного мода: объекты сливаются, поэтому меняется только
+  # prowess, а остальные модификаторы храброго остаются как были.
+  brave:
+    modifiers: { prowess: 4 }
+
+# ---------------------------------------------------------------- постройка
+buildings:
+  tilting_yard:
+    icon: "🎠"
+    holding: castle
+    cost: { gold: 90 }
+    days: 200
+    modifiers: { levy_mult: 0.05 }
+    owner_modifiers: { prowess: 2, monthly_prestige: 0.2 }
+
+# ---------------------------------------------------------------- решение
+decisions:
+  hold_tournament:
+    icon: "🏇"
+    is_shown: { is_ruler: yes, tier: ">= duchy" }
+    is_valid:
+      is_at_war: no
+      is_adult: yes
+    cost: { gold: { value: 60, add: { value: tier, multiply: 20 } } }
+    cooldown: { years: 4 }
+    effect:
+      - trigger_event: tournament.0001
+    ai_check_months: 12
+    ai_will_do:
+      value: 10
+      if:
+        - limit: { has_trait: [brave, tourney_champion, knight_errant] }
+          add: 20
+
+# ---------------------------------------------------------------- события
+events:
+  tournament.0001:
+    theme: feast
+    icon: "🏇"
+    triggered_only: true
+    options:
+      - trigger: { is_adult: yes, health: 4 }
+        effect:
+          random_list:
+            - weight: { value: 30, add: { value: prowess, multiply: 3 } }
+              add_trait: tourney_champion
+              add_prestige: 100
+            - weight: 40
+              add_prestige: 30
+            - weight: 20
+              add_trait: wounded
+            - weight: 3
+              death: { reason: tournament }
+        ai_chance: { value: 20, add: { value: ai_boldness, multiply: 10 } }
+      - effect:
+          add_prestige: 50
+          every_vassal: { add_opinion: { target: root, modifier: feast_guest } }
+          random_courtier:
+            limit: { is_adult: yes, is_male: yes }
+            save_scope_as: champion
+            add_trait: knight_errant
+          trigger_event: { id: tournament.0002, days: 1 }
+        ai_chance: 40
+
+  tournament.0002:
+    theme: feast
+    icon: "🛡"
+    triggered_only: true
+    trigger: { exists: scope:champion }
+    options:
+      - effect:
+          scope:champion: { add_opinion: { target: root, modifier: grateful } }
+          add_gold: -20
+      - effect: { add_prestige: 10 }
+
+  # Случайное событие, добавленное в чужой on_action.
+  tournament.0010:
+    theme: court
+    icon: "🤺"
+    trigger:
+      is_adult: yes
+      age: "< 50"
+      has_trait: [brave, tourney_champion, knight_errant]
+    cooldown: { years: 5 }
+    options:
+      - effect:
+          random_list:
+            - weight: 60
+              add_prestige: 40
+            - weight: 40
+              add_trait: wounded
+      - effect: { add_prestige: -20 }
+
+# ---------------------------------------------------------------- вставки в чужой контент
+on_actions:
+  on_monthly_pulse:
+    random_events:
+      events:
+        tournament.0010: 6         # словари сливаются: событие добавится к остальным
+
+defines:
+  military:
+    battle_prestige: 30            # было 20 в основном моде
+
+# ---------------------------------------------------------------- режим карты из данных
+map_modes:
+  martial_might:
+    icon: "🗡"
+    order: 70
+    value: "holder.martial"        # путь: владелец провинции → его военное дело
+    min: 0
+    max: 25
+    gradient: ["#2a2a3a", "#6a4a9a", "#e0c060"]

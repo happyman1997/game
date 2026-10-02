@@ -1,0 +1,9 @@
+{
+  "id": "my_mod",
+  "name": { "ru": "Мой мод", "en": "My mod" },
+  "version": "0.1.0",
+  "author": "Ваше имя",
+  "description": { "ru": "Описание мода.", "en": "Mod description." },
+  "dependencies": ["core"],
+  "scripts": ["scripts/main.js"]
+}

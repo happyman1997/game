@@ -1,0 +1,34 @@
+trait:
+  tourney_champion: Tourney Champion
+  knight_errant: Knight-Errant
+building:
+  tilting_yard: Tilting Yard
+decision:
+  hold_tournament: Hold a Tournament
+decision_desc:
+  hold_tournament: Summon knights from far and wide to test their strength in the lists.
+death:
+  tournament: "{who} dies at a tournament"
+ui:
+  mapmode:
+    martial_might: Martial might of rulers
+  death_reason:
+    tournament: at a tournament
+ev:
+  tournament.0001:
+    t: The Tournament
+    desc: "Colourful pavilions, trumpets and the roar of the crowd. The knights await the signal. Will you enter the lists yourself?"
+    a: Take up a lance and fight!
+    b: Watch from the stands and reward the victor
+  tournament.0002:
+    t: A New Hero
+    desc: "[scope:champion] has won the tournament. The crowd chants their name."
+    a: Present a reward (−20 gold)
+    b: Applaud from the stands
+  tournament.0010:
+    t: A Challenge
+    desc: "A wandering knight throws down his gauntlet at your feet."
+    a: Accept the challenge
+    b: Decline
+msg:
+  became_victorious: "Bards sing of your victories — you are now famed as a victorious commander!"

@@ -1,0 +1,12 @@
+{
+  "id": "tournaments",
+  "name": { "ru": "Турниры и рыцарство", "en": "Tourneys & Chivalry" },
+  "version": "1.0.0",
+  "author": "Пример мода",
+  "description": {
+    "ru": "Пример мода без кода — только YAML: новые черты, постройка, решение с цепочкой событий, режим карты, а также правка чужого контента директивами слияния.",
+    "en": "Code-free mod example — YAML only: new traits, a building, a decision with an event chain, a map mode, and patches to existing content via merge directives."
+  },
+  "dependencies": ["core"],
+  "tags": ["content", "example", "data-only"]
+}

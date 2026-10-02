@@ -1,0 +1,64 @@
+# Новый тип контента — болезни. Его читает JS-скрипт мода (scripts/main.js).
+# Другие моды могут добавить свои болезни или изменить эти параметры.
+diseases:
+  bubonic_plague:
+    color: "#7a1f1f"
+    icon: "☠"
+    outbreak_chance: 0.004     # шанс новой вспышки в месяц
+    spread_chance: 0.07        # шанс перекинуться на соседнюю провинцию в месяц
+    monthly_death_chance: 0.012 # для персонажей в заражённой столице
+    duration_months: 10
+    development_loss: 2
+  camp_fever:
+    color: "#7a6a1f"
+    icon: "🤢"
+    outbreak_chance: 0.008
+    spread_chance: 0.035
+    monthly_death_chance: 0.004
+    duration_months: 6
+    development_loss: 0
+
+modifiers:
+  quarantine: { icon: "🚧", modifiers: { tax_mult: -0.3 }, good: true }
+  plague_aftermath: { icon: "⚰", modifiers: { tax_mult: -0.2, levy_mult: -0.2 } }
+
+decisions:
+  close_city_gates:
+    icon: "🚧"
+    is_shown:
+      is_ruler: yes
+      capital_has_disease: yes
+    is_valid:
+      NOT: { capital: { has_province_modifier: quarantine } }
+    cost: { gold: 40 }
+    cooldown: { years: 2 }
+    effect:
+      - capital:
+          add_province_modifier: { id: quarantine, months: 12 }
+      - add_stress: -10
+      - custom_tooltip: plague.quarantine_tip
+    ai_will_do: 60
+    ai_check_months: 3
+
+events:
+  plague.0001:
+    theme: death
+    icon: "☠"
+    triggered_only: true
+    options:
+      - trigger: { gold: 40 }
+        effect:
+          capital: { add_province_modifier: { id: quarantine, months: 12 } }
+          add_gold: -40
+      - effect:
+          add_piety: 30
+          add_stress: 20
+
+# Вставляем своё событие в чужой on_action, не трогая файлы основного мода.
+on_actions:
+  on_death:
+    effect:
+      $append:
+        - if:
+            limit: { capital_has_disease: yes }
+            add_dynasty_prestige: -5

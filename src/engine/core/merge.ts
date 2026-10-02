@@ -69,7 +69,7 @@ export function deepMerge(base: any, patch: any): any {
       return arr;
     }
     if (patch.$replace === true || !isPlainObject(base)) return stripDirectives(clone(patch));
-    const out: Record<string, any> = { ...base };
+    const out: Record<string, any> = clone(base);
     for (const k of Object.keys(patch)) {
       if (k === '$replace' || k === '$delete') continue;
       const v = deepMerge(base[k], patch[k]);

@@ -303,3 +303,19 @@ stat:
   development_growth: Development growth
   tax: Tax
   levy: Levy
+
+bookmark:
+  b1066: The Norman Conquest
+bookmark_desc:
+  b1066: "1066. Edward the Confessor has died childless, and three men claim the English throne: Harold Godwinson, William of Normandy and Edgar Ætheling. Ireland is divided among petty kings, Wales is split, and the young King of France rules under the regency of the Count of Flanders."
+
+# Подсказки, на которые ссылаются данные мода
+ui:
+  choose_spouse_from_family: Whom do you offer in marriage?
+  need_learning_8: Requires learning of at least 8
+  need_health_3: Requires health of at least 3
+  need_stress: Requires stress of at least 30
+  need_two_british_kingdoms: You must hold two kingdoms of Britain
+  alliance_requires_marriage: Requires a marriage between your families
+  must_be_neighbor: Their lands must border yours
+  invasion_tooltip: "Knights from all over France flock to your banners: +5500 soldiers for 4 years."

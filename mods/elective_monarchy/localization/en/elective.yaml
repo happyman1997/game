@@ -1,0 +1,4 @@
+succession_law:
+  feudal_elective: Feudal Elective
+succession_law_desc:
+  feudal_elective: "Vassals elect the heir among adult dynasty members and the mightiest vassals. Each vote depends on the elector's opinion of the candidate."

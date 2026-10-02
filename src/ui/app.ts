@@ -21,7 +21,7 @@ import { bundledPackages } from './bundled';
 import { type Child, clear, esc, fmt, h, hideTip, initTooltips, signed } from './dom';
 import { registerBuiltinMapModes } from './map/mapModes';
 import { type MapHost, MapView } from './map/mapView';
-import { renderMainMenu } from './screens/menu';
+import { openIssues, renderMainMenu } from './screens/menu';
 import { renderEventModal, renderRequestModal } from './panels/events';
 import { renderCharacterPanel } from './panels/character';
 import { renderProvincePanel, renderTitlePanel } from './panels/province';
@@ -32,7 +32,7 @@ import { renderDecisionsPanel } from './panels/decisions';
 import { renderRealmPanel } from './panels/realm';
 import { renderLogPanel } from './panels/log';
 import { breakdownHtml, button, charLink, portrait, titleCoa } from './widgets';
-import { listSaves, quickSaveSlot, writeSave } from './screens/saves';
+import { exportSave, openLoadDialog, openSaveDialog, quickSaveSlot, writeSave } from './screens/saves';
 
 export type PanelRef =
   | { kind: 'character'; id: string }
@@ -680,15 +680,14 @@ export class App implements MapHost {
       h('div', { class: 'game-menu' },
         h('h2', null, this.t('ui.menu')),
         button(this.t('ui.resume'), () => { close(); this.paused = wasPaused; }),
-        button(this.t('ui.save_game'), () => { close(); import('./screens/saves').then((m) => m.openSaveDialog(this)); }, { disabled: !g.state.player }),
-        button(this.t('ui.load_game'), () => { close(); import('./screens/saves').then((m) => m.openLoadDialog(this)); }),
-        button(this.t('ui.export_save'), () => import('./screens/saves').then((m) => m.exportSave(this))),
+        button(this.t('ui.save_game'), () => { close(); openSaveDialog(this); }, { disabled: !g.state.player }),
+        button(this.t('ui.load_game'), () => { close(); openLoadDialog(this); }),
+        button(this.t('ui.export_save'), () => exportSave(this)),
         button(this.lang === 'ru' ? 'English' : 'Русский', () => { this.setLanguage(this.lang === 'ru' ? 'en' : 'ru'); close(); }),
-        button(this.t('ui.mod_issues'), () => { close(); import('./screens/menu').then((m) => m.openIssues(this)); }),
+        button(this.t('ui.mod_issues'), () => { close(); openIssues(this); }),
         button(this.t('ui.main_menu'), () => { close(); this.showMainMenu(); }),
       ),
     );
-    void listSaves;
   }
 
   /** Короткий ранг + имя для списков. */

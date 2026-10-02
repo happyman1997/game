@@ -471,11 +471,16 @@ export class MapView {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     if (this.zoom < 2.6) {
-      for (const l of this.labels) {
+      const placed: [number, number, number, number][] = [];
+      for (const l of [...this.labels].sort((a, b) => b.size - a.size)) {
         const px = l.size * this.zoom;
         if (px < 9) continue;
         const [x, y] = this.toScreen(l.x, l.y);
         ctx.font = `600 ${px}px "Cormorant Garamond", Georgia, serif`;
+        const w = ctx.measureText(l.text).width * 1.15 + px * 0.3;
+        const rect: [number, number, number, number] = [x - w / 2, y - px / 2, x + w / 2, y + px / 2];
+        if (placed.some((r) => rect[0] < r[2] && rect[2] > r[0] && rect[1] < r[3] && rect[3] > r[1])) continue;
+        placed.push(rect);
         ctx.lineWidth = Math.max(2, px / 6);
         ctx.strokeStyle = 'rgba(20,14,8,0.55)';
         ctx.fillStyle = 'rgba(245,232,200,0.92)';
