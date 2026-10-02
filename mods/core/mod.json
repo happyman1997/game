@@ -1,0 +1,14 @@
+{
+  "id": "core",
+  "name": { "ru": "Основная игра: 1066", "en": "Base game: 1066" },
+  "version": "1.0.0",
+  "author": "Crown & Dynasty",
+  "description": {
+    "ru": "Базовый контент: Британские острова и Франция в 1066 году. Сам является модом — его можно заменить полностью.",
+    "en": "Base content: the British Isles and France in 1066. It is a mod itself and can be replaced entirely."
+  },
+  "priority": -100,
+  "data": ["data"],
+  "localization": "localization",
+  "tags": ["base", "map", "history"]
+}

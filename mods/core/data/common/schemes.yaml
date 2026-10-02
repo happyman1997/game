@@ -1,0 +1,156 @@
+# Интриги. Скоупы: root = scope:owner, scope:target, scope:scheme.
+# progress — прогресс в месяц (до 100), success_chance — шанс успеха в %,
+# discovery_chance — ежемесячный шанс, что цель раскроет интригу.
+schemes:
+  murder:
+    category: hostile
+    icon: "☠"
+    skill: intrigue
+    is_valid:
+      scope:target: { is_alive: yes }
+    progress:
+      value: 5
+      add: { value: "scope:owner.intrigue", multiply: 0.6 }
+    success_chance:
+      value: 20
+      add:
+        - { desc: ai.your_intrigue, value: { value: "scope:owner.intrigue", multiply: 3 } }
+        - { desc: ai.target_intrigue, value: { value: "scope:target.intrigue", multiply: -2 } }
+        - { desc: ai.target_prowess, value: { value: "scope:target.prowess", multiply: -0.5 } }
+        - { desc: ai.paranoid_target, limit: { scope:target: { has_trait: paranoid } }, value: -15 }
+      min: 3
+      max: 90
+    discovery_chance:
+      value: 6
+      add:
+        - { value: "scope:target.intrigue", multiply: 0.5 }
+        - { value: "scope:owner.intrigue", multiply: -0.4 }
+      min: 1
+    on_success:
+      - scope:owner:
+          send_message: { text: msg.murder_success, kind: good }
+          if:
+            limit: { has_trait: compassionate }
+            add_stress: 40
+      - scope:target:
+          every_close_family:
+            limit: { is_adult: yes }
+            add_opinion: { target: scope:owner, modifier: murdered_relative }
+      - scope:target: { death: { reason: murder, killer: scope:owner } }
+    on_failure:
+      - scope:owner:
+          send_message: { text: msg.murder_failed, kind: bad }
+          add_stress: 10
+    on_discovered:
+      - scope:target:
+          add_opinion: { target: scope:owner, modifier: attempted_murder }
+          trigger_event: intrigue.0001
+      - scope:owner: { send_message: { text: msg.scheme_discovered, kind: bad } }
+
+  befriend:
+    category: personal
+    icon: "😊"
+    skill: diplomacy
+    is_valid:
+      scope:target: { is_alive: yes }
+    progress:
+      value: 8
+      add: { value: "scope:owner.diplomacy", multiply: 0.6 }
+    success_chance:
+      value: 40
+      add:
+        - { desc: ai.your_diplomacy, value: { value: "scope:owner.diplomacy", multiply: 2 } }
+        - { desc: ai.opinion, value: { value: "scope:target.opinion(scope:owner)", multiply: 0.5 } }
+        - { desc: ai.shy_target, limit: { scope:target: { has_trait: shy } }, value: -15 }
+        - { desc: ai.gregarious_target, limit: { scope:target: { has_trait: gregarious } }, value: 15 }
+      min: 5
+      max: 95
+    on_success:
+      - scope:owner: { add_opinion: { target: scope:target, modifier: friend } }
+      - scope:target: { add_opinion: { target: scope:owner, modifier: friend } }
+      - scope:owner: { send_message: { text: msg.befriend_success, kind: good }, add_stress: -15 }
+    on_failure:
+      - scope:target: { add_opinion: { target: scope:owner, modifier: insulted, value: -10 } }
+      - scope:owner: { send_message: { text: msg.befriend_failed, kind: bad } }
+
+  sway:
+    category: personal
+    icon: "🎶"
+    skill: diplomacy
+    is_valid:
+      scope:target: { is_alive: yes }
+    progress:
+      value: 10
+      add: { value: "scope:owner.diplomacy", multiply: 0.7 }
+    success_chance:
+      value: 55
+      add:
+        - { desc: ai.your_diplomacy, value: { value: "scope:owner.diplomacy", multiply: 2 } }
+      min: 10
+      max: 95
+    on_success:
+      - scope:target: { add_opinion: { target: scope:owner, modifier: swayed } }
+      - scope:owner: { send_message: { text: msg.sway_success, kind: good } }
+    on_failure:
+      - scope:owner: { send_message: { text: msg.sway_failed, kind: bad } }
+
+  seduce:
+    category: personal
+    icon: "💋"
+    skill: intrigue
+    is_valid:
+      scope:target: { is_alive: yes, is_adult: yes }
+      NOT: { scope:target: { is_spouse_of: scope:owner } }
+    progress:
+      value: 8
+      add: { value: "scope:owner.intrigue", multiply: 0.5 }
+    success_chance:
+      value: 25
+      add:
+        - { desc: ai.attraction, value: { value: "scope:owner.attraction", multiply: 0.8 } }
+        - { desc: ai.opinion, value: { value: "scope:target.opinion(scope:owner)", multiply: 0.4 } }
+        - { desc: ai.chaste_target, limit: { scope:target: { has_trait: chaste } }, value: -35 }
+        - { desc: ai.lustful_target, limit: { scope:target: { has_trait: lustful } }, value: 25 }
+        - { desc: ai.target_married, limit: { scope:target: { is_married: yes } }, value: -10 }
+      min: 3
+      max: 90
+    discovery_chance: { value: 3 }
+    on_success:
+      - scope:owner: { add_opinion: { target: scope:target, modifier: lover }, add_stress: -20 }
+      - scope:target: { add_opinion: { target: scope:owner, modifier: lover } }
+      - scope:owner:
+          send_message: { text: msg.seduce_success, kind: good }
+          if:
+            limit: { has_trait: chaste }
+            add_stress: 30
+    on_failure:
+      - scope:target: { add_opinion: { target: scope:owner, modifier: rejected_advances } }
+      - scope:owner: { send_message: { text: msg.seduce_failed, kind: bad } }
+    on_discovered:
+      - scope:target:
+          every_spouse:
+            add_opinion: { target: scope:owner, modifier: insulted, value: -30 }
+
+  fabricate_claim:
+    category: political
+    icon: "📝"
+    skill: learning
+    is_valid:
+      scope:target: { is_alive: yes, is_ruler: yes }
+    progress:
+      value: 4
+      add: { value: "scope:owner.learning", multiply: 0.5 }
+    success_chance:
+      value: 45
+      add:
+        - { desc: ai.your_learning, value: { value: "scope:owner.learning", multiply: 2 } }
+      min: 10
+      max: 95
+    on_success:
+      - if:
+          limit: { scope:target.tier: "<= scope:owner.tier" }
+          then: { add_claim: scope:target.primary_title }
+          else: { add_claim: scope:target.capital.county }
+      - scope:owner: { send_message: { text: msg.claim_fabricated, kind: good } }
+    on_failure:
+      - scope:owner: { send_message: { text: msg.claim_failed, kind: bad }, add_prestige: -25 }

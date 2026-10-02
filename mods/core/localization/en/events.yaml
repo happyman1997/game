@@ -1,0 +1,171 @@
+ev:
+  health.0001:
+    t: Feeling Unwell
+    desc: "For days now you have felt wretched: your bones ache and you shiver with fever. Courtiers whisper behind your back."
+    a: Summon the best physician (−20 gold)
+    b: Pray for recovery
+    c: It's nothing, it will pass
+  health.0002:
+    t: Pneumonia
+    desc: "The illness will not relent — every breath now rattles with pain. The physicians shake their heads gravely."
+    a: I have survived worse
+    b: Bring a learned doctor from Salerno (−50 gold)
+  health.0003:
+    t: Recovery
+    desc: "One morning you wake and realise the illness has passed. Praise the Lord!"
+    a: Thank the heavens
+  health.0004:
+    t: The Weight of Years
+    desc: "Your hands are not as steady, nor your eyes as sharp, as they once were. Old age is upon you."
+    a: Such is the fate of all mortals
+    b: Find solace in prayer
+  health.0005:
+    t: Sparring Match
+    desc: "A young knight challenges you to a practice bout. The court gathers to watch."
+    a: Accept the challenge!
+    b: I have more important matters
+  stress.0001:
+    t: Unbearable Strain
+    desc: "The burdens of rule weigh heavily upon you. This cannot go on — you need some release."
+    a: Drown my worries in wine
+    b: Atone through the lash
+    c: Throw a wild revel (−30 gold)
+    d: Grit my teeth and endure
+  stress.0002:
+    t: At the Edge
+    desc: "You can no longer sleep, your thoughts are a tangle and your heart pounds as if about to burst."
+    a: I must endure...
+  court.0001:
+    t: A Vassal's Plea
+    desc: "[scope:vassal] asks for your help: their coffers are empty and debts are mounting."
+    a: Help with money (30 gold)
+    b: Let them deal with their own debts
+  court.0002:
+    t: The Wandering Scholar
+    desc: "A learned man who has seen Constantinople and Córdoba has arrived at court and offers his services."
+    a: Hire him as an advisor (−30 gold)
+    b: Let him stay at court
+    c: Send the charlatan away
+  court.0004:
+    t: Quarrel at Court
+    desc: "[scope:first] and [scope:second] came to blows in the great hall. Both demand that you settle the dispute."
+    a: "Side with [scope:first.first_name]"
+    b: "Side with [scope:second.first_name]"
+    c: Stay out of it
+  court.0005:
+    t: Peasant Unrest
+    desc: "The peasants of [scope:province] refuse to pay their dues and threaten to take up pitchforks."
+    a: Crush the revolt
+    b: Make concessions (−40 gold)
+    c: Let them grumble
+  court.0006:
+    t: Bountiful Harvest
+    desc: "This summer [scope:province] has gathered an unheard-of harvest — the granaries are bursting."
+    a: Excellent news!
+  court.0007:
+    t: Poor Harvest
+    desc: "Rains have ruined the crops in [scope:province]. The peasants face hunger this winter."
+    a: Open the lord's granaries (−30 gold)
+    b: Let them survive as they can
+  court.0008:
+    t: Trade Fair
+    desc: "Merchants ask permission to hold a great fair in [scope:province]."
+    a: Allow it, without tolls
+    b: Tax the merchants (+40 gold)
+  court.0009:
+    t: The Bishop's Request
+    desc: "The bishop asks for a donation towards a new church. A refusal would not be well received."
+    a: Donate 50 gold
+    b: The treasury is not bottomless
+  court.0010:
+    t: Mercenaries
+    desc: "The captain of a mercenary band offers his sword — for a fine price, of course."
+    a: Hire the band (−100 gold)
+    b: We'll manage
+  court.0011:
+    t: An Insolent Vassal
+    desc: "[scope:vassal] openly mocks you. The court awaits your answer."
+    a: Humiliate the upstart before all
+    b: Pretend not to notice
+    c: Invite them to a reconciliation dinner (−25 gold)
+  court.0012:
+    t: The Hairy Star
+    desc: "A bright comet with a fiery tail has appeared in the sky. Monks record it in their chronicles, and the people whisper of omens."
+    a: A sign of victory to come!
+    b: An ill omen. We must pray
+  family.0001:
+    t: A Gifted Child
+    desc: "The tutors of [scope:child] report great progress. What should they focus on?"
+    a: Diplomacy
+    b: Martial
+    c: Stewardship
+    d: Learning
+  family.0002:
+    t: Family Quarrel
+    desc: "[scope:spouse] makes a scene over a trifle. The servants scatter."
+    a: Apologise
+    b: Stand my ground
+  family.0003:
+    t: Domestic Bliss
+    desc: "An evening by the fire with [scope:spouse] reminds you what life is worth living for."
+    a: It is good to be home
+  family.0004:
+    t: A Jealous Kinsman
+    desc: "[scope:sibling] makes no secret of envying your position and hints at deserving more."
+    a: Gift 50 gold
+    b: Know your place
+  death.0001:
+    t: Loss
+    desc: "[scope:deceased] has died. The court is in mourning."
+    a: Pray for their soul
+    b: Grieve alone
+  intrigue.0001:
+    t: Plot Uncovered!
+    desc: "Your men caught an assassin. Under torture he confessed that he was hired by [scope:owner]!"
+    a: I will not forget this!
+    b: Forgive, as the Lord commands
+  succession.0001:
+    t: A New Reign
+    desc: "Your predecessor has passed on. The burden of rule now rests on your shoulders."
+    a: A splendid coronation (−100 gold)
+    b: Begin the reign modestly
+  start.0001:
+    t: The Year 1066
+    desc: "You are [root.full_name], [root.title_name]. The world around you is full of dangers and opportunities. May your reign be long!"
+    desc_william: "King Edward the Confessor is dead, and Harold Godwinson has seized the throne that was promised to you! The Norman barons await your command. Prepare the invasion (Decisions menu) and declare war for England."
+    desc_harold: "You are King of England, but the crown sits uneasily. Across the sea William of Normandy is sharpening his sword, and Edgar Ætheling has not forgotten his rights."
+    desc_independent: "You rule [root.title_name] and pay tribute to no one. Your neighbours watch your every move."
+    a: Let the reign begin!
+  war.0001:
+    t: War!
+    desc: "[scope:attacker] has declared war on us! Raise your armies (Military tab) before the enemy invades our lands."
+    a: To arms!
+  feast.0001:
+    t: The Feast
+    desc: "The tables groan with food, wine flows like a river, and minstrels sing of your ancestors' deeds."
+    a: Make merry with everyone!
+    b: Keep my dignity
+  feast.0002:
+    t: Drunken Brawl
+    desc: "Well into their cups, [scope:brawler] has started a fight with a neighbour at the table."
+    a: Stop this disgrace at once
+    b: Laugh along with the guests
+  hunt.0001:
+    t: The Hunt
+    desc: "The hounds have flushed a magnificent stag. The huntsmen sound their horns."
+    a: Spur my horse to a gallop!
+    b: Enjoy a leisurely ride
+  hunt.0002:
+    t: The Wounded Boar
+    desc: "A huge enraged boar bursts from the bushes and charges straight at you!"
+    a: Meet it with my spear
+    b: Fall back to my retinue
+  pilgrimage.0001:
+    t: On the Road
+    desc: "You leave your affairs to your advisors and set out for the holy places."
+    a: Walk humbly, like a simple pilgrim
+    b: Travel in fitting luxury (−50 gold)
+  pilgrimage.0002:
+    t: The Pilgrim Returns
+    desc: "You have returned home, renewed in body and soul."
+    a: Praise the Lord

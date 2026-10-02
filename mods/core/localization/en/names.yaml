@@ -1,0 +1,85 @@
+# Names that differ from their raw key. Everything else is shown as-is.
+name:
+  Nameless: Nameless
+  Ponc: Ponç
+  Sanc: Sanç
+  Gillebrigte: Gille Brigte
+  Maelsnechtai: Máel Snechtai
+  Maelsechnaill: Máel Sechnaill
+  Donnsleibe: Donn Sléibe
+  Ruaidri: Ruaidrí
+  Etienne: Étienne
+  Ingibiorg: Ingibjörg
+  Aed: Áed
+  Judicael: Judicaël
+  Erispoe: Erispoë
+  Grainne: Gráinne
+  Mor: Mór
+  Aelfric: Ælfric
+  Aethelred: Æthelred
+  Aelfgar: Ælfgar
+  Aelfgifu: Ælfgifu
+  Aethelflaed: Æthelflæd
+
+dynasty:
+  godwin: Godwinson
+  leofwine: of Mercia
+  siward: Siwardson
+  bamburgh: of Bamburgh
+  wessex: of Wessex
+  normandy: of Normandy
+  conteville: de Conteville
+  montgomery: de Montgomery
+  capet: Capet
+  capet_burgundy: of Burgundy
+  rurikid: Rurikid
+  flanders: of Flanders
+  hainaut: of Hainaut
+  boulogne: of Boulogne
+  ponthieu: de Ponthieu
+  vermandois: de Vermandois
+  blois: de Blois
+  anjou: of Anjou
+  poitiers: de Poitiers
+  rennes: of Rennes
+  cornouaille: de Cornouaille
+  dunkeld: Dunkeld
+  moray: of Moray
+  orkney: of Orkney
+  arnmodlingar: Arnmødling
+  mathrafal: Mathrafal
+  dinefwr: Dinefwr
+  morgannwg: of Morgannwg
+  gwynllwg: of Gwynllwg
+  ui_chennselaig: Uí Chennselaig
+  ui_briain: Ua Briain
+  ui_conchobair: Ua Conchobair
+  clann_cholmain: Ua Máel Sechnaill
+  mac_lochlainn: Mac Lochlainn
+  dal_fiatach: Dál Fiatach
+  ui_imair: Uí Ímair
+
+dynasty_pattern:
+  english: "{name}ing"
+  norman: "de {place}"
+  french: "de {place}"
+  occitan: "de {place}"
+  breton: "de {place}"
+  flemish: "van {place}"
+  welsh: "ap {name}"
+  scottish: "mac {name}"
+  irish: "Ua {name}"
+  norse: "{name}sson"
+  russian: "{name}ovichi"
+
+nick:
+  bastard: the Bastard
+  curthose: Curthose
+  rufus: Rufus
+  frisian: the Frisian
+  bearded: the Bearded
+  rechin: le Réchin
+  old: the Old
+  mighty: the Mighty
+  canmore: Canmore
+  ban: Bán

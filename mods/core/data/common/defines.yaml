@@ -1,0 +1,151 @@
+# Числовые константы движка. Любой мод может переопределить отдельные
+# значения, просто указав их в своём файле defines — остальные сохранятся.
+defines:
+  start_gold_by_tier: [0, 40, 100, 250, 450]
+  start_prestige_by_tier: [0, 50, 150, 400, 800]
+
+  character:
+    adult_age: 16
+    marriage_age: 16
+    base_health: 5
+    personality_traits: 3
+    base_stats: { fertility: 0.5 }
+    old_age_start: 50
+    old_age_health_per_year: 0.08
+    old_age_prowess_per_year: 0.25
+    old_age_fertility_per_year: 0.015
+    health_mortality_factor: 0.35
+    # [возраст, годовая вероятность смерти]
+    mortality: [[0, 0.035], [5, 0.008], [16, 0.005], [30, 0.008], [40, 0.014], [50, 0.03], [60, 0.06], [70, 0.12], [80, 0.25], [90, 0.5]]
+    min_fertile_age: 16
+    max_fertile_age: 45
+    base_conception: 0.035
+    conception_child_decay: 0.85
+    pregnancy_days: 270
+    childbirth_death_chance: 0.015
+    stress_decay: 2
+    stress_skill_penalty: 1
+    education_level_weights: [30, 40, 22, 8]
+    name_after_relative_chance: 0.25
+    prune_after_years: 60
+
+  court:
+    min_courtiers_by_tier: [0, 2, 3, 4, 5]
+    max_courtiers_by_tier: [0, 6, 9, 12, 15]
+    noble_courtier_chance: 0.5
+
+  setup:
+    female_ruler_chance: 0.03
+    married_chance: 0.75
+
+  economy:
+    development_tax: 0.02
+    development_levy: 0.01
+    tax_skill: stewardship
+    tax_per_skill: 0.02
+    domain_skill: stewardship
+    domain_limit_base: 2
+    domain_limit_per_skill: 5
+    domain_limit_by_tier: [0, 0, 1, 2, 3]
+    over_domain_penalty: 0.2
+    vassal_tax_share: 0.15
+    vassal_levy_share: 0.35
+    levy_maintenance_per_100: 0.25
+    monthly_prestige_by_tier: [0, 0.2, 0.5, 1.0, 1.5]
+    piety_per_learning: 0.03
+    debt_prestige_divisor: 50
+    dynasty_prestige_share: 0.1
+
+  development:
+    base_growth: 0.12
+    growth_per_stewardship: 0.01
+    max: 100
+
+  buildings:
+    slots_per_holding: 2
+
+  military:
+    speed: 12            # пикселей карты в день
+    min_army: 50
+    min_levy_ratio: 0.1
+    levy_regen: 0.05
+    martial_bonus: 0.04
+    battle_luck_min: 0.85
+    battle_luck_max: 1.15
+    loser_loss_base: 0.25
+    loser_loss_scale: 0.4
+    winner_loss_base: 0.05
+    winner_loss_scale: 0.2
+    battle_score_min: 5
+    battle_score_max: 25
+    battle_prestige: 20
+    loser_commander_death: 0.04
+    winner_commander_death: 0.01
+    siege_per_fort: 800
+    siege_base: 400
+    siege_speed: 3
+    siege_max_daily: 12
+
+  war:
+    target_weight: 70
+    max_battle_score: 50
+    capital_bonus: 15
+    max_ticking: 25
+    ticking_gain: 2
+    ticking_loss: 1
+    defender_ticking_after_months: 12
+    truce_years: 5
+    ally_min_opinion: -10
+    ai_surrender_threshold: 75
+    min_surrender_threshold: 40
+    fatigue_after_years: 2
+    fatigue_per_year: 6
+    white_peace_years: 3
+    white_peace_max_score: 30
+    white_peace_losing: 25
+
+  ai:
+    war_check_chance: 0.35
+    war_strength_ratio: 1.3
+    base_war_chance: 0.2
+    enforce_at: 50
+    surrender_to_player_at: 90
+    max_targets_per_interaction: 12
+    max_interaction_chance: 90
+    marriage_chance: 0.5
+    gold_reserve: 60
+    build_chance: 0.3
+
+  opinion:
+    same_culture: 5
+    different_culture: -10
+    same_faith: 5
+    different_faith: -30
+    spouse: 20
+    parent: 20
+    child: 20
+    sibling: 10
+    same_dynasty: 5
+    liege_base: 0
+    holds_my_claim: -15
+
+  titles:
+    create_fraction: 0.51
+    create_cost:
+      duchy: { gold: 100, prestige: 300 }
+      kingdom: { gold: 300, prestige: 800 }
+      empire: { gold: 600, prestige: 1600 }
+    usurp_cost:
+      duchy: { gold: 0, prestige: 400 }
+      kingdom: { gold: 0, prestige: 1000 }
+      empire: { gold: 0, prestige: 2000 }
+
+  schemes:
+    max_success: 95
+
+  succession:
+    default_law: partition
+    max_partition_heirs: 4
+
+  # Характеристики, доступные в скриптах как значения (gold, age и навыки — встроены).
+  script_stat_values: [general_opinion, vassal_opinion, monthly_prestige, monthly_piety, commander_advantage, levy_flat]

@@ -1,0 +1,97 @@
+# Цепочки событий для решений: пир, охота, паломничество.
+events:
+  feast.0001:
+    theme: feast
+    icon: "🍖"
+    triggered_only: true
+    options:
+      - effect:
+          add_prestige: 40
+          add_stress: -25
+          add_modifier: { id: recent_feast, years: 2 }
+          every_vassal: { add_opinion: { target: root, modifier: feast_guest } }
+          random: { chance: 35, trigger_event: { id: feast.0002, days: 2 } }
+        ai_chance: { value: 30, add: { value: ai_sociability, multiply: 10 } }
+      - effect:
+          add_prestige: 60
+          add_stress: -10
+          every_vassal: { add_opinion: { target: root, modifier: feast_guest } }
+        ai_chance: 30
+
+  feast.0002:
+    theme: feast
+    icon: "🍺"
+    triggered_only: true
+    trigger: { any_vassal: { is_adult: yes } }
+    immediate:
+      random_vassal: { save_scope_as: brawler }
+    options:
+      - effect:
+          add_prestige: 15
+          scope:brawler: { add_opinion: { target: root, modifier: humiliated, value: -10 } }
+      - effect:
+          add_stress: -10
+          scope:brawler: { add_opinion: { target: root, modifier: grateful } }
+
+  hunt.0001:
+    theme: hunt
+    icon: "🦌"
+    triggered_only: true
+    options:
+      - effect:
+          random_list:
+            - weight: 50
+              add_modifier: { id: hunting_trophy, years: 5 }
+              add_prestige: 30
+            - weight: 30
+              add_stress: -20
+            - weight: 20
+              trigger_event: { id: hunt.0002, days: 1 }
+        ai_chance: { value: 40, add: { value: ai_boldness, multiply: 10 } }
+      - effect:
+          add_stress: -30
+        ai_chance: 40
+
+  hunt.0002:
+    theme: hunt
+    icon: "🐗"
+    triggered_only: true
+    options:
+      - effect:
+          random_list:
+            - weight: 60
+              add_trait: hunter
+              add_prestige: 50
+            - weight: 32
+              add_trait: wounded
+            - weight: 8
+              death: { reason: hunting }
+        ai_chance: { value: 30, add: { value: ai_boldness, multiply: 15 } }
+      - effect:
+          add_prestige: -20
+        ai_chance: 50
+
+  pilgrimage.0001:
+    theme: faith
+    icon: "🧭"
+    triggered_only: true
+    options:
+      - effect:
+          add_piety: 30
+          trigger_event: { id: pilgrimage.0002, days: 120 }
+      - trigger: { gold: 50 }
+        effect:
+          add_gold: -50
+          add_prestige: 40
+          trigger_event: { id: pilgrimage.0002, days: 90 }
+
+  pilgrimage.0002:
+    theme: faith
+    icon: "✝"
+    triggered_only: true
+    options:
+      - effect:
+          add_trait: pilgrim
+          add_piety: 100
+          add_stress: -30
+          add_modifier: { id: pilgrim_blessing, years: 5 }

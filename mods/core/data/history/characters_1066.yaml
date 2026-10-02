@@ -1,0 +1,382 @@
+# Исторические персонажи. Персонажи, умершие до даты закладки, нужны для
+# семейного древа. Навыки, не указанные явно, генерируются.
+dynasties:
+  godwin: { culture: english, prestige: 300 }
+  leofwine: { culture: english, prestige: 150 }
+  siward: { culture: english, prestige: 100 }
+  bamburgh: { culture: english, prestige: 100 }
+  wessex: { culture: english, prestige: 800 }
+  normandy: { culture: norman, prestige: 400 }
+  conteville: { culture: norman, prestige: 50 }
+  montgomery: { culture: norman, prestige: 50 }
+  capet: { culture: french, prestige: 700 }
+  capet_burgundy: { culture: french, prestige: 250 }
+  rurikid: { culture: russian, prestige: 500 }
+  flanders: { culture: flemish, prestige: 350 }
+  hainaut: { culture: flemish, prestige: 100 }
+  boulogne: { culture: french, prestige: 120 }
+  ponthieu: { culture: french, prestige: 60 }
+  vermandois: { culture: french, prestige: 150 }
+  blois: { culture: french, prestige: 250 }
+  anjou: { culture: french, prestige: 200 }
+  poitiers: { culture: french, prestige: 250 }
+  rennes: { culture: breton, prestige: 150 }
+  cornouaille: { culture: breton, prestige: 80 }
+  dunkeld: { culture: scottish, prestige: 250 }
+  moray: { culture: scottish, prestige: 100 }
+  orkney: { culture: norse, prestige: 150 }
+  arnmodlingar: { culture: norse, prestige: 80 }
+  mathrafal: { culture: welsh, prestige: 150 }
+  dinefwr: { culture: welsh, prestige: 120 }
+  morgannwg: { culture: welsh, prestige: 80 }
+  gwynllwg: { culture: welsh, prestige: 40 }
+  ui_chennselaig: { culture: irish, prestige: 200 }
+  ui_briain: { culture: irish, prestige: 250 }
+  ui_conchobair: { culture: irish, prestige: 120 }
+  clann_cholmain: { culture: irish, prestige: 120 }
+  mac_lochlainn: { culture: irish, prestige: 100 }
+  dal_fiatach: { culture: irish, prestige: 80 }
+  ui_imair: { culture: norse, prestige: 120 }
+
+characters:
+  # =========================================================== Англия
+  godwin_sr: { name: Godwin, dynasty: godwin, culture: english, faith: catholic, birth: "1001.1.1", death: "1053.4.15", spouse: gytha_thorkel }
+  gytha_thorkel: { name: Gytha, female: true, dynasty: arnmodlingar, culture: norse, faith: catholic, birth: "997.1.1", court: harold, traits: [zealous, stubborn, generous] }
+  harold:
+    name: Harold
+    dynasty: godwin
+    culture: english
+    faith: catholic
+    birth: "1022.3.1"
+    father: godwin_sr
+    mother: gytha_thorkel
+    spouse: ealdgyth
+    traits: [brave, ambitious, diligent, education_martial_4, strong]
+    skills: { diplomacy: 10, martial: 13, stewardship: 8, intrigue: 7, learning: 5, prowess: 14 }
+    gold: 200
+    prestige: 700
+    dna: { hair: 0.75, skin: 0.15 }
+  edith_swanneck: { name: Edith, female: true, culture: english, faith: catholic, birth: "1025.1.1", court: harold, traits: [beautiful] }
+  godwin_h: { name: Godwin, dynasty: godwin, culture: english, faith: catholic, birth: "1049.1.1", father: harold, mother: edith_swanneck }
+  edmund_h: { name: Edmund, dynasty: godwin, culture: english, faith: catholic, birth: "1050.1.1", father: harold, mother: edith_swanneck }
+  magnus_h: { name: Magnus, dynasty: godwin, culture: english, faith: catholic, birth: "1051.6.1", father: harold, mother: edith_swanneck }
+  gytha_h: { name: Gytha, female: true, dynasty: godwin, culture: english, faith: catholic, birth: "1053.1.1", father: harold, mother: edith_swanneck }
+  gunhild_h: { name: Gunhild, female: true, dynasty: godwin, culture: english, faith: catholic, birth: "1055.1.1", father: harold, mother: edith_swanneck }
+  ealdgyth: { name: Ealdgyth, female: true, dynasty: leofwine, culture: english, faith: catholic, birth: "1040.1.1", father: aelfgar }
+  gyrth:
+    name: Gyrth
+    dynasty: godwin
+    culture: english
+    faith: catholic
+    birth: "1032.1.1"
+    father: godwin_sr
+    mother: gytha_thorkel
+    traits: [brave, honest, just, education_martial_2]
+  leofwine_g:
+    name: Leofwine
+    dynasty: godwin
+    culture: english
+    faith: catholic
+    birth: "1035.1.1"
+    father: godwin_sr
+    mother: gytha_thorkel
+    traits: [brave, gregarious, education_diplomacy_2]
+  tostig:
+    name: Tostig
+    dynasty: godwin
+    culture: english
+    faith: catholic
+    birth: "1026.1.1"
+    father: godwin_sr
+    mother: gytha_thorkel
+    court: malcolm
+    claims: [d_york, d_northumberland]
+    traits: [ambitious, wrathful, vengeful, education_martial_3]
+  wulfnoth: { name: Wulfnoth, dynasty: godwin, culture: english, faith: catholic, birth: "1040.1.1", father: godwin_sr, mother: gytha_thorkel, court: william }
+  edith_wessex: { name: Edith, female: true, dynasty: godwin, culture: english, faith: catholic, birth: "1025.1.1", father: godwin_sr, mother: gytha_thorkel, court: harold, traits: [zealous, chaste, education_learning_3] }
+
+  aelfgar: { name: Aelfgar, dynasty: leofwine, culture: english, faith: catholic, birth: "1002.1.1", death: "1062.1.1" }
+  edwin:
+    name: Edwin
+    dynasty: leofwine
+    culture: english
+    faith: catholic
+    birth: "1042.1.1"
+    father: aelfgar
+    traits: [ambitious, fickle, education_diplomacy_2]
+  morcar:
+    name: Morcar
+    dynasty: leofwine
+    culture: english
+    faith: catholic
+    birth: "1044.1.1"
+    father: aelfgar
+    traits: [ambitious, impatient, education_martial_2]
+  waltheof:
+    name: Waltheof
+    dynasty: siward
+    culture: english
+    faith: catholic
+    birth: "1050.1.1"
+    traits: [brave, zealous, honest, education_martial_2, strong]
+  oswulf: { name: Oswulf, dynasty: bamburgh, culture: english, faith: catholic, birth: "1030.1.1", traits: [vengeful, brave] }
+
+  edward_exile: { name: Edward, dynasty: wessex, culture: english, faith: catholic, birth: "1016.1.1", death: "1057.8.19", spouse: agatha_wessex }
+  agatha_wessex: { name: Agatha, female: true, culture: english, faith: catholic, birth: "1025.1.1", court: harold }
+  edgar_aetheling:
+    name: Edgar
+    dynasty: wessex
+    culture: english
+    faith: catholic
+    birth: "1051.6.1"
+    father: edward_exile
+    mother: agatha_wessex
+    court: harold
+    claims: [k_england]
+    traits: [content, craven, trusting]
+  margaret_wessex: { name: Margaret, female: true, dynasty: wessex, culture: english, faith: catholic, birth: "1045.1.1", father: edward_exile, mother: agatha_wessex, court: harold, traits: [zealous, chaste, compassionate, education_learning_4] }
+  cristina_wessex: { name: Cristina, female: true, dynasty: wessex, culture: english, faith: catholic, birth: "1050.1.1", father: edward_exile, mother: agatha_wessex, court: harold, traits: [zealous] }
+
+  # =========================================================== Нормандия
+  robert_i_normandy: { name: Robert, dynasty: normandy, culture: norman, faith: catholic, birth: "1000.1.1", death: "1035.7.2" }
+  herleva: { name: Lesceline, female: true, culture: norman, faith: catholic, birth: "1003.1.1", death: "1050.1.1" }
+  herluin: { name: Hugh, dynasty: conteville, culture: norman, faith: catholic, birth: "1001.1.1", death: "1066.3.1", spouse: herleva }
+  william:
+    name: William
+    nickname: nick.bastard
+    dynasty: normandy
+    culture: norman
+    faith: catholic
+    birth: "1028.9.1"
+    father: robert_i_normandy
+    mother: herleva
+    spouse: matilda_flanders
+    claims: [k_england]
+    traits: [ambitious, wrathful, diligent, education_martial_4, strong]
+    skills: { diplomacy: 9, martial: 15, stewardship: 11, intrigue: 9, learning: 6, prowess: 13 }
+    gold: 350
+    prestige: 700
+    dna: { hair: 0.35, skin: 0.2 }
+  matilda_flanders: { name: Matilda, female: true, dynasty: flanders, culture: flemish, faith: catholic, birth: "1031.1.1", father: baldwin_v, mother: adela_france, traits: [ambitious, generous, education_stewardship_3] }
+  robert_curthose: { name: Robert, nickname: nick.curthose, dynasty: normandy, culture: norman, faith: catholic, birth: "1051.1.1", father: william, mother: matilda_flanders, traits: [brave, generous, lazy] }
+  richard_n: { name: Richard, dynasty: normandy, culture: norman, faith: catholic, birth: "1054.1.1", father: william, mother: matilda_flanders }
+  adeliza_n: { name: Adeliza, female: true, dynasty: normandy, culture: norman, faith: catholic, birth: "1055.1.1", father: william, mother: matilda_flanders }
+  william_rufus: { name: William, nickname: nick.rufus, dynasty: normandy, culture: norman, faith: catholic, birth: "1056.6.1", father: william, mother: matilda_flanders, traits: [wrathful, arrogant] }
+  cecilia_n: { name: Cecilia, female: true, dynasty: normandy, culture: norman, faith: catholic, birth: "1057.1.1", father: william, mother: matilda_flanders, traits: [zealous] }
+  constance_n: { name: Constance, female: true, dynasty: normandy, culture: norman, faith: catholic, birth: "1061.1.1", father: william, mother: matilda_flanders }
+  agatha_n: { name: Agatha, female: true, dynasty: normandy, culture: norman, faith: catholic, birth: "1064.1.1", father: william, mother: matilda_flanders }
+  odo: { name: Odo, dynasty: conteville, culture: norman, faith: catholic, birth: "1030.1.1", father: herluin, mother: herleva, court: william, traits: [ambitious, deceitful, greedy, education_learning_3] }
+  robert_mortain: { name: Robert, dynasty: conteville, culture: norman, faith: catholic, birth: "1031.1.1", father: herluin, mother: herleva, traits: [content, honest, education_martial_2] }
+  roger_montgomery: { name: Roger, dynasty: montgomery, culture: norman, faith: catholic, birth: "1030.1.1", traits: [diligent, ambitious, education_stewardship_3] }
+
+  # =========================================================== Франция
+  henry_i_france: { name: Henri, dynasty: capet, culture: french, faith: catholic, birth: "1008.5.4", death: "1060.8.4", spouse: anne_kiev }
+  anne_kiev: { name: Anne, female: true, dynasty: rurikid, culture: russian, faith: catholic, birth: "1030.1.1", court: philip, traits: [education_learning_3, zealous, beautiful] }
+  philip:
+    name: Philippe
+    dynasty: capet
+    culture: french
+    faith: catholic
+    birth: "1052.5.23"
+    father: henry_i_france
+    mother: anne_kiev
+    traits: [gluttonous, greedy, lustful]
+    skills: { diplomacy: 8, martial: 5, stewardship: 9, intrigue: 8, learning: 6, prowess: 6 }
+    gold: 250
+  hugh_vermandois: { name: Hugues, dynasty: capet, culture: french, faith: catholic, birth: "1057.1.1", father: henry_i_france, mother: anne_kiev }
+  adela_france: { name: Adele, female: true, dynasty: capet, culture: french, faith: catholic, birth: "1009.1.1", spouse: baldwin_v }
+  baldwin_v:
+    name: Baldwin
+    dynasty: flanders
+    culture: flemish
+    faith: catholic
+    birth: "1012.1.1"
+    traits: [calm, diligent, just, education_diplomacy_4]
+    gold: 300
+  baldwin_vi: { name: Baldwin, dynasty: flanders, culture: flemish, faith: catholic, birth: "1030.1.1", father: baldwin_v, mother: adela_france, spouse: richilde, traits: [calm, honest] }
+  richilde: { name: Richilde, female: true, dynasty: hainaut, culture: flemish, faith: catholic, birth: "1031.1.1", traits: [ambitious, arrogant] }
+  arnulf_f: { name: Arnulf, dynasty: flanders, culture: flemish, faith: catholic, birth: "1055.1.1", father: baldwin_vi, mother: richilde }
+  robert_frisian: { name: Robrecht, nickname: nick.frisian, dynasty: flanders, culture: flemish, faith: catholic, birth: "1035.1.1", father: baldwin_v, mother: adela_france, court: baldwin_v, traits: [ambitious, brave, deceitful] }
+  eustace_ii: { name: Eustache, dynasty: boulogne, culture: french, faith: catholic, birth: "1015.1.1", spouse: ida_lorraine, traits: [ambitious, greedy, brave] }
+  ida_lorraine: { name: Ida, female: true, culture: french, faith: catholic, birth: "1040.1.1", traits: [zealous, chaste] }
+  godfrey_bouillon: { name: Geoffroy, dynasty: boulogne, culture: french, faith: catholic, birth: "1060.9.18", father: eustace_ii, mother: ida_lorraine, traits: [zealous, brave] }
+  baldwin_boulogne: { name: Baudouin, dynasty: boulogne, culture: french, faith: catholic, birth: "1064.1.1", father: eustace_ii, mother: ida_lorraine }
+  guy_ponthieu: { name: Guy, dynasty: ponthieu, culture: french, faith: catholic, birth: "1025.1.1", traits: [greedy, deceitful] }
+  herbert_vermandois: { name: Herbert, dynasty: vermandois, culture: french, faith: catholic, birth: "1032.1.1", traits: [content] }
+  theobald_blois: { name: Thibaut, dynasty: blois, culture: french, faith: catholic, birth: "1019.1.1", traits: [ambitious, diligent, education_stewardship_3] }
+  geoffrey_anjou: { name: Geoffroy, nickname: nick.bearded, dynasty: anjou, culture: french, faith: catholic, birth: "1040.1.1", traits: [arrogant, fickle] }
+  fulk_rechin: { name: Foulques, nickname: nick.rechin, dynasty: anjou, culture: french, faith: catholic, birth: "1043.1.1", court: geoffrey_anjou, traits: [ambitious, deceitful, lustful] }
+  william_aquitaine: { name: Guillaume, dynasty: poitiers, culture: french, faith: catholic, birth: "1025.1.1", traits: [brave, zealous, education_martial_3] }
+  robert_burgundy: { name: Robert, nickname: nick.old, dynasty: capet_burgundy, culture: french, faith: catholic, birth: "1011.1.1", traits: [wrathful, callous, arbitrary] }
+  conan_ii: { name: Conan, dynasty: rennes, culture: breton, faith: catholic, birth: "1033.1.1", traits: [ambitious, brave, stubborn] }
+  hawise_b: { name: Hawise, female: true, dynasty: rennes, culture: breton, faith: catholic, birth: "1037.1.1", spouse: hoel_cornouaille }
+  hoel_cornouaille: { name: Hoel, dynasty: cornouaille, culture: breton, faith: catholic, birth: "1031.1.1", traits: [patient, just] }
+
+  # =========================================================== Шотландия и острова
+  duncan_i: { name: Duncan, dynasty: dunkeld, culture: scottish, faith: catholic, birth: "1001.1.1", death: "1040.8.14" }
+  thorfinn: { name: Thorfinn, nickname: nick.mighty, dynasty: orkney, culture: norse, faith: catholic, birth: "1009.1.1", death: "1065.1.1", spouse: ingibiorg }
+  ingibiorg: { name: Ingibiorg, female: true, dynasty: arnmodlingar, culture: norse, faith: catholic, birth: "1030.1.1", spouse: malcolm }
+  malcolm:
+    name: Malcolm
+    nickname: nick.canmore
+    dynasty: dunkeld
+    culture: scottish
+    faith: catholic
+    birth: "1031.3.26"
+    father: duncan_i
+    traits: [ambitious, brave, wrathful, education_martial_3]
+    skills: { diplomacy: 7, martial: 12, stewardship: 6, intrigue: 8, learning: 4, prowess: 11 }
+  duncan_ii: { name: Duncan, dynasty: dunkeld, culture: scottish, faith: catholic, birth: "1060.1.1", father: malcolm, mother: ingibiorg }
+  donald_m: { name: Donald, dynasty: dunkeld, culture: scottish, faith: catholic, birth: "1062.1.1", father: malcolm, mother: ingibiorg }
+  donald_ban: { name: Donald, nickname: nick.ban, dynasty: dunkeld, culture: scottish, faith: catholic, birth: "1033.1.1", father: duncan_i, court: malcolm, traits: [ambitious, stubborn] }
+  maelsnechtai: { name: Maelsnechtai, dynasty: moray, culture: scottish, faith: catholic, birth: "1048.1.1", traits: [zealous, shy] }
+  paul_orkney: { name: Paul, dynasty: orkney, culture: norse, faith: catholic, birth: "1040.1.1", father: thorfinn, mother: ingibiorg, traits: [just, calm] }
+  erlend_orkney: { name: Erlend, dynasty: orkney, culture: norse, faith: catholic, birth: "1042.1.1", father: thorfinn, mother: ingibiorg, traits: [brave, gregarious] }
+  godred_sitricson: { name: Godred, dynasty: ui_imair, culture: norse, faith: catholic, birth: "1030.1.1", traits: [greedy, brave] }
+
+  # =========================================================== Уэльс
+  bleddyn: { name: Bleddyn, dynasty: mathrafal, culture: welsh, faith: catholic, birth: "1025.1.1", traits: [just, brave, education_diplomacy_3] }
+  rhiwallon: { name: Rhiwallon, dynasty: mathrafal, culture: welsh, faith: catholic, birth: "1026.1.1", traits: [wrathful, brave] }
+  maredudd: { name: Maredudd, dynasty: dinefwr, culture: welsh, faith: catholic, birth: "1030.1.1", traits: [content, calm] }
+  cadwgan: { name: Cadwgan, dynasty: morgannwg, culture: welsh, faith: catholic, birth: "1030.1.1", traits: [patient] }
+  caradog: { name: Caradog, dynasty: gwynllwg, culture: welsh, faith: catholic, birth: "1035.1.1", traits: [ambitious, deceitful, brave] }
+
+  # =========================================================== Ирландия
+  diarmait: { name: Diarmait, dynasty: ui_chennselaig, culture: irish, faith: catholic, birth: "1000.1.1", traits: [ambitious, brave, education_martial_3] }
+  murchad: { name: Murchad, dynasty: ui_chennselaig, culture: irish, faith: catholic, birth: "1030.1.1", father: diarmait, traits: [brave, wrathful] }
+  toirdelbach: { name: Toirdelbach, dynasty: ui_briain, culture: irish, faith: catholic, birth: "1009.1.1", traits: [ambitious, patient, education_diplomacy_3] }
+  muirchertach: { name: Muirchertach, dynasty: ui_briain, culture: irish, faith: catholic, birth: "1050.1.1", father: toirdelbach, traits: [ambitious, brave] }
+  aed_connacht: { name: Aed, dynasty: ui_conchobair, culture: irish, faith: catholic, birth: "1020.1.1", traits: [wrathful, brave] }
+  conchobar_mide: { name: Conchobar, dynasty: clann_cholmain, culture: irish, faith: catholic, birth: "1020.1.1", traits: [stubborn] }
+  ardgar: { name: Ardgar, dynasty: mac_lochlainn, culture: irish, faith: catholic, birth: "1030.1.1", traits: [vengeful] }
+  donnsleibe: { name: Donnsleibe, dynasty: dal_fiatach, culture: irish, faith: catholic, birth: "1040.1.1", traits: [ambitious] }
+
+bookmarks:
+  b1066:
+    date: "1066.9.1"
+    playable: [william, harold, malcolm, philip, baldwin_v, bleddyn, diarmait, toirdelbach, conan_ii]
+    holders:
+      # Англия
+      k_england: harold
+      d_wessex: harold
+      c_winchester: harold
+      c_wiltshire: harold
+      c_dorset: harold
+      c_somerset: harold
+      c_middlesex: harold
+      c_sussex: harold
+      d_east_anglia: gyrth
+      c_norfolk: gyrth
+      c_suffolk: gyrth
+      c_cambridge: gyrth
+      d_kent: leofwine_g
+      c_kent: leofwine_g
+      c_surrey: leofwine_g
+      c_essex: leofwine_g
+      d_mercia: edwin
+      c_stafford: edwin
+      c_chester: edwin
+      c_warwick: edwin
+      d_york: morcar
+      c_york: morcar
+      c_holderness: morcar
+      d_huntingdon: waltheof
+      c_huntingdon: waltheof
+      c_northampton: waltheof
+      d_northumberland: oswulf
+      c_bamburgh: oswulf
+      c_hexham: oswulf
+      # Нормандия и Франция
+      d_normandy: william
+      c_rouen: william
+      c_caux: william
+      c_bayeux: william
+      c_evreux: william
+      c_avranches: robert_mortain
+      c_hiesmes: roger_montgomery
+      c_maine: robert_curthose
+      k_france: philip
+      d_ile_de_france: philip
+      c_paris: philip
+      c_orleans: philip
+      c_senlis: philip
+      c_sens: philip
+      d_flanders: baldwin_v
+      c_bruges: baldwin_v
+      c_ghent: baldwin_v
+      c_ypres: baldwin_v
+      c_artois: baldwin_vi
+      c_boulogne: eustace_ii
+      c_ponthieu: guy_ponthieu
+      c_vermandois: herbert_vermandois
+      d_champagne: theobald_blois
+      d_blois: theobald_blois
+      c_blois: theobald_blois
+      c_chartres: theobald_blois
+      c_troyes: theobald_blois
+      c_meaux: theobald_blois
+      d_anjou: geoffrey_anjou
+      c_anjou: geoffrey_anjou
+      c_tours: geoffrey_anjou
+      d_aquitaine: william_aquitaine
+      c_poitiers: william_aquitaine
+      c_bordeaux: william_aquitaine
+      c_saintonge: william_aquitaine
+      d_burgundy: robert_burgundy
+      c_dijon: robert_burgundy
+      c_autun: robert_burgundy
+      d_brittany: conan_ii
+      c_rennes: conan_ii
+      c_vannes: conan_ii
+      c_cornouaille: hoel_cornouaille
+      c_nantes: hoel_cornouaille
+      # Шотландия и острова
+      k_scotland: malcolm
+      d_albany: malcolm
+      c_gowrie: malcolm
+      c_fife: malcolm
+      c_angus: malcolm
+      c_stirling: malcolm
+      d_moray: maelsnechtai
+      c_moray: maelsnechtai
+      d_orkney: paul_orkney
+      c_orkney: paul_orkney
+      c_caithness: erlend_orkney
+      d_the_isles: godred_sitricson
+      c_man: godred_sitricson
+      # Уэльс
+      d_gwynedd: bleddyn
+      d_powys: bleddyn
+      c_gwynedd: bleddyn
+      c_mon: bleddyn
+      c_powys: rhiwallon
+      d_deheubarth: maredudd
+      c_ystrad_tywi: maredudd
+      c_ceredigion: maredudd
+      d_morgannwg: cadwgan
+      c_morgannwg: cadwgan
+      c_gwent: caradog
+      # Ирландия
+      d_leinster: diarmait
+      c_ui_chennselaig: diarmait
+      c_kildare: diarmait
+      c_dublin: murchad
+      d_munster: toirdelbach
+      c_thomond: toirdelbach
+      c_ormond: toirdelbach
+      c_limerick: muirchertach
+      d_connacht: aed_connacht
+      c_connacht: aed_connacht
+      d_meath: conchobar_mide
+      c_mide: conchobar_mide
+      d_ailech: ardgar
+      c_ailech: ardgar
+      d_ulaid: donnsleibe
+      c_ulaid: donnsleibe
+    alliances:
+      - [william, baldwin_v]
+    vassal_of:
+      robert_curthose: william
+      guy_ponthieu: william
+      rhiwallon: bleddyn
+      muirchertach: toirdelbach

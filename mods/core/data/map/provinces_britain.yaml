@@ -1,0 +1,116 @@
+# Провинции (графства). lat/lon — «зерно» провинции на карте.
+# holdings — владения (castle, city, temple), development — развитие.
+provinces:
+  # --------------------------------------------------- Англия
+  c_winchester:  { lat: 51.06, lon: -1.31, duchy: d_wessex, terrain: farmlands, culture: english, faith: catholic, development: 14, holdings: [castle, city, temple] }
+  c_wiltshire:   { lat: 51.12, lon: -1.9,  duchy: d_wessex, terrain: plains, culture: english, faith: catholic, development: 10, holdings: [castle, temple] }
+  c_dorset:      { lat: 50.75, lon: -2.4,  duchy: d_wessex, terrain: hills, culture: english, faith: catholic, development: 9, holdings: [castle, city] }
+  c_somerset:    { lat: 51.12, lon: -2.75, duchy: d_wessex, terrain: wetlands, culture: english, faith: catholic, development: 9, holdings: [castle, temple] }
+  c_berkshire:   { lat: 51.45, lon: -1.2,  duchy: d_wessex, terrain: farmlands, culture: english, faith: catholic, development: 10, holdings: [castle, city] }
+  c_cornwall:    { lat: 50.42, lon: -4.85, duchy: d_cornwall, terrain: hills, culture: english, faith: catholic, development: 6, holdings: [castle, temple] }
+  c_devon:       { lat: 50.75, lon: -3.65, duchy: d_cornwall, terrain: hills, culture: english, faith: catholic, development: 10, holdings: [castle, city, temple] }
+  c_kent:        { lat: 51.22, lon: 0.9,   duchy: d_kent, terrain: farmlands, culture: english, faith: catholic, development: 13, holdings: [castle, city, temple] }
+  c_sussex:      { lat: 50.95, lon: -0.1,  duchy: d_kent, terrain: forest, culture: english, faith: catholic, development: 10, holdings: [castle, city] }
+  c_surrey:      { lat: 51.25, lon: -0.5,  duchy: d_kent, terrain: forest, culture: english, faith: catholic, development: 8, holdings: [castle, temple] }
+  c_middlesex:   { lat: 51.53, lon: -0.2,  duchy: d_kent, terrain: farmlands, culture: english, faith: catholic, development: 20, holdings: [castle, city, temple] }
+  c_essex:       { lat: 51.82, lon: 0.65,  duchy: d_kent, terrain: farmlands, culture: english, faith: catholic, development: 11, holdings: [castle, city] }
+  c_hertford:    { lat: 51.85, lon: -0.2,  duchy: d_kent, terrain: farmlands, culture: english, faith: catholic, development: 9, holdings: [castle, temple] }
+  c_norfolk:     { lat: 52.68, lon: 1.0,   duchy: d_east_anglia, terrain: farmlands, culture: english, faith: catholic, development: 14, holdings: [castle, city, temple] }
+  c_suffolk:     { lat: 52.2,  lon: 1.0,   duchy: d_east_anglia, terrain: farmlands, culture: english, faith: catholic, development: 11, holdings: [castle, city, temple] }
+  c_cambridge:   { lat: 52.35, lon: 0.15,  duchy: d_east_anglia, terrain: wetlands, culture: english, faith: catholic, development: 9, holdings: [castle, temple] }
+  c_huntingdon:  { lat: 52.45, lon: -0.3,  duchy: d_huntingdon, terrain: farmlands, culture: english, faith: catholic, development: 8, holdings: [castle, temple] }
+  c_northampton: { lat: 52.3,  lon: -0.95, duchy: d_huntingdon, terrain: farmlands, culture: english, faith: catholic, development: 9, holdings: [castle, city] }
+  c_bedford:     { lat: 52.08, lon: -0.5,  duchy: d_huntingdon, terrain: farmlands, culture: english, faith: catholic, development: 8, holdings: [castle, temple] }
+  c_buckingham:  { lat: 51.85, lon: -0.85, duchy: d_huntingdon, terrain: forest, culture: english, faith: catholic, development: 8, holdings: [castle, temple] }
+  c_oxford:      { lat: 51.8,  lon: -1.4,  duchy: d_huntingdon, terrain: farmlands, culture: english, faith: catholic, development: 11, holdings: [castle, city, temple] }
+  c_gloucester:  { lat: 51.82, lon: -2.2,  duchy: d_mercia, terrain: farmlands, culture: english, faith: catholic, development: 11, holdings: [castle, city, temple] }
+  c_worcester:   { lat: 52.2,  lon: -2.2,  duchy: d_mercia, terrain: farmlands, culture: english, faith: catholic, development: 9, holdings: [castle, temple] }
+  c_hereford:    { lat: 52.08, lon: -2.75, duchy: d_mercia, terrain: hills, culture: english, faith: catholic, development: 8, holdings: [castle, temple] }
+  c_shrewsbury:  { lat: 52.7,  lon: -2.75, duchy: d_mercia, terrain: hills, culture: english, faith: catholic, development: 8, holdings: [castle, city] }
+  c_chester:     { lat: 53.15, lon: -2.75, duchy: d_mercia, terrain: plains, culture: english, faith: catholic, development: 9, holdings: [castle, city] }
+  c_stafford:    { lat: 52.8,  lon: -2.1,  duchy: d_mercia, terrain: plains, culture: english, faith: catholic, development: 8, holdings: [castle, temple] }
+  c_warwick:     { lat: 52.35, lon: -1.6,  duchy: d_mercia, terrain: forest, culture: english, faith: catholic, development: 9, holdings: [castle, city] }
+  c_leicester:   { lat: 52.65, lon: -1.15, duchy: d_mercia, terrain: farmlands, culture: english, faith: catholic, development: 9, holdings: [castle, city, temple] }
+  c_derby:       { lat: 53.1,  lon: -1.6,  duchy: d_mercia, terrain: hills, culture: english, faith: catholic, development: 7, holdings: [castle, temple] }
+  c_lincoln:     { lat: 53.25, lon: -0.5,  duchy: d_lincoln, terrain: farmlands, culture: english, faith: catholic, development: 12, holdings: [castle, city, temple] }
+  c_holland:     { lat: 52.9,  lon: -0.2,  duchy: d_lincoln, terrain: wetlands, culture: english, faith: catholic, development: 7, holdings: [castle, city] }
+  c_nottingham:  { lat: 53.05, lon: -1.1,  duchy: d_lincoln, terrain: forest, culture: english, faith: catholic, development: 8, holdings: [castle, city] }
+  c_york:        { lat: 53.95, lon: -1.15, duchy: d_york, terrain: farmlands, culture: english, faith: catholic, development: 14, holdings: [castle, city, temple] }
+  c_holderness:  { lat: 53.85, lon: -0.4,  duchy: d_york, terrain: wetlands, culture: english, faith: catholic, development: 8, holdings: [castle, temple] }
+  c_richmond:    { lat: 54.4,  lon: -1.8,  duchy: d_york, terrain: hills, culture: english, faith: catholic, development: 6, holdings: [castle] }
+  c_cleveland:   { lat: 54.35, lon: -0.9,  duchy: d_york, terrain: hills, culture: english, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_lancaster:   { lat: 53.85, lon: -2.6,  duchy: d_york, terrain: hills, culture: english, faith: catholic, development: 6, holdings: [castle, temple] }
+  c_hallamshire: { lat: 53.45, lon: -1.6,  duchy: d_york, terrain: hills, culture: english, faith: catholic, development: 6, holdings: [castle, city] }
+  c_bamburgh:    { lat: 55.4,  lon: -1.9,  duchy: d_northumberland, terrain: hills, culture: english, faith: catholic, development: 6, holdings: [castle, temple] }
+  c_durham:      { lat: 54.75, lon: -1.65, duchy: d_northumberland, terrain: hills, culture: english, faith: catholic, development: 7, holdings: [castle, temple] }
+  c_hexham:      { lat: 54.98, lon: -2.2,  duchy: d_northumberland, terrain: hills, culture: english, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_carlisle:    { lat: 54.85, lon: -3.0,  duchy: d_northumberland, terrain: hills, culture: english, faith: catholic, development: 5, holdings: [castle] }
+  c_westmorland: { lat: 54.45, lon: -2.75, duchy: d_northumberland, terrain: mountains, culture: english, faith: catholic, development: 4, holdings: [castle] }
+
+  # --------------------------------------------------- Уэльс
+  c_gwynedd:      { lat: 52.95, lon: -3.95, duchy: d_gwynedd, terrain: mountains, culture: welsh, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_mon:          { lat: 53.27, lon: -4.38, duchy: d_gwynedd, terrain: farmlands, culture: welsh, faith: catholic, development: 6, holdings: [castle, temple] }
+  c_rhos:         { lat: 53.15, lon: -3.45, duchy: d_gwynedd, terrain: hills, culture: welsh, faith: catholic, development: 5, holdings: [castle] }
+  c_powys:        { lat: 52.68, lon: -3.35, duchy: d_powys, terrain: mountains, culture: welsh, faith: catholic, development: 4, holdings: [castle] }
+  c_maelienydd:   { lat: 52.35, lon: -3.35, duchy: d_powys, terrain: mountains, culture: welsh, faith: catholic, development: 3, holdings: [castle] }
+  c_brycheiniog:  { lat: 51.98, lon: -3.4,  duchy: d_powys, terrain: mountains, culture: welsh, faith: catholic, development: 4, holdings: [castle, temple] }
+  c_ceredigion:   { lat: 52.28, lon: -3.95, duchy: d_deheubarth, terrain: hills, culture: welsh, faith: catholic, development: 4, holdings: [castle, temple] }
+  c_dyfed:        { lat: 51.85, lon: -4.95, duchy: d_deheubarth, terrain: hills, culture: welsh, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_ystrad_tywi:  { lat: 51.9,  lon: -4.15, duchy: d_deheubarth, terrain: hills, culture: welsh, faith: catholic, development: 5, holdings: [castle] }
+  c_morgannwg:    { lat: 51.6,  lon: -3.5,  duchy: d_morgannwg, terrain: hills, culture: welsh, faith: catholic, development: 6, holdings: [castle, temple] }
+  c_gwent:        { lat: 51.72, lon: -2.95, duchy: d_morgannwg, terrain: hills, culture: welsh, faith: catholic, development: 6, holdings: [castle, city] }
+
+  # --------------------------------------------------- Шотландия
+  c_lothian:      { lat: 55.88, lon: -3.0,  duchy: d_lothian, terrain: plains, culture: scottish, faith: catholic, development: 9, holdings: [castle, city, temple] }
+  c_teviotdale:   { lat: 55.5,  lon: -2.65, duchy: d_lothian, terrain: hills, culture: scottish, faith: catholic, development: 6, holdings: [castle, temple] }
+  c_strathclyde:  { lat: 55.8,  lon: -4.25, duchy: d_strathclyde, terrain: hills, culture: scottish, faith: catholic, development: 7, holdings: [castle, city] }
+  c_carrick:      { lat: 55.3,  lon: -4.55, duchy: d_strathclyde, terrain: hills, culture: scottish, faith: catholic, development: 4, holdings: [castle] }
+  c_galloway:     { lat: 54.95, lon: -4.35, duchy: d_strathclyde, terrain: hills, culture: scottish, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_dumfries:     { lat: 55.2,  lon: -3.55, duchy: d_strathclyde, terrain: hills, culture: scottish, faith: catholic, development: 4, holdings: [castle] }
+  c_fife:         { lat: 56.25, lon: -3.1,  duchy: d_albany, terrain: plains, culture: scottish, faith: catholic, development: 8, holdings: [castle, temple] }
+  c_gowrie:       { lat: 56.45, lon: -3.5,  duchy: d_albany, terrain: hills, culture: scottish, faith: catholic, development: 7, holdings: [castle, temple] }
+  c_stirling:     { lat: 56.15, lon: -4.15, duchy: d_albany, terrain: hills, culture: scottish, faith: catholic, development: 5, holdings: [castle] }
+  c_atholl:       { lat: 56.8,  lon: -4.0,  duchy: d_albany, terrain: mountains, culture: scottish, faith: catholic, development: 3, holdings: [castle] }
+  c_angus:        { lat: 56.72, lon: -2.9,  duchy: d_albany, terrain: hills, culture: scottish, faith: catholic, development: 6, holdings: [castle, city] }
+  c_moray:        { lat: 57.55, lon: -3.4,  duchy: d_moray, terrain: hills, culture: scottish, faith: catholic, development: 6, holdings: [castle, temple] }
+  c_mar:          { lat: 57.15, lon: -2.5,  duchy: d_moray, terrain: hills, culture: scottish, faith: catholic, development: 5, holdings: [castle, city] }
+  c_buchan:       { lat: 57.5,  lon: -2.2,  duchy: d_moray, terrain: hills, culture: scottish, faith: catholic, development: 4, holdings: [castle] }
+  c_ross:         { lat: 57.7,  lon: -4.7,  duchy: d_moray, terrain: mountains, culture: scottish, faith: catholic, development: 3, holdings: [castle] }
+  c_lochaber:     { lat: 56.95, lon: -5.0,  duchy: d_moray, terrain: mountains, culture: scottish, faith: catholic, development: 3, holdings: [castle] }
+  c_argyll:       { lat: 56.25, lon: -5.15, duchy: d_argyll, terrain: mountains, culture: scottish, faith: catholic, development: 4, holdings: [castle] }
+  c_kintyre:      { lat: 55.55, lon: -5.6,  duchy: d_argyll, terrain: hills, culture: scottish, faith: catholic, development: 3, holdings: [castle] }
+
+  # --------------------------------------------------- Острова и Оркни
+  c_man:          { lat: 54.23, lon: -4.55, duchy: d_the_isles, terrain: hills, culture: norse, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_islay:        { lat: 55.78, lon: -6.25, duchy: d_the_isles, terrain: hills, culture: norse, faith: catholic, development: 3, holdings: [castle, temple] }
+  c_skye:         { lat: 57.35, lon: -6.25, duchy: d_the_isles, terrain: mountains, culture: norse, faith: catholic, development: 3, holdings: [castle] }
+  c_lewis:        { lat: 58.15, lon: -6.6,  duchy: d_the_isles, terrain: hills, culture: norse, faith: catholic, development: 3, holdings: [castle] }
+  c_uist:         { lat: 57.4,  lon: -7.32, duchy: d_the_isles, terrain: wetlands, culture: norse, faith: catholic, development: 2, holdings: [castle] }
+  c_orkney:       { lat: 59.0,  lon: -3.05, duchy: d_orkney, terrain: plains, culture: norse, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_caithness:    { lat: 58.45, lon: -3.4,  duchy: d_orkney, terrain: plains, culture: norse, faith: catholic, development: 4, holdings: [castle] }
+  c_sutherland:   { lat: 58.15, lon: -4.4,  duchy: d_orkney, terrain: mountains, culture: norse, faith: catholic, development: 2, holdings: [castle] }
+
+  # --------------------------------------------------- Ирландия
+  c_ulaid:          { lat: 54.4,  lon: -5.9,  duchy: d_ulaid, terrain: hills, culture: irish, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_dal_araide:     { lat: 54.85, lon: -6.3,  duchy: d_ulaid, terrain: hills, culture: irish, faith: catholic, development: 4, holdings: [castle] }
+  c_ailech:         { lat: 54.9,  lon: -7.3,  duchy: d_ailech, terrain: hills, culture: irish, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_tir_conaill:    { lat: 54.9,  lon: -8.05, duchy: d_ailech, terrain: mountains, culture: irish, faith: catholic, development: 3, holdings: [castle] }
+  c_airgialla:      { lat: 54.3,  lon: -6.8,  duchy: d_ailech, terrain: hills, culture: irish, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_connacht:       { lat: 53.65, lon: -8.4,  duchy: d_connacht, terrain: plains, culture: irish, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_breifne:        { lat: 54.05, lon: -7.7,  duchy: d_connacht, terrain: wetlands, culture: irish, faith: catholic, development: 4, holdings: [castle] }
+  c_umall:          { lat: 53.85, lon: -9.35, duchy: d_connacht, terrain: hills, culture: irish, faith: catholic, development: 3, holdings: [castle] }
+  c_iar_connacht:   { lat: 53.38, lon: -9.3,  duchy: d_connacht, terrain: hills, culture: irish, faith: catholic, development: 3, holdings: [castle] }
+  c_cairbre:        { lat: 54.2,  lon: -8.55, duchy: d_connacht, terrain: hills, culture: irish, faith: catholic, development: 4, holdings: [castle, temple] }
+  c_mide:           { lat: 53.65, lon: -6.75, duchy: d_meath, terrain: plains, culture: irish, faith: catholic, development: 7, holdings: [castle, temple] }
+  c_tethba:         { lat: 53.55, lon: -7.6,  duchy: d_meath, terrain: wetlands, culture: irish, faith: catholic, development: 4, holdings: [castle] }
+  c_dublin:         { lat: 53.33, lon: -6.35, duchy: d_leinster, terrain: plains, culture: norse, faith: catholic, development: 9, holdings: [castle, city, temple] }
+  c_ui_chennselaig: { lat: 52.55, lon: -6.6,  duchy: d_leinster, terrain: hills, culture: irish, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_osraige:        { lat: 52.65, lon: -7.3,  duchy: d_leinster, terrain: plains, culture: irish, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_ui_failge:      { lat: 53.2,  lon: -7.5,  duchy: d_leinster, terrain: wetlands, culture: irish, faith: catholic, development: 4, holdings: [castle] }
+  c_kildare:        { lat: 53.1,  lon: -6.85, duchy: d_leinster, terrain: plains, culture: irish, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_thomond:        { lat: 52.85, lon: -8.95, duchy: d_munster, terrain: hills, culture: irish, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_ormond:         { lat: 52.55, lon: -7.9,  duchy: d_munster, terrain: plains, culture: irish, faith: catholic, development: 6, holdings: [castle, temple] }
+  c_desmond:        { lat: 51.95, lon: -8.65, duchy: d_munster, terrain: hills, culture: irish, faith: catholic, development: 5, holdings: [castle, city] }
+  c_ciarraige:      { lat: 52.1,  lon: -9.65, duchy: d_munster, terrain: mountains, culture: irish, faith: catholic, development: 3, holdings: [castle] }
+  c_deise:          { lat: 52.2,  lon: -7.45, duchy: d_munster, terrain: plains, culture: irish, faith: catholic, development: 5, holdings: [castle, city] }
+  c_limerick:       { lat: 52.5,  lon: -8.65, duchy: d_munster, terrain: plains, culture: irish, faith: catholic, development: 5, holdings: [castle, city] }

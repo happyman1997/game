@@ -1,0 +1,82 @@
+# on_actions — точки, в которых движок «зовёт» контент. Моды могут
+# дописывать события, не трогая чужие файлы:
+#   on_actions:
+#     on_monthly_pulse:
+#       random_events:
+#         events: { my_mod.0001: 10 }      # словари сливаются автоматически
+#     on_death:
+#       events: { $append: [my_mod.0002] } # списки — через $append
+on_actions:
+  on_monthly_pulse:
+    random_events:
+      chance:
+        value: 3
+        if:
+          - limit: { is_player: yes }
+            add: 22
+      events:
+        health.0001: 10
+        health.0002: 8
+        health.0003: 15
+        health.0005: 4
+        court.0001: 8
+        court.0002: 5
+        court.0004: 6
+        court.0005: 6
+        court.0009: 5
+        court.0010: 8
+        court.0011: 8
+        court.0012: 50
+        family.0001: 8
+        family.0002: 5
+        family.0003: 5
+        family.0004: 5
+
+  on_yearly_pulse:
+    random_events:
+      chance:
+        value: 20
+        if:
+          - limit: { is_player: yes }
+            add: 30
+      events:
+        court.0006: 10
+        court.0007: 8
+        court.0008: 6
+        health.0004: 6
+
+  on_stress_level:
+    events: [stress.0001, stress.0002]
+
+  on_death:
+    effect:
+      - save_scope_as: deceased
+      - every_close_family:
+          limit: { is_adult: yes }
+          add_stress: 10
+          if:
+            limit: { is_player: yes }
+            trigger_event: death.0001
+
+  on_battle_won:
+    effect:
+      - change_var: { name: battles_won, add: 1 }
+      - if:
+          limit:
+            var: { name: battles_won, value: ">= 3" }
+            NOT: { has_trait: victorious }
+          add_trait: victorious
+          send_message: { text: msg.became_victorious, kind: good }
+
+  on_player_succession:
+    events: [succession.0001]
+
+  on_player_start:
+    events: [start.0001]
+
+  on_war_started:
+    effect:
+      - scope:defender:
+          if:
+            limit: { is_player: yes }
+            trigger_event: war.0001

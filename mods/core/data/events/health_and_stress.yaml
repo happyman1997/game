@@ -1,0 +1,136 @@
+# Тексты событий берутся из локализации по умолчанию:
+#   заголовок — ev.<id>.t, описание — ev.<id>.d, варианты — ev.<id>.a/.b/.c...
+# Можно указать title/desc/name явно — ключом локализации или прямо текстом.
+events:
+  health.0001:
+    theme: health
+    icon: "🤒"
+    trigger:
+      is_adult: yes
+      NOT: { has_trait: [ill, pneumonic] }
+    weight: { value: 5, add: { value: age, multiply: 0.2 } }
+    cooldown: { years: 3 }
+    immediate:
+      add_trait: ill
+    options:
+      - trigger: { gold: 20 }
+        effect:
+          add_gold: -20
+          random: { chance: 50, remove_trait: ill }
+        ai_chance: 50
+      - effect:
+          add_piety: 15
+          random: { chance: 20, remove_trait: ill }
+        ai_chance: { value: 20, add: { value: ai_zeal, multiply: 10 } }
+      - effect:
+          add_stress: 10
+        ai_chance: 20
+
+  health.0002:
+    theme: health
+    icon: "🫁"
+    trigger:
+      has_trait: ill
+      age: ">= 35"
+    weight: { value: 5, add: { value: age, multiply: 0.3 } }
+    immediate:
+      remove_trait: ill
+      add_trait: pneumonic
+    options:
+      - effect: { add_stress: 15 }
+      - trigger: { gold: 50 }
+        effect:
+          add_gold: -50
+          random: { chance: 40, remove_trait: pneumonic }
+        ai_chance: 80
+
+  health.0003:
+    theme: health
+    icon: "🌤"
+    trigger:
+      has_trait: [ill, pneumonic]
+    weight: 20
+    immediate:
+      - remove_trait: ill
+      - remove_trait: pneumonic
+    options:
+      - effect: { add_piety: 10, add_stress: -10 }
+
+  health.0004:
+    theme: health
+    icon: "🦯"
+    trigger:
+      age: ">= 62"
+      NOT: { has_trait: infirm }
+    weight: { value: 2, add: { value: age, subtract: 60 } }
+    immediate:
+      add_trait: infirm
+    options:
+      - effect: { add_stress: 10 }
+      - effect: { add_piety: 20 }
+
+  health.0005:
+    theme: health
+    icon: "🤺"
+    trigger:
+      is_adult: yes
+      age: "< 50"
+      NOT: { has_trait: [wounded, maimed] }
+    cooldown: { years: 5 }
+    options:
+      - effect:
+          random_list:
+            - weight: 50
+              add_trait: scarred
+              add_prestige: 20
+            - weight: 35
+              add_trait: wounded
+            - weight: 15
+              add_prestige: 30
+        ai_chance: { value: 30, add: { value: ai_boldness, multiply: 10 } }
+      - effect: { add_stress: 5 }
+        ai_chance: 50
+
+  stress.0001:
+    theme: stress
+    icon: "😣"
+    triggered_only: true
+    trigger:
+      stress_level: { gte: 1, lt: 3 }
+    options:
+      - trigger: { NOT: { has_trait: drunkard } }
+        effect:
+          add_trait: drunkard
+          add_stress: -50
+        ai_chance: 20
+      - trigger: { faith: catholic, NOT: { has_trait: flagellant } }
+        effect:
+          add_trait: flagellant
+          add_stress: -50
+          add_piety: 30
+        ai_chance: { value: 10, add: { value: ai_zeal, multiply: 10 } }
+      - trigger: { gold: 30, NOT: { has_trait: reveler } }
+        effect:
+          add_gold: -30
+          add_trait: reveler
+          add_stress: -50
+        ai_chance: { value: 15, add: { value: ai_sociability, multiply: 10 } }
+      - effect:
+          add_stress: -15
+          random: { chance: 35, add_trait: depressed }
+        ai_chance: 20
+
+  stress.0002:
+    theme: stress
+    icon: "💀"
+    triggered_only: true
+    trigger:
+      stress_level: ">= 3"
+    options:
+      - effect:
+          random_list:
+            - weight: 25
+              death: { reason: stress }
+            - weight: 75
+              add_trait: depressed
+              add_stress: -150

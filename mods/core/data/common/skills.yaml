@@ -1,0 +1,9 @@
+# Навыки. Можно добавить свой навык — он автоматически станет доступен
+# в скриптах как значение (например, `cooking: ">= 5"`).
+skills:
+  diplomacy:   { icon: "🗣", color: "#5b8bd6", order: 1 }
+  martial:     { icon: "⚔", color: "#c0504d", order: 2 }
+  stewardship: { icon: "💰", color: "#d4a63a", order: 3 }
+  intrigue:    { icon: "🗡", color: "#8a5bb0", order: 4 }
+  learning:    { icon: "📖", color: "#4a9a6a", order: 5 }
+  prowess:     { icon: "💪", color: "#a5704a", order: 6 }

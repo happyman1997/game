@@ -1,0 +1,258 @@
+# Названия титулов и провинций. Ключ — id титула/провинции.
+# <id>_full — полное название (иначе «<ранг> <название>»),
+# <id>_rank_m / <id>_rank_f — особый титул правителя.
+e_britannia: Британия
+e_britannia_full: Британская империя
+k_england: Англия
+k_wales: Уэльс
+k_scotland: Шотландия
+k_isles: Острова
+k_isles_full: Королевство Островов
+k_ireland: Ирландия
+k_france: Франция
+
+d_wessex: Уэссекс
+d_cornwall: Корнуолл
+d_kent: Кент
+d_east_anglia: Восточная Англия
+d_huntingdon: Хантингдон
+d_mercia: Мерсия
+d_lincoln: Линкольн
+d_york: Йорк
+d_northumberland: Нортумберленд
+d_gwynedd: Гвинед
+d_gwynedd_full: Королевство Гвинед
+d_gwynedd_rank_m: Король
+d_gwynedd_rank_f: Королева
+d_powys: Поуис
+d_powys_full: Королевство Поуис
+d_powys_rank_m: Король
+d_powys_rank_f: Королева
+d_deheubarth: Дехейбарт
+d_deheubarth_full: Королевство Дехейбарт
+d_deheubarth_rank_m: Король
+d_deheubarth_rank_f: Королева
+d_morgannwg: Морганнуг
+d_morgannwg_full: Королевство Морганнуг
+d_morgannwg_rank_m: Король
+d_morgannwg_rank_f: Королева
+d_lothian: Лотиан
+d_strathclyde: Стратклайд
+d_albany: Олбани
+d_moray: Морей
+d_argyll: Аргайл
+d_the_isles: Мэн и Острова
+d_the_isles_full: Королевство Мэн и Острова
+d_the_isles_rank_m: Король
+d_the_isles_rank_f: Королева
+d_orkney: Оркни
+d_orkney_full: Ярлство Оркни
+d_orkney_rank_m: Ярл
+d_orkney_rank_f: Ярл
+d_ulaid: Улад
+d_ulaid_full: Королевство Улад
+d_ulaid_rank_m: Король
+d_ulaid_rank_f: Королева
+d_ailech: Айлех
+d_ailech_full: Королевство Айлех
+d_ailech_rank_m: Король
+d_ailech_rank_f: Королева
+d_connacht: Коннахт
+d_connacht_full: Королевство Коннахт
+d_connacht_rank_m: Король
+d_connacht_rank_f: Королева
+d_meath: Миде
+d_meath_full: Королевство Миде
+d_meath_rank_m: Король
+d_meath_rank_f: Королева
+d_leinster: Лейнстер
+d_leinster_full: Королевство Лейнстер
+d_leinster_rank_m: Король
+d_leinster_rank_f: Королева
+d_munster: Мунстер
+d_munster_full: Королевство Мунстер
+d_munster_rank_m: Король
+d_munster_rank_f: Королева
+d_normandy: Нормандия
+d_brittany: Бретань
+d_flanders: Фландрия
+d_flanders_full: Графство Фландрия
+d_flanders_rank_m: Граф
+d_flanders_rank_f: Графиня
+d_picardy: Пикардия
+d_ile_de_france: Иль-де-Франс
+d_champagne: Шампань
+d_champagne_full: Графство Шампань
+d_champagne_rank_m: Граф
+d_champagne_rank_f: Графиня
+d_blois: Блуа
+d_anjou: Анжу
+d_anjou_full: Графство Анжу
+d_anjou_rank_m: Граф
+d_anjou_rank_f: Графиня
+d_aquitaine: Аквитания
+d_burgundy: Бургундия
+d_auvergne: Овернь
+
+c_winchester: Винчестер
+c_wiltshire: Уилтшир
+c_dorset: Дорсет
+c_somerset: Сомерсет
+c_berkshire: Беркшир
+c_cornwall: Корнуолл
+c_devon: Девон
+c_kent: Кент
+c_sussex: Суссекс
+c_surrey: Суррей
+c_middlesex: Лондон
+c_essex: Эссекс
+c_hertford: Хартфорд
+c_norfolk: Норфолк
+c_suffolk: Суффолк
+c_cambridge: Кембридж
+c_huntingdon: Хантингдон
+c_northampton: Нортгемптон
+c_bedford: Бедфорд
+c_buckingham: Бакингем
+c_oxford: Оксфорд
+c_gloucester: Глостер
+c_worcester: Вустер
+c_hereford: Херефорд
+c_shrewsbury: Шрусбери
+c_chester: Честер
+c_stafford: Стаффорд
+c_warwick: Уорик
+c_leicester: Лестер
+c_derby: Дерби
+c_lincoln: Линкольн
+c_holland: Холланд
+c_nottingham: Ноттингем
+c_york: Йорк
+c_holderness: Холдернесс
+c_richmond: Ричмонд
+c_cleveland: Кливленд
+c_lancaster: Ланкастер
+c_hallamshire: Халламшир
+c_bamburgh: Бамбург
+c_durham: Дарем
+c_hexham: Хексем
+c_carlisle: Карлайл
+c_westmorland: Уэстморленд
+c_gwynedd: Гвинед
+c_mon: Англси
+c_rhos: Рос
+c_powys: Поуис
+c_maelienydd: Майлиенидд
+c_brycheiniog: Брихейниог
+c_ceredigion: Кередигион
+c_dyfed: Дивед
+c_ystrad_tywi: Истрад-Тиви
+c_morgannwg: Морганнуг
+c_gwent: Гвент
+c_lothian: Лотиан
+c_teviotdale: Тевиотдейл
+c_strathclyde: Стратклайд
+c_carrick: Каррик
+c_galloway: Галлоуэй
+c_dumfries: Дамфрис
+c_fife: Файф
+c_gowrie: Гаури
+c_stirling: Стерлинг
+c_atholl: Атолл
+c_angus: Ангус
+c_moray: Морей
+c_mar: Мар
+c_buchan: Бьюкен
+c_ross: Росс
+c_lochaber: Лохабер
+c_argyll: Аргайл
+c_kintyre: Кинтайр
+c_man: Остров Мэн
+c_islay: Айлей
+c_skye: Скай
+c_lewis: Льюис
+c_uist: Уист
+c_orkney: Оркни
+c_caithness: Кейтнесс
+c_sutherland: Сазерленд
+c_ulaid: Улад
+c_dal_araide: Дал-Арайде
+c_ailech: Айлех
+c_tir_conaill: Тир-Конайлл
+c_airgialla: Айргиалла
+c_connacht: Коннахт
+c_breifne: Брефне
+c_umall: Умалл
+c_iar_connacht: Иар-Коннахт
+c_cairbre: Кайрбре
+c_mide: Миде
+c_tethba: Тетба
+c_dublin: Дублин
+c_ui_chennselaig: Уи-Хеннселайг
+c_osraige: Осрайге
+c_ui_failge: Уи-Файлге
+c_kildare: Килдэр
+c_thomond: Томонд
+c_ormond: Ормонд
+c_desmond: Десмонд
+c_ciarraige: Киррайге
+c_deise: Дейси
+c_limerick: Лимерик
+c_rouen: Руан
+c_caux: Ко
+c_evreux: Эврё
+c_bayeux: Байё
+c_cotentin: Котантен
+c_avranches: Авранш
+c_hiesmes: Йем
+c_rennes: Ренн
+c_nantes: Нант
+c_vannes: Ванн
+c_cornouaille: Корнуай
+c_leon: Леон
+c_penthievre: Пентьевр
+c_bruges: Брюгге
+c_ghent: Гент
+c_ypres: Ипр
+c_artois: Артуа
+c_boulogne: Булонь
+c_ponthieu: Понтье
+c_amiens: Амьен
+c_vermandois: Вермандуа
+c_beauvais: Бове
+c_paris: Париж
+c_senlis: Санлис
+c_orleans: Орлеан
+c_sens: Санс
+c_troyes: Труа
+c_meaux: Мо
+c_reims: Реймс
+c_blois: Блуа
+c_chartres: Шартр
+c_anjou: Анжу
+c_tours: Тур
+c_maine: Мэн
+c_poitiers: Пуатье
+c_thouars: Туар
+c_aunis: Онис
+c_saintonge: Сентонж
+c_angouleme: Ангулем
+c_limoges: Лимож
+c_perigord: Перигор
+c_bordeaux: Бордо
+c_dijon: Дижон
+c_auxerre: Осер
+c_nevers: Невер
+c_autun: Отён
+c_chalon: Шалон
+c_clermont: Клермон
+c_bourges: Бурж
+c_bourbon: Бурбон
+w_holland: Голландия (Священная Римская империя)
+w_brabant: Брабант (Священная Римская империя)
+w_lorraine: Лотарингия (Священная Римская империя)
+w_alsace: Эльзас (Священная Римская империя)
+w_franche: Бургундское графство (Священная Римская империя)
+w_lyonnais: Лионне (Священная Римская империя)
+w_toulouse: Тулуза
+w_rouergue: Руэрг

@@ -1,0 +1,129 @@
+# Культуры. Имена — «сырые» ключи: перевод берётся из локализации name.<Имя>.
+# dynasty_pattern — как называются новые династии этой культуры
+# (шаблон из локализации dynasty_pattern.<культура>; {name} — имя, {place} — графство).
+# skin/hair — диапазоны внешности для портретов (0..1).
+cultures:
+  english:
+    group: anglo_saxon
+    color: "#c8504a"
+    skin: [0.05, 0.3]
+    hair: [0.2, 0.9]
+    succession_law: partition
+    dynasty_pattern: name
+    male_names: [Aelfric, Alfred, Aethelred, Alwin, Brihtric, Cuthbert, Eadric, Edwin, Edmund, Edward, Godric, Godwin, Harold, Leofric, Leofwine, Oswulf, Siward, Wulfstan, Wulfnoth, Osgod]
+    female_names: [Aelfgifu, Aethelflaed, Eadgyth, Ealdgyth, Edith, Godgifu, Gunhild, Gytha, Hild, Leofrun, Mildred, Wulfrun]
+  norman:
+    group: frankish
+    color: "#d6a33c"
+    skin: [0.05, 0.3]
+    hair: [0.15, 0.85]
+    succession_law: partition
+    dynasty_pattern: place
+    modifiers: { martial: 1 }
+    male_names: [William, Robert, Richard, Ralph, Roger, Hugh, Walter, Odo, Tancred, Geoffrey, Gilbert, Henry, Nigel, Humphrey, Osbern, Serlo]
+    female_names: [Matilda, Adeliza, Agatha, Cecilia, Constance, Emma, Gunnor, Hawise, Judith, Lesceline, Muriel, Sibyl]
+  french:
+    group: frankish
+    color: "#4d6fb8"
+    skin: [0.08, 0.35]
+    hair: [0.1, 0.7]
+    succession_law: partition
+    dynasty_pattern: place
+    male_names: [Philippe, Hugues, Robert, Henri, Eudes, Thibaut, Raoul, Gauthier, Geoffroy, Foulques, Herbert, Guy, Etienne, Louis, Simon, Baudouin]
+    female_names: [Adele, Anne, Berthe, Constance, Emma, Ermengarde, Hildegarde, Isabelle, Mahaut, Alix, Blanche, Agnes]
+  occitan:
+    group: frankish
+    color: "#8e5aa6"
+    skin: [0.15, 0.45]
+    hair: [0.05, 0.5]
+    succession_law: partition
+    dynasty_pattern: place
+    male_names: [Guilhem, Raimon, Bernat, Ponc, Aimeric, Uc, Peire, Arnaut, Jordan, Sanc, Gaston, Bertran]
+    female_names: [Ermessenda, Almodis, Garsenda, Azalais, Beatritz, Esclarmonda, Guillelma, Tiburga, Sibilla, Maria, Alamanda, Ricsenda]
+  breton:
+    group: celtic
+    color: "#3f8f8a"
+    skin: [0.05, 0.3]
+    hair: [0.1, 0.7]
+    succession_law: partition
+    dynasty_pattern: place
+    male_names: [Alan, Conan, Hoel, Eudon, Judicael, Gurvant, Riwallon, Salomon, Budic, Tanguy, Erispoe, Derrien]
+    female_names: [Hawise, Berthe, Ermengarde, Agnes, Judith, Orguen, Aenor, Gwenn, Enora]
+  welsh:
+    group: celtic
+    color: "#c23b3b"
+    skin: [0.05, 0.3]
+    hair: [0.05, 0.6]
+    succession_law: partition
+    dynasty_pattern: name
+    male_names: [Gruffydd, Bleddyn, Rhiwallon, Owain, Maredudd, Rhys, Cadwgan, Caradog, Hywel, Iorwerth, Madog, Trahaearn, Meurig, Llywelyn, Cynan, Einion]
+    female_names: [Angharad, Gwenllian, Nest, Gwladus, Efa, Senena, Marared, Tangwystl, Gwerful, Lleucu]
+  scottish:
+    group: celtic
+    color: "#3d6ea3"
+    skin: [0.0, 0.25]
+    hair: [0.3, 1.0]
+    succession_law: tanistry
+    dynasty_pattern: name
+    male_names: [Malcolm, Donald, Duncan, Macbeth, Lulach, Aed, Constantine, Kenneth, Gillebrigte, Maelsnechtai, Eochaid, Fergus, Cormac, Alexander, David, Edgar]
+    female_names: [Gruoch, Bethoc, Margaret, Ethne, Muirgel, Cristina, Gormflaith, Dervorgilla, Matilda]
+  irish:
+    group: celtic
+    color: "#3f9a4c"
+    skin: [0.0, 0.25]
+    hair: [0.3, 1.0]
+    succession_law: tanistry
+    dynasty_pattern: name
+    male_names: [Brian, Toirdelbach, Diarmait, Murchad, Donnchad, Conchobar, Aed, Ruaidri, Domnall, Tadc, Niall, Muirchertach, Maelsechnaill, Ardgar, Donnsleibe, Cathal]
+    female_names: [Gormlaith, Derbforgaill, Mor, Sadb, Eithne, Emer, Grainne, Muirenn, Benmide]
+  norse:
+    group: north_germanic
+    color: "#6d7f99"
+    skin: [0.0, 0.15]
+    hair: [0.5, 1.0]
+    succession_law: partition
+    dynasty_pattern: name
+    male_names: [Harald, Magnus, Olaf, Sigurd, Thorfinn, Paul, Erlend, Haakon, Sven, Ragnvald, Godred, Sitric, Ivar, Ketil, Thorkel, Einar]
+    female_names: [Ingibiorg, Ragnhild, Thora, Gyda, Astrid, Sigrid, Gunnhild, Helga, Ingrid, Thorunn]
+  flemish:
+    group: frankish
+    color: "#e0c040"
+    skin: [0.05, 0.25]
+    hair: [0.3, 0.9]
+    succession_law: partition
+    dynasty_pattern: place
+    modifiers: { stewardship: 1 }
+    male_names: [Baldwin, Arnulf, Robrecht, Diederik, Filips, Karel, Willem, Gillis, Hendrik, Jan, Lodewijk, Wouter]
+    female_names: [Adela, Gertrude, Richilde, Judith, Clementia, Machteld, Sibylla, Margaretha, Beatrijs, Johanna]
+  russian:
+    group: east_slavic
+    color: "#b5543a"
+    skin: [0.0, 0.2]
+    hair: [0.3, 0.95]
+    succession_law: tanistry
+    dynasty_pattern: name
+    male_names: [Yaroslav, Vladimir, Izyaslav, Svyatoslav, Vsevolod, Mstislav, Boris, Gleb, Oleg, Igor, Rostislav, Vyacheslav]
+    female_names: [Anna, Elizaveta, Anastasia, Olga, Evpraksia, Predslava, Yanka, Agafya]
+
+faiths:
+  catholic:
+    religion: christianity
+    color: "#d8d0b0"
+    icon: "✝"
+    doctrines: { polygamy: false, divorce: approval }
+    virtues: [chaste, temperate, humble, just, patient, generous, diligent]
+    sins: [lustful, gluttonous, arrogant, arbitrary, impatient, greedy, lazy]
+  orthodox:
+    religion: christianity
+    color: "#b07a3a"
+    icon: "☦"
+    doctrines: { polygamy: false }
+    virtues: [chaste, temperate, humble, zealous]
+    sins: [lustful, gluttonous, arrogant, cynical]
+  norse_pagan:
+    religion: germanic
+    color: "#5a6a8a"
+    icon: "ᚱ"
+    doctrines: { polygamy: true }
+    virtues: [brave, wrathful, gregarious]
+    sins: [craven, shy, content]

@@ -1,0 +1,54 @@
+# Иерархия титулов де-юре. Графства создаются автоматически из провинций
+# (поле duchy у провинции задаёт их де-юре герцогство).
+# Цвет — для режимов карты; capital — столица титула.
+titles:
+  e_britannia: { tier: empire, color: "#7a2430", capital: c_middlesex }
+
+  k_england: { tier: kingdom, liege: e_britannia, color: "#b8342c", capital: c_middlesex }
+  d_wessex: { tier: duchy, liege: k_england, color: "#c4473a", capital: c_winchester }
+  d_cornwall: { tier: duchy, liege: k_england, color: "#a8392d", capital: c_devon }
+  d_kent: { tier: duchy, liege: k_england, color: "#d45c48", capital: c_kent }
+  d_east_anglia: { tier: duchy, liege: k_england, color: "#b04538", capital: c_norfolk }
+  d_huntingdon: { tier: duchy, liege: k_england, color: "#cc6044", capital: c_northampton }
+  d_mercia: { tier: duchy, liege: k_england, color: "#a3402e", capital: c_stafford }
+  d_lincoln: { tier: duchy, liege: k_england, color: "#c2553d", capital: c_lincoln }
+  d_york: { tier: duchy, liege: k_england, color: "#9e3631", capital: c_york }
+  d_northumberland: { tier: duchy, liege: k_england, color: "#944236", capital: c_bamburgh }
+
+  k_wales: { tier: kingdom, liege: e_britannia, color: "#d27a2e", capital: c_gwynedd }
+  d_gwynedd: { tier: duchy, liege: k_wales, color: "#dc8a31", capital: c_gwynedd }
+  d_powys: { tier: duchy, liege: k_wales, color: "#c26a28", capital: c_powys }
+  d_deheubarth: { tier: duchy, liege: k_wales, color: "#e6a040", capital: c_ystrad_tywi }
+  d_morgannwg: { tier: duchy, liege: k_wales, color: "#b25f25", capital: c_morgannwg }
+
+  k_scotland: { tier: kingdom, liege: e_britannia, color: "#2f7f8f", capital: c_gowrie }
+  d_lothian: { tier: duchy, liege: k_scotland, color: "#3a8c9b", capital: c_lothian }
+  d_strathclyde: { tier: duchy, liege: k_scotland, color: "#26707f", capital: c_strathclyde }
+  d_albany: { tier: duchy, liege: k_scotland, color: "#358898", capital: c_gowrie }
+  d_moray: { tier: duchy, liege: k_scotland, color: "#2a7686", capital: c_moray }
+  d_argyll: { tier: duchy, liege: k_scotland, color: "#4296a3", capital: c_argyll }
+
+  k_isles: { tier: kingdom, liege: e_britannia, color: "#5b6f8c", capital: c_man }
+  d_the_isles: { tier: duchy, liege: k_isles, color: "#667b9c", capital: c_man }
+  d_orkney: { tier: duchy, liege: k_isles, color: "#4e6080", capital: c_orkney }
+
+  k_ireland: { tier: kingdom, liege: e_britannia, color: "#3a8f4a", capital: c_mide }
+  d_ulaid: { tier: duchy, liege: k_ireland, color: "#48a258", capital: c_ulaid }
+  d_ailech: { tier: duchy, liege: k_ireland, color: "#357f43", capital: c_ailech }
+  d_connacht: { tier: duchy, liege: k_ireland, color: "#2c733b", capital: c_connacht }
+  d_meath: { tier: duchy, liege: k_ireland, color: "#52a055", capital: c_mide }
+  d_leinster: { tier: duchy, liege: k_ireland, color: "#3d924a", capital: c_ui_chennselaig }
+  d_munster: { tier: duchy, liege: k_ireland, color: "#5cae62", capital: c_ormond }
+
+  k_france: { tier: kingdom, color: "#2f4ea0", capital: c_paris }
+  d_normandy: { tier: duchy, liege: k_france, color: "#c9982e", capital: c_rouen }
+  d_brittany: { tier: duchy, liege: k_france, color: "#2a8a7f", capital: c_rennes }
+  d_flanders: { tier: duchy, liege: k_france, color: "#d9bf3a", capital: c_bruges }
+  d_picardy: { tier: duchy, liege: k_france, color: "#5a74b8", capital: c_amiens }
+  d_ile_de_france: { tier: duchy, liege: k_france, color: "#2a46a0", capital: c_paris }
+  d_champagne: { tier: duchy, liege: k_france, color: "#8a6fb0", capital: c_troyes }
+  d_blois: { tier: duchy, liege: k_france, color: "#7a5ea0", capital: c_blois }
+  d_anjou: { tier: duchy, liege: k_france, color: "#9c3f5a", capital: c_anjou }
+  d_aquitaine: { tier: duchy, liege: k_france, color: "#b07a4a", capital: c_poitiers }
+  d_burgundy: { tier: duchy, liege: k_france, color: "#7a2f4a", capital: c_dijon }
+  d_auvergne: { tier: duchy, liege: k_france, color: "#8a5a3a", capital: c_clermont }

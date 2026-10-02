@@ -1,0 +1,305 @@
+skill:
+  diplomacy: Diplomacy
+  martial: Martial
+  stewardship: Stewardship
+  intrigue: Intrigue
+  learning: Learning
+  prowess: Prowess
+
+trait:
+  brave: Brave
+  craven: Craven
+  calm: Calm
+  wrathful: Wrathful
+  chaste: Chaste
+  lustful: Lustful
+  content: Content
+  ambitious: Ambitious
+  diligent: Diligent
+  lazy: Lazy
+  forgiving: Forgiving
+  vengeful: Vengeful
+  generous: Generous
+  greedy: Greedy
+  gregarious: Gregarious
+  shy: Shy
+  honest: Honest
+  deceitful: Deceitful
+  humble: Humble
+  arrogant: Arrogant
+  just: Just
+  arbitrary: Arbitrary
+  patient: Patient
+  impatient: Impatient
+  temperate: Temperate
+  gluttonous: Gluttonous
+  trusting: Trusting
+  paranoid: Paranoid
+  zealous: Zealous
+  cynical: Cynical
+  compassionate: Compassionate
+  callous: Callous
+  stubborn: Stubborn
+  fickle: Fickle
+  education_diplomacy_1: Naive Appeaser
+  education_diplomacy_2: Adequate Bargainer
+  education_diplomacy_3: Charismatic Negotiator
+  education_diplomacy_4: Grey Eminence
+  education_martial_1: Misguided Warrior
+  education_martial_2: Tough Soldier
+  education_martial_3: Skilled Tactician
+  education_martial_4: Brilliant Strategist
+  education_stewardship_1: Thrifty Clerk
+  education_stewardship_2: Fortune Builder
+  education_stewardship_3: Shrewd Manager
+  education_stewardship_4: Midas Touched
+  education_intrigue_1: Amateurish Plotter
+  education_intrigue_2: Flamboyant Trickster
+  education_intrigue_3: Intricate Webweaver
+  education_intrigue_4: Elusive Shadow
+  education_learning_1: Conscientious Scribe
+  education_learning_2: Insightful Thinker
+  education_learning_3: Astute Theologian
+  education_learning_4: Mastermind Philosopher
+  genius: Genius
+  quick: Quick
+  slow: Slow
+  beautiful: Beautiful
+  pretty: Pretty
+  homely: Homely
+  strong: Strong
+  weak: Weak
+  hale: Hale
+  infertile: Infertile
+  ill: Ill
+  pneumonic: Pneumonic
+  wounded: Wounded
+  maimed: Maimed
+  scarred: Scarred
+  infirm: Infirm
+  depressed: Depressed
+  drunkard: Drunkard
+  flagellant: Flagellant
+  reveler: Reveler
+  hunter: Hunter
+  pilgrim: Pilgrim
+  victorious: Victorious
+  scholar: Scholar
+  conqueror: Conqueror
+
+trait_desc:
+  brave: This character does not back down from danger.
+  craven: Danger makes this character look for the nearest exit.
+  ambitious: Never enough — more land, more power, more glory.
+  genius: This character's mind astonishes everyone.
+  ill: Suffering from an illness that may pass — or kill.
+  pneumonic: A grave lung disease, often fatal.
+  infirm: The years are taking their toll.
+  victorious: Has won several battles and is famed as a commander.
+  conqueror: Famed as a conqueror.
+
+culture:
+  english: English
+  norman: Norman
+  french: French
+  occitan: Occitan
+  breton: Breton
+  welsh: Welsh
+  scottish: Scottish
+  irish: Irish
+  norse: Norse
+  flemish: Flemish
+  russian: Russian
+
+faith:
+  catholic: Catholic
+  orthodox: Orthodox
+  norse_pagan: Ásatrú
+
+terrain:
+  farmlands: Farmlands
+  plains: Plains
+  forest: Forest
+  hills: Hills
+  mountains: Mountains
+  wetlands: Wetlands
+
+holding:
+  castle: Castle
+  city: City
+  temple: Temple
+
+building:
+  walls: Curtain Walls
+  barracks: Barracks
+  training_grounds: Training Grounds
+  farms: Farm Estates
+  market: Market
+  guild_hall: Guild Hall
+  monastery: Monastery
+  cathedral: Cathedral
+  hunting_grounds: Hunting Grounds
+
+succession_law:
+  partition: Partition
+  primogeniture: Primogeniture
+  tanistry: Tanistry
+  equal_primogeniture: Equal Primogeniture
+succession_law_desc:
+  partition: Titles are split between children; the eldest gets the primary one. Realms fragment.
+  primogeniture: The eldest child inherits everything. The realm stays whole.
+  tanistry: The eldest adult member of the dynasty inherits.
+  equal_primogeniture: The eldest child inherits everything regardless of gender.
+
+opinion_modifier:
+  generic: Opinion
+  gift: Gift
+  grateful: Grateful
+  feast_guest: Feast guest
+  granted_title: Granted a title
+  revoked_title: Revoked a title
+  tyranny: Tyranny
+  insulted: Insulted
+  refused_proposal: Refused proposal
+  married_into_family: Married into the family
+  attempted_murder: Attempted murder
+  murdered_relative: Murdered a relative
+  friend: Friend
+  rival: Rival
+  lover: Lover
+  rejected_advances: Rejected advances
+  swayed: Swayed
+  vassalized: Became a vassal
+  released: Released from vassalage
+  alms_given: Gave alms
+  pious_respect: Pious respect
+  humiliated: Humiliated
+  supported: Supported
+
+modifier:
+  recent_feast: Recent Feast
+  pilgrim_blessing: Pilgrim's Blessing
+  grieving: Grieving
+  hunting_trophy: Hunting Trophy
+  inspired: Inspired
+  heartbroken: Heartbroken
+  norman_host: Norman Host
+  royal_coronation: Coronation
+  emergency_taxes: Emergency Taxes
+  well_advised: Well Advised
+  mercenary_band: Mercenary Band
+  bountiful_harvest: Bountiful Harvest
+  poor_harvest: Poor Harvest
+  peasant_unrest: Peasant Unrest
+  trade_fair: Trade Fair
+  new_church: New Church
+
+casus_belli:
+  claim: Claim on a Title
+  de_jure: De Jure Claim
+  independence: War of Independence
+  county_conquest: Raiding Conquest
+  holy_war: Holy War
+casus_belli_desc:
+  claim: Fight for a title you have a claim on. Victory grants the title and its lands.
+  de_jure: Annex counties that rightfully belong to your titles.
+  independence: Throw off the rule of your liege.
+  county_conquest: Take a neighbouring county by the sword.
+  holy_war: Take lands from the infidels.
+
+cb:
+  claim:
+    war_name: "War for [scope:target]"
+  de_jure:
+    war_name: "De jure war for [scope:target]"
+  independence:
+    war_name: "Independence war of [scope:attacker]"
+  county_conquest:
+    war_name: "Conquest of [scope:target]"
+  holy_war:
+    war_name: "Holy war for [scope:target]"
+
+interaction:
+  arrange_marriage: Arrange Marriage
+  send_gift: Send Gift
+  propose_alliance: Propose Alliance
+  offer_vassalization: Offer Vassalization
+  grant_title: Grant Title
+  revoke_title: Revoke Title
+  release_vassal: Release Vassal
+  invite_to_court: Invite to Court
+  befriend: Befriend
+  sway: Sway
+  seduce: Seduce
+  murder: Murder
+  fabricate_claim: Fabricate Claim
+interaction_desc:
+  arrange_marriage: Marry off a member of your family or court. Marrying into a ruling house creates an alliance.
+  send_gift: A gift improves the recipient's opinion of you.
+  propose_alliance: Allies join your wars. Requires a marriage tie.
+  offer_vassalization: Offer a ruler to become your vassal.
+  grant_title: Give a county or duchy to a vassal or courtier.
+  revoke_title: Take a title away from a vassal. Tyranny!
+  release_vassal: Let a vassal go — they become independent.
+  invite_to_court: Invite a character to move to your court.
+  befriend: Start a scheme to become friends.
+  sway: Start a scheme to improve the character's opinion of you.
+  seduce: Start a seduction scheme.
+  murder: Plot a murder. Being discovered has dire consequences.
+  fabricate_claim: Your scribes will "find" documents proving your rights.
+
+scheme:
+  murder: Murder
+  befriend: Befriend
+  sway: Sway
+  seduce: Seduce
+  fabricate_claim: Fabricate Claim
+
+decision:
+  hold_feast: Hold a Feast
+  go_hunting: Go Hunting
+  go_on_pilgrimage: Go on Pilgrimage
+  give_alms: Give Alms
+  seek_solitude: Seek Solitude
+  commission_chronicle: Commission a Chronicle
+  emergency_taxes: Levy Emergency Taxes
+  prepare_invasion_of_england: Prepare the Invasion of England
+  unite_britannia: Unite Britannia
+  hire_mercenaries: Hire Mercenaries
+decision_desc:
+  hold_feast: Invite your vassals to a feast. Prestige, goodwill and some relief from worries.
+  go_hunting: Hunting relieves stress and brings glory — with some luck.
+  go_on_pilgrimage: A long road to the holy places will strengthen your faith.
+  give_alms: Generosity to the poor pleases God.
+  seek_solitude: Withdraw from affairs to recover.
+  commission_chronicle: Chroniclers will glorify your house for ages.
+  emergency_taxes: Fill the treasury quickly — at the price of vassal discontent.
+  prepare_invasion_of_england: Gather a fleet and knights from all over France to take what you were promised.
+  unite_britannia: Proclaim yourself Emperor of Britannia.
+  hire_mercenaries: A mercenary band strengthens your army for a year.
+
+stat:
+  diplomacy: Diplomacy
+  martial: Martial
+  stewardship: Stewardship
+  intrigue: Intrigue
+  learning: Learning
+  prowess: Prowess
+  health: Health
+  fertility: Fertility
+  monthly_prestige: Monthly prestige
+  monthly_piety: Monthly piety
+  monthly_income: Monthly income
+  general_opinion: General opinion
+  vassal_opinion: Vassal opinion
+  attraction_opinion: Attraction
+  stress_gain_mult: Stress gain
+  tax_mult: Taxes
+  levy_mult: Levies
+  levy_flat: Troops
+  domain_limit: Domain limit
+  commander_advantage: Commander advantage
+  fort: Fortifications
+  development_growth: Development growth
+  tax: Tax
+  levy: Levy

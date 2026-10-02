@@ -1,0 +1,305 @@
+skill:
+  diplomacy: Дипломатия
+  martial: Военное дело
+  stewardship: Управление
+  intrigue: Интриги
+  learning: Учёность
+  prowess: Личная доблесть
+
+trait:
+  brave: Храбрый
+  craven: Трусливый
+  calm: Спокойный
+  wrathful: Гневный
+  chaste: Целомудренный
+  lustful: Похотливый
+  content: Довольный
+  ambitious: Честолюбивый
+  diligent: Усердный
+  lazy: Ленивый
+  forgiving: Всепрощающий
+  vengeful: Мстительный
+  generous: Щедрый
+  greedy: Жадный
+  gregarious: Общительный
+  shy: Застенчивый
+  honest: Честный
+  deceitful: Лживый
+  humble: Скромный
+  arrogant: Высокомерный
+  just: Справедливый
+  arbitrary: Своевольный
+  patient: Терпеливый
+  impatient: Нетерпеливый
+  temperate: Умеренный
+  gluttonous: Чревоугодник
+  trusting: Доверчивый
+  paranoid: Параноик
+  zealous: Ревностный
+  cynical: Циник
+  compassionate: Сострадательный
+  callous: Чёрствый
+  stubborn: Упрямый
+  fickle: Непостоянный
+  education_diplomacy_1: Наивный миротворец
+  education_diplomacy_2: Сносный переговорщик
+  education_diplomacy_3: Обаятельный дипломат
+  education_diplomacy_4: Серый кардинал
+  education_martial_1: Заблудший воин
+  education_martial_2: Стойкий солдат
+  education_martial_3: Искусный тактик
+  education_martial_4: Блестящий стратег
+  education_stewardship_1: Бережливый писарь
+  education_stewardship_2: Сборщик богатств
+  education_stewardship_3: Умелый управитель
+  education_stewardship_4: Касание Мидаса
+  education_intrigue_1: Мелкий интриган
+  education_intrigue_2: Хитрый плут
+  education_intrigue_3: Опытный заговорщик
+  education_intrigue_4: Повелитель теней
+  education_learning_1: Прилежный ученик
+  education_learning_2: Начитанный клирик
+  education_learning_3: Мудрый богослов
+  education_learning_4: Светоч учёности
+  genius: Гений
+  quick: Сообразительный
+  slow: Тугодум
+  beautiful: Прекрасный
+  pretty: Миловидный
+  homely: Невзрачный
+  strong: Сильный
+  weak: Слабый
+  hale: Крепкий здоровьем
+  infertile: Бесплодный
+  ill: Болен
+  pneumonic: Воспаление лёгких
+  wounded: Ранен
+  maimed: Покалечен
+  scarred: Покрыт шрамами
+  infirm: Немощный
+  depressed: Подавленный
+  drunkard: Пьяница
+  flagellant: Флагеллант
+  reveler: Кутила
+  hunter: Охотник
+  pilgrim: Паломник
+  victorious: Победоносный
+  scholar: Учёный
+  conqueror: Завоеватель
+
+trait_desc:
+  brave: Этот персонаж не отступает перед опасностью.
+  craven: Опасность заставляет этого персонажа искать спасения в бегстве.
+  ambitious: "Ему всегда мало: больше земель, больше власти, больше славы."
+  genius: Ум этого персонажа поражает всех вокруг.
+  ill: Персонаж страдает от недуга, который может пройти — или убить.
+  pneumonic: Тяжёлая болезнь лёгких, нередко смертельная.
+  infirm: Годы берут своё.
+  victorious: Выиграл несколько сражений и прославился как полководец.
+  conqueror: Прославился как завоеватель.
+
+culture:
+  english: Английская
+  norman: Нормандская
+  french: Французская
+  occitan: Окситанская
+  breton: Бретонская
+  welsh: Валлийская
+  scottish: Шотландская
+  irish: Ирландская
+  norse: Скандинавская
+  flemish: Фламандская
+  russian: Русская
+
+faith:
+  catholic: Католичество
+  orthodox: Православие
+  norse_pagan: Асатру
+
+terrain:
+  farmlands: Пашни
+  plains: Равнины
+  forest: Леса
+  hills: Холмы
+  mountains: Горы
+  wetlands: Болота
+
+holding:
+  castle: Замок
+  city: Город
+  temple: Храм
+
+building:
+  walls: Крепостные стены
+  barracks: Казармы
+  training_grounds: Плац
+  farms: Фермы
+  market: Рынок
+  guild_hall: Гильдейский дом
+  monastery: Монастырь
+  cathedral: Собор
+  hunting_grounds: Охотничьи угодья
+
+succession_law:
+  partition: Разделённое наследование
+  primogeniture: Первородство
+  tanistry: Таниство
+  equal_primogeniture: Равное первородство
+succession_law_desc:
+  partition: Титулы делятся между детьми, старший получает основной. Державы дробятся.
+  primogeniture: Всё наследует старший ребёнок. Держава остаётся целой.
+  tanistry: Наследует старший взрослый член династии.
+  equal_primogeniture: Всё наследует старший ребёнок, независимо от пола.
+
+opinion_modifier:
+  generic: Отношение
+  gift: Подарок
+  grateful: Благодарность
+  feast_guest: Гость на пиру
+  granted_title: Пожалован титул
+  revoked_title: Отобран титул
+  tyranny: Тирания
+  insulted: Оскорблён
+  refused_proposal: Отказ в предложении
+  married_into_family: Породнились
+  attempted_murder: Покушение на жизнь
+  murdered_relative: Убийство родича
+  friend: Друг
+  rival: Соперник
+  lover: Возлюбленный
+  rejected_advances: Отвергнутые ухаживания
+  swayed: Расположение
+  vassalized: Принят в вассалы
+  released: Освобождён от вассалитета
+  alms_given: Раздача милостыни
+  pious_respect: Уважение к благочестию
+  humiliated: Унижен
+  supported: Поддержка
+
+modifier:
+  recent_feast: Недавний пир
+  pilgrim_blessing: Благословение паломника
+  grieving: Скорбь
+  hunting_trophy: Охотничий трофей
+  inspired: Вдохновение
+  heartbroken: Разбитое сердце
+  norman_host: Норманнское воинство
+  royal_coronation: Коронация
+  emergency_taxes: Чрезвычайные подати
+  well_advised: Мудрый советник
+  mercenary_band: Наёмный отряд
+  bountiful_harvest: Обильный урожай
+  poor_harvest: Неурожай
+  peasant_unrest: Крестьянские волнения
+  trade_fair: Ярмарка
+  new_church: Новая церковь
+
+casus_belli:
+  claim: Претензия на титул
+  de_jure: Де-юре притязание
+  independence: Война за независимость
+  county_conquest: Набег-завоевание
+  holy_war: Священная война
+casus_belli_desc:
+  claim: Отвоевать титул, на который у вас есть претензия. Победа отдаёт титул и его земли.
+  de_jure: Присоединить графства, по праву входящие в ваши титулы.
+  independence: Сбросить власть сюзерена.
+  county_conquest: Захватить соседнее графство силой меча.
+  holy_war: Отвоевать земли у иноверцев.
+
+cb:
+  claim:
+    war_name: "Война за [scope:target]"
+  de_jure:
+    war_name: "Де-юре война за [scope:target]"
+  independence:
+    war_name: "Война за независимость [scope:attacker]"
+  county_conquest:
+    war_name: "Завоевание: [scope:target]"
+  holy_war:
+    war_name: "Священная война за [scope:target]"
+
+interaction:
+  arrange_marriage: Устроить брак
+  send_gift: Отправить подарок
+  propose_alliance: Предложить союз
+  offer_vassalization: Предложить вассалитет
+  grant_title: Пожаловать титул
+  revoke_title: Отобрать титул
+  release_vassal: Освободить вассала
+  invite_to_court: Пригласить ко двору
+  befriend: Подружиться
+  sway: Расположить к себе
+  seduce: Соблазнить
+  murder: Убить
+  fabricate_claim: Сфабриковать претензию
+interaction_desc:
+  arrange_marriage: Выдайте замуж или жените члена вашей семьи или двора. Брак с правящим домом создаёт союз.
+  send_gift: Подарок улучшит мнение получателя о вас.
+  propose_alliance: Союзники приходят на помощь в войнах. Нужна связь через брак.
+  offer_vassalization: Предложите правителю стать вашим вассалом.
+  grant_title: Отдайте графство или герцогство вассалу или придворному.
+  revoke_title: Отберите титул у вассала. Это тирания!
+  release_vassal: Отпустите вассала — он станет независимым.
+  invite_to_court: Пригласите персонажа переехать к вашему двору.
+  befriend: Начните интригу, чтобы стать друзьями.
+  sway: Начните интригу, чтобы улучшить мнение персонажа о вас.
+  seduce: Начните интригу соблазнения.
+  murder: Начните заговор с целью убийства. Если его раскроют — последствия будут тяжёлыми.
+  fabricate_claim: Ваши писцы «найдут» документы, подтверждающие ваши права.
+
+scheme:
+  murder: Убийство
+  befriend: Дружба
+  sway: Расположение
+  seduce: Соблазнение
+  fabricate_claim: Фабрикация претензии
+
+decision:
+  hold_feast: Устроить пир
+  go_hunting: Отправиться на охоту
+  go_on_pilgrimage: Совершить паломничество
+  give_alms: Раздать милостыню
+  seek_solitude: Уединиться
+  commission_chronicle: Заказать хронику рода
+  emergency_taxes: Ввести чрезвычайные подати
+  prepare_invasion_of_england: Подготовить вторжение в Англию
+  unite_britannia: Объединить Британию
+  hire_mercenaries: Нанять наёмников
+decision_desc:
+  hold_feast: Пригласите вассалов на пир. Престиж, хорошие отношения и отдых от забот.
+  go_hunting: Охота снимает стресс и приносит славу — если повезёт.
+  go_on_pilgrimage: Долгий путь к святым местам укрепит вашу веру.
+  give_alms: Щедрость к бедным угодна Богу.
+  seek_solitude: Удалитесь от дел, чтобы прийти в себя.
+  commission_chronicle: Летописцы прославят ваш род в веках.
+  emergency_taxes: Быстро пополнить казну — ценой недовольства вассалов.
+  prepare_invasion_of_england: Соберите флот и рыцарей со всей Франции, чтобы взять то, что вам обещано.
+  unite_britannia: Провозгласите себя императором Британии.
+  hire_mercenaries: Наёмный отряд усилит армию на год.
+
+stat:
+  diplomacy: Дипломатия
+  martial: Военное дело
+  stewardship: Управление
+  intrigue: Интриги
+  learning: Учёность
+  prowess: Доблесть
+  health: Здоровье
+  fertility: Плодовитость
+  monthly_prestige: Престиж в месяц
+  monthly_piety: Благочестие в месяц
+  monthly_income: Доход в месяц
+  general_opinion: Общее мнение
+  vassal_opinion: Мнение вассалов
+  attraction_opinion: Привлекательность
+  stress_gain_mult: Получение стресса
+  tax_mult: Налоги
+  levy_mult: Ополчение
+  levy_flat: Войска
+  domain_limit: Лимит домена
+  commander_advantage: Преимущество полководца
+  fort: Укрепления
+  development_growth: Рост развития
+  tax: Налог
+  levy: Ополчение

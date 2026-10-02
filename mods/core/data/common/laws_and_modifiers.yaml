@@ -1,0 +1,74 @@
+# Законы наследования. algorithm — имя алгоритма из реестра движка:
+# partition (разделение), primogeniture (первородство), seniority (старшинство).
+# Моды могут добавить свои алгоритмы на JS.
+succession_laws:
+  partition:
+    algorithm: partition
+    gender: male_preference
+    change_cost: { prestige: 200 }
+  primogeniture:
+    algorithm: primogeniture
+    gender: male_preference
+    change_cost: { prestige: 500 }
+    can_change:
+      tier: ">= duchy"
+      custom_tooltip:
+        text: ui.need_learning_8
+        trigger: { learning: 8 }
+  tanistry:
+    algorithm: seniority
+    gender: male_only
+    change_cost: { prestige: 200 }
+  equal_primogeniture:
+    algorithm: primogeniture
+    gender: equal
+    change_cost: { prestige: 800 }
+    can_change:
+      tier: ">= kingdom"
+
+# Модификаторы мнения: value — величина, decay — убывание в месяц,
+# years/months — срок действия, stacking — можно ли получить несколько раз.
+opinion_modifiers:
+  generic: { value: 10 }
+  gift: { value: 20, decay: 1 }
+  grateful: { value: 15, years: 5 }
+  feast_guest: { value: 10, years: 3 }
+  granted_title: { value: 30, decay: 0.5 }
+  revoked_title: { value: -50, decay: 0.3 }
+  tyranny: { value: -15, years: 5, stacking: true }
+  insulted: { value: -20, decay: 0.5 }
+  refused_proposal: { value: -10, years: 2 }
+  married_into_family: { value: 15, years: 10 }
+  attempted_murder: { value: -60, decay: 0.3 }
+  murdered_relative: { value: -80, decay: 0.2 }
+  friend: { value: 60 }
+  rival: { value: -60 }
+  lover: { value: 50 }
+  rejected_advances: { value: -15, years: 3 }
+  swayed: { value: 25, years: 10 }
+  vassalized: { value: 10, years: 10 }
+  released: { value: 40, years: 15 }
+  alms_given: { value: 5, years: 3 }
+  pious_respect: { value: 10, years: 5 }
+  humiliated: { value: -25, decay: 0.5 }
+  supported: { value: 20, years: 5 }
+
+# Временные модификаторы персонажей и провинций.
+modifiers:
+  recent_feast: { icon: "🍖", modifiers: { diplomacy: 1, general_opinion: 5 }, good: true }
+  pilgrim_blessing: { icon: "🙏", modifiers: { monthly_piety: 0.5, health: 0.5 }, good: true }
+  grieving: { icon: "🖤", modifiers: { diplomacy: -2, stewardship: -1, learning: -1 } }
+  hunting_trophy: { icon: "🦌", modifiers: { monthly_prestige: 0.3, prowess: 1 }, good: true }
+  inspired: { icon: "✨", modifiers: { learning: 2, stewardship: 1 }, good: true }
+  heartbroken: { icon: "💔", modifiers: { diplomacy: -2, stress_gain_mult: 0.2 } }
+  norman_host: { icon: "⚓", modifiers: { levy_flat: 5500, martial: 2, commander_advantage: 10 }, good: true }
+  royal_coronation: { icon: "👑", modifiers: { vassal_opinion: 10, monthly_prestige: 1 }, good: true }
+  emergency_taxes: { icon: "🪙", modifiers: { vassal_opinion: -15 } }
+  well_advised: { icon: "📜", modifiers: { stewardship: 2, diplomacy: 1 }, good: true }
+  mercenary_band: { icon: "🗡", modifiers: { levy_flat: 1000 }, good: true }
+  # провинции
+  bountiful_harvest: { icon: "🌾", modifiers: { tax_mult: 0.25, development_growth: 0.05 }, good: true }
+  poor_harvest: { icon: "🥀", modifiers: { tax_mult: -0.25, levy_mult: -0.1 } }
+  peasant_unrest: { icon: "🔥", modifiers: { tax_mult: -0.3, levy_mult: -0.3 } }
+  trade_fair: { icon: "🎪", modifiers: { tax_mult: 0.3 }, good: true }
+  new_church: { icon: "⛪", modifiers: { development_growth: 0.1 }, good: true }

@@ -1,0 +1,32 @@
+# Оформление событий по темам (цвет рамки и значок по умолчанию).
+event_themes:
+  default: { icon: "📜", color: "#8a6d3b" }
+  health: { icon: "🤒", color: "#4f7a5a" }
+  stress: { icon: "😣", color: "#7a4f6a" }
+  court: { icon: "🏰", color: "#8a6d3b" }
+  realm: { icon: "👑", color: "#9a7a2a" }
+  family: { icon: "👪", color: "#a05a5a" }
+  faith: { icon: "✝", color: "#c8b88a" }
+  war: { icon: "⚔", color: "#8a3a3a" }
+  intrigue: { icon: "🗡", color: "#5a3a7a" }
+  feast: { icon: "🍖", color: "#a0702a" }
+  hunt: { icon: "🦌", color: "#4a6a3a" }
+  death: { icon: "🕯", color: "#444455" }
+
+# Режимы карты, описанные данными: значение считается в скоупе провинции,
+# цвет — интерполяция по gradient между min и max.
+map_modes:
+  development:
+    icon: "📈"
+    order: 50
+    value: development
+    min: 0
+    max: 20
+    gradient: ["#5a3b2a", "#c8a050", "#f0e6a0"]
+  wealth:
+    icon: "💰"
+    order: 60
+    value: tax
+    min: 0
+    max: 6
+    gradient: ["#3a2a2a", "#8a7a2a", "#f0d050"]

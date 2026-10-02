@@ -1,0 +1,70 @@
+provinces:
+  # --------------------------------------------------- Нормандия
+  c_rouen:      { lat: 49.42, lon: 1.15,  duchy: d_normandy, terrain: farmlands, culture: norman, faith: catholic, development: 15, holdings: [castle, city, temple] }
+  c_caux:       { lat: 49.72, lon: 0.75,  duchy: d_normandy, terrain: farmlands, culture: norman, faith: catholic, development: 11, holdings: [castle, temple] }
+  c_evreux:     { lat: 49.0,  lon: 1.15,  duchy: d_normandy, terrain: farmlands, culture: norman, faith: catholic, development: 10, holdings: [castle, temple] }
+  c_bayeux:     { lat: 49.15, lon: -0.5,  duchy: d_normandy, terrain: farmlands, culture: norman, faith: catholic, development: 11, holdings: [castle, city, temple] }
+  c_cotentin:   { lat: 49.35, lon: -1.45, duchy: d_normandy, terrain: hills, culture: norman, faith: catholic, development: 8, holdings: [castle] }
+  c_avranches:  { lat: 48.72, lon: -1.2,  duchy: d_normandy, terrain: hills, culture: norman, faith: catholic, development: 7, holdings: [castle, temple] }
+  c_hiesmes:    { lat: 48.72, lon: 0.15,  duchy: d_normandy, terrain: forest, culture: norman, faith: catholic, development: 8, holdings: [castle] }
+  # --------------------------------------------------- Бретань
+  c_rennes:     { lat: 48.12, lon: -1.65, duchy: d_brittany, terrain: forest, culture: breton, faith: catholic, development: 8, holdings: [castle, city] }
+  c_nantes:     { lat: 47.25, lon: -1.6,  duchy: d_brittany, terrain: farmlands, culture: breton, faith: catholic, development: 10, holdings: [castle, city, temple] }
+  c_vannes:     { lat: 47.75, lon: -2.75, duchy: d_brittany, terrain: hills, culture: breton, faith: catholic, development: 6, holdings: [castle, temple] }
+  c_cornouaille: { lat: 48.05, lon: -4.0, duchy: d_brittany, terrain: hills, culture: breton, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_leon:       { lat: 48.5,  lon: -4.25, duchy: d_brittany, terrain: hills, culture: breton, faith: catholic, development: 5, holdings: [castle] }
+  c_penthievre: { lat: 48.45, lon: -2.85, duchy: d_brittany, terrain: forest, culture: breton, faith: catholic, development: 6, holdings: [castle] }
+  # --------------------------------------------------- Фландрия
+  c_bruges:     { lat: 51.12, lon: 3.15,  duchy: d_flanders, terrain: farmlands, culture: flemish, faith: catholic, development: 16, holdings: [castle, city, temple] }
+  c_ghent:      { lat: 50.98, lon: 3.75,  duchy: d_flanders, terrain: farmlands, culture: flemish, faith: catholic, development: 15, holdings: [castle, city] }
+  c_ypres:      { lat: 50.82, lon: 2.75,  duchy: d_flanders, terrain: farmlands, culture: flemish, faith: catholic, development: 12, holdings: [castle, city] }
+  c_artois:     { lat: 50.35, lon: 2.75,  duchy: d_flanders, terrain: farmlands, culture: french, faith: catholic, development: 12, holdings: [castle, city, temple] }
+  c_boulogne:   { lat: 50.65, lon: 1.8,   duchy: d_flanders, terrain: farmlands, culture: french, faith: catholic, development: 10, holdings: [castle, city] }
+  # --------------------------------------------------- Пикардия
+  c_ponthieu:   { lat: 50.12, lon: 1.85,  duchy: d_picardy, terrain: farmlands, culture: french, faith: catholic, development: 9, holdings: [castle, temple] }
+  c_amiens:     { lat: 49.85, lon: 2.35,  duchy: d_picardy, terrain: farmlands, culture: french, faith: catholic, development: 11, holdings: [castle, city, temple] }
+  c_vermandois: { lat: 49.85, lon: 3.3,   duchy: d_picardy, terrain: farmlands, culture: french, faith: catholic, development: 10, holdings: [castle, temple] }
+  c_beauvais:   { lat: 49.42, lon: 2.05,  duchy: d_picardy, terrain: farmlands, culture: french, faith: catholic, development: 10, holdings: [castle, temple] }
+  # --------------------------------------------------- Иль-де-Франс
+  c_paris:      { lat: 48.85, lon: 2.35,  duchy: d_ile_de_france, terrain: farmlands, culture: french, faith: catholic, development: 18, holdings: [castle, city, temple] }
+  c_senlis:     { lat: 49.2,  lon: 2.65,  duchy: d_ile_de_france, terrain: forest, culture: french, faith: catholic, development: 9, holdings: [castle, temple] }
+  c_orleans:    { lat: 47.9,  lon: 1.95,  duchy: d_ile_de_france, terrain: farmlands, culture: french, faith: catholic, development: 13, holdings: [castle, city, temple] }
+  c_sens:       { lat: 48.2,  lon: 3.3,   duchy: d_ile_de_france, terrain: farmlands, culture: french, faith: catholic, development: 9, holdings: [castle, temple] }
+  # --------------------------------------------------- Шампань и Блуа
+  c_troyes:     { lat: 48.3,  lon: 4.1,   duchy: d_champagne, terrain: farmlands, culture: french, faith: catholic, development: 11, holdings: [castle, city] }
+  c_meaux:      { lat: 48.95, lon: 3.05,  duchy: d_champagne, terrain: farmlands, culture: french, faith: catholic, development: 10, holdings: [castle, city] }
+  c_reims:      { lat: 49.25, lon: 4.05,  duchy: d_champagne, terrain: farmlands, culture: french, faith: catholic, development: 13, holdings: [castle, city, temple] }
+  c_blois:      { lat: 47.6,  lon: 1.3,   duchy: d_blois, terrain: forest, culture: french, faith: catholic, development: 9, holdings: [castle, temple] }
+  c_chartres:   { lat: 48.45, lon: 1.5,   duchy: d_blois, terrain: farmlands, culture: french, faith: catholic, development: 11, holdings: [castle, city, temple] }
+  # --------------------------------------------------- Анжу
+  c_anjou:      { lat: 47.47, lon: -0.55, duchy: d_anjou, terrain: farmlands, culture: french, faith: catholic, development: 11, holdings: [castle, city, temple] }
+  c_tours:      { lat: 47.4,  lon: 0.7,   duchy: d_anjou, terrain: farmlands, culture: french, faith: catholic, development: 12, holdings: [castle, city, temple] }
+  c_maine:      { lat: 48.0,  lon: 0.2,   duchy: d_anjou, terrain: forest, culture: french, faith: catholic, development: 9, holdings: [castle, temple] }
+  # --------------------------------------------------- Аквитания
+  c_poitiers:   { lat: 46.58, lon: 0.35,  duchy: d_aquitaine, terrain: farmlands, culture: french, faith: catholic, development: 11, holdings: [castle, city, temple] }
+  c_thouars:    { lat: 46.85, lon: -0.6,  duchy: d_aquitaine, terrain: farmlands, culture: french, faith: catholic, development: 7, holdings: [castle] }
+  c_aunis:      { lat: 46.25, lon: -1.0,  duchy: d_aquitaine, terrain: farmlands, culture: french, faith: catholic, development: 6, holdings: [castle, city] }
+  c_saintonge:  { lat: 45.75, lon: -0.6,  duchy: d_aquitaine, terrain: farmlands, culture: occitan, faith: catholic, development: 8, holdings: [castle, temple] }
+  c_angouleme:  { lat: 45.65, lon: 0.2,   duchy: d_aquitaine, terrain: hills, culture: occitan, faith: catholic, development: 8, holdings: [castle, temple] }
+  c_limoges:    { lat: 45.83, lon: 1.3,   duchy: d_aquitaine, terrain: hills, culture: occitan, faith: catholic, development: 8, holdings: [castle, city, temple] }
+  c_perigord:   { lat: 45.15, lon: 0.75,  duchy: d_aquitaine, terrain: forest, culture: occitan, faith: catholic, development: 7, holdings: [castle, temple] }
+  c_bordeaux:   { lat: 44.85, lon: -0.6,  duchy: d_aquitaine, terrain: farmlands, culture: occitan, faith: catholic, development: 11, holdings: [castle, city, temple] }
+  # --------------------------------------------------- Бургундия и Овернь
+  c_dijon:      { lat: 47.32, lon: 5.0,   duchy: d_burgundy, terrain: farmlands, culture: french, faith: catholic, development: 11, holdings: [castle, city, temple] }
+  c_auxerre:    { lat: 47.8,  lon: 3.6,   duchy: d_burgundy, terrain: farmlands, culture: french, faith: catholic, development: 9, holdings: [castle, temple] }
+  c_nevers:     { lat: 47.0,  lon: 3.15,  duchy: d_burgundy, terrain: forest, culture: french, faith: catholic, development: 8, holdings: [castle] }
+  c_autun:      { lat: 46.95, lon: 4.3,   duchy: d_burgundy, terrain: hills, culture: french, faith: catholic, development: 7, holdings: [castle, temple] }
+  c_chalon:     { lat: 46.7,  lon: 4.85,  duchy: d_burgundy, terrain: farmlands, culture: french, faith: catholic, development: 8, holdings: [castle, city] }
+  c_clermont:   { lat: 45.78, lon: 3.1,   duchy: d_auvergne, terrain: mountains, culture: occitan, faith: catholic, development: 7, holdings: [castle, temple] }
+  c_bourges:    { lat: 47.08, lon: 2.4,   duchy: d_auvergne, terrain: farmlands, culture: french, faith: catholic, development: 9, holdings: [castle, city, temple] }
+  c_bourbon:    { lat: 46.5,  lon: 3.0,   duchy: d_auvergne, terrain: forest, culture: french, faith: catholic, development: 6, holdings: [castle] }
+
+  # --------------------------------------------------- Непроходимые окраины карты
+  w_holland:    { lat: 52.4,  lon: 5.6,  impassable: true, terrain: wetlands, culture: flemish, faith: catholic }
+  w_brabant:    { lat: 50.9,  lon: 5.2,  impassable: true, terrain: farmlands, culture: flemish, faith: catholic }
+  w_lorraine:   { lat: 49.4,  lon: 5.9,  impassable: true, terrain: hills, culture: french, faith: catholic }
+  w_alsace:     { lat: 48.1,  lon: 6.2,  impassable: true, terrain: forest, culture: french, faith: catholic }
+  w_franche:    { lat: 46.9,  lon: 6.2,  impassable: true, terrain: hills, culture: french, faith: catholic }
+  w_lyonnais:   { lat: 45.6,  lon: 5.6,  impassable: true, terrain: hills, culture: french, faith: catholic }
+  w_toulouse:   { lat: 44.45, lon: 1.6,  impassable: true, terrain: hills, culture: occitan, faith: catholic }
+  w_rouergue:   { lat: 44.5,  lon: 3.5,  impassable: true, terrain: mountains, culture: occitan, faith: catholic }

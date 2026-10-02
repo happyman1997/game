@@ -1,0 +1,255 @@
+e_britannia: Britannia
+e_britannia_full: Empire of Britannia
+k_england: England
+k_wales: Wales
+k_scotland: Scotland
+k_isles: the Isles
+k_isles_full: Kingdom of the Isles
+k_ireland: Ireland
+k_france: France
+
+d_wessex: Wessex
+d_cornwall: Cornwall
+d_kent: Kent
+d_east_anglia: East Anglia
+d_huntingdon: Huntingdon
+d_mercia: Mercia
+d_lincoln: Lincoln
+d_york: York
+d_northumberland: Northumberland
+d_gwynedd: Gwynedd
+d_gwynedd_full: Kingdom of Gwynedd
+d_gwynedd_rank_m: King
+d_gwynedd_rank_f: Queen
+d_powys: Powys
+d_powys_full: Kingdom of Powys
+d_powys_rank_m: King
+d_powys_rank_f: Queen
+d_deheubarth: Deheubarth
+d_deheubarth_full: Kingdom of Deheubarth
+d_deheubarth_rank_m: King
+d_deheubarth_rank_f: Queen
+d_morgannwg: Morgannwg
+d_morgannwg_full: Kingdom of Morgannwg
+d_morgannwg_rank_m: King
+d_morgannwg_rank_f: Queen
+d_lothian: Lothian
+d_strathclyde: Strathclyde
+d_albany: Albany
+d_moray: Moray
+d_argyll: Argyll
+d_the_isles: Mann and the Isles
+d_the_isles_full: Kingdom of Mann and the Isles
+d_the_isles_rank_m: King
+d_the_isles_rank_f: Queen
+d_orkney: Orkney
+d_orkney_full: Jarldom of Orkney
+d_orkney_rank_m: Jarl
+d_orkney_rank_f: Jarl
+d_ulaid: Ulaid
+d_ulaid_full: Kingdom of Ulaid
+d_ulaid_rank_m: King
+d_ulaid_rank_f: Queen
+d_ailech: Ailech
+d_ailech_full: Kingdom of Ailech
+d_ailech_rank_m: King
+d_ailech_rank_f: Queen
+d_connacht: Connacht
+d_connacht_full: Kingdom of Connacht
+d_connacht_rank_m: King
+d_connacht_rank_f: Queen
+d_meath: Meath
+d_meath_full: Kingdom of Meath
+d_meath_rank_m: King
+d_meath_rank_f: Queen
+d_leinster: Leinster
+d_leinster_full: Kingdom of Leinster
+d_leinster_rank_m: King
+d_leinster_rank_f: Queen
+d_munster: Munster
+d_munster_full: Kingdom of Munster
+d_munster_rank_m: King
+d_munster_rank_f: Queen
+d_normandy: Normandy
+d_brittany: Brittany
+d_flanders: Flanders
+d_flanders_full: County of Flanders
+d_flanders_rank_m: Count
+d_flanders_rank_f: Countess
+d_picardy: Picardy
+d_ile_de_france: Île-de-France
+d_champagne: Champagne
+d_champagne_full: County of Champagne
+d_champagne_rank_m: Count
+d_champagne_rank_f: Countess
+d_blois: Blois
+d_anjou: Anjou
+d_anjou_full: County of Anjou
+d_anjou_rank_m: Count
+d_anjou_rank_f: Countess
+d_aquitaine: Aquitaine
+d_burgundy: Burgundy
+d_auvergne: Auvergne
+
+c_winchester: Winchester
+c_wiltshire: Wiltshire
+c_dorset: Dorset
+c_somerset: Somerset
+c_berkshire: Berkshire
+c_cornwall: Cornwall
+c_devon: Devon
+c_kent: Kent
+c_sussex: Sussex
+c_surrey: Surrey
+c_middlesex: London
+c_essex: Essex
+c_hertford: Hertford
+c_norfolk: Norfolk
+c_suffolk: Suffolk
+c_cambridge: Cambridge
+c_huntingdon: Huntingdon
+c_northampton: Northampton
+c_bedford: Bedford
+c_buckingham: Buckingham
+c_oxford: Oxford
+c_gloucester: Gloucester
+c_worcester: Worcester
+c_hereford: Hereford
+c_shrewsbury: Shrewsbury
+c_chester: Chester
+c_stafford: Stafford
+c_warwick: Warwick
+c_leicester: Leicester
+c_derby: Derby
+c_lincoln: Lincoln
+c_holland: Holland
+c_nottingham: Nottingham
+c_york: York
+c_holderness: Holderness
+c_richmond: Richmond
+c_cleveland: Cleveland
+c_lancaster: Lancaster
+c_hallamshire: Hallamshire
+c_bamburgh: Bamburgh
+c_durham: Durham
+c_hexham: Hexham
+c_carlisle: Carlisle
+c_westmorland: Westmorland
+c_gwynedd: Gwynedd
+c_mon: Anglesey
+c_rhos: Rhos
+c_powys: Powys
+c_maelienydd: Maelienydd
+c_brycheiniog: Brycheiniog
+c_ceredigion: Ceredigion
+c_dyfed: Dyfed
+c_ystrad_tywi: Ystrad Tywi
+c_morgannwg: Morgannwg
+c_gwent: Gwent
+c_lothian: Lothian
+c_teviotdale: Teviotdale
+c_strathclyde: Strathclyde
+c_carrick: Carrick
+c_galloway: Galloway
+c_dumfries: Dumfries
+c_fife: Fife
+c_gowrie: Gowrie
+c_stirling: Stirling
+c_atholl: Atholl
+c_angus: Angus
+c_moray: Moray
+c_mar: Mar
+c_buchan: Buchan
+c_ross: Ross
+c_lochaber: Lochaber
+c_argyll: Argyll
+c_kintyre: Kintyre
+c_man: Isle of Man
+c_islay: Islay
+c_skye: Skye
+c_lewis: Lewis
+c_uist: Uist
+c_orkney: Orkney
+c_caithness: Caithness
+c_sutherland: Sutherland
+c_ulaid: Ulaid
+c_dal_araide: Dál nAraidi
+c_ailech: Ailech
+c_tir_conaill: Tír Conaill
+c_airgialla: Airgíalla
+c_connacht: Connacht
+c_breifne: Bréifne
+c_umall: Umall
+c_iar_connacht: Iar Connacht
+c_cairbre: Cairbre
+c_mide: Mide
+c_tethba: Tethba
+c_dublin: Dublin
+c_ui_chennselaig: Uí Chennselaig
+c_osraige: Osraige
+c_ui_failge: Uí Failge
+c_kildare: Kildare
+c_thomond: Thomond
+c_ormond: Ormond
+c_desmond: Desmond
+c_ciarraige: Ciarraige
+c_deise: Déise
+c_limerick: Limerick
+c_rouen: Rouen
+c_caux: Caux
+c_evreux: Évreux
+c_bayeux: Bayeux
+c_cotentin: Cotentin
+c_avranches: Avranches
+c_hiesmes: Hiémois
+c_rennes: Rennes
+c_nantes: Nantes
+c_vannes: Vannes
+c_cornouaille: Cornouaille
+c_leon: Léon
+c_penthievre: Penthièvre
+c_bruges: Bruges
+c_ghent: Ghent
+c_ypres: Ypres
+c_artois: Artois
+c_boulogne: Boulogne
+c_ponthieu: Ponthieu
+c_amiens: Amiens
+c_vermandois: Vermandois
+c_beauvais: Beauvais
+c_paris: Paris
+c_senlis: Senlis
+c_orleans: Orléans
+c_sens: Sens
+c_troyes: Troyes
+c_meaux: Meaux
+c_reims: Reims
+c_blois: Blois
+c_chartres: Chartres
+c_anjou: Anjou
+c_tours: Tours
+c_maine: Maine
+c_poitiers: Poitiers
+c_thouars: Thouars
+c_aunis: Aunis
+c_saintonge: Saintonge
+c_angouleme: Angoulême
+c_limoges: Limoges
+c_perigord: Périgord
+c_bordeaux: Bordeaux
+c_dijon: Dijon
+c_auxerre: Auxerre
+c_nevers: Nevers
+c_autun: Autun
+c_chalon: Chalon
+c_clermont: Clermont
+c_bourges: Bourges
+c_bourbon: Bourbon
+w_holland: Holland (Holy Roman Empire)
+w_brabant: Brabant (Holy Roman Empire)
+w_lorraine: Lorraine (Holy Roman Empire)
+w_alsace: Alsace (Holy Roman Empire)
+w_franche: Free County of Burgundy (Holy Roman Empire)
+w_lyonnais: Lyonnais (Holy Roman Empire)
+w_toulouse: Toulouse
+w_rouergue: Rouergue

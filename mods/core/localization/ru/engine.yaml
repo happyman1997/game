@@ -1,0 +1,179 @@
+# Строки, которые использует движок: ранги, описания эффектов и условий, сообщения.
+tier:
+  county: Графство
+  duchy: Герцогство
+  kingdom: Королевство
+  empire: Империя
+rank:
+  county: { m: Граф, f: Графиня }
+  duchy: { m: Герцог, f: Герцогиня }
+  kingdom: { m: Король, f: Королева }
+  empire: { m: Император, f: Императрица }
+  english:
+    duchy: { m: Эрл, f: Леди }
+  norse:
+    county: { m: Ярл, f: Ярл }
+
+fx:
+  add_gold: "{value} 💰"
+  add_prestige: "{value} престижа"
+  add_piety: "{value} благочестия"
+  add_stress: "{value} стресса"
+  add_health: "{value} к здоровью"
+  add_dynasty_prestige: "{value} престижа династии"
+  add_skill: "{skill} {value}"
+  add_trait: "Получает черту «{value}»"
+  remove_trait: "Теряет черту «{value}»"
+  add_modifier: "Получает «{value}» ({detail})"
+  add_modifier_timed: "Получает «{value}» на {days} мес. ({detail})"
+  remove_modifier: "Теряет «{value}»"
+  add_opinion: "Мнение {who} → {target}: {value} ({mod})"
+  death: "{who} умрёт"
+  add_claim: "Претензия на {value}"
+  marry: "Брак: {a} и {b}"
+  add_hook: "Крюк на {value}"
+  become_vassal_of: "{who} становится вассалом: {liege}"
+  become_independent: "{who} обретает независимость"
+  move_to_court: "{who} переезжает ко двору: {court}"
+  gain_title: "{who} получает: {value}"
+  give_title: "{value} переходит к {to}"
+  annex_war_targets: Цели войны переходят победителю
+  set_succession_law: "Закон наследования: {value}"
+  add_alliance: "Союз с {value}"
+  pay_gold: "Выплатить {value} 💰: {to}"
+  set_nickname: "{who} получает прозвище «{value}»"
+  change_culture: "{who}: культура → {value}"
+  change_faith: "{who}: вера → {value}"
+  add_development: "{place}: развитие {value}"
+  add_building: "{place}: постройка «{value}»"
+  add_province_modifier: "{place}: «{value}»"
+  random: "С вероятностью {chance}%:"
+  random_list: "Одно из:"
+  iter:
+    every: "Каждый ({list}: {n}):"
+    random: "Случайный ({list}):"
+    ordered: "Лучший ({list}):"
+
+tr:
+  is_alive: Должен быть жив
+  is_adult: Должен быть совершеннолетним
+  is_adult.not: Должен быть ребёнком
+  is_child: Должен быть ребёнком
+  is_ruler: Должен владеть землями
+  is_ruler.not: Не должен владеть землями
+  is_landed: Должен владеть землями
+  is_independent: Должен быть независимым
+  is_independent.not: Должен быть вассалом
+  is_married: Должен состоять в браке
+  is_married.not: Не должен состоять в браке
+  is_at_war: Должен вести войну
+  is_at_war.not: Не должен вести войну
+  is_female: Должна быть женщиной
+  is_male: Должен быть мужчиной
+  is_player.not: Не должен быть игроком
+  has_trait: "Нужна черта: {value}"
+  has_modifier: "Нужен модификатор: {value}"
+  culture: "Культура: {value}"
+  faith: "Вера: {value}"
+  same_faith_as: Нужна та же вера
+  is_vassal_of: Должен быть вашим вассалом
+  can_marry: Брак невозможен (возраст, родство или уже в браке)
+  gold: "Нужно золото: {value}"
+  tier: "Нужен ранг: {value}"
+  stress: "Нужен стресс: {value}"
+  health: "Нужно здоровье: {value}"
+
+msg:
+  title_created: "{who} создаёт титул: {title}"
+  title_usurped: "{who} узурпирует титул {title} у {from}"
+  you_now_play: "Теперь вы играете за: {who}"
+  war_declared: "Объявлена война: {name}"
+  war_won_att: "Война окончена победой нападавших: {name}"
+  war_won_def: "Война окончена победой защитников: {name}"
+  war_white_peace: "Белый мир: {name}"
+  battle: "Битва ({place}): {winner} разбивает {loser}. Потери: {wl} / {ll}"
+  siege_won: "{place} взят: {who}"
+  birth: "Родился ребёнок: {child} (мать — {mother})"
+  building_done: "Завершено строительство: {building} ({place})"
+  interaction_accepted: "{who} соглашается: {what}"
+  interaction_declined: "{who} отказывает: {what}"
+  murder_success: Заговор удался — цель мертва.
+  murder_failed: Покушение провалилось.
+  scheme_discovered: Ваша интрига раскрыта!
+  befriend_success: "Теперь вы друзья с [scope:target]."
+  befriend_failed: "[scope:target] не желает с вами дружить."
+  sway_success: "[scope:target] проникается к вам симпатией."
+  sway_failed: Попытка расположить к себе не удалась.
+  seduce_success: "[scope:target] уступает вашим чарам."
+  seduce_failed: "[scope:target] отвергает ваши ухаживания."
+  claim_fabricated: "Писцы «нашли» нужные документы — у вас новая претензия!"
+  claim_failed: Подделку разоблачили. Какой позор!
+  became_victorious: Вы прославились как победоносный полководец!
+
+death:
+  generic: "{who} умирает"
+  natural: "{who} умирает от старости"
+  illness: "{who} умирает от болезни"
+  childhood: "{who} умирает в детстве"
+  battle: "{who} гибнет в бою"
+  childbirth: "{who} умирает при родах"
+  murder: "{who} убит(а)"
+  hunting: "{who} гибнет на охоте"
+  stress: "{who} умирает от разрыва сердца"
+  plague: "{who} умирает от чумы"
+
+opinion:
+  traits: Черты характера
+  general: Обаяние
+  attraction: Привлекательность
+  same_culture: Та же культура
+  different_culture: Чужая культура
+  same_faith: Та же вера
+  different_faith: Иноверец
+  spouse: Супруг(а)
+  parent: Родитель
+  child: Ребёнок
+  sibling: Брат или сестра
+  same_dynasty: Одна династия
+  liege: Сюзерен
+  holds_claim: Держит мой титул
+
+ai:
+  opinion: Мнение
+  rank: Разница в ранге
+  prestige: Престиж
+  marry_ruler: Брак с правителем
+  marry_heir: Брак с наследником
+  different_faith: Другая вера
+  at_war: Ведёт войну
+  relative_power: Соотношение сил
+  same_culture: Та же культура
+  ambitious: Честолюбие
+  current_liege: Верность нынешнему сюзерену
+  your_intrigue: Ваши интриги
+  target_intrigue: Интриги цели
+  target_prowess: Доблесть цели
+  paranoid_target: Цель — параноик
+  your_diplomacy: Ваша дипломатия
+  shy_target: Цель застенчива
+  gregarious_target: Цель общительна
+  attraction: Привлекательность
+  chaste_target: Цель целомудренна
+  lustful_target: Цель похотлива
+  target_married: Цель в браке
+  your_learning: Ваша учёность
+
+modsrc:
+  buildings: Постройки
+  stress: Стресс
+
+list:
+  vassal: вассалы
+  courtier: придворные
+  child: дети
+  close_family: близкие
+  spouse: супруги
+  sibling: братья и сёстры
+  realm_province: провинции державы
+  domain_province: провинции домена
+  realm_vassal: все вассалы

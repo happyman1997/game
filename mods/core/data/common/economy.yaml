@@ -1,0 +1,77 @@
+# Местность, владения и постройки.
+terrain:
+  farmlands: { color: "#a9b56a", defense: 0.0, movement: 1.0, height: 0.05, development_growth: 0.06 }
+  plains:    { color: "#c2c07e", defense: 0.0, movement: 1.0, height: 0.1 }
+  forest:    { color: "#4f7a43", defense: 0.2, movement: 1.3, height: 0.2 }
+  hills:     { color: "#9a8a5a", defense: 0.3, movement: 1.4, height: 0.45 }
+  mountains: { color: "#8a8178", defense: 0.5, movement: 1.8, height: 0.85, development_growth: -0.05 }
+  wetlands:  { color: "#6f8f7a", defense: 0.25, movement: 1.6, height: 0.02 }
+
+holdings:
+  castle: { icon: "🏰", tax: 0.5, levy: 180, fort: 2 }
+  city:   { icon: "🏙", tax: 1.0, levy: 80, fort: 1 }
+  temple: { icon: "⛪", tax: 0.5, levy: 60, fort: 1 }
+
+# Постройки: modifiers — для провинции (tax_mult, levy_mult, fort, development_growth),
+# owner_modifiers — для владельца графства.
+buildings:
+  walls:
+    icon: "🧱"
+    holding: castle
+    cost: { gold: 120 }
+    days: 365
+    modifiers: { fort: 2 }
+  barracks:
+    icon: "🛡"
+    holding: castle
+    cost: { gold: 100 }
+    days: 300
+    modifiers: { levy_mult: 0.3 }
+  training_grounds:
+    icon: "🎯"
+    holding: castle
+    requires: [barracks]
+    cost: { gold: 160 }
+    days: 400
+    modifiers: { levy_mult: 0.2 }
+    owner_modifiers: { commander_advantage: 3, prowess: 1 }
+  farms:
+    icon: "🌾"
+    cost: { gold: 80 }
+    days: 240
+    modifiers: { tax_mult: 0.15, development_growth: 0.05 }
+  market:
+    icon: "⚖"
+    holding: city
+    cost: { gold: 110 }
+    days: 300
+    modifiers: { tax_mult: 0.3 }
+  guild_hall:
+    icon: "🏛"
+    holding: city
+    requires: [market]
+    cost: { gold: 200 }
+    days: 450
+    modifiers: { tax_mult: 0.35, development_growth: 0.05 }
+  monastery:
+    icon: "📿"
+    holding: temple
+    cost: { gold: 100 }
+    days: 300
+    modifiers: { tax_mult: 0.1 }
+    owner_modifiers: { monthly_piety: 0.3, learning: 1 }
+  cathedral:
+    icon: "⛪"
+    holding: temple
+    requires: [monastery]
+    cost: { gold: 250 }
+    days: 600
+    modifiers: { development_growth: 0.05 }
+    owner_modifiers: { monthly_piety: 0.6, monthly_prestige: 0.3 }
+  hunting_grounds:
+    icon: "🦌"
+    cost: { gold: 70 }
+    days: 200
+    trigger: { OR: [{ terrain: forest }, { terrain: hills }] }
+    modifiers: {}
+    owner_modifiers: { prowess: 1, stress_gain_mult: -0.05 }

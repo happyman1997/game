@@ -1,0 +1,413 @@
+# Черты персонажей.
+#  category    — personality | education | congenital | health | lifestyle | fame
+#  modifiers   — модификаторы характеристик (навыки, fertility, health,
+#                monthly_prestige, monthly_piety, general_opinion, vassal_opinion,
+#                attraction_opinion, stress_gain_mult, tax_mult, levy_mult,
+#                domain_limit, commander_advantage, monthly_income ...)
+#  opposites   — взаимоисключающие черты
+#  compatibility — как носитель черты относится к носителям других черт
+#  ai          — личность для ИИ (aggression, boldness, compassion, greed, honor,
+#                rationality, sociability, vengefulness, zeal, energy)
+traits:
+  # ------------------------------------------------------------ личность
+  brave:
+    category: personality
+    icon: "🦁"
+    modifiers: { martial: 2, prowess: 3, attraction_opinion: 5 }
+    opposites: [craven]
+    compatibility: { brave: 10, craven: -15 }
+    ai: { boldness: 3, aggression: 1 }
+  craven:
+    category: personality
+    icon: "🐇"
+    modifiers: { intrigue: 2, prowess: -3, martial: -2 }
+    opposites: [brave]
+    compatibility: { brave: -10 }
+    ai: { boldness: -3, aggression: -2 }
+  calm:
+    category: personality
+    icon: "🌊"
+    modifiers: { diplomacy: 1, intrigue: 1, stress_gain_mult: -0.1 }
+    opposites: [wrathful]
+    compatibility: { wrathful: -10 }
+    ai: { rationality: 2, vengefulness: -1 }
+  wrathful:
+    category: personality
+    icon: "🔥"
+    modifiers: { martial: 3, diplomacy: -1, intrigue: -1 }
+    opposites: [calm]
+    compatibility: { calm: -5, wrathful: -5 }
+    ai: { aggression: 2, vengefulness: 2, rationality: -2 }
+  chaste:
+    category: personality
+    icon: "🕊"
+    modifiers: { learning: 2, fertility: -0.25 }
+    opposites: [lustful]
+    compatibility: { lustful: -15, chaste: 10 }
+    ai: { zeal: 1 }
+  lustful:
+    category: personality
+    icon: "💋"
+    modifiers: { intrigue: 2, fertility: 0.25 }
+    opposites: [chaste]
+    compatibility: { lustful: 10, chaste: -10 }
+    ai: { sociability: 1 }
+  content:
+    category: personality
+    icon: "😌"
+    modifiers: { learning: 2, intrigue: -1, vassal_opinion: 5 }
+    opposites: [ambitious]
+    ai: { energy: -2, greed: -2, aggression: -1 }
+  ambitious:
+    category: personality
+    icon: "👑"
+    modifiers: { diplomacy: 1, martial: 1, stewardship: 1, intrigue: 1, learning: 1, prowess: 1, stress_gain_mult: 0.15, vassal_opinion: -5 }
+    opposites: [content]
+    compatibility: { ambitious: -10 }
+    ai: { energy: 3, greed: 2, aggression: 2 }
+  diligent:
+    category: personality
+    icon: "🔨"
+    modifiers: { diplomacy: 1, martial: 1, stewardship: 2, learning: 1, monthly_prestige: 0.2 }
+    opposites: [lazy]
+    compatibility: { lazy: -10 }
+    ai: { energy: 3 }
+  lazy:
+    category: personality
+    icon: "💤"
+    modifiers: { stewardship: -2, intrigue: 1, stress_gain_mult: -0.1 }
+    opposites: [diligent]
+    compatibility: { diligent: -5 }
+    ai: { energy: -3 }
+  forgiving:
+    category: personality
+    icon: "🤝"
+    modifiers: { diplomacy: 2, learning: 1, intrigue: -2 }
+    opposites: [vengeful]
+    compatibility: { vengeful: -10 }
+    ai: { vengefulness: -3, compassion: 1 }
+  vengeful:
+    category: personality
+    icon: "⚖"
+    modifiers: { martial: 2, intrigue: 2, diplomacy: -2 }
+    opposites: [forgiving]
+    compatibility: { forgiving: -5 }
+    ai: { vengefulness: 3, aggression: 1 }
+  generous:
+    category: personality
+    icon: "🎁"
+    modifiers: { diplomacy: 3, general_opinion: 5 }
+    opposites: [greedy]
+    compatibility: { greedy: -15, generous: 5 }
+    ai: { greed: -3, compassion: 1 }
+  greedy:
+    category: personality
+    icon: "💰"
+    modifiers: { diplomacy: -2, tax_mult: 0.1 }
+    opposites: [generous]
+    compatibility: { generous: -10 }
+    ai: { greed: 3 }
+  gregarious:
+    category: personality
+    icon: "🍻"
+    modifiers: { diplomacy: 2, general_opinion: 5 }
+    opposites: [shy]
+    compatibility: { gregarious: 10, shy: -5 }
+    ai: { sociability: 3 }
+  shy:
+    category: personality
+    icon: "🙈"
+    modifiers: { diplomacy: -2, learning: 2 }
+    opposites: [gregarious]
+    ai: { sociability: -3 }
+  honest:
+    category: personality
+    icon: "📜"
+    modifiers: { diplomacy: 2, intrigue: -4, general_opinion: 5 }
+    opposites: [deceitful]
+    compatibility: { deceitful: -15, honest: 10 }
+    ai: { honor: 3 }
+  deceitful:
+    category: personality
+    icon: "🎭"
+    modifiers: { intrigue: 4, diplomacy: -2 }
+    opposites: [honest]
+    compatibility: { honest: -10 }
+    ai: { honor: -3 }
+  humble:
+    category: personality
+    icon: "🙏"
+    modifiers: { monthly_piety: 0.3, general_opinion: 5 }
+    opposites: [arrogant]
+    compatibility: { arrogant: -10 }
+    ai: { greed: -1 }
+  arrogant:
+    category: personality
+    icon: "🦚"
+    modifiers: { monthly_prestige: 0.5, general_opinion: -5 }
+    opposites: [humble]
+    compatibility: { arrogant: -15, humble: -5 }
+    ai: { aggression: 1 }
+  just:
+    category: personality
+    icon: "⚖️"
+    modifiers: { stewardship: 2, learning: 1, intrigue: -3, vassal_opinion: 5 }
+    opposites: [arbitrary]
+    compatibility: { arbitrary: -15, just: 10 }
+    ai: { honor: 2, rationality: 1 }
+  arbitrary:
+    category: personality
+    icon: "🎲"
+    modifiers: { intrigue: 2, stewardship: -2, learning: -1 }
+    opposites: [just]
+    compatibility: { just: -10 }
+    ai: { honor: -2, rationality: -2 }
+  patient:
+    category: personality
+    icon: "⏳"
+    modifiers: { learning: 2, intrigue: 1 }
+    opposites: [impatient]
+    compatibility: { impatient: -10 }
+    ai: { rationality: 2, aggression: -1 }
+  impatient:
+    category: personality
+    icon: "⚡"
+    modifiers: { martial: 1, learning: -2, prowess: 1 }
+    opposites: [patient]
+    ai: { energy: 2, aggression: 1 }
+  temperate:
+    category: personality
+    icon: "🥛"
+    modifiers: { stewardship: 2, health: 0.5 }
+    opposites: [gluttonous]
+    compatibility: { gluttonous: -10 }
+  gluttonous:
+    category: personality
+    icon: "🍗"
+    modifiers: { stewardship: -2, health: -0.3, stress_gain_mult: -0.1 }
+    opposites: [temperate]
+    compatibility: { gluttonous: 5 }
+  trusting:
+    category: personality
+    icon: "🤲"
+    modifiers: { diplomacy: 2, intrigue: -2, general_opinion: 5 }
+    opposites: [paranoid]
+    ai: { honor: 1, sociability: 1 }
+  paranoid:
+    category: personality
+    icon: "👁"
+    modifiers: { intrigue: 3, diplomacy: -1, stress_gain_mult: 0.2 }
+    opposites: [trusting]
+    compatibility: { paranoid: -10 }
+    ai: { boldness: -1, vengefulness: 1 }
+  zealous:
+    category: personality
+    icon: "✝"
+    modifiers: { martial: 2, monthly_piety: 0.5 }
+    opposites: [cynical]
+    compatibility: { cynical: -20, zealous: 10 }
+    ai: { zeal: 3, aggression: 1 }
+  cynical:
+    category: personality
+    icon: "🤨"
+    modifiers: { intrigue: 2, learning: 2, monthly_piety: -0.3 }
+    opposites: [zealous]
+    compatibility: { zealous: -10 }
+    ai: { zeal: -3, rationality: 1 }
+  compassionate:
+    category: personality
+    icon: "💗"
+    modifiers: { diplomacy: 2, intrigue: -2, general_opinion: 5 }
+    opposites: [callous]
+    compatibility: { callous: -15, compassionate: 10 }
+    ai: { compassion: 3, aggression: -1 }
+  callous:
+    category: personality
+    icon: "🧊"
+    modifiers: { intrigue: 2, diplomacy: -2 }
+    opposites: [compassionate]
+    compatibility: { compassionate: -10 }
+    ai: { compassion: -3 }
+  stubborn:
+    category: personality
+    icon: "🪨"
+    modifiers: { stewardship: 3, stress_gain_mult: -0.05 }
+    opposites: [fickle]
+    ai: { rationality: -1 }
+  fickle:
+    category: personality
+    icon: "🍃"
+    modifiers: { diplomacy: 2, stewardship: -2 }
+    opposites: [stubborn]
+    ai: { rationality: -2 }
+
+  # ------------------------------------------------------------ образование
+  education_diplomacy_1: { category: education, icon: "🗣", education: { skill: diplomacy, level: 1 }, modifiers: { diplomacy: 2 } }
+  education_diplomacy_2: { category: education, icon: "🗣", education: { skill: diplomacy, level: 2 }, modifiers: { diplomacy: 4 } }
+  education_diplomacy_3: { category: education, icon: "🗣", education: { skill: diplomacy, level: 3 }, modifiers: { diplomacy: 6, general_opinion: 5 } }
+  education_diplomacy_4: { category: education, icon: "🗣", education: { skill: diplomacy, level: 4 }, modifiers: { diplomacy: 8, general_opinion: 10 } }
+  education_martial_1: { category: education, icon: "⚔", education: { skill: martial, level: 1 }, modifiers: { martial: 2 } }
+  education_martial_2: { category: education, icon: "⚔", education: { skill: martial, level: 2 }, modifiers: { martial: 4 } }
+  education_martial_3: { category: education, icon: "⚔", education: { skill: martial, level: 3 }, modifiers: { martial: 6, commander_advantage: 5 } }
+  education_martial_4: { category: education, icon: "⚔", education: { skill: martial, level: 4 }, modifiers: { martial: 8, commander_advantage: 10 } }
+  education_stewardship_1: { category: education, icon: "💰", education: { skill: stewardship, level: 1 }, modifiers: { stewardship: 2 } }
+  education_stewardship_2: { category: education, icon: "💰", education: { skill: stewardship, level: 2 }, modifiers: { stewardship: 4 } }
+  education_stewardship_3: { category: education, icon: "💰", education: { skill: stewardship, level: 3 }, modifiers: { stewardship: 6, domain_limit: 1 } }
+  education_stewardship_4: { category: education, icon: "💰", education: { skill: stewardship, level: 4 }, modifiers: { stewardship: 8, domain_limit: 1, tax_mult: 0.1 } }
+  education_intrigue_1: { category: education, icon: "🗡", education: { skill: intrigue, level: 1 }, modifiers: { intrigue: 2 } }
+  education_intrigue_2: { category: education, icon: "🗡", education: { skill: intrigue, level: 2 }, modifiers: { intrigue: 4 } }
+  education_intrigue_3: { category: education, icon: "🗡", education: { skill: intrigue, level: 3 }, modifiers: { intrigue: 6 } }
+  education_intrigue_4: { category: education, icon: "🗡", education: { skill: intrigue, level: 4 }, modifiers: { intrigue: 8 } }
+  education_learning_1: { category: education, icon: "📖", education: { skill: learning, level: 1 }, modifiers: { learning: 2 } }
+  education_learning_2: { category: education, icon: "📖", education: { skill: learning, level: 2 }, modifiers: { learning: 4 } }
+  education_learning_3: { category: education, icon: "📖", education: { skill: learning, level: 3 }, modifiers: { learning: 6, monthly_piety: 0.2 } }
+  education_learning_4: { category: education, icon: "📖", education: { skill: learning, level: 4 }, modifiers: { learning: 8, monthly_piety: 0.4 } }
+
+  # ------------------------------------------------------------ врождённые
+  genius:
+    category: congenital
+    icon: "🧠"
+    genetic: true
+    birth_chance: 0.01
+    inherit_chance: 0.15
+    group: intellect
+    modifiers: { diplomacy: 5, martial: 5, stewardship: 5, intrigue: 5, learning: 5 }
+  quick:
+    category: congenital
+    icon: "💡"
+    genetic: true
+    birth_chance: 0.03
+    inherit_chance: 0.15
+    group: intellect
+    modifiers: { diplomacy: 2, martial: 2, stewardship: 2, intrigue: 2, learning: 2 }
+  slow:
+    category: congenital
+    icon: "🐌"
+    genetic: true
+    birth_chance: 0.02
+    inherit_chance: 0.1
+    group: intellect
+    modifiers: { diplomacy: -3, martial: -3, stewardship: -3, intrigue: -3, learning: -3 }
+  beautiful:
+    category: congenital
+    icon: "🌹"
+    genetic: true
+    birth_chance: 0.015
+    inherit_chance: 0.15
+    group: beauty
+    modifiers: { attraction_opinion: 25, diplomacy: 2, fertility: 0.1 }
+  pretty:
+    category: congenital
+    icon: "🌸"
+    genetic: true
+    birth_chance: 0.04
+    inherit_chance: 0.15
+    group: beauty
+    modifiers: { attraction_opinion: 12, diplomacy: 1 }
+  homely:
+    category: congenital
+    icon: "🥔"
+    genetic: true
+    birth_chance: 0.04
+    inherit_chance: 0.1
+    group: beauty
+    modifiers: { attraction_opinion: -12, diplomacy: -1 }
+  strong:
+    category: congenital
+    icon: "🏋"
+    genetic: true
+    birth_chance: 0.03
+    inherit_chance: 0.15
+    group: physique
+    modifiers: { prowess: 5, health: 0.5, attraction_opinion: 5 }
+  weak:
+    category: congenital
+    icon: "🥀"
+    genetic: true
+    birth_chance: 0.02
+    inherit_chance: 0.1
+    group: physique
+    modifiers: { prowess: -5, health: -0.5 }
+  hale:
+    category: congenital
+    icon: "🍎"
+    genetic: true
+    birth_chance: 0.04
+    inherit_chance: 0.15
+    modifiers: { health: 1 }
+  infertile:
+    category: congenital
+    icon: "🚫"
+    birth_chance: 0.03
+    modifiers: { fertility: -0.5 }
+
+  # ------------------------------------------------------------ здоровье
+  ill:
+    category: health
+    icon: "🤒"
+    modifiers: { health: -1.5, diplomacy: -1, stewardship: -1 }
+    monthly_cure_chance: 0.2
+    monthly_death_chance: 0.004
+  pneumonic:
+    category: health
+    icon: "🫁"
+    modifiers: { health: -3, prowess: -4 }
+    monthly_cure_chance: 0.12
+    monthly_death_chance: 0.03
+  wounded:
+    category: health
+    icon: "🩸"
+    modifiers: { health: -1, prowess: -3 }
+    duration_days: 365
+    monthly_death_chance: 0.005
+  maimed:
+    category: health
+    icon: "🦾"
+    modifiers: { prowess: -6, attraction_opinion: -10, health: -0.5 }
+  scarred:
+    category: health
+    icon: "⚡"
+    modifiers: { prowess: 2, attraction_opinion: -5, monthly_prestige: 0.1 }
+  infirm:
+    category: health
+    icon: "🦯"
+    modifiers: { diplomacy: -2, martial: -3, stewardship: -2, intrigue: -2, learning: -1, prowess: -6, health: -1 }
+  depressed:
+    category: health
+    icon: "🌧"
+    modifiers: { diplomacy: -2, learning: -1, health: -0.5, fertility: -0.2 }
+    monthly_cure_chance: 0.02
+
+  # ------------------------------------------------------------ образ жизни и слава
+  drunkard:
+    category: lifestyle
+    icon: "🍷"
+    modifiers: { stewardship: -2, stress_gain_mult: -0.25, health: -0.3 }
+  flagellant:
+    category: lifestyle
+    icon: "🩹"
+    modifiers: { monthly_piety: 0.5, stress_gain_mult: -0.2, health: -0.3 }
+  reveler:
+    category: lifestyle
+    icon: "🎉"
+    modifiers: { diplomacy: 2, general_opinion: 5, stewardship: -1 }
+  hunter:
+    category: lifestyle
+    icon: "🏹"
+    modifiers: { prowess: 2, martial: 1 }
+  pilgrim:
+    category: fame
+    icon: "🧭"
+    modifiers: { learning: 1, monthly_piety: 0.3, general_opinion: 5 }
+  victorious:
+    category: fame
+    icon: "🏆"
+    modifiers: { martial: 2, monthly_prestige: 0.5, commander_advantage: 5 }
+  scholar:
+    category: lifestyle
+    icon: "🎓"
+    modifiers: { learning: 3 }
+  conqueror:
+    category: fame
+    icon: "🗺"
+    modifiers: { martial: 3, monthly_prestige: 1, commander_advantage: 10, vassal_opinion: 5 }

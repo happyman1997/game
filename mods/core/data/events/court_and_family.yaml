@@ -1,0 +1,314 @@
+events:
+  court.0001:
+    theme: court
+    icon: "🙇"
+    trigger:
+      gold: 40
+      any_vassal: { gold: "< 30" }
+    cooldown: { years: 2 }
+    immediate:
+      random_vassal:
+        limit: { gold: "< 30" }
+        save_scope_as: vassal
+    options:
+      - effect:
+          pay_gold: { target: scope:vassal, value: 30 }
+          scope:vassal: { add_opinion: { target: root, modifier: supported } }
+        ai_chance: { value: 40, add: { value: ai_compassion, multiply: 10 } }
+      - effect:
+          scope:vassal: { add_opinion: { target: root, modifier: insulted, value: -10 } }
+        ai_chance: { value: 30, add: { value: ai_greed, multiply: 10 } }
+
+  court.0002:
+    theme: court
+    icon: "🧙"
+    trigger: { is_ruler: yes, gold: 30 }
+    cooldown: { years: 5 }
+    options:
+      - effect:
+          add_gold: -30
+          add_modifier: { id: well_advised, years: 5 }
+        ai_chance: 40
+      - effect:
+          create_character: { age: 45, female: random, traits: [scholar] }
+          add_prestige: 10
+        ai_chance: 30
+      - effect: { add_prestige: -5 }
+        ai_chance: 10
+
+  court.0004:
+    theme: court
+    icon: "🤬"
+    trigger: { num_courtiers: ">= 2" }
+    cooldown: { years: 3 }
+    immediate:
+      - random_courtier: { limit: { is_adult: yes }, save_scope_as: first }
+      - random_courtier:
+          limit: { is_adult: yes, NOT: { is_same_as: scope:first } }
+          save_scope_as: second
+    options:
+      - trigger: { exists: scope:second }
+        effect:
+          scope:first: { add_opinion: { target: root, modifier: supported } }
+          scope:second: { add_opinion: { target: root, modifier: insulted } }
+      - trigger: { exists: scope:second }
+        effect:
+          scope:second: { add_opinion: { target: root, modifier: supported } }
+          scope:first: { add_opinion: { target: root, modifier: insulted } }
+      - effect: { add_prestige: -10, add_stress: 5 }
+
+  court.0005:
+    theme: realm
+    icon: "🔥"
+    trigger:
+      num_counties: ">= 1"
+    cooldown: { years: 4 }
+    immediate:
+      random_domain_province:
+        limit: { NOT: { has_province_modifier: peasant_unrest } }
+        save_scope_as: province
+    options:
+      - effect:
+          add_prestige: 20
+          scope:province: { add_development: -1 }
+          if: { limit: { has_trait: compassionate }, add_stress: 20 }
+        ai_chance: { value: 20, add: { value: ai_compassion, multiply: -5 } }
+      - trigger: { gold: 40 }
+        effect:
+          add_gold: -40
+          scope:province: { add_development: 1 }
+        ai_chance: { value: 20, add: { value: ai_compassion, multiply: 10 } }
+      - effect:
+          scope:province: { add_province_modifier: { id: peasant_unrest, years: 2 } }
+        ai_chance: 20
+
+  court.0006:
+    theme: realm
+    icon: "🌾"
+    trigger: { num_counties: ">= 1" }
+    immediate:
+      random_domain_province: { save_scope_as: province }
+    options:
+      - effect:
+          scope:province: { add_province_modifier: { id: bountiful_harvest, years: 2 } }
+          add_gold: 15
+
+  court.0007:
+    theme: realm
+    icon: "🥀"
+    trigger: { num_counties: ">= 1" }
+    immediate:
+      random_domain_province: { save_scope_as: province }
+    options:
+      - trigger: { gold: 30 }
+        effect:
+          add_gold: -30
+          add_prestige: 15
+          every_vassal: { add_opinion: { target: root, modifier: grateful } }
+          scope:province: { add_province_modifier: { id: poor_harvest, years: 1 } }
+        ai_chance: { value: 30, add: { value: ai_compassion, multiply: 10 } }
+      - effect:
+          scope:province: { add_province_modifier: { id: poor_harvest, years: 2 } }
+        ai_chance: 40
+
+  court.0008:
+    theme: realm
+    icon: "🎪"
+    trigger: { num_counties: ">= 1" }
+    immediate:
+      random_domain_province: { save_scope_as: province }
+    options:
+      - effect:
+          scope:province: { add_province_modifier: { id: trade_fair, years: 2 } }
+        ai_chance: 50
+      - effect: { add_gold: 40, add_prestige: -10 }
+        ai_chance: { value: 20, add: { value: ai_greed, multiply: 15 } }
+
+  court.0009:
+    theme: faith
+    icon: "⛪"
+    trigger: { faith: catholic, gold: 50, is_ruler: yes }
+    cooldown: { years: 4 }
+    options:
+      - effect: { add_gold: -50, add_piety: 70 }
+        ai_chance: { value: 30, add: { value: ai_zeal, multiply: 10 } }
+      - effect: { add_piety: -20 }
+        ai_chance: { value: 30, add: { value: ai_greed, multiply: 10 } }
+
+  court.0010:
+    theme: war
+    icon: "🗡"
+    trigger: { is_at_war: yes, gold: 100, NOT: { has_modifier: mercenary_band } }
+    cooldown: { years: 1 }
+    options:
+      - effect:
+          add_gold: -100
+          add_modifier: { id: mercenary_band, years: 1 }
+        ai_chance: 60
+      - effect: {}
+        ai_chance: 40
+
+  court.0011:
+    theme: court
+    icon: "😤"
+    trigger:
+      any_vassal: { opinion: { target: root, value: "< -20" } }
+    cooldown: { years: 3 }
+    immediate:
+      random_vassal:
+        limit: { opinion: { target: root, value: "< -20" } }
+        save_scope_as: vassal
+    options:
+      - effect:
+          add_prestige: 30
+          scope:vassal: { add_opinion: { target: root, modifier: humiliated } }
+        ai_chance: { value: 30, add: { value: ai_vengefulness, multiply: 10 } }
+      - effect:
+          add_prestige: -20
+          scope:vassal: { add_opinion: { target: root, modifier: supported } }
+        ai_chance: { value: 30, add: { value: ai_compassion, multiply: 10 } }
+      - trigger: { gold: 25 }
+        effect:
+          add_gold: -25
+          scope:vassal: { add_opinion: { target: root, modifier: feast_guest } }
+        ai_chance: 30
+
+  court.0012:
+    theme: faith
+    icon: "☄"
+    trigger:
+      is_player: yes
+      current_year: "<= 1067"
+      NOT: { has_global_flag: comet_seen }
+    immediate:
+      set_global_flag: comet_seen
+    options:
+      - effect: { add_prestige: 40 }
+      - effect: { add_piety: 40, add_stress: 10 }
+
+  family.0001:
+    theme: family
+    icon: "🧒"
+    trigger:
+      any_child: { age: { gte: 6, lt: 16 } }
+    cooldown: { years: 3 }
+    immediate:
+      random_child:
+        limit: { age: { gte: 6, lt: 16 } }
+        save_scope_as: child
+    options:
+      - effect: { scope:child: { add_skill: { skill: diplomacy, value: 2 } } }
+      - effect: { scope:child: { add_skill: { skill: martial, value: 2 } } }
+      - effect: { scope:child: { add_skill: { skill: stewardship, value: 2 } } }
+      - effect: { scope:child: { add_skill: { skill: learning, value: 2 } } }
+
+  family.0002:
+    theme: family
+    icon: "😠"
+    trigger: { is_married: yes }
+    cooldown: { years: 4 }
+    immediate:
+      spouse: { save_scope_as: spouse }
+    options:
+      - effect:
+          add_prestige: -10
+          scope:spouse: { add_opinion: { target: root, modifier: grateful } }
+        ai_chance: { value: 30, add: { value: ai_compassion, multiply: 10 } }
+      - effect:
+          add_stress: -5
+          scope:spouse: { add_opinion: { target: root, modifier: insulted } }
+        ai_chance: 30
+
+  family.0003:
+    theme: family
+    icon: "💞"
+    trigger: { is_married: yes }
+    cooldown: { years: 5 }
+    immediate:
+      spouse: { save_scope_as: spouse }
+    options:
+      - effect:
+          add_stress: -15
+          scope:spouse:
+            add_opinion: { target: root, modifier: grateful }
+            add_stress: -15
+
+  family.0004:
+    theme: family
+    icon: "😒"
+    trigger:
+      any_sibling: { is_adult: yes, has_trait: ambitious }
+    cooldown: { years: 5 }
+    immediate:
+      random_sibling:
+        limit: { is_adult: yes, has_trait: ambitious }
+        save_scope_as: sibling
+    options:
+      - trigger: { gold: 50 }
+        effect:
+          pay_gold: { target: scope:sibling, value: 50 }
+          scope:sibling: { add_opinion: { target: root, modifier: supported } }
+        ai_chance: 40
+      - effect:
+          scope:sibling: { add_opinion: { target: root, modifier: insulted } }
+        ai_chance: 40
+
+  death.0001:
+    theme: death
+    icon: "🕯"
+    triggered_only: true
+    trigger: { exists: scope:deceased }
+    immediate:
+      add_modifier: { id: grieving, years: 1 }
+    options:
+      - effect: { add_stress: 10, add_piety: 10 }
+      - effect: { add_stress: 20, add_prestige: 10 }
+
+  intrigue.0001:
+    theme: intrigue
+    icon: "🗡"
+    triggered_only: true
+    trigger: { exists: scope:owner }
+    options:
+      - effect:
+          add_opinion: { target: scope:owner, modifier: rival }
+          add_prestige: 10
+        ai_chance: { value: 50, add: { value: ai_vengefulness, multiply: 10 } }
+      - effect:
+          add_piety: 30
+          add_stress: 10
+        ai_chance: { value: 30, add: { value: ai_compassion, multiply: 10 } }
+
+  succession.0001:
+    theme: realm
+    icon: "👑"
+    triggered_only: true
+    options:
+      - trigger: { tier: ">= kingdom", gold: 100 }
+        effect:
+          add_gold: -100
+          add_modifier: { id: royal_coronation, years: 5 }
+      - effect: { add_prestige: 25 }
+
+  start.0001:
+    theme: realm
+    icon: "🏰"
+    triggered_only: true
+    desc:
+      - trigger: { has_claim_on: title:k_england, culture: norman }
+        desc: ev.start.0001.desc_william
+      - trigger: { holds_title: title:k_england }
+        desc: ev.start.0001.desc_harold
+      - trigger: { is_independent: yes }
+        desc: ev.start.0001.desc_independent
+      - desc: ev.start.0001.desc
+    options:
+      - effect: { add_prestige: 10 }
+
+  war.0001:
+    theme: war
+    icon: "⚔"
+    triggered_only: true
+    trigger: { exists: scope:attacker }
+    options:
+      - effect: { add_prestige: 5 }

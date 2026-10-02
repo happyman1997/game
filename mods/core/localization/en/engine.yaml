@@ -1,0 +1,178 @@
+tier:
+  county: County
+  duchy: Duchy
+  kingdom: Kingdom
+  empire: Empire
+rank:
+  county: { m: Count, f: Countess }
+  duchy: { m: Duke, f: Duchess }
+  kingdom: { m: King, f: Queen }
+  empire: { m: Emperor, f: Empress }
+  english:
+    duchy: { m: Earl, f: Lady }
+  norse:
+    county: { m: Jarl, f: Jarl }
+
+fx:
+  add_gold: "{value} 💰"
+  add_prestige: "{value} prestige"
+  add_piety: "{value} piety"
+  add_stress: "{value} stress"
+  add_health: "{value} health"
+  add_dynasty_prestige: "{value} dynasty prestige"
+  add_skill: "{skill} {value}"
+  add_trait: "Gains the trait «{value}»"
+  remove_trait: "Loses the trait «{value}»"
+  add_modifier: "Gains «{value}» ({detail})"
+  add_modifier_timed: "Gains «{value}» for {days} months ({detail})"
+  remove_modifier: "Loses «{value}»"
+  add_opinion: "Opinion {who} → {target}: {value} ({mod})"
+  death: "{who} will die"
+  add_claim: "Claim on {value}"
+  marry: "Marriage: {a} and {b}"
+  add_hook: "Hook on {value}"
+  become_vassal_of: "{who} becomes a vassal of {liege}"
+  become_independent: "{who} becomes independent"
+  move_to_court: "{who} moves to the court of {court}"
+  gain_title: "{who} gains {value}"
+  give_title: "{value} goes to {to}"
+  annex_war_targets: The war targets go to the victor
+  set_succession_law: "Succession law: {value}"
+  add_alliance: "Alliance with {value}"
+  pay_gold: "Pay {value} 💰 to {to}"
+  set_nickname: "{who} is now known as «{value}»"
+  change_culture: "{who}: culture → {value}"
+  change_faith: "{who}: faith → {value}"
+  add_development: "{place}: development {value}"
+  add_building: "{place}: building «{value}»"
+  add_province_modifier: "{place}: «{value}»"
+  random: "With {chance}% chance:"
+  random_list: "One of:"
+  iter:
+    every: "Every ({list}: {n}):"
+    random: "A random one ({list}):"
+    ordered: "The best ({list}):"
+
+tr:
+  is_alive: Must be alive
+  is_adult: Must be an adult
+  is_adult.not: Must be a child
+  is_child: Must be a child
+  is_ruler: Must be landed
+  is_ruler.not: Must not be landed
+  is_landed: Must be landed
+  is_independent: Must be independent
+  is_independent.not: Must be a vassal
+  is_married: Must be married
+  is_married.not: Must not be married
+  is_at_war: Must be at war
+  is_at_war.not: Must not be at war
+  is_female: Must be a woman
+  is_male: Must be a man
+  is_player.not: Must not be a player
+  has_trait: "Requires trait: {value}"
+  has_modifier: "Requires modifier: {value}"
+  culture: "Culture: {value}"
+  faith: "Faith: {value}"
+  same_faith_as: Requires the same faith
+  is_vassal_of: Must be your vassal
+  can_marry: Marriage impossible (age, kinship or already married)
+  gold: "Requires gold: {value}"
+  tier: "Requires rank: {value}"
+  stress: "Requires stress: {value}"
+  health: "Requires health: {value}"
+
+msg:
+  title_created: "{who} creates the title: {title}"
+  title_usurped: "{who} usurps {title} from {from}"
+  you_now_play: "You now play as: {who}"
+  war_declared: "War declared: {name}"
+  war_won_att: "War won by the attackers: {name}"
+  war_won_def: "War won by the defenders: {name}"
+  war_white_peace: "White peace: {name}"
+  battle: "Battle ({place}): {winner} defeats {loser}. Losses: {wl} / {ll}"
+  siege_won: "{place} taken by {who}"
+  birth: "A child is born: {child} (mother — {mother})"
+  building_done: "Construction complete: {building} ({place})"
+  interaction_accepted: "{who} accepts: {what}"
+  interaction_declined: "{who} declines: {what}"
+  murder_success: The plot succeeded — the target is dead.
+  murder_failed: The assassination attempt failed.
+  scheme_discovered: Your scheme has been discovered!
+  befriend_success: "You are now friends with [scope:target]."
+  befriend_failed: "[scope:target] does not want to be your friend."
+  sway_success: "[scope:target] warms to you."
+  sway_failed: The attempt to sway failed.
+  seduce_success: "[scope:target] gives in to your charms."
+  seduce_failed: "[scope:target] rejects your advances."
+  claim_fabricated: "Your scribes have \"found\" the right documents — you have a new claim!"
+  claim_failed: The forgery was exposed. What a disgrace!
+  became_victorious: You are now famed as a victorious commander!
+
+death:
+  generic: "{who} dies"
+  natural: "{who} dies of old age"
+  illness: "{who} dies of illness"
+  childhood: "{who} dies in childhood"
+  battle: "{who} falls in battle"
+  childbirth: "{who} dies in childbirth"
+  murder: "{who} has been murdered"
+  hunting: "{who} dies in a hunting accident"
+  stress: "{who} dies of a broken heart"
+  plague: "{who} dies of the plague"
+
+opinion:
+  traits: Personality traits
+  general: Charisma
+  attraction: Attraction
+  same_culture: Same culture
+  different_culture: Foreign culture
+  same_faith: Same faith
+  different_faith: Infidel
+  spouse: Spouse
+  parent: Parent
+  child: Child
+  sibling: Sibling
+  same_dynasty: Same dynasty
+  liege: Liege
+  holds_claim: Holds my title
+
+ai:
+  opinion: Opinion
+  rank: Rank difference
+  prestige: Prestige
+  marry_ruler: Marrying a ruler
+  marry_heir: Marrying an heir
+  different_faith: Different faith
+  at_war: At war
+  relative_power: Relative power
+  same_culture: Same culture
+  ambitious: Ambition
+  current_liege: Loyalty to current liege
+  your_intrigue: Your intrigue
+  target_intrigue: Target's intrigue
+  target_prowess: Target's prowess
+  paranoid_target: Target is paranoid
+  your_diplomacy: Your diplomacy
+  shy_target: Target is shy
+  gregarious_target: Target is gregarious
+  attraction: Attraction
+  chaste_target: Target is chaste
+  lustful_target: Target is lustful
+  target_married: Target is married
+  your_learning: Your learning
+
+modsrc:
+  buildings: Buildings
+  stress: Stress
+
+list:
+  vassal: vassals
+  courtier: courtiers
+  child: children
+  close_family: close family
+  spouse: spouses
+  sibling: siblings
+  realm_province: realm provinces
+  domain_province: domain provinces
+  realm_vassal: all vassals

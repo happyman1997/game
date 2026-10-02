@@ -1,0 +1,281 @@
+# Взаимодействия персонажей.
+# Скоупы: root = scope:actor (инициатор), scope:recipient (получатель),
+# scope:decider (кто решает: получатель или его опекун — decider: guardian),
+# scope:secondary_actor (выбранный член семьи/двора), scope:target (выбранный титул и т.п.).
+# ai_accept считается в скоупе decider; слагаемые с desc видны игроку в подсказке.
+interactions:
+  arrange_marriage:
+    icon: "💍"
+    category: diplomacy
+    decider: guardian
+    is_shown:
+      scope:recipient: { is_married: no, is_adult: yes }
+    is_valid:
+      NOT: { scope:actor: { is_at_war_with: scope:decider } }
+    secondary_actor:
+      list: [self, child, sibling, grandchild, courtier]
+      title: ui.choose_spouse_from_family
+      trigger:
+        is_married: no
+        is_adult: yes
+        can_marry: scope:recipient
+    ai_accept:
+      value: -5
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.5 } }
+        - { desc: ai.rank, value: { value: "scope:actor.tier", subtract: "tier", multiply: 15 } }
+        - { desc: ai.prestige, value: { value: "scope:actor.prestige", divide: 100, max: 20 } }
+        - { desc: ai.marry_ruler, limit: { scope:secondary_actor: { is_ruler: yes } }, value: 20 }
+        - { desc: ai.marry_heir, limit: { scope:secondary_actor: { is_heir_of: scope:actor } }, value: 15 }
+        - { desc: ai.different_faith, limit: { NOT: { same_faith_as: scope:actor } }, value: -40 }
+        - { desc: ai.at_war, limit: { is_at_war: yes }, value: -20 }
+    on_accept:
+      - scope:secondary_actor: { marry: scope:recipient }
+      - if:
+          limit:
+            scope:decider: { is_ruler: yes }
+            NOR:
+              - scope:actor: { is_allied_with: scope:decider }
+              - scope:decider: { is_same_as: scope:actor }
+          scope:actor: { add_alliance: scope:decider }
+      - scope:decider: { add_opinion: { target: scope:actor, modifier: married_into_family } }
+      - scope:actor: { add_opinion: { target: scope:decider, modifier: married_into_family } }
+    on_decline:
+      - scope:actor: { add_opinion: { target: scope:decider, modifier: refused_proposal } }
+
+  send_gift:
+    icon: "🎁"
+    category: diplomacy
+    is_shown:
+      scope:recipient: { is_adult: yes }
+    cost:
+      gold: { value: 20, add: { value: "scope:recipient.tier", multiply: 15 } }
+    auto_accept: yes
+    cooldown: { years: 1 }
+    on_accept:
+      - scope:recipient: { add_opinion: { target: scope:actor, modifier: gift } }
+    ai_targets: [liege, vassal]
+    ai_frequency_months: 12
+    ai_will_do:
+      value: 0
+      if:
+        - limit:
+            gold: 150
+            scope:recipient: { opinion: { target: scope:actor, value: "< 0" } }
+          add: 40
+
+  propose_alliance:
+    icon: "🤝"
+    category: diplomacy
+    is_shown:
+      scope:actor: { is_ruler: yes }
+      scope:recipient: { is_ruler: yes }
+      NOT: { scope:actor: { is_allied_with: scope:recipient } }
+    is_valid:
+      NOT: { scope:actor: { is_at_war_with: scope:recipient } }
+      custom_tooltip:
+        text: ui.alliance_requires_marriage
+        trigger:
+          scope:actor:
+            OR:
+              - any_spouse: { is_close_family_of: scope:recipient }
+              - any_close_family: { any_spouse: { OR: [{ is_same_as: scope:recipient }, { is_close_family_of: scope:recipient }] } }
+    ai_accept:
+      value: 0
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.6 } }
+        - { desc: ai.relative_power, value: { value: "scope:actor.levies", divide: { value: levies, min: 100 }, multiply: 10, max: 30 } }
+    on_accept:
+      - scope:actor: { add_alliance: scope:recipient }
+    ai_targets: [neighboring_ruler]
+    ai_frequency_months: 24
+    ai_will_do: 40
+
+  offer_vassalization:
+    icon: "🛡"
+    category: diplomacy
+    is_shown:
+      scope:actor: { is_independent: yes }
+      scope:recipient: { is_independent: yes, tier: "< scope:actor.tier" }
+    is_valid:
+      scope:recipient: { is_at_war: no }
+      custom_tooltip:
+        text: ui.must_be_neighbor
+        trigger:
+          scope:actor: { any_neighboring_ruler: { is_same_as: scope:recipient } }
+    ai_accept:
+      value: -35
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.5 } }
+        - { desc: ai.relative_power, value: { value: "scope:actor.levies", divide: { value: levies, min: 100 }, multiply: 6, max: 50 } }
+        - { desc: ai.same_culture, limit: { same_culture_as: scope:actor }, value: 10 }
+        - { desc: ai.different_faith, limit: { NOT: { same_faith_as: scope:actor } }, value: -50 }
+        - { desc: ai.ambitious, limit: { has_trait: ambitious }, value: -20 }
+    on_accept:
+      - scope:recipient:
+          become_vassal_of: scope:actor
+          add_opinion: { target: scope:actor, modifier: vassalized }
+      - scope:actor: { add_prestige: 75 }
+    ai_targets: [neighboring_ruler]
+    ai_frequency_months: 12
+    ai_will_do: 50
+
+  grant_title:
+    icon: "🏰"
+    category: realm
+    is_shown:
+      scope:recipient: { is_adult: yes }
+      OR:
+        - scope:recipient: { is_courtier_of: scope:actor }
+        - scope:recipient: { is_vassal_of: scope:actor }
+    target:
+      provider: grantable_titles
+      title: ui.choose_title
+    auto_accept: yes
+    on_accept:
+      - give_title: { title: scope:target, to: scope:recipient }
+      - scope:recipient: { add_opinion: { target: scope:actor, modifier: granted_title } }
+    ai_targets: [courtier, vassal]
+    ai_frequency_months: 6
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { num_counties: "> domain_limit" }
+          add: 70
+        - limit: { scope:recipient: { is_child_of: scope:actor } }
+          multiply: 1.5
+
+  revoke_title:
+    icon: "⚔"
+    category: realm
+    is_shown:
+      scope:recipient: { is_vassal_of: scope:actor }
+    cost: { prestige: 100 }
+    target:
+      provider: revocable_titles
+      title: ui.choose_title
+    auto_accept: yes
+    on_accept:
+      - take_title: { title: scope:target }
+      - scope:recipient: { add_opinion: { target: scope:actor, modifier: revoked_title } }
+      - every_vassal:
+          limit: { NOT: { is_same_as: scope:recipient } }
+          add_opinion: { target: scope:actor, modifier: tyranny }
+
+  release_vassal:
+    icon: "🕊"
+    category: realm
+    is_shown:
+      scope:recipient: { is_vassal_of: scope:actor }
+    auto_accept: yes
+    on_accept:
+      - scope:recipient:
+          become_independent: yes
+          add_opinion: { target: scope:actor, modifier: released }
+      - add_prestige: -50
+
+  invite_to_court:
+    icon: "🚪"
+    category: diplomacy
+    is_shown:
+      scope:recipient: { is_ruler: no, is_adult: yes }
+      NOR:
+        - scope:recipient: { is_courtier_of: scope:actor }
+        - scope:recipient: { is_close_family_of: scope:recipient.liege }
+    is_valid:
+      NOT: { scope:recipient: { is_married: yes } }
+    ai_accept:
+      value: -10
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.5 } }
+        - { desc: ai.current_liege, value: { value: "opinion(liege)", multiply: -0.4 } }
+        - { desc: ai.rank, value: { value: "scope:actor.tier", subtract: "liege.tier", multiply: 10 } }
+    on_accept:
+      - scope:recipient: { move_to_court: scope:actor }
+
+  befriend:
+    icon: "😊"
+    category: personal
+    scheme: befriend
+    is_shown:
+      scope:recipient: { is_adult: yes }
+      NOT: { has_opinion_modifier: { target: scope:recipient, modifier: friend } }
+    ai_targets: [liege, vassal, courtier]
+    ai_frequency_months: 24
+    ai_will_do:
+      value: 10
+      add: { value: ai_sociability, multiply: 5 }
+
+  sway:
+    icon: "🎶"
+    category: personal
+    scheme: sway
+    is_shown:
+      scope:recipient: { is_adult: yes }
+    ai_targets: [liege, vassal]
+    ai_frequency_months: 18
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { scope:recipient: { opinion: { target: scope:actor, value: "< 0" } } }
+          add: 30
+
+  seduce:
+    icon: "💋"
+    category: personal
+    scheme: seduce
+    is_shown:
+      scope:recipient: { is_adult: yes }
+      scope:actor: { is_adult: yes }
+      NOR:
+        - scope:actor: { is_spouse_of: scope:recipient }
+        - scope:actor: { is_close_relative_of: scope:recipient }
+      OR:
+        - AND: [{ scope:actor: { is_male: yes } }, { scope:recipient: { is_female: yes } }]
+        - AND: [{ scope:actor: { is_female: yes } }, { scope:recipient: { is_male: yes } }]
+    ai_targets: [courtier, vassal]
+    ai_frequency_months: 36
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { has_trait: lustful }
+          add: 25
+
+  murder:
+    icon: "☠"
+    category: hostile
+    scheme: murder
+    is_shown:
+      NOT: { scope:actor: { is_same_as: scope:recipient } }
+    ai_targets: [liege, vassal, neighboring_ruler]
+    ai_frequency_months: 24
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { scope:actor: { opinion: { target: scope:recipient, value: "< -50" } } }
+          add: 10
+        - limit:
+            scope:actor: { any_claim: { holder: { is_same_as: scope:recipient } } }
+          add: 5
+        - limit: { has_trait: [compassionate, honest, just] }
+          multiply: 0
+        - limit: { has_trait: [callous, deceitful, vengeful] }
+          multiply: 2
+
+  fabricate_claim:
+    icon: "📝"
+    category: political
+    scheme: fabricate_claim
+    is_shown:
+      scope:recipient: { is_ruler: yes }
+      scope:actor: { is_ruler: yes }
+      NOT: { scope:recipient: { is_in_realm_of: scope:actor } }
+    cost: { gold: 50 }
+    ai_targets: [neighboring_ruler]
+    ai_frequency_months: 24
+    ai_will_do:
+      value: 5
+      add: { value: ai_greed, multiply: 5 }
+      if:
+        - limit: { has_any_claim: yes }
+          multiply: 0.2

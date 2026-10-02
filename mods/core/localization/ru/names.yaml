@@ -1,0 +1,353 @@
+# Имена персонажей: name.<ключ>. Ключ — «сырое» имя из данных.
+name:
+  John: Джон
+  Mary: Мэри
+  Nameless: Безымянный
+  # английские
+  Aelfric: Эльфрик
+  Alfred: Альфред
+  Aethelred: Этельред
+  Alwin: Эльвин
+  Brihtric: Бриктрик
+  Cuthbert: Катберт
+  Eadric: Эдрик
+  Edwin: Эдвин
+  Edmund: Эдмунд
+  Edward: Эдуард
+  Godric: Годрик
+  Godwin: Годвин
+  Harold: Гарольд
+  Leofric: Леофрик
+  Leofwine: Леофвин
+  Oswulf: Освульф
+  Siward: Сивард
+  Wulfstan: Вульфстан
+  Wulfnoth: Вульфнот
+  Osgod: Осгод
+  Tostig: Тостиг
+  Morcar: Моркар
+  Waltheof: Вальтеоф
+  Aelfgar: Эльфгар
+  Edgar: Эдгар
+  Magnus: Магнус
+  Aelfgifu: Эльфгифу
+  Aethelflaed: Этельфлед
+  Eadgyth: Эдгита
+  Ealdgyth: Эалдгит
+  Edith: Эдит
+  Godgifu: Годгифу
+  Gunhild: Гунхильда
+  Gytha: Гита
+  Hild: Хильда
+  Leofrun: Леофрун
+  Mildred: Милдред
+  Wulfrun: Вульфрун
+  Margaret: Маргарита
+  Cristina: Кристина
+  Agatha: Агата
+  # нормандские
+  William: Вильгельм
+  Robert: Роберт
+  Richard: Ричард
+  Ralph: Рауль
+  Roger: Роджер
+  Hugh: Гуго
+  Walter: Вальтер
+  Odo: Одо
+  Tancred: Танкред
+  Geoffrey: Жоффруа
+  Gilbert: Жильбер
+  Henry: Генрих
+  Nigel: Нигель
+  Humphrey: Онфруа
+  Osbern: Осберн
+  Serlo: Серлон
+  Matilda: Матильда
+  Adeliza: Аделиза
+  Cecilia: Сесилия
+  Constance: Констанция
+  Emma: Эмма
+  Gunnor: Гуннора
+  Hawise: Авуаза
+  Judith: Юдифь
+  Lesceline: Лесцелина
+  Muriel: Мюриэль
+  Sibyl: Сибилла
+  # французские
+  Philippe: Филипп
+  Hugues: Гуго
+  Henri: Генрих
+  Eudes: Эд
+  Thibaut: Тибо
+  Raoul: Рауль
+  Gauthier: Готье
+  Geoffroy: Жоффруа
+  Foulques: Фульк
+  Herbert: Герберт
+  Guy: Ги
+  Etienne: Этьен
+  Louis: Людовик
+  Simon: Симон
+  Baudouin: Бодуэн
+  Guillaume: Гильом
+  Eustache: Евстафий
+  Adele: Адель
+  Anne: Анна
+  Berthe: Берта
+  Ermengarde: Эрменгарда
+  Hildegarde: Хильдегарда
+  Isabelle: Изабелла
+  Mahaut: Маго
+  Alix: Аликс
+  Blanche: Бланка
+  Agnes: Агнесса
+  Ida: Ида
+  # окситанские
+  Guilhem: Гильем
+  Raimon: Раймон
+  Bernat: Бернат
+  Ponc: Понс
+  Aimeric: Эймерик
+  Uc: Юк
+  Peire: Пейре
+  Arnaut: Арнаут
+  Jordan: Журдан
+  Sanc: Санш
+  Gaston: Гастон
+  Bertran: Бертран
+  Ermessenda: Эрмессенда
+  Almodis: Альмодис
+  Garsenda: Гарсенда
+  Azalais: Азалаис
+  Beatritz: Беатриса
+  Esclarmonda: Эскларамонда
+  Guillelma: Гильельма
+  Tiburga: Тибурга
+  Sibilla: Сибилла
+  Maria: Мария
+  Alamanda: Аламанда
+  Ricsenda: Риксенда
+  # бретонские
+  Alan: Алан
+  Conan: Конан
+  Hoel: Хоэль
+  Eudon: Эдон
+  Judicael: Юдикаэль
+  Gurvant: Гурвант
+  Riwallon: Ривалон
+  Salomon: Саломон
+  Budic: Будик
+  Tanguy: Танги
+  Erispoe: Эриспоэ
+  Derrien: Дерьен
+  Orguen: Оргуэн
+  Aenor: Аэнор
+  Gwenn: Гвенн
+  Enora: Энора
+  # валлийские
+  Gruffydd: Груффид
+  Bleddyn: Бледдин
+  Rhiwallon: Риваллон
+  Owain: Оуайн
+  Maredudd: Маредид
+  Rhys: Рис
+  Cadwgan: Кадуган
+  Caradog: Карадог
+  Hywel: Хивел
+  Iorwerth: Иорверт
+  Madog: Мадог
+  Trahaearn: Трахайарн
+  Meurig: Мейриг
+  Llywelyn: Лливелин
+  Cynan: Кинан
+  Einion: Эйнион
+  Angharad: Ангарад
+  Gwenllian: Гвенллиан
+  Nest: Нест
+  Gwladus: Гвладис
+  Efa: Эва
+  Senena: Сенена
+  Marared: Марарет
+  Tangwystl: Тангвистл
+  Gwerful: Гверфул
+  Lleucu: Ллейку
+  # шотландские
+  Malcolm: Малькольм
+  Donald: Дональд
+  Duncan: Дункан
+  Macbeth: Макбет
+  Lulach: Лулах
+  Aed: Аэд
+  Constantine: Константин
+  Kenneth: Кеннет
+  Gillebrigte: Гилле Бригте
+  Maelsnechtai: Маэл Снехтай
+  Eochaid: Эохайд
+  Fergus: Фергус
+  Cormac: Кормак
+  Alexander: Александр
+  David: Давид
+  Gruoch: Груох
+  Bethoc: Беток
+  Ethne: Этне
+  Muirgel: Муиргел
+  Gormflaith: Гормфлат
+  Dervorgilla: Дерворгилла
+  # ирландские
+  Brian: Брайан
+  Toirdelbach: Тойрделбах
+  Diarmait: Диармайт
+  Murchad: Мурхад
+  Donnchad: Доннхад
+  Conchobar: Конхобар
+  Ruaidri: Руайдри
+  Domnall: Домнал
+  Tadc: Тадг
+  Niall: Ниалл
+  Muirchertach: Муйрхертах
+  Maelsechnaill: Маэл Сехнайлл
+  Ardgar: Ардгар
+  Donnsleibe: Донн Слейбе
+  Cathal: Кахал
+  Gormlaith: Гормлайт
+  Derbforgaill: Дербфоргайлл
+  Mor: Мор
+  Sadb: Сайв
+  Eithne: Эйтне
+  Emer: Эмер
+  Grainne: Грайне
+  Muirenn: Муйренн
+  Benmide: Бенмиде
+  # скандинавские
+  Harald: Харальд
+  Olaf: Олаф
+  Sigurd: Сигурд
+  Thorfinn: Торфинн
+  Paul: Пауль
+  Erlend: Эрленд
+  Haakon: Хакон
+  Sven: Свен
+  Ragnvald: Рёгнвальд
+  Godred: Годред
+  Sitric: Ситрик
+  Ivar: Ивар
+  Ketil: Кетиль
+  Thorkel: Торкель
+  Einar: Эйнар
+  Ingibiorg: Ингибьёрг
+  Ragnhild: Рагнхильд
+  Thora: Тора
+  Gyda: Гюда
+  Astrid: Астрид
+  Sigrid: Сигрид
+  Gunnhild: Гуннхильд
+  Helga: Хельга
+  Ingrid: Ингрид
+  Thorunn: Торунн
+  # фламандские
+  Baldwin: Бодуэн
+  Arnulf: Арнульф
+  Robrecht: Роберт
+  Diederik: Дидерик
+  Filips: Филипс
+  Karel: Карел
+  Willem: Виллем
+  Gillis: Жиль
+  Hendrik: Хендрик
+  Jan: Ян
+  Lodewijk: Лодевейк
+  Wouter: Вутер
+  Adela: Адела
+  Gertrude: Гертруда
+  Richilde: Рихильда
+  Clementia: Клеменция
+  Machteld: Махтельд
+  Sibylla: Сибилла
+  Margaretha: Маргарета
+  Beatrijs: Беатрис
+  Johanna: Иоганна
+  # русские
+  Yaroslav: Ярослав
+  Vladimir: Владимир
+  Izyaslav: Изяслав
+  Svyatoslav: Святослав
+  Vsevolod: Всеволод
+  Mstislav: Мстислав
+  Boris: Борис
+  Gleb: Глеб
+  Oleg: Олег
+  Igor: Игорь
+  Rostislav: Ростислав
+  Vyacheslav: Вячеслав
+  Anna: Анна
+  Elizaveta: Елизавета
+  Anastasia: Анастасия
+  Olga: Ольга
+  Evpraksia: Евпраксия
+  Predslava: Предслава
+  Yanka: Янка
+  Agafya: Агафья
+
+dynasty:
+  godwin: Годвинсон
+  leofwine: Мерсийский
+  siward: Сивардсон
+  bamburgh: Бамбургский
+  wessex: Уэссекский
+  normandy: Нормандский
+  conteville: де Контвиль
+  montgomery: де Монтгомери
+  capet: Капет
+  capet_burgundy: Бургундский
+  rurikid: Рюрикович
+  flanders: Фландрский
+  hainaut: д’Эно
+  boulogne: Булонский
+  ponthieu: де Понтье
+  vermandois: де Вермандуа
+  blois: де Блуа
+  anjou: Анжуйский
+  poitiers: де Пуатье
+  rennes: Реннский
+  cornouaille: де Корнуай
+  dunkeld: Данкельд
+  moray: Морейский
+  orkney: Оркнейский
+  arnmodlingar: Арнмёдлинг
+  mathrafal: Матравал
+  dinefwr: Диневур
+  morgannwg: Морганнугский
+  gwynllwg: Гвинллугский
+  ui_chennselaig: Уи Хеннселайг
+  ui_briain: Уа Бриайн
+  ui_conchobair: Уа Конхобайр
+  clann_cholmain: Уа Маэл Сехнайлл
+  mac_lochlainn: Мак Лохлайнн
+  dal_fiatach: Дал Фиатах
+  ui_imair: Уи Имайр
+
+# Шаблоны названий новых династий: {name} — имя основателя рода, {place} — графство.
+dynasty_pattern:
+  english: "{name}инг"
+  norman: "де {place}"
+  french: "де {place}"
+  occitan: "де {place}"
+  breton: "де {place}"
+  flemish: "ван {place}"
+  welsh: "ап {name}"
+  scottish: "мак {name}"
+  irish: "Уа {name}"
+  norse: "{name}ссон"
+  russian: "{name}ич"
+
+nick:
+  bastard: Бастард
+  curthose: Куртгёз
+  rufus: Рыжий
+  frisian: Фриз
+  bearded: Бородатый
+  rechin: Сварливый
+  old: Старый
+  mighty: Могучий
+  canmore: Канмор
+  ban: Бан
