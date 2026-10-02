@@ -5,6 +5,7 @@ import { type ScriptContext, makeContext } from '../script/context';
 import { evalTrigger, evalValue, failedTriggers, runEffect } from '../script/interpreter';
 import type { Character } from '../types';
 import { domainCounties } from './titles';
+import { costBlockers } from './economy';
 
 // ------------------------------------------------------------ решения
 
@@ -30,9 +31,7 @@ export function decisionBlockers(game: Game, def: DecisionDef, c: Character): st
   const ctx = decisionContext(game, c);
   const out = failedTriggers(ctx, ctx.root, def.is_valid);
   const cost = decisionCost(game, def, c);
-  if (c.gold < cost.gold) out.push(game.loc.t('ui.need_gold', { value: cost.gold }));
-  if (c.prestige < cost.prestige) out.push(game.loc.t('ui.need_prestige', { value: cost.prestige }));
-  if (c.piety < cost.piety) out.push(game.loc.t('ui.need_piety', { value: cost.piety }));
+  out.push(...costBlockers(game, c, cost));
   const cd = c.flags[`dec:${def.id}`];
   if (cd !== undefined && (cd === 0 || cd > game.date)) out.push(game.loc.t('ui.on_cooldown', { days: cd === 0 ? '∞' : cd - game.date }));
   return out;
@@ -77,8 +76,7 @@ export function buildingCandidates(game: Game, c: Character, provId: string): { 
     const ctx = makeContext(game, { type: 'province', id: provId }, { builder: { type: 'character', id: c.id } });
     blockers.push(...failedTriggers(ctx, ctx.root, b.trigger));
     const cost = buildingCost(game, b, c, provId);
-    if (c.gold < cost.gold) blockers.push(game.loc.t('ui.need_gold', { value: cost.gold }));
-    if (c.prestige < cost.prestige) blockers.push(game.loc.t('ui.need_prestige', { value: cost.prestige }));
+    blockers.push(...costBlockers(game, c, cost));
     out.push({ def: b, blockers });
   }
   return out;

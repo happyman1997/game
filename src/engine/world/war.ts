@@ -7,6 +7,7 @@ import { evalTrigger, evalValue, runEffect } from '../script/interpreter';
 import type { Character, War } from '../types';
 import { isAlive } from './characters';
 import { opinion } from './opinion';
+import { costBlockers } from './economy';
 import {
   deJureCounties,
   deJureVassalTitles,
@@ -252,7 +253,7 @@ export function warCost(game: Game, attacker: Character, t: WarTarget): { gold: 
 
 export function canAffordWar(game: Game, attacker: Character, t: WarTarget): boolean {
   const c = warCost(game, attacker, t);
-  return attacker.gold >= c.gold && attacker.prestige >= c.prestige && attacker.piety >= c.piety;
+  return costBlockers(game, attacker, c).length === 0;
 }
 
 /** ИИ-союзник решает, вступать ли в войну. */

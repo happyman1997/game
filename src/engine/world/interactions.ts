@@ -7,6 +7,7 @@ import { evalTrigger, evalValue, failedTriggers, runEffect } from '../script/int
 import type { Character, ScopeRef } from '../types';
 import { isAlive } from './characters';
 import { startScheme } from './schemes';
+import { costBlockers } from './economy';
 
 /**
  * Взаимодействия персонажей (брак, подарок, вассалитет, интриги...).
@@ -112,9 +113,7 @@ export function interactionBlockers(game: Game, def: InteractionDef, actor: Char
   const ctx = interactionContext(game, def, actor, recipient, args);
   const out = failedTriggers(ctx, ctx.root, def.is_valid);
   const cost = interactionCost(game, def, ctx);
-  if (actor.gold < cost.gold) out.push(game.loc.t('ui.need_gold', { value: cost.gold }));
-  if (actor.prestige < cost.prestige) out.push(game.loc.t('ui.need_prestige', { value: cost.prestige }));
-  if (actor.piety < cost.piety) out.push(game.loc.t('ui.need_piety', { value: cost.piety }));
+  out.push(...costBlockers(game, actor, cost));
   const cd = actor.flags[cooldownKey(def, recipient)];
   if (cd && cd > game.date) out.push(game.loc.t('ui.on_cooldown', { days: cd - game.date }));
   if (def.secondary_actor && !args.secondary && secondaryCandidates(game, def, actor, recipient).length === 0)

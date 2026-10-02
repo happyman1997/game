@@ -128,3 +128,12 @@ export function militaryStrength(game: Game, c: Character): number {
   for (const a of Object.values(game.state.armies)) if (a.owner === c.id) raised += a.size;
   return raised > 0 ? raised : realmLevy(game, c);
 }
+
+/** Причины, по которым персонаж не может заплатить цену (пусто — может). Нулевая цена всегда доступна. */
+export function costBlockers(game: Game, c: Character, cost: { gold?: number; prestige?: number; piety?: number }): string[] {
+  const out: string[] = [];
+  if ((cost.gold ?? 0) > 0 && c.gold < cost.gold!) out.push(game.loc.t('ui.need_gold', { value: cost.gold }));
+  if ((cost.prestige ?? 0) > 0 && c.prestige < cost.prestige!) out.push(game.loc.t('ui.need_prestige', { value: cost.prestige }));
+  if ((cost.piety ?? 0) > 0 && c.piety < cost.piety!) out.push(game.loc.t('ui.need_piety', { value: cost.piety }));
+  return out;
+}

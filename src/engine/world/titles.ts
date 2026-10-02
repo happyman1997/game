@@ -268,8 +268,8 @@ export function canCreateTitle(game: Game, c: Character, titleId: string): { ok:
   const need = Math.ceil(total * (game.defines.titles?.create_fraction ?? 0.51));
   if (have < need) reasons.push(game.loc.t('ui.need_counties', { have, need }));
   const cost = titleActionCost(game, titleId, 'create');
-  if (c.gold < cost.gold) reasons.push(game.loc.t('ui.need_gold', { value: cost.gold }));
-  if (c.prestige < cost.prestige) reasons.push(game.loc.t('ui.need_prestige', { value: cost.prestige }));
+  if (cost.gold > 0 && c.gold < cost.gold) reasons.push(game.loc.t('ui.need_gold', { value: cost.gold }));
+  if (cost.prestige > 0 && c.prestige < cost.prestige) reasons.push(game.loc.t('ui.need_prestige', { value: cost.prestige }));
   return { ok: reasons.length === 0, reasons };
 }
 
@@ -296,8 +296,8 @@ export function canUsurpTitle(game: Game, c: Character, titleId: string): { ok: 
   const need = Math.ceil(total * (game.defines.titles?.create_fraction ?? 0.51));
   if (have < need) reasons.push(game.loc.t('ui.need_counties', { have, need }));
   const cost = titleActionCost(game, titleId, 'usurp');
-  if (c.gold < cost.gold) reasons.push(game.loc.t('ui.need_gold', { value: cost.gold }));
-  if (c.prestige < cost.prestige) reasons.push(game.loc.t('ui.need_prestige', { value: cost.prestige }));
+  if (cost.gold > 0 && c.gold < cost.gold) reasons.push(game.loc.t('ui.need_gold', { value: cost.gold }));
+  if (cost.prestige > 0 && c.prestige < cost.prestige) reasons.push(game.loc.t('ui.need_prestige', { value: cost.prestige }));
   return { ok: reasons.length === 0, reasons };
 }
 

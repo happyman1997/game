@@ -4,7 +4,8 @@
  *   npm run sim -- --years 50 --seed 42 [--bookmark b1066] [--mods core,example]
  */
 import { Engine } from '../src/engine/engine';
-import { loadNodeModPackages } from '../src/engine/mods/nodeSource';
+import { loadNodeLocale, loadNodeModPackages } from '../src/engine/mods/nodeSource';
+import { createDefaultFormats } from '../src/engine/core/formats';
 import { realmCounties, titleFullName, topLiege } from '../src/engine/world/titles';
 import { charFullName } from '../src/engine/world/characters';
 
@@ -20,6 +21,7 @@ const t0 = Date.now();
 const engine = await Engine.create(await loadNodeModPackages('mods'), {
   enabled: modsArg ? new Set(modsArg.split(',')) : null,
   lang: arg('lang', 'ru'),
+  defaultLocalization: await loadNodeLocale('src/locale', (t, p) => createDefaultFormats().parse(t, p)),
 });
 console.log(`Моды: ${engine.mods.map((m) => m.manifest.id).join(', ')} (${Date.now() - t0} мс)`);
 for (const i of engine.issues) console.log(`  [${i.level}] ${i.mod ?? ''} ${i.file ?? ''} ${i.message}`);

@@ -49,3 +49,18 @@ export async function loadNodeModPackages(modsDir: string): Promise<ModPackage[]
   }
   return out;
 }
+
+/** Загружает встроенную локализацию движка (src/locale/<язык>/*.yaml) для CLI и тестов. */
+export async function loadNodeLocale(dir: string, parse: (text: string, path: string) => unknown): Promise<Record<string, unknown[]>> {
+  const out: Record<string, unknown[]> = {};
+  for (const lang of await readdir(dir)) {
+    const ld = join(dir, lang);
+    if (!(await stat(ld)).isDirectory()) continue;
+    out[lang] = [];
+    for (const f of (await readdir(ld)).sort()) {
+      if (!/\.(ya?ml|json)$/.test(f)) continue;
+      out[lang].push(parse(await readFile(join(ld, f), 'utf8'), join(ld, f)));
+    }
+  }
+  return out;
+}

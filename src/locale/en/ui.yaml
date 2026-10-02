@@ -1,0 +1,294 @@
+month:
+  1: January
+  2: February
+  3: March
+  4: April
+  5: May
+  6: June
+  7: July
+  8: August
+  9: September
+  10: October
+  11: November
+  12: December
+
+bookmark:
+  b1066: The Norman Conquest
+bookmark_desc:
+  b1066: "1066. Edward the Confessor has died childless, and three men claim the English throne: Harold Godwinson, William of Normandy and Edgar Ætheling. Ireland is divided among petty kings, Wales is split, and the young King of France rules under the regency of the Count of Flanders."
+
+ui:
+  game_title: Crown & Dynasty
+  game_subtitle: A moddable strategy of kings, heirs and intrigue
+  new_game: New Game
+  load_game: Load Game
+  save_game: Save Game
+  mods: Mods
+  active_mods: Active mods
+  issues_n: "errors: {e}, warnings: {w}"
+  mod_issues: Mod issues
+  no_issues: No issues found.
+  mods_hint: "Tick the mods and press Apply. Mods in the /mods folder are bundled automatically; you can also load a mod folder straight from the browser (for this session only)."
+  depends_on: Requires
+  load_mod_folder: Load mod folder…
+  load_mod_folder_tip: Choose a folder containing mod.json (or a folder with several mods).
+  apply_mods: Apply
+  loading_mods: Loading mods…
+  choose_bookmark: Choose an era
+  no_bookmarks: No mod has added any bookmarks. Enable the base game mod.
+  pick_on_map: Pick any ruler on the map…
+  generating_world: Creating the world…
+  main_menu: Main menu
+  menu: Menu
+  resume: Resume
+  export_save: Export save to file
+  import_save: Load from file…
+  save: Save
+  load: Load
+  saved: Game saved
+  save_failed: Could not save
+  load_failed: Could not load
+  no_saves: No saves yet.
+  autosave: Autosave
+  quicksave: Quicksave
+  cancel: Cancel
+  close: Close
+  back: Back
+  accept: Accept
+  decline: Decline
+  send: Send
+  free: free
+  none: none
+  game_over: The End of the Dynasty
+  game_over_no_heir: You have no heirs left. Your house has ended, but the world goes on without you.
+
+  pick_title: Choose a character
+  pick_text: "Choose a character from the list, or click any province on the map, open its holder and press “Play as this character”."
+  pick_character_hint: Choose the character you will play
+  play_as: Play as this character
+
+  speed_hint: "Space — pause, 1–5 — speed, F5 — quicksave"
+  pause_hint: Pause / resume (Space)
+  speed_n: "Speed {n}"
+  gold: Gold
+  prestige: Prestige
+  piety: Piety
+  levies: Levies
+  stress: Stress
+  stress_tip: "Stress. Every 100 points lowers skills and may lead to a breakdown."
+  health: Health
+  domain_tax: Domain taxes
+  vassal_tax: Vassal taxes
+  liege_tax: Tax to liege
+  other_income: Other income
+  army_upkeep: Army upkeep
+  base_value: Base
+  age: Age
+
+  tab:
+    character: Character
+    realm: Realm
+    military: Military
+    wars: Wars
+    intrigue: Intrigue
+    decisions: Decisions
+    log: Chronicle
+  mapmode:
+    realms: Realms
+    diplomacy: Diplomacy
+    de_jure_duchy: De jure duchies
+    de_jure_kingdom: De jure kingdoms
+    culture: Cultures
+    faith: Faiths
+    terrain: Terrain
+    development: Development
+    wealth: Tax income
+
+  province: Province
+  title: Title
+  army: Army
+  armies: Armies
+  unknown_character: Character not found
+  age_n: "age {n}"
+  died: "Died {date} at the age of {age} — {reason}"
+  death_reason:
+    natural: of old age
+    illness: of illness
+    childhood: in childhood
+    battle: in battle
+    childbirth: in childbirth
+    murder: murdered
+    hunting: while hunting
+    stress: of a broken heart
+    plague: of the plague
+  courtier_of: "Courtier of {who}"
+  wanderer: Wanderer
+  lowborn: Lowborn
+  dynasty_n: "Dynasty: {name}"
+  dynasty_prestige: "Dynasty prestige: {n}"
+  opinion_of_you: Opinion of you
+  your_opinion: Your opinion
+  trait_category:
+    personality: Personality trait
+    education: Education
+    congenital: Congenital trait
+    health: Health
+    lifestyle: Lifestyle
+    fame: Fame
+    childhood: Childhood trait
+  months_left: "Months left: {n}"
+  interactions: Interactions
+  self_actions: Actions
+  declare_war: Declare war
+  family: Family
+  liege: Liege
+  court: Court
+  heir: Heir
+  no_heir: no heir!
+  spouse: Spouse
+  former_spouses: Former spouses
+  parents: Parents
+  children: Children
+  siblings: Siblings
+  pregnant: Pregnancy
+  due: "due around {date}"
+  titles: Titles
+  claims: Claims
+  will_accept: Will accept
+  will_decline: Will decline
+  options_n: "Options: {n}"
+  choose_candidate: Choose a candidate
+  choose_target: Choose a target
+  choose_spouse_from_family: Whom do you offer in marriage?
+  choose_title: Choose a title
+  cost: Cost
+  effects: Effects
+  on_success: On success
+  start_scheme: Start scheme
+  no_candidates: No suitable candidates
+  no_targets: No suitable targets
+  scheme_exists: Such a scheme is already running
+  on_cooldown: "Not available yet ({days} more days)"
+  need_gold: "Requires gold: {value}"
+  need_prestige: "Requires prestige: {value}"
+  need_piety: "Requires piety: {value}"
+  need_counties: "Requires controlled counties: {need} (now {have})"
+  need_learning_8: Requires learning of at least 8
+  need_health_3: Requires health of at least 3
+  need_stress: Requires stress of at least 30
+  need_two_british_kingdoms: You must hold two kingdoms of Britain
+  alliance_requires_marriage: Requires a marriage between your families
+  must_be_neighbor: Their lands must border yours
+  invasion_tooltip: "Knights from all over France flock to your banners: +5500 soldiers for 4 years."
+  ia_result:
+    accepted: The offer was accepted
+    declined: The offer was declined
+    pending: Awaiting reply
+    invalid: Not possible right now
+    scheme: Scheme started
+  request_text: "{who} proposes: {what}. Do you agree?"
+
+  holder: Holder
+  occupant: Occupier
+  terrain: Terrain
+  culture: Culture
+  faith: Faith
+  development: Development
+  tax: Tax
+  levy: Levy
+  fort: Fortifications
+  month_short: mo.
+  siege: Siege
+  buildings: Buildings
+  build: Build
+  days_n: "{n} days"
+  days_left: "{n} days left"
+  construction_started: Construction started
+  not_your_domain: Not your domain
+  already_building: Construction already in progress
+  occupied: The province is occupied
+  no_slots: No free slots
+  armies_here: Armies in the province
+  title_actions: Titles
+  impassable: Impassable lands beyond the map
+  realm_of: "Realm: {name}"
+  occupied_by: "Occupied by {who}"
+  create_title: Create
+  usurp_title: Usurp
+  title_created: Title created!
+  title_usurped: Title usurped!
+  counties_controlled: "You control {have} of {total} counties"
+  cannot_create_tier: This title cannot be created
+  title_already_held: The title already has a holder
+  title_not_held_by_other: The title is not held by another ruler
+  would_outrank_liege: You cannot outrank your liege
+  counties: Counties
+  de_jure_vassals: De jure vassals
+  history: History of holders
+
+  levy_ratio: Levy replenishment
+  raise_army: Raise army
+  raise_army_tip: Raise your realm's levies at your capital. Armies cost gold to maintain.
+  move_hint: "Select an army and RIGHT-click a province to send it there."
+  allies: Allies
+  no_allies: No allies
+  truces: Truces
+  until_year: "until {y}"
+  army_gone: This army no longer exists
+  owner: Owner
+  commander: Commander
+  location: Location
+  status: Status
+  retreating: Retreating
+  marching: "Marching to {place} ({days} days to the next province)"
+  sieging: "Besieging: {n}%"
+  in_enemy_land: In enemy lands
+  idle: Encamped
+  disband: Disband
+  no_path: There is no way there
+  no_wars: You are not at war.
+  attackers: Attackers
+  defenders: Defenders
+  warscore: War score
+  ws_battles: Battles
+  ws_occupation: Occupation
+  ws_ticking: Holding targets
+  enforce_peace: Enforce peace
+  enforce_peace_tip: Available at 100% war score or if the enemy is willing to surrender.
+  white_peace: White peace
+  white_peace_accepted: The enemy accepted a white peace
+  white_peace_refused: The enemy refused a white peace
+  surrender: Surrender
+  possible_wars: Possible wars
+  declare: Declare
+  your_strength: Your strength
+  enemy_strength: Enemy strength
+  target: Target
+  enemy: Enemy
+  counties_n: "counties: {n}"
+  war_declared: War declared!
+  no_cb: You have no casus belli against this ruler. Claims can be fabricated through a scheme.
+  war: War
+  war_name_default: "War of [scope:attacker] against [scope:defender]"
+
+  scheme_hint: "To start a scheme, open a character window and choose an action (befriend, seduce, murder…)."
+  my_schemes: My schemes
+  schemes_against: Discovered schemes against you
+  scheme_stats: "Progress {progress}% (+{speed}/mo), success chance {chance}%"
+  discovered: discovered!
+  abandon: Abandon
+
+  take_decision: Take
+  no_decisions: No decisions available.
+
+  domain: Domain
+  domain_tip: "How many counties you hold personally and how many you can manage. Exceeding the limit reduces taxes."
+  realm_size: Counties in realm
+  income: Monthly income
+  succession: Succession
+  change_law: "Change succession law:"
+  law_changed: Succession law changed
+  claimable_titles: Titles within reach
+  vassals: Vassals
+  dynasty: Dynasty
+  members_n: "living members: {n}"

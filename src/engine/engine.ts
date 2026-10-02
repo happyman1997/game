@@ -29,6 +29,8 @@ export interface EngineOptions {
   enabled?: Set<string> | null;
   lang?: string;
   onProgress?: (msg: string) => void;
+  /** Встроенные строки движка и интерфейса: { ru: {...}, en: {...} }. Моды могут их переопределять. */
+  defaultLocalization?: Record<string, unknown[]>;
 }
 
 /**
@@ -74,6 +76,7 @@ export class Engine {
     e.mods = res.order;
     e.issues.push(...res.issues);
     if (opts.lang) e.loc.lang = opts.lang;
+    for (const [lang, docs] of Object.entries(opts.defaultLocalization ?? {})) for (const d of docs) e.loc.addDefaults(lang, d);
 
     normalizeContent(e.content);
     registerBuiltins(e);

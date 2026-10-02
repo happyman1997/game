@@ -33,6 +33,18 @@ export class Localization {
     walk(entries, prefix);
   }
 
+  /** Добавляет строки, не перезаписывая уже существующие (строки модов важнее). */
+  addDefaults(lang: string, entries: unknown): void {
+    const tmp = new Localization();
+    tmp.add(lang, entries);
+    let table = this.tables.get(lang);
+    if (!table) {
+      table = new Map();
+      this.tables.set(lang, table);
+    }
+    for (const k of tmp.keys(lang)) if (!table.has(k)) table.set(k, tmp.raw(k)!);
+  }
+
   languages(): string[] {
     return [...this.tables.keys()];
   }

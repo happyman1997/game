@@ -1,0 +1,295 @@
+# Строки интерфейса. Любой мод может переопределить их своими файлами локализации.
+month:
+  1: января
+  2: февраля
+  3: марта
+  4: апреля
+  5: мая
+  6: июня
+  7: июля
+  8: августа
+  9: сентября
+  10: октября
+  11: ноября
+  12: декабря
+
+bookmark:
+  b1066: Норманнское завоевание
+bookmark_desc:
+  b1066: "1066 год. Эдуард Исповедник умер бездетным, и на английский трон претендуют сразу трое: Гарольд Годвинсон, Вильгельм Нормандский и Эдгар Этелинг. Ирландия раздроблена между мелкими королями, Уэльс разделён, а юный король Франции правит под опекой графа Фландрского."
+
+ui:
+  game_title: Корона и Династия
+  game_subtitle: Модульная стратегия о королях, наследниках и интригах
+  new_game: Новая игра
+  load_game: Загрузить игру
+  save_game: Сохранить игру
+  mods: Моды
+  active_mods: Активные моды
+  issues_n: "ошибок: {e}, предупреждений: {w}"
+  mod_issues: Проблемы модов
+  no_issues: Проблем не найдено.
+  mods_hint: "Отметьте моды и нажмите «Применить». Моды из папки /mods встраиваются в игру автоматически; папку с модом можно также загрузить прямо из браузера (только на эту сессию)."
+  depends_on: Требует
+  load_mod_folder: Загрузить папку мода…
+  load_mod_folder_tip: Выберите папку, содержащую mod.json (или папку с несколькими модами).
+  apply_mods: Применить
+  loading_mods: Загрузка модов…
+  choose_bookmark: Выберите эпоху
+  no_bookmarks: Ни один мод не добавил закладок (bookmarks). Включите основной мод.
+  pick_on_map: Выбрать любого правителя на карте…
+  generating_world: Сотворение мира…
+  main_menu: Главное меню
+  menu: Меню
+  resume: Продолжить
+  export_save: Экспорт сохранения в файл
+  import_save: Загрузить из файла…
+  save: Сохранить
+  load: Загрузить
+  saved: Игра сохранена
+  save_failed: Не удалось сохранить
+  load_failed: Не удалось загрузить
+  no_saves: Сохранений пока нет.
+  autosave: Автосохранение
+  quicksave: Быстрое сохранение
+  cancel: Отмена
+  close: Закрыть
+  back: Назад
+  accept: Принять
+  decline: Отклонить
+  send: Отправить
+  free: бесплатно
+  none: нет
+  game_over: Конец династии
+  game_over_no_heir: У вас не осталось наследников. Ваш род угас, но история мира продолжается без вас.
+
+  pick_title: Выбор персонажа
+  pick_text: "Выберите персонажа из списка или щёлкните по любой провинции на карте, откройте её владельца и нажмите «Играть за этого персонажа»."
+  pick_character_hint: Выберите персонажа, за которого будете играть
+  play_as: Играть за этого персонажа
+
+  speed_hint: "Пробел — пауза, 1–5 — скорость, F5 — быстрое сохранение"
+  pause_hint: Пауза / продолжить (пробел)
+  speed_n: "Скорость {n}"
+  gold: Золото
+  prestige: Престиж
+  piety: Благочестие
+  levies: Ополчение
+  stress: Стресс
+  stress_tip: "Стресс. Каждые 100 единиц снижают навыки и могут привести к срыву."
+  health: Здоровье
+  domain_tax: Налоги с домена
+  vassal_tax: Налоги вассалов
+  liege_tax: Налог сюзерену
+  other_income: Прочие доходы
+  army_upkeep: Содержание армий
+  base_value: База
+  age: Возраст
+
+  tab:
+    character: Персонаж
+    realm: Владения
+    military: Армия
+    wars: Войны
+    intrigue: Интриги
+    decisions: Решения
+    log: Летопись
+  mapmode:
+    realms: Державы
+    diplomacy: Дипломатия
+    de_jure_duchy: Де-юре герцогства
+    de_jure_kingdom: Де-юре королевства
+    culture: Культуры
+    faith: Веры
+    terrain: Местность
+    development: Развитие
+    wealth: Налоговый доход
+
+  province: Провинция
+  title: Титул
+  army: Армия
+  armies: Армии
+  unknown_character: Персонаж не найден
+  age_n: "{n} лет"
+  died: "Умер(ла) {date} в возрасте {age} — {reason}"
+  death_reason:
+    natural: от старости
+    illness: от болезни
+    childhood: в детстве
+    battle: в бою
+    childbirth: при родах
+    murder: убит(а)
+    hunting: на охоте
+    stress: от разрыва сердца
+    plague: от чумы
+  courtier_of: "Придворный: {who}"
+  wanderer: Странник
+  lowborn: Безродный
+  dynasty_n: "Династия: {name}"
+  dynasty_prestige: "Престиж династии: {n}"
+  opinion_of_you: Мнение о вас
+  your_opinion: Ваше мнение
+  trait_category:
+    personality: Черта характера
+    education: Образование
+    congenital: Врождённая черта
+    health: Здоровье
+    lifestyle: Образ жизни
+    fame: Слава
+    childhood: Детская черта
+  months_left: "Осталось месяцев: {n}"
+  interactions: Взаимодействия
+  self_actions: Действия
+  declare_war: Объявить войну
+  family: Семья
+  liege: Сюзерен
+  court: Двор
+  heir: Наследник
+  no_heir: нет наследника!
+  spouse: Супруг(а)
+  former_spouses: Бывшие супруги
+  parents: Родители
+  children: Дети
+  siblings: Братья и сёстры
+  pregnant: Беременность
+  due: "роды около {date}"
+  titles: Титулы
+  claims: Претензии
+  will_accept: Согласится
+  will_decline: Откажется
+  options_n: "Вариантов: {n}"
+  choose_candidate: Выберите кандидата
+  choose_target: Выберите цель
+  choose_spouse_from_family: Кого вы предлагаете в супруги?
+  choose_title: Выберите титул
+  cost: Цена
+  effects: Последствия
+  on_success: В случае успеха
+  start_scheme: Начать интригу
+  no_candidates: Нет подходящих кандидатов
+  no_targets: Нет подходящих целей
+  scheme_exists: Такая интрига уже идёт
+  on_cooldown: "Пока недоступно (ещё {days} дн.)"
+  need_gold: "Нужно золота: {value}"
+  need_prestige: "Нужно престижа: {value}"
+  need_piety: "Нужно благочестия: {value}"
+  need_counties: "Нужно графств под контролем: {need} (сейчас {have})"
+  need_learning_8: Нужна учёность не ниже 8
+  need_health_3: Нужно здоровье не ниже 3
+  need_stress: Нужен стресс не ниже 30
+  need_two_british_kingdoms: Нужно владеть двумя королевствами Британии
+  alliance_requires_marriage: Нужен брак между вашими семьями
+  must_be_neighbor: Земли должны граничить с вашими
+  invasion_tooltip: "Под ваши знамёна стекаются рыцари со всей Франции: +5500 воинов на 4 года."
+  ia_result:
+    accepted: Предложение принято
+    declined: Предложение отклонено
+    pending: Ожидаем ответа
+    invalid: Сейчас это невозможно
+    scheme: Интрига начата
+  request_text: "{who} предлагает: {what}. Вы согласны?"
+
+  holder: Владелец
+  occupant: Оккупант
+  terrain: Местность
+  culture: Культура
+  faith: Вера
+  development: Развитие
+  tax: Налог
+  levy: Ополчение
+  fort: Укрепления
+  month_short: мес.
+  siege: Осада
+  buildings: Постройки
+  build: Построить
+  days_n: "{n} дн."
+  days_left: "ещё {n} дн."
+  construction_started: Строительство начато
+  not_your_domain: Это не ваш домен
+  already_building: Уже идёт строительство
+  occupied: Провинция оккупирована
+  no_slots: Нет свободных мест
+  armies_here: Армии в провинции
+  title_actions: Титулы
+  impassable: Непроходимые земли за пределами карты
+  realm_of: "Держава: {name}"
+  occupied_by: "Оккупирована: {who}"
+  create_title: Создать
+  usurp_title: Узурпировать
+  title_created: Титул создан!
+  title_usurped: Титул узурпирован!
+  counties_controlled: "Под вашим контролем {have} из {total} графств"
+  cannot_create_tier: Этот титул нельзя создать
+  title_already_held: У титула уже есть владелец
+  title_not_held_by_other: Титул не принадлежит другому правителю
+  would_outrank_liege: Нельзя превзойти рангом своего сюзерена
+  counties: Графств
+  de_jure_vassals: Де-юре вассалы
+  history: История владельцев
+
+  levy_ratio: Восстановление ополчения
+  raise_army: Собрать армию
+  raise_army_tip: Собрать ополчение своей державы в столице. Содержание армии стоит золота.
+  move_hint: "Выберите армию и щёлкните ПРАВОЙ кнопкой мыши по провинции, чтобы отправить её туда."
+  allies: Союзники
+  no_allies: Союзников нет
+  truces: Перемирия
+  until_year: "до {y} г."
+  army_gone: Армия больше не существует
+  owner: Владелец
+  commander: Полководец
+  location: Местоположение
+  status: Состояние
+  retreating: Отступает
+  marching: "Идёт: {place} (до следующей провинции {days} дн.)"
+  sieging: "Осаждает крепость: {n}%"
+  in_enemy_land: Во вражеских землях
+  idle: Стоит лагерем
+  disband: Распустить
+  no_path: Туда не пройти
+  no_wars: Вы ни с кем не воюете.
+  attackers: Нападающие
+  defenders: Защитники
+  warscore: Счёт войны
+  ws_battles: Сражения
+  ws_occupation: Оккупация
+  ws_ticking: Удержание целей
+  enforce_peace: Принудить к миру
+  enforce_peace_tip: Доступно при счёте 100% или если противник готов сдаться.
+  white_peace: Белый мир
+  white_peace_accepted: Противник согласился на белый мир
+  white_peace_refused: Противник отверг белый мир
+  surrender: Капитулировать
+  possible_wars: Возможные войны
+  declare: Объявить
+  your_strength: Ваша сила
+  enemy_strength: Сила врага
+  target: Цель
+  enemy: Противник
+  counties_n: "графств: {n}"
+  war_declared: Война объявлена!
+  no_cb: У вас нет поводов к войне против этого правителя. Претензии можно сфабриковать интригой.
+  war: Война
+  war_name_default: "Война [scope:attacker] против [scope:defender]"
+
+  scheme_hint: "Чтобы начать интригу, откройте окно персонажа и выберите действие (подружиться, соблазнить, убить…)."
+  my_schemes: Мои интриги
+  schemes_against: Раскрытые интриги против вас
+  scheme_stats: "Прогресс {progress}% (+{speed}/мес.), шанс успеха {chance}%"
+  discovered: раскрыта!
+  abandon: Отказаться
+
+  take_decision: Принять
+  no_decisions: Нет доступных решений.
+
+  domain: Домен
+  domain_tip: "Сколько графств вы держите лично и сколько можете эффективно управлять. Превышение лимита снижает налоги."
+  realm_size: Графств в державе
+  income: Доход в месяц
+  succession: Наследование
+  change_law: "Сменить закон наследования:"
+  law_changed: Закон наследования изменён
+  claimable_titles: Титулы, которые можно получить
+  vassals: Вассалы
+  dynasty: Династия
+  members_n: "живых членов: {n}"
