@@ -11,6 +11,8 @@ import type { App } from '../app';
 import { type Child, esc, fmt, h, signed } from '../dom';
 import { breakdownHtml, button, charLink, dynastyCoa, modifiersHtml, portrait, reasonsHtml, section, titleCoa, titleLink } from '../widgets';
 import { openInteraction } from './interaction';
+import { lifestyleSummary } from './lifestyle';
+import { councilBadge } from './council';
 import { openDeclareWar } from './wars';
 
 export function renderCharacterPanel(app: App, id: string): HTMLElement {
@@ -36,6 +38,9 @@ export function renderCharacterPanel(app: App, id: string): HTMLElement {
     const d = g.state.dynasties[c.dynasty];
     info.push(h('div', { class: 'dyn-line', tip: app.t('ui.dynasty_prestige', { n: fmt(d?.prestige ?? 0) }) }, dynastyCoa(app, c.dynasty, 18), ' ', app.t('ui.dynasty_n', { name: g.nameOf('dynasties', c.dynasty) })));
   } else info.push(h('div', { class: 'muted' }, app.t('ui.lowborn')));
+  const badge = councilBadge(app, c);
+  if (badge) info.push(badge);
+  if (c.prison) info.push(h('div', { class: 'bad prison-line' }, '⛓ ', app.t('ui.in_prison_of', { jailer: '' }), charLink(app, c.prison.by, true)));
   root.append(h('div', { class: 'char-head' }, portrait(app, c, 96, false), h('div', { class: 'char-info' }, ...info), c.titles[0] ? titleCoa(app, c.titles[0], 44) : null));
 
   if (app.pickMode && alive && c.titles.length) {
@@ -87,6 +92,9 @@ export function renderCharacterPanel(app: App, id: string): HTMLElement {
       return h('span', { class: ['modifier', def?.good ? 'good' : 'bad'], tip: () => `<div class="tip-title">${esc(g.nameOf('modifiers', m.id))}</div>${left != null ? `<div class="muted">${esc(app.t('ui.months_left', { n: left }))}</div>` : ''}${modifiersHtml(app, def?.modifiers)}` }, `${def?.icon ?? '✦'} ${g.nameOf('modifiers', m.id)}`);
     })));
   }
+
+  const ls = lifestyleSummary(app, c);
+  if (ls) root.append(section(app.t('ui.lifestyle'), ls));
 
   // ---------------------------------------------------- действия
   if (p && alive && !app.pickMode && !g.state.gameOver) {

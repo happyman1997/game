@@ -1,0 +1,27 @@
+interaction:
+  imprison: Заключить в темницу
+  release_prisoner: Освободить
+  execute_prisoner: Казнить
+  demand_ransom: Потребовать выкуп
+interaction_desc:
+  imprison: Бросить персонажа в темницу. Без законного повода (раскрытого заговора, мятежа) это тирания — вассалы будут недовольны, а владетельный вассал может успеть бежать.
+  release_prisoner: Отпустить пленника на свободу. Он будет благодарен.
+  execute_prisoner: Казнить пленника. Родня не простит, а без законного повода это тяжкая тирания.
+  demand_ransom: Предложить семье или сюзерену пленника выкупить его.
+opinion_modifier:
+  imprisoned_me: Бросил меня в темницу
+  imprisoned_relative: Заточил моего родича
+  executed_relative: Казнил моего родича
+  attempted_imprisonment: Пытался меня заточить
+  refused_ransom: Отказался платить выкуп
+  rebel: Мятежник
+  tyranny: Тирания
+ui:
+  tyranny_tooltip: "Тирания: все вассалы станут хуже к вам относиться."
+  payer_cant_afford: Плательщику не хватает золота на выкуп
+msg:
+  imprison_failed: "[scope:recipient] успевает бежать в свои владения!"
+ai:
+  ransom_family: Свой родич
+  ransom_opinion: Мнение о пленнике
+  ransom_wealth: Хватает ли золота

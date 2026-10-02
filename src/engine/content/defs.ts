@@ -185,6 +185,8 @@ export interface CasusBelliDef {
   ai_will_do?: ValueExpr;
   truce_years?: number;
   war_name?: TextValue;
+  /** Повод не предлагается в обычном объявлении войны (только из скриптов и механик). */
+  manual?: boolean;
 }
 
 export interface InteractionDef {
@@ -205,8 +207,10 @@ export interface InteractionDef {
   ai_accept?: ValueExpr;
   on_accept?: ScriptBlock;
   on_decline?: ScriptBlock;
-  /** Кто решает: recipient (по умолчанию) или guardian — сюзерен безземельного получателя. */
-  decider?: "recipient" | "guardian";
+  /** Кто решает: recipient (по умолчанию), guardian — сюзерен безземельного получателя, или id из registries.interactionDeciders (payer — плательщик выкупа). */
+  decider?: string;
+  /** Взаимодействие с пленником: never (по умолчанию) — недоступно, only — только с пленником, allowed — с любым. */
+  prisoner?: 'never' | 'only' | 'allowed';
   /** Запускает интригу этого типа вместо обычного исполнения. */
   scheme?: string;
   ai_will_do?: ValueExpr;

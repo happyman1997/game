@@ -1,0 +1,22 @@
+regiment_type:
+  light_footmen: Light Footmen
+  archers: Archers
+  pikemen: Pikemen
+  light_cavalry: Light Cavalry
+  heavy_infantry: Heavy Infantry
+  heavy_cavalry: Heavy Cavalry
+  housecarls: Housecarls
+  chevaliers: Chevaliers
+  gallowglass: Gallowglass
+  longbowmen: Welsh Longbowmen
+regiment_type_desc:
+  light_footmen: Cheap and hardy spearmen. Good in forests and hills.
+  archers: Shooters who mow down infantry from afar. Vulnerable to cavalry.
+  pikemen: A wall of spears against which any cavalry breaks.
+  light_cavalry: Swift riders — the bane of archers. Useless in forests and marshes.
+  heavy_infantry: Armoured warriors who hack through pike lines.
+  heavy_cavalry: Knightly cavalry — the most crushing force on open ground, but wary of pikes.
+  housecarls: The personal retinue of Anglo-Saxon and Norse lords, wielding great axes.
+  chevaliers: Norman and French knights — the finest heavy cavalry of the age.
+  gallowglass: Gaelic warriors with long axes, at home in hills and bogs.
+  longbowmen: Welsh archers whose longbows pierce even mail.

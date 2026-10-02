@@ -25,6 +25,11 @@ export interface InteractionTargetProvider {
   options(game: Game, actor: Character, recipient: Character): InteractionOption[];
 }
 
+/** Кто принимает решение по взаимодействию (поле decider в данных). */
+export interface InteractionDecider {
+  decider(game: Game, recipient: Character, actor?: Character): Character | undefined;
+}
+
 export interface InteractionArgs {
   secondary?: string;
   target?: ScopeRef;
@@ -44,11 +49,16 @@ export function interactionContext(game: Game, def: InteractionDef, actor: Chara
 
 /** Кто принимает решение: сам получатель или (decider: guardian) его опекун-сюзерен. */
 export function deciderOf(game: Game, def: InteractionDef, recipient: Character): Character {
-  if (def.decider === 'guardian' && !recipient.titles.length && recipient.liege) {
-    const g = game.char(recipient.liege);
-    if (g && isAlive(g)) return g;
+  if (!def.decider || def.decider === 'recipient') return recipient;
+  if (def.decider === 'guardian') {
+    if (!recipient.titles.length && recipient.liege) {
+      const g = game.char(recipient.liege);
+      if (g && isAlive(g)) return g;
+    }
+    return recipient;
   }
-  return recipient;
+  const d = game.engine.registries.interactionDeciders.get(def.decider)?.decider(game, recipient);
+  return d && isAlive(d) ? d : recipient;
 }
 
 export function interactionDefs(game: Game): InteractionDef[] {
@@ -58,6 +68,10 @@ export function interactionDefs(game: Game): InteractionDef[] {
 export function isInteractionShown(game: Game, def: InteractionDef, actor: Character, recipient: Character): boolean {
   if (!isAlive(actor) || !isAlive(recipient)) return false;
   if (def.self ? actor.id !== recipient.id : actor.id === recipient.id) return false;
+  // Пленники ничего не предпринимают; с пленником доступны только взаимодействия с prisoner: only/allowed.
+  if (actor.prison) return false;
+  const mode = def.prisoner ?? 'never';
+  if (recipient.prison ? mode === 'never' : mode === 'only') return false;
   const ctx = interactionContext(game, def, actor, recipient);
   return evalTrigger(ctx, ctx.root, def.is_shown);
 }

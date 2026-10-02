@@ -1,0 +1,112 @@
+# Strings for engine features: lifestyles, council, prison, factions, regiments.
+ui:
+  tab:
+    lifestyle: Lifestyle
+  focus_n: "Focus: {name}"
+  lifestyle: Lifestyle
+  focus: Focus
+  no_focus: No focus chosen
+  choose_focus: Choose focus
+  current_focus: Current focus
+  focus_cooldown: "You can change focus again in {days} days."
+  lifestyle_xp: "Experience: {xp} / {cost}"
+  lifestyle_xp_month: "+{n} experience per month"
+  perks_n: "Perks: {n}"
+  perk_owned: Unlocked
+  perk_locked: Unlock the previous perk first
+  perk_need_xp: "Requires experience: {cost} (you have {xp})"
+  perk_unlock: Unlock perk
+  perk_grants_trait: "Grants the trait “{trait}”"
+  lifestyle_skill: "Skill: {skill}"
+  lifestyle_all_done: All perks of this lifestyle are unlocked
+  council: Council
+  vacant: Vacant
+  appoint: Appoint
+  dismiss: Dismiss
+  replace: Replace
+  choose_councillor: "Who should be your {position}?"
+  no_council_candidates: No suitable candidates (adult courtiers or vassals are needed).
+  council_task: Task
+  task_monthly_chance: "Chance per month: {n}%"
+  councillor_of: "{position} at the court of {liege}"
+  prison: Dungeon
+  prisoners: Prisoners
+  in_prison_of: "Imprisoned by {jailer}"
+  prison_months: "{n} mo."
+  ransom_n: "Ransom: {n} 💰"
+  ws_captured_leader: Enemy leader captured
+  factions: Factions
+  factions_against_you: Factions against you
+  factions_against_liege: Factions against your liege
+  faction_power: "Power: {n}%"
+  faction_discontent: "Discontent: {n}%"
+  faction_members: "Members ({n})"
+  faction_leader: Leader
+  faction_claimant: Claimant
+  join_faction: Join
+  leave_faction: Leave
+  create_faction: Create
+  send_ultimatum: Send ultimatum
+  faction_cooldown: You took part in a faction recently
+  faction_hint: "When a faction's power exceeds {n}% of its liege's, discontent grows. At 100% the faction sends an ultimatum: yield or face a revolt."
+  no_factions: There are no factions against you.
+  in_faction: "In faction: {faction}"
+  regiments: Men-at-Arms
+  regiments_n: "Regiments: {n} / {cap}"
+  regiment_upkeep: Men-at-arms upkeep
+  regiment_cap_reached: "Regiment limit reached ({n})"
+  recruit: Recruit
+  recruit_regiment: Recruit a regiment
+  regiment_power: "Strength: {n} levies"
+  regiment_stats: "{size} soldiers × {power}"
+  regiment_upkeep_n: "Upkeep: {n} 💰/mo. (×{mult} when raised)"
+  regiment_counters: "Strong against: {list}"
+  regiment_countered_by: "Weak against: {list}"
+  regiment_terrain: "Terrain: {list}"
+  regiment_in_army: raised
+  regiment_reinforcing: reinforcing
+  regiments_hint: Regiments march together with your levies. Each soldier is worth several levies, and matching the right types against the enemy decides battles.
+  dismiss_regiment: Disband
+  no_regiments: No regiments.
+  army_regiments: Regiments in the army
+  council_hint: Councillors strengthen the ruler depending on their skills and the chosen task.
+msg:
+  faction_created: "{who} founds the {faction} against {liege}"
+  faction_demands_accepted: "{liege} yields to the demands of the {faction}"
+  faction_ready: Your faction is ready to send an ultimatum to your liege (Realm tab).
+  imprisoned: "{who} is thrown into the dungeon of {jailer}"
+  prison_released: "{who} is released from prison"
+  prison_ransomed: "{who} is ransomed"
+  prison_escaped: "{who} escapes from prison!"
+  prison_jailer_died: "{who} goes free: the jailer has died"
+  perk_gained: "Perk unlocked: “{perk}”"
+  perk_available: "A new perk can be unlocked ({lifestyle}) — see the Lifestyle tab."
+tr:
+  is_in_faction: Must be in a faction
+  is_in_faction.not: Must not be in a faction
+  is_imprisoned: Must be imprisoned
+  is_imprisoned.not: Must not be imprisoned
+  is_imprisoned_by: Must be your prisoner
+  has_imprisonment_reason: Requires a lawful reason (a crime against you)
+  is_councillor: Must sit on a council
+  is_councillor.not: Must not sit on a council
+  has_perk: "Requires perk: {value}"
+  has_focus: "Requires focus: {value}"
+  has_lifestyle: "Requires lifestyle: {value}"
+fx:
+  add_regiment: "Regiment: {value}"
+  faction_enforce_demands: "The demands of the {faction} will be met"
+  faction_start_war: "The {faction} will revolt"
+  imprison: "{who} will be thrown into the dungeon"
+  release_from_prison: "{who} is set free"
+  discover_scheme_against: Uncovers a plot against you or your family
+  add_perk: "Unlocks the perk “{value}”"
+  set_focus: "Focus: {value}"
+  add_lifestyle_xp: "{value} experience ({lifestyle})"
+opinion:
+  short_reign: Short reign
+  family_bonus: Respect for the head of the house
+  on_council: Seat on the council
+ai:
+  scheme_power: Scheme power
+  target_scheme_defense: Target's defenses

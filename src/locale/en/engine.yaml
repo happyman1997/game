@@ -120,6 +120,7 @@ death:
   hunting: "{who} dies in a hunting accident"
   stress: "{who} dies of a broken heart"
   plague: "{who} dies of the plague"
+  execution: "{who} is executed"
 
 opinion:
   traits: Personality traits

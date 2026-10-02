@@ -66,7 +66,7 @@ _setDisband(disbandArmy);
 
 export function commanderOf(game: Game, a: Army): Character | undefined {
   const c = game.char(a.commander) ?? game.char(a.owner);
-  return c && isAlive(c) && isAdult(game, c) ? c : undefined;
+  return c && isAlive(c) && isAdult(game, c) && !c.prison ? c : undefined;
 }
 
 // ------------------------------------------------------------ путь
@@ -191,19 +191,28 @@ function resolveBattles(game: Game) {
   }
 }
 
-function sidePower(game: Game, armies: Army[], defending: boolean, loc: string): { power: number; men: number; commander?: Character } {
+/** Сила армии с учётом бонусов механик (отряды и т.п.); enemies — армии противника в бою. */
+export function armyStrength(game: Game, a: Army, enemies: Army[] = [], location?: string): number {
+  let v = a.size;
+  for (const b of game.engine.hooks.collect<number>('army.power_bonus', { game, army: a, enemies, location: location ?? a.location })) v += b;
+  return Math.max(0, v);
+}
+
+function sidePower(game: Game, armies: Army[], defending: boolean, loc: string, enemies: Army[] = []): { power: number; men: number; commander?: Character } {
   const m = mil(game);
   let men = 0;
+  let eff = 0;
   let best: Character | undefined;
   for (const a of armies) {
     men += a.size;
+    eff += armyStrength(game, a, enemies, loc);
     const c = commanderOf(game, a);
     if (c && (!best || skill(game, c, 'martial') > skill(game, best, 'martial'))) best = c;
   }
   const martial = best ? skill(game, best, 'martial') : 0;
   const adv = best ? stat(game, best, 'commander_advantage') : 0;
   const terrain = game.content.get<TerrainDef>('terrain', game.content.get('provinces', loc)?.terrain ?? '');
-  let power = men * (1 + martial * (m.martial_bonus ?? 0.04) + adv / 100) * game.rng.float(m.battle_luck_min ?? 0.85, m.battle_luck_max ?? 1.15);
+  let power = eff * (1 + martial * (m.martial_bonus ?? 0.04) + adv / 100) * game.rng.float(m.battle_luck_min ?? 0.85, m.battle_luck_max ?? 1.15);
   if (defending) power *= 1 + (terrain?.defense ?? 0);
   return { power, men, commander: best };
 }
@@ -211,15 +220,20 @@ function sidePower(game: Game, armies: Army[], defending: boolean, loc: string):
 function battle(game: Game, w: War, loc: string, att: Army[], def: Army[]) {
   const m = mil(game);
   const ctrlSide = sideOf(game, w, provinceController(game, loc)?.id);
-  const A = sidePower(game, att, ctrlSide === 'att', loc);
-  const D = sidePower(game, def, ctrlSide === 'def', loc);
+  const A = sidePower(game, att, ctrlSide === 'att', loc, def);
+  const D = sidePower(game, def, ctrlSide === 'def', loc, att);
   const attWins = A.power >= D.power;
   const [win, lose, winArmies, loseArmies] = attWins ? [A, D, att, def] : [D, A, def, att];
   const ratio = Math.min(1, lose.power / Math.max(1, win.power));
   const loseLoss = Math.round(lose.men * ((m.loser_loss_base ?? 0.25) + (m.loser_loss_scale ?? 0.4) * (1 - ratio)));
   const winLoss = Math.round(win.men * ((m.winner_loss_base ?? 0.05) + (m.winner_loss_scale ?? 0.2) * ratio));
   const distribute = (armies: Army[], total: number, men: number) => {
-    for (const a of armies) a.size = Math.max(0, a.size - Math.round((total * a.size) / Math.max(1, men)));
+    for (const a of armies) {
+      const before = a.size;
+      a.size = Math.max(0, a.size - Math.round((total * a.size) / Math.max(1, men)));
+      // профессиональные отряды несут потери в той же доле
+      if (a.regiments?.length && before > 0) for (const r of a.regiments) r.size = Math.round((r.size * a.size) / before);
+    }
   };
   distribute(winArmies, winLoss, win.men);
   distribute(loseArmies, loseLoss, lose.men);
@@ -253,8 +267,9 @@ function battle(game: Game, w: War, loc: string, att: Army[], def: Army[]) {
   // Гибель полководцев
   if (lose.commander && game.rng.chance(m.loser_commander_death ?? 0.04)) {
     killCharacter(game, lose.commander, 'battle', win.commander?.id);
-  } else if (win.commander && game.rng.chance(m.winner_commander_death ?? 0.01)) {
-    killCharacter(game, win.commander, 'battle', lose.commander?.id);
+  } else {
+    if (win.commander && game.rng.chance(m.winner_commander_death ?? 0.01)) killCharacter(game, win.commander, 'battle', lose.commander?.id);
+    if (lose.commander && lose.commander.death === undefined) game.emit('battle.commander_survived', { war: w, commander: lose.commander.id, captor: winOwner.id });
   }
 
   // Отступление проигравших

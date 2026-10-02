@@ -291,3 +291,65 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; margin: 0.2em 0; color
   .left-panel { width: calc(100% - 16px); }
   .right-col { display: none; }
 }
+
+/* ---------------------------------------------------- образ жизни */
+.ls-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+.ls-tab { font-size: 12px; padding: 3px 7px; }
+.ls-tab.active { border-color: var(--border-hi); background: linear-gradient(#5a4520, #3a2a10); }
+.ls-tab.current::after { content: ' ★'; color: var(--gold); }
+.ls-head { border-left: 4px solid var(--border); padding: 4px 8px; margin-bottom: 6px; background: rgba(0,0,0,0.25); }
+.ls-title { font-family: var(--serif); font-size: 18px; font-weight: 700; color: var(--gold); }
+.ls-focuses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.ls-focus { position: relative; border: 1px solid var(--border); border-radius: 6px; padding: 6px 4px; text-align: center; cursor: pointer; background: rgba(0,0,0,0.3); }
+.ls-focus:hover { border-color: var(--border-hi); }
+.ls-focus.active { border-color: var(--gold); box-shadow: 0 0 8px rgba(227,192,106,0.35); cursor: default; }
+.ls-focus-icon { font-size: 22px; }
+.ls-focus-name { font-size: 12px; }
+.ls-focus-mark { position: absolute; top: 2px; right: 5px; color: var(--good); font-size: 12px; }
+.ls-trees { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.ls-tree { display: flex; flex-direction: column; align-items: stretch; }
+.ls-tree-name { font-family: var(--serif); font-weight: 700; color: var(--gold); text-align: center; margin-bottom: 4px; }
+.ls-link { width: 2px; height: 10px; background: var(--border); margin: 0 auto; }
+.ls-perk { display: flex; align-items: center; gap: 6px; border: 1px solid #4e3d22; border-radius: 5px; padding: 4px 6px; font-size: 12px; background: rgba(0,0,0,0.35); }
+.ls-perk-icon { font-size: 16px; width: 22px; text-align: center; }
+.ls-perk.owned { border-color: var(--gold); background: linear-gradient(rgba(138,106,36,0.45), rgba(90,66,16,0.45)); }
+.ls-perk.available { border-color: var(--good); cursor: pointer; animation: ls-pulse 1.6s ease-in-out infinite; }
+.ls-perk.next { opacity: 0.85; }
+.ls-perk.locked { opacity: 0.45; }
+@keyframes ls-pulse { 50% { box-shadow: 0 0 8px rgba(143,209,106,0.6); } }
+.ls-summary { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.ls-sum-focus { border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 12px; margin-right: 4px; }
+.ls-sum-perk { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #8a6a24; border-radius: 4px; font-size: 14px; background: rgba(0,0,0,0.35); }
+
+/* ---------------------------------------------------- совет */
+.council { display: flex; flex-direction: column; gap: 6px; }
+.council-row { display: grid; grid-template-columns: 120px 1fr auto; grid-template-areas: "pos holder btns" "tasks tasks tasks"; gap: 4px 8px; align-items: center; border-bottom: 1px solid #3e3220; padding-bottom: 6px; }
+.council-pos { grid-area: pos; font-family: var(--serif); font-weight: 700; color: var(--gold); }
+.council-icon { font-size: 16px; }
+.council-holder { grid-area: holder; display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.council-btns { grid-area: btns; display: flex; gap: 4px; }
+.council-tasks { grid-area: tasks; display: flex; flex-wrap: wrap; gap: 4px; }
+.council-task.active { border-color: var(--gold); background: linear-gradient(#6a5020, #3a2a10); }
+.council-badge { font-size: 12.5px; color: var(--gold); }
+.cand-skill { font-weight: 700; margin-left: auto; margin-right: 8px; }
+
+/* ---------------------------------------------------- темница */
+.prisoner-row { display: flex; align-items: center; gap: 6px; padding: 2px 0; border-bottom: 1px solid #3e3220; font-size: 13px; }
+.prison-line { font-size: 12.5px; }
+
+/* ---------------------------------------------------- фракции */
+.faction-card { border: 1px solid #5a3a28; border-radius: 6px; padding: 6px 8px; margin: 6px 0; background: rgba(60,20,10,0.25); font-size: 13px; }
+.faction-card.new { border-style: dashed; background: none; }
+.faction-name { font-family: var(--serif); font-weight: 700; color: #e09a7a; font-size: 15px; }
+.faction-btns { display: flex; gap: 4px; margin-top: 4px; }
+.bar-red .bar-fill { background: linear-gradient(90deg, #7a2a22, #ef6d5c); }
+
+/* ---------------------------------------------------- отряды */
+.regiments { display: flex; flex-direction: column; gap: 4px; }
+.regiment-row { display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #3e3220; padding: 3px 0; font-size: 13px; }
+.regiment-row.small { border: none; padding: 1px 0; }
+.reg-icon { font-size: 20px; width: 26px; text-align: center; }
+.reg-main { flex: 1; }
+.reg-shop { display: flex; flex-wrap: wrap; gap: 4px; }
+.reg-buy { font-size: 12px; }
+.section-sub { font-family: var(--serif); font-weight: 700; color: var(--muted); margin: 8px 0 4px; }

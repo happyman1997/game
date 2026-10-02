@@ -1,0 +1,126 @@
+lifestyle:
+  diplomacy_lifestyle: Diplomacy
+  martial_lifestyle: Martial
+  stewardship_lifestyle: Stewardship
+  intrigue_lifestyle: Intrigue
+  learning_lifestyle: Learning
+
+focus:
+  focus_foreign_affairs: Foreign Affairs
+  focus_majesty: Majesty
+  focus_family: Family
+  focus_strategy: Strategy
+  focus_chivalry: Chivalry
+  focus_authority: Authority
+  focus_wealth: Wealth
+  focus_domain: Domain
+  focus_duty: Duty
+  focus_scheming: Scheming
+  focus_seduction: Seduction
+  focus_protection: Vigilance
+  focus_scholarship: Scholarship
+  focus_theology: Theology
+  focus_medicine: Medicine
+focus_desc:
+  focus_foreign_affairs: Negotiating with foreign courts hones your diplomatic talent.
+  focus_majesty: You carry yourself like a true monarch, and tales of your majesty travel far.
+  focus_family: You devote your time to your spouse, your children and your house.
+  focus_strategy: You study the works of ancient generals and maps of campaigns.
+  focus_chivalry: Tournaments, duels and knightly vows harden hand and spirit.
+  focus_authority: You keep your vassals and your army in an iron grip.
+  focus_wealth: Every coin counts — and the treasury grows.
+  focus_domain: You personally tour your lands and oversee their management.
+  focus_duty: You heed your vassals' needs and honour your obligations.
+  focus_scheming: Whispers, secret letters and the right people in the right places.
+  focus_seduction: Charm is a weapon too, and you wield it masterfully.
+  focus_protection: Your informants make sure no one plots against you.
+  focus_scholarship: Libraries and learned conversation are your passion.
+  focus_theology: You spend your days in prayer and reading Scripture.
+  focus_medicine: You study herbs and the works of ancient physicians.
+
+perk_tree:
+  august: August
+  family_first: Family First
+  strategist: Strategist
+  overseer: Overseer
+  architect: Architect
+  administrator: Administrator
+  schemer: Schemer
+  seducer: Seducer
+  scholarship: Scholar
+  theology: Theologian
+
+perk:
+  regal_bearing: Regal Bearing
+  court_etiquette: Court Etiquette
+  statesman: Statesman
+  august_majesty: August Majesty
+  fecund_line: Fecund Line
+  blood_ties: Blood Ties
+  wise_mentor: Wise Mentor
+  head_of_house: Head of the House
+  logistics: Logistics
+  battle_tactics: Battle Tactics
+  military_drills: Military Drills
+  master_strategist: Master Strategist
+  stalwart_leader: Stalwart Leader
+  iron_discipline: Iron Discipline
+  levy_reforms: Levy Reforms
+  overseer_of_men: Overseer
+  master_builder: Master Builder
+  thriving_lands: Thriving Lands
+  bountiful_harvests: Bountiful Harvests
+  royal_architect: Royal Architect
+  efficient_rule: Efficient Rule
+  tax_collectors: Tax Collectors
+  golden_obligations: Golden Obligations
+  great_administrator: Great Administrator
+  subtle_hand: Subtle Hand
+  prying_eyes: Prying Eyes
+  truth_is_relative: Truth Is Relative
+  master_schemer: Master Schemer
+  alluring: Alluring
+  sweet_words: Sweet Words
+  heartbreaker: Heartbreaker
+  irresistible: Irresistible
+  avid_reader: Avid Reader
+  natural_philosophy: Natural Philosophy
+  polymath: Polymath
+  renowned_scholar: Renowned Scholar
+  devout_prayer: Devout Prayer
+  inner_peace: Inner Peace
+  healing_hands: Healing Hands
+  doctor_of_theology: Doctor of Theology
+perk_desc:
+  head_of_house: You are the acknowledged head of your house. Your dynasty gains 100 prestige.
+  natural_philosophy: Studying nature speeds up the development of your lands and all learning.
+  levy_reforms: More soldiers, but vassals resent the new obligations.
+
+trait:
+  diplomat: Diplomat
+  family_patriarch: Patriarch
+  strategist: Strategist
+  overseer: Overseer
+  architect: Architect
+  administrator: Administrator
+  schemer: Schemer
+  seducer: Seducer
+  theologian: Theologian
+trait_desc:
+  diplomat: An acknowledged master of negotiation.
+  family_patriarch: Head of a large and close-knit house.
+  strategist: A commander who knows the worth of every step on the battlefield.
+  overseer: Knows how to raise and keep an army.
+  architect: Builds quickly, cheaply and to last.
+  administrator: Keeps vast holdings in good order.
+  schemer: Weaves webs of intrigue while staying in the shadows.
+  seducer: Few can resist these charms.
+  theologian: A profound scholar of Scripture and the Church Fathers.
+
+stat:
+  family_opinion: Family opinion
+  army_upkeep_mult: Army upkeep
+  build_cost_mult: Building cost
+  scheme_power: Scheme power
+  scheme_defense: Scheme defense
+  lifestyle_xp_mult: Lifestyle experience

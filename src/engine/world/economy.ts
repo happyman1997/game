@@ -63,8 +63,8 @@ export function vassalTaxShare(game: Game): number {
 export function armyMaintenance(game: Game, c: Character): number {
   const per100 = econ(game).levy_maintenance_per_100 ?? 0.25;
   let men = 0;
-  for (const a of Object.values(game.state.armies)) if (a.owner === c.id) men += a.size;
-  return (men / 100) * per100;
+  for (const a of Object.values(game.state.armies)) if (a.owner === c.id) men += a.size - (a.regiments ?? []).reduce((x, r) => x + r.size, 0);
+  return Math.max(0, (men / 100) * per100 * (1 + stat(game, c, 'army_upkeep_mult')));
 }
 
 export function incomeBreakdown(game: Game, c: Character): IncomePart[] {
@@ -78,7 +78,7 @@ export function incomeBreakdown(game: Game, c: Character): IncomePart[] {
   parts.push({ label: game.loc.t('ui.domain_tax'), value: dom });
   const share = vassalTaxShare(game);
   let fromVassals = 0;
-  for (const v of game.vassalsOf(c.id)) fromVassals += domainTax(game, v) * share;
+  for (const v of game.vassalsOf(c.id)) if (!inRevolt(game, v.id, c.id)) fromVassals += domainTax(game, v) * share;
   if (fromVassals) parts.push({ label: game.loc.t('ui.vassal_tax'), value: fromVassals });
   if (c.liege) parts.push({ label: game.loc.t('ui.liege_tax'), value: -dom * share });
   const flat = stat(game, c, 'monthly_income');
@@ -118,15 +118,29 @@ export function realmLevy(game: Game, c: Character, depth = 0): number {
   if (depth > 10) return 0;
   const share = econ(game).vassal_levy_share ?? 0.35;
   let sum = domainLevy(game, c) + stat(game, c, 'levy_flat');
-  for (const v of game.vassalsOf(c.id)) sum += realmLevy(game, v, depth + 1) * share;
+  for (const v of game.vassalsOf(c.id)) if (!inRevolt(game, v.id, c.id)) sum += realmLevy(game, v, depth + 1) * share;
   return Math.round(sum);
+}
+
+/** Вассал воюет против своего сюзерена (мятеж): не платит налогов и не даёт войск. */
+export function inRevolt(game: Game, vassal: string, liege: string): boolean {
+  for (const w of Object.values(game.state.wars)) {
+    if ((w.attackers.includes(vassal) && w.defenders.includes(liege)) || (w.defenders.includes(vassal) && w.attackers.includes(liege))) return true;
+  }
+  return false;
 }
 
 /** Приблизительная «военная сила» для ИИ: ополчение + уже поднятые армии. */
 export function militaryStrength(game: Game, c: Character): number {
   let raised = 0;
-  for (const a of Object.values(game.state.armies)) if (a.owner === c.id) raised += a.size;
-  return raised > 0 ? raised : realmLevy(game, c);
+  for (const a of Object.values(game.state.armies)) {
+    if (a.owner !== c.id) continue;
+    raised += a.size;
+    for (const b of game.engine.hooks.collect<number>('army.power_bonus', { game, army: a, enemies: [], location: a.location })) raised += b;
+  }
+  let extra = 0;
+  for (const b of game.engine.hooks.collect<number>('military.strength_bonus', { game, character: c })) extra += b;
+  return (raised > 0 ? raised : realmLevy(game, c)) + extra;
 }
 
 /** Причины, по которым персонаж не может заплатить цену (пусто — может). Нулевая цена всегда доступна. */

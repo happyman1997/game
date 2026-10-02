@@ -15,6 +15,26 @@ export class ScriptValidator {
   issues: ModIssue[] = [];
   constructor(private engine: Engine) {}
 
+  /** Предупреждение от проверки механики или мода. */
+  issue(message: string, level: 'warning' | 'error' = 'warning') {
+    this.issues.push({ level, message });
+  }
+
+  /** Проверка ссылки на запись контента. */
+  ref(type: string, id: unknown, where: string) {
+    if (id == null) return;
+    if (!this.engine.content.has(type, String(id))) this.issue(`${where}: ссылка на несуществующий ${type}/${id}`);
+  }
+
+  /** Проверка скриптового значения (только ссылок на триггеры внутри limit). */
+  value(expr: unknown, where: string) {
+    if (!isPlainObject(expr)) return;
+    for (const [k, v] of Object.entries(expr)) {
+      if (k === 'limit') this.trigger(v, where);
+      else if (k === 'if' || k === 'add' || k === 'multiply' || k === 'subtract') for (const x of Array.isArray(v) ? v : [v]) this.value(x, where);
+    }
+  }
+
   private warn(where: string, msg: string) {
     const mods = this.engine.content.provenance.get(where.split(' ')[0]) ?? [];
     this.issues.push({ level: 'warning', mod: mods[mods.length - 1], message: `${where}: ${msg}` });
@@ -228,6 +248,8 @@ export function validateContent(engine: Engine): ModIssue[] {
     if (d.target && !engine.registries.interactionTargets.has(d.target.provider))
       v.issues.push({ level: 'warning', message: `${w}: нет поставщика целей "${d.target.provider}"` });
     if (d.scheme) ref('schemes', d.scheme, w);
+    if (d.decider && d.decider !== 'recipient' && d.decider !== 'guardian' && !engine.registries.interactionDeciders.has(d.decider))
+      v.issues.push({ level: 'warning', message: `${w}: нет решающего "${d.decider}"` });
   }
   for (const s of c.all('schemes')) {
     v.trigger(s.is_valid, `schemes/${s.id} is_valid`);
@@ -243,5 +265,12 @@ export function validateContent(engine: Engine): ModIssue[] {
   for (const st of c.all('scripted_triggers')) v.trigger(bodyOf(st, 'trigger'), `scripted_triggers/${st.id}`);
   for (const se of c.all('scripted_effects')) v.effect(bodyOf(se, 'effect'), `scripted_effects/${se.id}`);
   for (const b of c.all('buildings')) v.trigger(b.trigger, `buildings/${b.id}`);
+  for (const [id, fn] of engine.registries.contentValidators.entries()) {
+    try {
+      fn(engine, v);
+    } catch (e) {
+      v.issue(`Проверка ${id}: ${(e as Error).message}`, 'error');
+    }
+  }
   return v.issues;
 }

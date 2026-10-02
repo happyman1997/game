@@ -52,7 +52,7 @@ const tabs = await page.$$('.tab-btn');
 await tabs[tabs.length - 1].click();
 await page.waitForTimeout(300);
 await shot('04-plague-panel');
-await page.click('.tab-btn >> nth=5');
+await page.click('.tab-btn[data-tab=decisions]');
 await page.waitForTimeout(300);
 await shot('05-decisions');
 // английский

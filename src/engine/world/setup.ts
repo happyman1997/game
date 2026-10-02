@@ -28,6 +28,7 @@ export function emptyState(engine: Engine, bookmark: string, date: number, seed:
     scheduled: [],
     pendingEvents: [],
     pendingRequests: [],
+    factions: {},
     globalFlags: {},
     globalVars: {},
     messages: [],

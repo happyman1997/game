@@ -302,7 +302,9 @@ export const developmentSystem: GameSystem = {
     for (const p of Object.values(game.state.provinces)) {
       const holder = game.char(game.state.titles[p.id]?.holder);
       const chance =
-        (d.base_growth ?? 0.12) + provStat(game, p.id, 'development_growth') + (holder ? skill(game, holder, 'stewardship') * (d.growth_per_stewardship ?? 0.01) : 0);
+        (d.base_growth ?? 0.12) +
+        provStat(game, p.id, 'development_growth') +
+        (holder ? skill(game, holder, 'stewardship') * (d.growth_per_stewardship ?? 0.01) + stat(game, holder, 'development_growth') : 0);
       if (!p.occupant && game.rng.chance(Math.max(0, chance))) p.development = Math.min(d.max ?? 100, p.development + 1);
     }
   },

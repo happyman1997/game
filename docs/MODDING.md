@@ -164,13 +164,17 @@ defines:
 | `dynasties`, `characters`, `bookmarks` | `core/data/history/` | Исторические персонажи и стартовые даты. |
 | `succession_laws` | `core/data/common/laws_and_modifiers.yaml` | `algorithm` (`partition`, `primogeniture`, `seniority` или свой из JS), `gender`, `change_cost`, `can_change`. |
 | `opinion_modifiers`, `modifiers` | там же | Модификаторы мнения (`value`, `decay`, `years`, `stacking`) и временные модификаторы персонажей/провинций. |
-| `casus_belli` | `core/data/common/war.yaml` | Поводы к войне: `targets` (поставщик целей), `is_valid`, `cost`, `on_victory`, `on_white_peace`, `on_defeat`, `ai_will_do`, `truce_years`, `war_name`. |
+| `casus_belli` | `core/data/common/war.yaml` | Поводы к войне: `targets` (поставщик целей), `is_valid`, `cost`, `on_victory`, `on_white_peace`, `on_defeat`, `ai_will_do`, `truce_years`, `war_name`, `manual` (не предлагать игроку и ИИ — только для скриптов, например мятежей). |
 | `interactions` | `core/data/common/interactions.yaml` | Взаимодействия персонажей (см. раздел 6). |
 | `schemes` | `core/data/common/schemes.yaml` | Интриги: `progress`, `success_chance`, `discovery_chance`, `on_success`, `on_failure`, `on_discovered`. |
 | `decisions` | `core/data/common/decisions.yaml` | `is_shown`, `is_valid`, `cost`, `effect`, `cooldown`, `major`, `ai_will_do`, `ai_check_months`. |
 | `events`, `on_actions` | `core/data/events/`, `core/data/common/on_actions.yaml` | События и точки их вызова — раздел 5. |
 | `script_values`, `scripted_triggers`, `scripted_effects` | `core/data/common/decisions.yaml` | Именованные формулы и блоки скрипта для повторного использования. |
 | `event_themes`, `map_modes` | `core/data/common/ui.yaml` | Оформление событий; режимы карты без кода (значение + градиент). |
+| `lifestyles`, `focuses`, `perks` | `core/data/common/lifestyles.yaml` | Образ жизни: фокусы и деревья перков — раздел 10. |
+| `council_positions`, `council_tasks` | `core/data/common/council.yaml` | Совет: должности и задачи — раздел 10. |
+| `factions` | `core/data/common/factions.yaml` | Фракции вассалов и их мятежи — раздел 10. |
+| `regiment_types` | `core/data/common/regiments.yaml` | Профессиональные войска — раздел 10. |
 | **любой свой тип** | `plague/data/plague.yaml` (`diseases`) | Движок сохранит его; читайте из JS: `api.content.all('diseases')`. |
 
 Подробные комментарии есть прямо в файлах мода `core` — это лучший справочник по полям.
@@ -489,7 +493,8 @@ export function init(api) {
 | `api.script` | Регистрация `trigger`, `effect`, `value`, `link`, `list`, `constant` + функции интерпретатора (`evalTrigger`, `runEffect`, `evalValue`, `makeContext`…). |
 | `api.systems` | `add`, `replace`, `remove`, `get`, `list`. |
 | `api.hooks` | `on(name, fn, priority)`. |
-| `api.registries` | `successionAlgorithms`, `cbTargets`, `interactionTargets`, `modifierProviders`, `provinceModifierProviders`, `opinionProviders`. |
+| `api.registries` | `successionAlgorithms`, `cbTargets`, `interactionTargets`, `interactionDeciders`, `modifierProviders`, `provinceModifierProviders`, `opinionProviders`, `contentValidators`. |
+| `api.features` | `add(feature)` — установить свою механику; `list()`; `evalModifiers(ctx, scope, mods)` — модификаторы со скриптовыми значениями. |
 | `api.ui` | `mapModes`, `panels`, `characterSections`, `provinceSections`, `topBar`, `eventThemes`. |
 | `api.world` | Функции мира: `characters` (createCharacter, addTrait, marry…), `titles` (transferTitle, topLiege…), `succession` (killCharacter, heirsOf…), `war` (declareWar, endWar…), `military`, `economy`, `opinion`, `stats`, `interactions`, `schemes`, `decisions`, `ai`. |
 | `api.util` | `Rng`, `hashString`, даты, `deepMerge`, шум `fbm`. |
@@ -527,10 +532,166 @@ export function init(api) {
 | `ai.think` | `character` | **veto**: вернуть `false`, чтобы ИИ этого персонажа пропустил ход |
 | `economy.income` | `character` | **collect**: верните `{ label, value }`, чтобы добавить статью дохода |
 | `on_action.<id>` | `root`, `scopes` | после каждого on_action |
+| `war.score` | `war` | **collect**: верните `{ label, value }` (или массив) — слагаемое счёта войны (плюс — в пользу нападающих) |
+| `army.power_bonus` | `army`, `enemies`, `location` | **collect**: число — прибавка к силе армии в бою и в оценках ИИ |
+| `military.strength_bonus` | `character` | **collect**: прибавка к «военной силе» для решений ИИ о войне |
+| `battle.commander_survived` | `war`, `commander`, `captor` | полководец проигравших выжил (механика темницы берёт его в плен) |
+| `perk.gained`, `lifestyle.focus_changed` | `character`, `perk`/`focus` | |
+| `council.appointed`, `council.dismissed`, `council.task_fired` | `liege`, `position`, … | |
+| `prison.before_imprison` | `jailer`, `prisoner`, `reason` | **veto** |
+| `prison.imprisoned`, `prison.released` | `prisoner`, `jailer`, `reason` | |
+| `faction.created`, `faction.joined`, `faction.left`, `faction.dissolved`, `faction.ultimatum` | `faction`, … | |
+| `regiment.recruited` | `character`, `regiment` | |
 
 ---
 
-## 10. Полная замена контента (total conversion)
+## 10. Механики: образ жизни, совет, темница, фракции, отряды
+
+Крупные подсистемы в стиле CK3 устроены как **механики** (`src/engine/features`).
+Механика — модуль, который при запуске регистрирует свои системы, триггеры,
+эффекты, поставщиков модификаторов и проверки контента — ровно теми же
+средствами, что доступны JS-модам. Поэтому:
+
+- **всё содержимое механик — данные** в моде `core`: должности совета, перки,
+  фракции, типы отрядов меняются и дополняются обычным YAML со слиянием;
+- **любую механику можно выключить** из данных — например, для мода без совета:
+
+  ```yaml
+  defines:
+    disabled_features: [council, factions]
+  ```
+
+  (доступны `lifestyles`, `council`, `prison`, `factions`, `regiments`;
+  интерфейс скрывает вкладки и разделы выключенных механик). Словарь скриптов
+  механики (её триггеры, эффекты, значения) остаётся зарегистрированным, так что
+  чужие данные, которые его упоминают, не ломаются — на пустом состоянии
+  триггеры просто ложны. А записи с полем `requires_feature: <механика>`
+  (у любого типа контента) при отключении механики удаляются — так помечены,
+  например, взаимодействия с пленниками и поводы к мятежам;
+- **свою механику** мод добавляет через `api.features.add({ id, script(engine) { … }, install(engine) { … } })`.
+
+Все числа механик — в `defines` (`lifestyle`, `council`, `prison`, `factions`, `regiments`).
+
+### Образ жизни
+
+```yaml
+lifestyles:
+  stewardship_lifestyle: { skill: stewardship, icon: "💰", order: 3 }
+focuses:
+  focus_wealth:
+    lifestyle: stewardship_lifestyle
+    modifiers: { stewardship: 1, tax_mult: 0.1 }
+    ai_will_do: 1                       # вес при выборе ИИ (умножается на навык)
+perks:
+  master_builder: { lifestyle: stewardship_lifestyle, tree: architect, modifiers: { build_cost_mult: -0.15 } }
+  royal_architect:
+    lifestyle: stewardship_lifestyle
+    tree: architect
+    requires: master_builder            # или список
+    trait: architect                    # черта за завершение дерева
+    effect: { add_prestige: 100 }       # эффект при открытии (необязательно)
+```
+
+Взрослые персонажи копят опыт текущего образа жизни: `(base_xp + навык × xp_per_skill) × (1 + lifestyle_xp_mult)`
+в месяц; перк стоит `perk_cost + perk_cost_growth × открытых перков`. ИИ выбирает
+фокус и перки сам (по `ai_will_do`), игрок — во вкладке «Образ жизни».
+Скрипт: `has_perk`, `has_focus`, `has_lifestyle`, `num_perks`, `lifestyle_xp`,
+`add_perk`, `remove_perk`, `set_focus`, `add_lifestyle_xp`.
+
+### Совет
+
+```yaml
+council_positions:
+  court_chaplain:
+    skill: learning
+    candidate: { same_faith_as: scope:liege }   # кто может занять (root — кандидат)
+council_tasks:
+  develop_domain:
+    position: steward
+    liege_modifiers:                            # модификаторы правителя; root — советник
+      tax_mult: { value: stewardship, multiply: 0.01 }
+    monthly_chance: { value: stewardship, multiply: 0.6 }   # % в месяц
+    monthly_effect:
+      scope:liege:
+        random_domain_province: { add_development: 1 }
+    ai_will_do: 10                              # root — правитель
+```
+
+Кандидаты — совершеннолетние придворные, вассалы и супруги правителя. ИИ
+заполняет места лучшими по навыку и раз в год меняет слабых. Советник лучше
+относится к правителю (`defines.council.councillor_opinion`), снятый — обижается.
+Скрипт: `is_councillor` (yes/no/должность), `has_council_task`, `council_size`,
+ссылки по id должностей (`root.marshal`, `scope:liege.spymaster`), список
+`councillor`, `neighboring_county`, эффекты `appoint_councillor`, `discover_scheme_against`.
+
+### Темница
+
+Взаимодействия с пленниками — обычные `interactions` с полем `prisoner`:
+`never` (по умолчанию — с пленником недоступно), `only` (только с пленником),
+`allowed`. Выкуп решает не сам пленник, а плательщик: `decider: payer`
+(свои «решающие» регистрируются в `registries.interactionDeciders`).
+
+Правителей берут в плен при взятии их столицы, полководцев — после
+проигранных сражений; плен вражеского лидера даёт `leader_captured_warscore`
+очков войны. Пленник не правит, не командует и не ведёт интриги.
+Скрипт: `is_imprisoned`, `is_imprisoned_by`, `has_imprisonment_reason`
+(законный повод: раскрытая интрига, модификатор мнения из
+`crime_opinion_modifiers`, флаг от `mark_criminal`), `prison_months`,
+`ransom_cost`, `num_prisoners`, список `prisoner`, эффекты `imprison`,
+`release_from_prison`, `mark_criminal`. Казнь — обычный `death: { reason: execution, killer: … }`.
+
+### Фракции
+
+```yaml
+factions:
+  independence_faction:
+    cb: independence_revolt          # повод к войне с manual: yes
+    can_join: { is_vassal: yes }     # root — вассал, scope:liege — сюзерен
+    ai_join: { value: -10, add: { value: "opinion(scope:liege)", multiply: -0.8 } }
+    ai_accept_demands: { value: -60, add: { value: scope:faction.faction_power, multiply: 0.35 } }
+    on_demands_accepted:
+      scope:faction: { every_faction_member: { become_independent: yes } }
+  claimant_faction:
+    claimant: yes                    # нужен претендент с претензией на основной титул сюзерена
+    …
+```
+
+Когда сила фракции превышает `power_threshold`% силы сюзерена, копится
+недовольство; на 100% — ультиматум. ИИ-сюзерен решает по `ai_accept_demands`,
+игроку приходит событие `faction.0001` (его можно заменить). Отказ —
+война с поводом `cb`, где все члены фракции — нападающие; в эффектах повода
+доступны `scope:war` (списки `war_attacker`, `war_defender`) и `scope:claimant`.
+Скоуп фракции: значения `faction_power`, `faction_discontent`,
+`num_faction_members`; ссылки `faction_leader`, `faction_target`,
+`faction_claimant`; список `faction_member`; эффекты `faction_enforce_demands`,
+`faction_start_war`, `add_faction_discontent`. Для персонажа: `is_in_faction`,
+`is_faction_leader`, `joined_faction`, `join_faction`, `leave_faction`,
+`seize_primary_title`.
+
+### Профессиональные войска
+
+```yaml
+regiment_types:
+  pikemen:
+    size: 100            # воинов в отряде
+    power: 2.4           # сколько ополченцев стоит один воин
+    cost: { gold: 50 }
+    upkeep: 0.35         # в месяц; в поднятой армии × raised_upkeep_mult
+    counters: { heavy_cavalry: 0.6 }   # до 60% силы рыцарей снимается, если пикинёров не меньше
+    terrain: { hills: 0.2 }            # бонус к силе на местности
+    can_recruit: { culture: [english, norse] }
+    ai_will_do: 10
+```
+
+Поднятая армия забирает отряды правителя, потери в бою переносятся на
+отряды, после роспуска они пополняются (`reinforce_rate`). Сила армии в бою
+и в оценках ИИ складывается через хук `army.power_bonus` — мод может
+добавить свои бонусы (например, от рыцарей-персонажей).
+Скрипт: `has_regiment`, `num_regiments`, `regiment_cap`, `regiment_power`, `add_regiment`.
+
+---
+
+## 11. Полная замена контента (total conversion)
 
 Отключите `core` в менеджере модов и включите свой мод. Минимальный набор для
 запуска партии:
@@ -545,7 +706,7 @@ export function init(api) {
 
 ---
 
-## 11. Инструменты
+## 12. Инструменты
 
 | Команда | Что делает |
 |---|---|

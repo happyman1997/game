@@ -46,6 +46,13 @@ engine.hooks.on('interaction', ({ interaction, accepted }) => count(`взаим�
 engine.hooks.on('decision.taken', ({ decision }) => count(`решение ${decision}`));
 engine.hooks.on('scheme.ended', ({ scheme, success }) => count(`интрига ${scheme.type} ${success ? 'успех' : 'провал'}`));
 engine.hooks.on('title.transferred', () => count('передач титулов'));
+engine.hooks.on('perk.gained', () => count('перков открыто'));
+engine.hooks.on('council.appointed', () => count('назначений в совет'));
+engine.hooks.on('prison.imprisoned', ({ reason }) => count(`заключений${reason ? ` (${reason})` : ''}`));
+engine.hooks.on('prison.released', ({ reason }) => count(`освобождений${reason ? ` (${reason})` : ''}`));
+engine.hooks.on('faction.created', ({ faction }) => count(`фракций создано: ${faction.type}`));
+engine.hooks.on('faction.ultimatum', ({ faction, accepted }) => count(`ультиматумов ${faction.type}: ${accepted ? 'принято' : 'война'}`));
+engine.hooks.on('regiment.recruited', ({ regiment }) => count(`отрядов нанято: ${regiment.type}`));
 const bookmark = arg('bookmark') ?? engine.bookmarks()[0]?.id;
 const game = engine.newGame(bookmark, seed);
 console.log(`Старт: ${game.living().length} живых персонажей, ${game.rulers().length} правителей`);

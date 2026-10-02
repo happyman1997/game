@@ -1,0 +1,126 @@
+lifestyle:
+  diplomacy_lifestyle: Дипломатия
+  martial_lifestyle: Воинское дело
+  stewardship_lifestyle: Управление
+  intrigue_lifestyle: Интриги
+  learning_lifestyle: Учёность
+
+focus:
+  focus_foreign_affairs: Внешняя политика
+  focus_majesty: Величие
+  focus_family: Семья
+  focus_strategy: Стратегия
+  focus_chivalry: Рыцарство
+  focus_authority: Власть
+  focus_wealth: Богатство
+  focus_domain: Домен
+  focus_duty: Долг
+  focus_scheming: Козни
+  focus_seduction: Обольщение
+  focus_protection: Бдительность
+  focus_scholarship: Науки
+  focus_theology: Богословие
+  focus_medicine: Медицина
+focus_desc:
+  focus_foreign_affairs: Переговоры с иноземными дворами оттачивают ваш дипломатический талант.
+  focus_majesty: Вы держитесь как истинный монарх, и молва о вашем величии разносится далеко.
+  focus_family: Вы посвящаете время супругу, детям и делам рода.
+  focus_strategy: Вы изучаете труды древних полководцев и карты походов.
+  focus_chivalry: Турниры, поединки и рыцарские обеты закаляют руку и дух.
+  focus_authority: Вы держите вассалов и войско в железном кулаке.
+  focus_wealth: Каждая монета на счету — казна растёт.
+  focus_domain: Вы лично объезжаете свои земли и следите за хозяйством.
+  focus_duty: Вы внимательны к нуждам вассалов и честно исполняете обязательства.
+  focus_scheming: Шёпот, тайные письма и нужные люди в нужных местах.
+  focus_seduction: Обаяние — тоже оружие, и вы владеете им мастерски.
+  focus_protection: Ваши осведомители следят, чтобы никто не замышлял против вас.
+  focus_scholarship: Библиотеки и учёные беседы — ваша страсть.
+  focus_theology: Вы проводите дни в молитвах и чтении Писания.
+  focus_medicine: Вы изучаете травы и труды лекарей древности.
+
+perk_tree:
+  august: Августейший
+  family_first: Семья прежде всего
+  strategist: Стратег
+  overseer: Надзиратель
+  architect: Зодчий
+  administrator: Администратор
+  schemer: Интриган
+  seducer: Соблазнитель
+  scholarship: Учёный муж
+  theology: Богослов
+
+perk:
+  regal_bearing: Царственная осанка
+  court_etiquette: Придворный этикет
+  statesman: Государственный муж
+  august_majesty: Августейшее величие
+  fecund_line: Плодовитый род
+  blood_ties: Узы крови
+  wise_mentor: Мудрый наставник
+  head_of_house: Глава дома
+  logistics: Снабжение
+  battle_tactics: Тактика боя
+  military_drills: Воинские учения
+  master_strategist: Великий стратег
+  stalwart_leader: Стойкий вождь
+  iron_discipline: Железная дисциплина
+  levy_reforms: Реформа ополчения
+  overseer_of_men: Надзиратель
+  master_builder: Мастер-строитель
+  thriving_lands: Цветущие земли
+  bountiful_harvests: Щедрые урожаи
+  royal_architect: Королевский зодчий
+  efficient_rule: Умелое правление
+  tax_collectors: Сборщики податей
+  golden_obligations: Золотые обязательства
+  great_administrator: Великий администратор
+  subtle_hand: Тонкая работа
+  prying_eyes: Всевидящее око
+  truth_is_relative: Правда относительна
+  master_schemer: Мастер интриг
+  alluring: Обаяние
+  sweet_words: Сладкие речи
+  heartbreaker: Сердцеед
+  irresistible: Неотразимость
+  avid_reader: Книжник
+  natural_philosophy: Натурфилософия
+  polymath: Эрудит
+  renowned_scholar: Прославленный учёный
+  devout_prayer: Усердная молитва
+  inner_peace: Душевный покой
+  healing_hands: Целительные руки
+  doctor_of_theology: Доктор богословия
+perk_desc:
+  head_of_house: Вы — признанный глава рода. Династия получает 100 престижа.
+  natural_philosophy: Изучение природы ускоряет развитие ваших земель и любое обучение.
+  levy_reforms: Больше воинов, но вассалы недовольны новыми повинностями.
+
+trait:
+  diplomat: Дипломат
+  family_patriarch: Патриарх
+  strategist: Стратег
+  overseer: Надзиратель
+  architect: Зодчий
+  administrator: Администратор
+  schemer: Интриган
+  seducer: Соблазнитель
+  theologian: Богослов
+trait_desc:
+  diplomat: Признанный мастер переговоров.
+  family_patriarch: Глава большого и сплочённого рода.
+  strategist: Полководец, знающий цену каждому шагу на поле боя.
+  overseer: Умеет собрать и содержать войско.
+  architect: Строит быстро, дёшево и на века.
+  administrator: Держит в порядке огромные владения.
+  schemer: Плетёт сети интриг, оставаясь в тени.
+  seducer: Немногие могут устоять перед этими чарами.
+  theologian: Глубокий знаток Писания и отцов церкви.
+
+stat:
+  family_opinion: Мнение родни
+  army_upkeep_mult: Содержание армии
+  build_cost_mult: Стоимость построек
+  scheme_power: Сила интриг
+  scheme_defense: Защита от интриг
+  lifestyle_xp_mult: Опыт образа жизни

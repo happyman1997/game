@@ -19,6 +19,7 @@ import { charRef, makeContext, provRef, titleRef } from './script/context';
 import { describeEffect, evalTrigger, evalValue, resolveScope, runEffect } from './script/interpreter';
 import type { EffectDef, LinkDef, ListLinkDef, TriggerDef, ValueDef } from './script/registry';
 import type { GameSystem } from './systems/core';
+import { type EngineFeature, evalModifiers } from './features/feature';
 import * as world from './world';
 
 export function createModApi(engine: Engine, mod: ModManifest) {
@@ -53,6 +54,18 @@ export function createModApi(engine: Engine, mod: ModManifest) {
       charRef,
       titleRef,
       provRef,
+    },
+    features: {
+      /** Установить свою механику (или заменить встроенную с тем же id — до её установки это не сработает). */
+      add: (f: EngineFeature) => {
+        engine.features.register(f.id, f, owner);
+        f.script?.(engine);
+        f.install(engine);
+        engine.installedFeatures.add(f.id);
+      },
+      list: () => engine.features.ids(),
+      has: (id: string) => engine.hasFeature(id),
+      evalModifiers,
     },
     systems: {
       add: (s: GameSystem) => engine.systems.register(s.id, s, owner),

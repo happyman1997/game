@@ -117,7 +117,7 @@ export function isMarried(c: Character): boolean {
 
 export function canMarry(game: Game, a: Character, b: Character): boolean {
   if (!isAlive(a) || !isAlive(b) || a.id === b.id) return false;
-  if (a.female === b.female) return false;
+  if (a.female === b.female || a.prison || b.prison) return false;
   const polygamy = (c: Character) => !!game.content.get('faiths', c.faith)?.doctrines?.polygamy;
   if (isMarried(a) && !polygamy(a)) return false;
   if (isMarried(b) && !polygamy(b)) return false;

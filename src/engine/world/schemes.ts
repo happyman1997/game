@@ -72,6 +72,7 @@ export function monthlySchemes(game: Game): void {
       endScheme(game, s.id);
       continue;
     }
+    if (owner.prison) continue; // в темнице интриги стоят
     s.progress += schemeMonthlyProgress(game, s);
     if (!s.discovered && def.discovery_chance != null && game.rng.next() * 100 < evalValue(ctx, ctx.root, def.discovery_chance)) {
       s.discovered = true;

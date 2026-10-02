@@ -10,7 +10,11 @@ import { domainCounties } from './titles';
  * черты, временные модификаторы, культура, вера, возраст и «поставщики»
  * модификаторов, которые регистрируют моды (registries.modifierProviders).
  */
-export type ModifierProviderFn = (game: Game, c: Character) => Record<string, number> | null | undefined;
+/** Поставщик возвращает модификаторы одним блоком или списком именованных блоков. */
+export type ModifierProviderFn = (
+  game: Game,
+  c: Character,
+) => Record<string, number> | { label: string; modifiers: Record<string, number> }[] | null | undefined;
 export interface ModifierProvider {
   label?: TextValue;
   fn: ModifierProviderFn;
@@ -37,7 +41,10 @@ interface Source {
   mods: Record<string, number>;
 }
 
-function sources(game: Game, c: Character): Source[] {
+/** Персонажи, чьи характеристики считаются прямо сейчас (защита от циклов: совет супругов и т.п.). */
+const computing = new Set<string>();
+
+function sources(game: Game, c: Character, withProviders = true): Source[] {
   const out: Source[] = [];
   const base: Record<string, number> = { health: c.health };
   for (const s of skillIds(game)) base[s] = c.skills[s] ?? 0;
@@ -55,10 +62,13 @@ function sources(game: Game, c: Character): Source[] {
   if (cul?.modifiers) out.push({ label: game.nameOf('cultures', c.culture), mods: cul.modifiers });
   const faith = game.content.get('faiths', c.faith);
   if (faith?.modifiers) out.push({ label: game.nameOf('faiths', c.faith), mods: faith.modifiers });
+  if (!withProviders) return out;
   for (const [id, p] of game.engine.registries.modifierProviders.entries()) {
     try {
       const mods = p.fn(game, c);
-      if (mods && Object.keys(mods).length) out.push({ label: p.label ? game.loc.resolve(p.label) : game.loc.tOr(`modsrc.${id}`, id), mods });
+      if (Array.isArray(mods)) {
+        for (const m of mods) if (m?.modifiers && Object.keys(m.modifiers).length) out.push({ label: m.label, mods: m.modifiers });
+      } else if (mods && Object.keys(mods).length) out.push({ label: p.label ? game.loc.resolve(p.label) : game.loc.tOr(`modsrc.${id}`, id), mods });
     } catch (e) {
       game.scriptError(`Поставщик модификаторов ${id}: ${(e as Error).message}`);
     }
@@ -89,7 +99,17 @@ export function charStats(game: Game, c: Character): Record<string, number> {
   const cached = game.statCache.get(c.id);
   if (cached) return cached;
   const out: Record<string, number> = {};
-  for (const s of sources(game, c)) addInto(out, s.mods);
+  if (computing.has(c.id)) {
+    // Циклическая зависимость (A считает навык B, а B — навык A): берём характеристики без поставщиков.
+    for (const s of sources(game, c, false)) addInto(out, s.mods);
+    return out;
+  }
+  computing.add(c.id);
+  try {
+    for (const s of sources(game, c)) addInto(out, s.mods);
+  } finally {
+    computing.delete(c.id);
+  }
   addInto(out, ageAdjust(game, c, out));
   game.statCache.set(c.id, out);
   return out;

@@ -1,0 +1,116 @@
+# Совет правителя. Скоупы задач: root = scope:councillor (советник), scope:liege (правитель).
+# liege_modifiers — модификаторы правителя; значения могут зависеть от навыков советника.
+# monthly_chance — ежемесячный шанс (в %) сработать monthly_effect.
+council_positions:
+  chancellor: { skill: diplomacy, icon: "📜", order: 1 }
+  steward: { skill: stewardship, icon: "💰", order: 2 }
+  marshal: { skill: martial, icon: "⚔", order: 3 }
+  spymaster: { skill: intrigue, icon: "🗝", order: 4 }
+  court_chaplain:
+    skill: learning
+    icon: "⛪"
+    order: 5
+    candidate: { same_faith_as: scope:liege }
+
+council_tasks:
+  # ---------------------------------------------------------------- канцлер
+  domestic_affairs:
+    position: chancellor
+    icon: "🏛"
+    default: yes
+    liege_modifiers:
+      vassal_opinion: { value: diplomacy, multiply: 0.4 }
+    ai_will_do: { value: 10, add: { value: num_vassals, multiply: 2, max: 20 } }
+  foreign_affairs:
+    position: chancellor
+    icon: "🌍"
+    liege_modifiers:
+      monthly_prestige: { value: diplomacy, multiply: 0.06 }
+    ai_will_do: 12
+
+  # ---------------------------------------------------------------- казначей
+  collect_taxes:
+    position: steward
+    icon: "🪙"
+    default: yes
+    liege_modifiers:
+      tax_mult: { value: stewardship, multiply: 0.01 }
+    ai_will_do: { value: 10, if: { limit: { gold: "< 50" }, add: 15 } }
+  develop_domain:
+    position: steward
+    icon: "🏗"
+    monthly_chance: { value: stewardship, multiply: 0.6 }
+    monthly_effect:
+      scope:liege:
+        random_domain_province:
+          limit: { is_occupied: no }
+          weight: { value: 20, subtract: development, min: 1 }
+          add_development: 1
+    ai_will_do: { value: 8, if: { limit: { gold: ">= 150" }, add: 8 } }
+
+  # ---------------------------------------------------------------- маршал
+  organize_levies:
+    position: marshal
+    icon: "📯"
+    default: yes
+    liege_modifiers:
+      levy_mult: { value: martial, multiply: 0.012 }
+    ai_will_do: { value: 10, if: { limit: { is_at_war: yes }, add: 10 } }
+  train_commanders:
+    position: marshal
+    icon: "🎯"
+    liege_modifiers:
+      commander_advantage: { value: martial, multiply: 0.4 }
+    ai_will_do: 8
+
+  # ---------------------------------------------------------------- тайный советник
+  disrupt_schemes:
+    position: spymaster
+    icon: "🛡"
+    default: yes
+    liege_modifiers:
+      scheme_defense: { value: intrigue, multiply: 1 }
+    monthly_chance: { value: intrigue, multiply: 1.2 }
+    monthly_effect:
+      scope:liege: { discover_scheme_against: yes }
+    ai_will_do: { value: 10, if: { limit: { has_trait: paranoid }, add: 20 } }
+  fabricate_claims:
+    position: spymaster
+    icon: "📝"
+    monthly_chance: { value: intrigue, multiply: 0.15 }
+    monthly_effect:
+      - scope:liege:
+          random_neighboring_county:
+            limit: { NOT: { scope:liege: { has_claim_on: prev } } }
+            save_scope_as: claim_target
+      - if:
+          limit: { exists: scope:claim_target }
+          scope:liege:
+            add_claim: scope:claim_target
+            send_message: { text: msg.spymaster_claim, kind: good }
+    ai_will_do:
+      value: 6
+      if:
+        - limit: { has_trait: ambitious }
+          add: 8
+        - limit: { has_trait: [greedy, arbitrary] }
+          add: 4
+
+  # ---------------------------------------------------------------- духовник
+  spiritual_guidance:
+    position: court_chaplain
+    icon: "🙏"
+    default: yes
+    liege_modifiers:
+      monthly_piety: { value: learning, multiply: 0.05 }
+    ai_will_do: 10
+  promote_learning:
+    position: court_chaplain
+    icon: "📚"
+    liege_modifiers:
+      lifestyle_xp_mult: { value: learning, multiply: 0.015 }
+      development_growth: { value: learning, multiply: 0.003 }
+    ai_will_do: 9
+
+opinion_modifiers:
+  dismissed_from_council: { value: -20, years: 5 }

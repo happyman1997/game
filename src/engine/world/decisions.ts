@@ -5,6 +5,7 @@ import { type ScriptContext, makeContext } from '../script/context';
 import { evalTrigger, evalValue, failedTriggers, runEffect } from '../script/interpreter';
 import type { Character } from '../types';
 import { domainCounties } from './titles';
+import { stat } from './stats';
 import { costBlockers } from './economy';
 
 // ------------------------------------------------------------ решения
@@ -84,8 +85,9 @@ export function buildingCandidates(game: Game, c: Character, provId: string): { 
 
 export function buildingCost(game: Game, b: BuildingDef, c: Character, provId: string) {
   const ctx = makeContext(game, { type: 'province', id: provId }, { builder: { type: 'character', id: c.id } });
+  const mult = Math.max(0.1, 1 + stat(game, c, 'build_cost_mult'));
   return {
-    gold: Math.round(evalValue(ctx, ctx.root, b.cost?.gold ?? 0)),
+    gold: Math.round(evalValue(ctx, ctx.root, b.cost?.gold ?? 0) * mult),
     prestige: Math.round(evalValue(ctx, ctx.root, b.cost?.prestige ?? 0)),
   };
 }

@@ -4,7 +4,7 @@
  */
 import type { RngState } from './core/rng';
 
-export type ScopeType = 'character' | 'title' | 'province' | 'dynasty' | 'war' | 'scheme' | 'army' | 'none';
+export type ScopeType = 'character' | 'title' | 'province' | 'dynasty' | 'war' | 'scheme' | 'army' | 'faction' | 'none';
 
 /** Ссылка на объект мира — так «скоупы» хранятся в событиях и контекстах. */
 export interface ScopeRef {
@@ -77,6 +77,56 @@ export interface Character {
   successionLaw?: string;
   /** Доля доступных ополчений (0..1), восстанавливается после войн. */
   levyRatio: number;
+  /** Образ жизни: фокус, опыт по образам жизни, открытые перки. */
+  lifestyle?: LifestyleState;
+  /** Совет правителя: должность → место. */
+  council?: Record<string, CouncilSeat>;
+  /** Заключение: кто держит в темнице. */
+  prison?: PrisonState;
+  /** Профессиональные войска (отряды). */
+  regiments?: Regiment[];
+}
+
+export interface LifestyleState {
+  focus?: string;
+  /** Когда фокус был выбран (для перерыва между сменами). */
+  focusSince?: number;
+  xp: Record<string, number>;
+  perks: string[];
+}
+
+export interface CouncilSeat {
+  holder?: string;
+  task?: string;
+  since?: number;
+}
+
+export interface PrisonState {
+  by: string;
+  since: number;
+  /** Двор, к которому персонаж принадлежал до заключения. */
+  home?: string;
+  war?: string;
+}
+
+export interface Regiment {
+  id: string;
+  type: string;
+  size: number;
+}
+
+export interface Faction {
+  id: string;
+  type: string;
+  /** Против кого (сюзерен). */
+  target: string;
+  leader: string;
+  members: string[];
+  claimant?: string;
+  discontent: number;
+  created: number;
+  /** Ультиматум предъявлен (ждём ответа игрока). */
+  ultimatum?: boolean;
 }
 
 export interface Dynasty {
@@ -124,6 +174,10 @@ export interface War {
   battleScore: number;
   ticking: number;
   name?: string;
+  /** Дополнительные именованные скоупы войны (например, претендент фракции). */
+  scopes?: Record<string, ScopeRef>;
+  /** Фракция, начавшая войну. */
+  faction?: string;
 }
 
 export interface Army {
@@ -138,6 +192,8 @@ export interface Army {
   commander?: string;
   /** Отступающая армия не вступает в бой, пока не дойдёт до цели. */
   retreating?: boolean;
+  /** Профессиональные отряды в составе армии (входят в size). */
+  regiments?: Regiment[];
   /** Задача ИИ (кэш), чтобы не пересчитывать путь каждый день. */
   aiTarget?: string;
   aiReplan?: number;
@@ -218,6 +274,7 @@ export interface GameState {
   scheduled: ScheduledEvent[];
   pendingEvents: PendingEvent[];
   pendingRequests: PendingRequest[];
+  factions: Record<string, Faction>;
   globalFlags: Record<string, number>;
   globalVars: Record<string, any>;
   messages: Message[];

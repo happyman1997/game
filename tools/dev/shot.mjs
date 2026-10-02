@@ -24,9 +24,8 @@ if (scenario !== 'menu') {
   const opt = await page.$('.event-option');
   if (opt) { await opt.click(); await page.waitForTimeout(300); }
   await page.screenshot({ path: 'screenshots/04-after-event.png' });
-  for (const [i, tab] of ['realm', 'military', 'wars', 'decisions'].entries()) {
-    const btns = await page.$$('.tab-btn');
-    await btns[i + 1].click();
+  for (const tab of ['realm', 'military', 'wars', 'decisions']) {
+    await page.click(`.tab-btn[data-tab=${tab}]`);
     await page.waitForTimeout(300);
     await page.screenshot({ path: `screenshots/05-tab-${tab}.png` });
   }

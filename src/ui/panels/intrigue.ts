@@ -1,7 +1,8 @@
 import { schemeMonthlyProgress, schemeSuccessChance, endScheme } from '../../engine/world/schemes';
+import { prisonersOf, ransomCost } from '../../engine/features/prison';
 import type { App } from '../app';
 import { fmt, h } from '../dom';
-import { bar, button, charLink, section } from '../widgets';
+import { bar, button, charLink, portrait, section } from '../widgets';
 
 export function renderIntriguePanel(app: App): HTMLElement {
   const g = app.game!;
@@ -21,6 +22,15 @@ export function renderIntriguePanel(app: App): HTMLElement {
   const against = Object.values(g.state.schemes).filter((s) => s.target === p.id && s.discovered);
   if (against.length) {
     root.append(section(app.t('ui.schemes_against'), ...against.map((s) => h('div', { class: 'scheme-card bad' }, `${g.nameOf('schemes', s.type)}: `, charLink(app, s.owner, true), ` (${Math.floor(s.progress)}%)`))));
+  }
+  if (g.engine.systems.has('prison')) {
+    const prisoners = prisonersOf(g, p.id);
+    if (prisoners.length) {
+      root.append(section(`⛓ ${app.t('ui.prisoners')} (${prisoners.length})`, ...prisoners.map((c) => h('div', { class: 'prisoner-row' },
+        portrait(app, c, 30), charLink(app, c.id, true),
+        h('span', { class: 'muted' }, ` · ${app.t('ui.prison_months', { n: Math.floor((g.date - c.prison!.since) / 30) })} · ${app.t('ui.ransom_n', { n: ransomCost(g, c) })}`),
+      ))));
+    }
   }
   return root;
 }

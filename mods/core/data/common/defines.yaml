@@ -128,6 +128,8 @@ defines:
     same_dynasty: 5
     liege_base: 0
     holds_my_claim: -15
+    short_reign: -25        # вассалы не доверяют новому правителю…
+    short_reign_years: 8    # …пока он не процарствует столько лет
 
   titles:
     create_fraction: 0.51
@@ -147,5 +149,59 @@ defines:
     default_law: partition
     max_partition_heirs: 4
 
+  # Образ жизни: опыт в месяц = (base_xp + навык × xp_per_skill) × (1 + lifestyle_xp_mult);
+  # цена перка = perk_cost + perk_cost_growth × (уже открытых перков этого образа жизни).
+  lifestyle:
+    base_xp: 20
+    xp_per_skill: 2
+    perk_cost: 300
+    perk_cost_growth: 100
+    focus_change_cooldown_months: 12
+
+  council:
+    councillor_opinion: 10          # мнение советника о сюзерене
+    ai_replace_skill_gap: 4         # ИИ меняет советника, если кандидат лучше на столько
+    dismiss_opinion_modifier: dismissed_from_council
+
+  prison:
+    escape_chance: 0.004            # в месяц
+    escape_per_intrigue: 0.0005
+    siege_capture_chance: 0.5       # правитель в столице при её взятии
+    family_capture_chance: 0.3
+    battle_capture_chance: 0.08     # выживший полководец проигравших
+    leader_captured_warscore: 75
+    ransom_base: 40
+    ransom_per_tier: 60
+    ransom_income_months: 6
+    monthly_stress: 2
+    dungeon_health: -1
+    crime_opinion_modifiers: [attempted_murder, murdered_relative, rebel]
+
+  factions:
+    power_threshold: 80             # % силы сюзерена, при котором растёт недовольство
+    discontent_gain: 6              # в месяц
+    discontent_decay: 4
+    ai_consider_chance: 0.35        # ИИ-вассал раз в месяц думает о фракциях
+    ai_join_chance: 0.5
+    ai_create_threshold: 10         # ai_join, при котором ИИ создаёт фракцию
+    ai_create_chance: 0.25
+    ai_leave_below: -10
+    cooldown_years: 5               # после распада фракции её члены не вступают в новые
+    sibling_claim_chance: 0.5       # дети, не унаследовавшие титул, получают на него претензию
+    ultimatum_event: faction.0001
+
+  regiments:
+    cap_by_tier: [0, 2, 3, 4, 6]    # сколько отрядов можно держать (по рангу)
+    start_regiments_by_tier: [0, 0, 1, 2, 3]
+    raised_upkeep_mult: 2
+    reinforce_rate: 0.1             # пополнение в месяц (доля от полного состава)
+    max_counter: 0.75
+    ai_recruit_chance: 0.15
+    ai_gold_reserve: 60
+    ai_disband_below_gold: -30
+
+  # Механики движка, которые нужно отключить (lifestyles, council, prison, factions, regiments).
+  disabled_features: []
+
   # Характеристики, доступные в скриптах как значения (gold, age и навыки — встроены).
-  script_stat_values: [general_opinion, vassal_opinion, monthly_prestige, monthly_piety, commander_advantage, levy_flat]
+  script_stat_values: [general_opinion, vassal_opinion, monthly_prestige, monthly_piety, commander_advantage, levy_flat, scheme_power, scheme_defense]

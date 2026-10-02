@@ -1,0 +1,109 @@
+# Профессиональные войска. power — сколько ополченцев стоит один воин;
+# counters — кого этот тип контрит (до какой доли силы снимает, если
+# контрящих не меньше, чем контримых); terrain — бонус к силе на местности.
+# upkeep — жалованье в месяц (в поднятой армии — × raised_upkeep_mult).
+regiment_types:
+  light_footmen:
+    icon: "🗡"
+    order: 1
+    size: 100
+    power: 2.0
+    cost: { gold: 35 }
+    upkeep: 0.25
+    terrain: { forest: 0.25, hills: 0.15, wetlands: 0.15 }
+    ai_will_do: 10
+  archers:
+    icon: "🏹"
+    order: 2
+    size: 100
+    power: 2.0
+    cost: { gold: 45 }
+    upkeep: 0.3
+    counters: { light_footmen: 0.4, heavy_infantry: 0.3 }
+    terrain: { hills: 0.25, forest: 0.1 }
+    ai_will_do: 10
+  pikemen:
+    icon: "🔱"
+    order: 3
+    size: 100
+    power: 2.4
+    cost: { gold: 50 }
+    upkeep: 0.35
+    counters: { heavy_cavalry: 0.6, light_cavalry: 0.5, chevaliers: 0.5 }
+    ai_will_do: 10
+  light_cavalry:
+    icon: "🐎"
+    order: 4
+    size: 100
+    power: 3.0
+    cost: { gold: 60 }
+    upkeep: 0.45
+    counters: { archers: 0.6, longbowmen: 0.5 }
+    terrain: { plains: 0.2, farmlands: 0.2, forest: -0.3, hills: -0.2, mountains: -0.4, wetlands: -0.4 }
+    ai_will_do: 8
+  heavy_infantry:
+    icon: "🛡"
+    order: 5
+    size: 100
+    power: 4.0
+    cost: { gold: 80 }
+    upkeep: 0.6
+    counters: { pikemen: 0.4, light_footmen: 0.3 }
+    can_recruit: { tier: ">= duchy" }
+    ai_will_do: 8
+  heavy_cavalry:
+    icon: "🏇"
+    order: 6
+    size: 50
+    power: 6.5
+    cost: { gold: 140 }
+    upkeep: 1.0
+    counters: { archers: 0.4, light_footmen: 0.5 }
+    terrain: { plains: 0.3, farmlands: 0.3, forest: -0.3, hills: -0.25, mountains: -0.5, wetlands: -0.5 }
+    can_recruit: { tier: ">= duchy" }
+    ai_will_do: { value: 6, if: { limit: { gold: ">= 300" }, add: 6 } }
+  # ---------------------------------------------------- культурные
+  housecarls:
+    icon: "🪓"
+    order: 10
+    size: 100
+    power: 5.0
+    cost: { gold: 90 }
+    upkeep: 0.6
+    counters: { pikemen: 0.4, light_footmen: 0.4 }
+    can_recruit: { culture: [english, norse] }
+    ai_will_do: 60
+  chevaliers:
+    icon: "⚜"
+    order: 11
+    size: 50
+    power: 7.5
+    cost: { gold: 160 }
+    upkeep: 1.1
+    counters: { archers: 0.5, light_footmen: 0.6, heavy_infantry: 0.2 }
+    terrain: { plains: 0.35, farmlands: 0.35, forest: -0.3, hills: -0.25, mountains: -0.5, wetlands: -0.5 }
+    can_recruit: { culture: [norman, french, flemish], tier: ">= duchy" }
+    ai_will_do: 60
+  gallowglass:
+    icon: "⚔"
+    order: 12
+    size: 100
+    power: 4.5
+    cost: { gold: 80 }
+    upkeep: 0.55
+    counters: { heavy_infantry: 0.3, light_cavalry: 0.3 }
+    terrain: { hills: 0.2, wetlands: 0.2 }
+    can_recruit: { culture: [scottish, irish] }
+    ai_will_do: 60
+  longbowmen:
+    icon: "🎯"
+    order: 13
+    size: 100
+    power: 2.8
+    cost: { gold: 55 }
+    upkeep: 0.35
+    counters: { heavy_infantry: 0.4, heavy_cavalry: 0.3, light_footmen: 0.3 }
+    terrain: { hills: 0.3, forest: 0.2 }
+    can_recruit: { culture: welsh }
+    ai_will_do: 60
+

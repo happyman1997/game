@@ -3,6 +3,7 @@ import { createModApi } from './api';
 import { normalizeContent } from './content/normalize';
 import type { ContentStore } from './content/store';
 import { validateContent } from './content/validate';
+import { type ContentValidator, type EngineFeature, builtinFeatures } from './features';
 import { createDefaultFormats } from './core/formats';
 import { HookBus } from './core/hooks';
 import type { Localization } from './core/localization';
@@ -16,7 +17,7 @@ import { registerBuiltins, registerSkillValues } from './script/builtins';
 import { ScriptRegistry } from './script/registry';
 import { type GameSystem, builtinSystems } from './systems/core';
 import { UIRegistry } from './uiRegistry';
-import type { InteractionTargetProvider } from './world/interactions';
+import type { InteractionDecider, InteractionTargetProvider } from './world/interactions';
 import { type OpinionProvider, builtinOpinionProviders } from './world/opinion';
 import { setupNewGame } from './world/setup';
 import { type ModifierProvider, type ProvinceModifierProvider, buildingOwnerProvider, stressProvider } from './world/stats';
@@ -47,10 +48,20 @@ export class Engine {
     successionAlgorithms: new Registry<SuccessionAlgorithm>('алгоритм наследования'),
     cbTargets: new Registry<CbTargetProvider>('поставщик целей войны'),
     interactionTargets: new Registry<InteractionTargetProvider>('поставщик целей взаимодействия'),
+    interactionDeciders: new Registry<InteractionDecider>('решающий во взаимодействии'),
     modifierProviders: new Registry<ModifierProvider>('поставщик модификаторов'),
     provinceModifierProviders: new Registry<ProvinceModifierProvider>('поставщик модификаторов провинции'),
     opinionProviders: new Registry<OpinionProvider>('поставщик мнения'),
+    contentValidators: new Registry<ContentValidator>('проверка контента'),
   };
+  /** Механики (образ жизни, совет, темница, фракции, отряды). */
+  readonly features = new Registry<EngineFeature>('механика');
+  /** Включённые (установленные) механики. */
+  readonly installedFeatures = new Set<string>();
+
+  hasFeature(id: string): boolean {
+    return this.installedFeatures.has(id);
+  }
   content!: ContentStore;
   loc!: Localization;
   mods: ModPackage[] = [];
@@ -82,6 +93,22 @@ export class Engine {
     registerBuiltins(e);
     registerSkillValues(e);
     e.registerDefaults();
+    const disabled = new Set<string>(e.content.singleton('defines').disabled_features ?? []);
+    for (const f of builtinFeatures) {
+      e.features.register(f.id, f, 'core');
+      f.script?.(e);
+      if (!disabled.has(f.id)) {
+        f.install(e);
+        e.installedFeatures.add(f.id);
+      }
+    }
+    // Записи, требующие отключённой механики, убираются из контента.
+    for (const type of e.content.types()) {
+      for (const id of e.content.ids(type)) {
+        const req = e.content.get(type, id)?.requires_feature;
+        if (req && [].concat(req).some((x: string) => !e.installedFeatures.has(x))) e.content.delete(type, id);
+      }
+    }
 
     for (const s of res.scripts) {
       const m = s.module;

@@ -1,0 +1,27 @@
+interaction:
+  imprison: Imprison
+  release_prisoner: Release
+  execute_prisoner: Execute
+  demand_ransom: Demand Ransom
+interaction_desc:
+  imprison: Throw the character into your dungeon. Without a lawful reason (an uncovered plot, rebellion) this is tyranny — vassals will be displeased, and a landed vassal may manage to flee.
+  release_prisoner: Set the prisoner free. They will be grateful.
+  execute_prisoner: Execute the prisoner. Their family will never forgive it, and without a lawful reason it is grave tyranny.
+  demand_ransom: Offer the prisoner's family or liege to ransom them.
+opinion_modifier:
+  imprisoned_me: Imprisoned me
+  imprisoned_relative: Imprisoned my relative
+  executed_relative: Executed my relative
+  attempted_imprisonment: Tried to imprison me
+  refused_ransom: Refused to pay a ransom
+  rebel: Rebel
+  tyranny: Tyranny
+ui:
+  tyranny_tooltip: "Tyranny: all your vassals will think less of you."
+  payer_cant_afford: The payer cannot afford the ransom
+msg:
+  imprison_failed: "[scope:recipient] manages to flee to their lands!"
+ai:
+  ransom_family: Their own relative
+  ransom_opinion: Opinion of the prisoner
+  ransom_wealth: Can afford it

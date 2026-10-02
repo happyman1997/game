@@ -1,0 +1,27 @@
+faction:
+  independence_faction: Independence Faction
+  claimant_faction: Claimant Faction
+faction_desc:
+  independence_faction: The vassals demand freedom from their liege. If the demands are met, every member becomes an independent ruler.
+  claimant_faction: The vassals want to put a claimant on the throne. If they win, the claimant takes the liege's primary title.
+casus_belli:
+  independence_revolt: Independence Revolt
+  claimant_revolt: Claimant Revolt
+cb:
+  independence_revolt:
+    war_name: "Revolt of [scope:attacker] against [scope:defender]"
+  claimant_revolt:
+    war_name: "Revolt for [scope:claimant]'s right to [scope:target]"
+ev:
+  faction.0001:
+    t: An Ultimatum
+    desc: "A messenger brings a letter sealed by your vassals. [scope:faction_leader] and the [scope:faction] demand that you yield. If you refuse, they will take up arms."
+    a: Yield to their demands
+    b: No concessions to rebels!
+ai:
+  content: Content with life
+  family: Family of the liege
+  councillor: Seat on the council
+  claimant_opinion: Opinion of the claimant
+  is_claimant: Is the claimant
+  claimant_family: Family of the claimant

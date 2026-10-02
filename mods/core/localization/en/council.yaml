@@ -1,0 +1,38 @@
+council_position:
+  chancellor: Chancellor
+  steward: Steward
+  marshal: Marshal
+  spymaster: Spymaster
+  court_chaplain: Court Chaplain
+council_position_desc:
+  chancellor: Handles the affairs of the realm and relations with foreign courts. Diplomacy matters.
+  steward: Manages the treasury and the domain. Stewardship matters.
+  marshal: Commands the army and raises the levies. Martial matters.
+  spymaster: Watches for plots and digs up useful documents. Intrigue matters.
+  court_chaplain: The ruler's spiritual guide and patron of learning. Learning matters.
+council_task:
+  domestic_affairs: Domestic Affairs
+  foreign_affairs: Foreign Affairs
+  collect_taxes: Collect Taxes
+  develop_domain: Develop the Domain
+  organize_levies: Organize Levies
+  train_commanders: Train Commanders
+  disrupt_schemes: Disrupt Schemes
+  fabricate_claims: Find Claims
+  spiritual_guidance: Spiritual Guidance
+  promote_learning: Promote Learning
+council_task_desc:
+  domestic_affairs: The chancellor settles vassal disputes — they think better of their liege.
+  foreign_affairs: The chancellor keeps up ties with foreign courts — prestige grows.
+  collect_taxes: The steward makes sure taxes are collected properly.
+  develop_domain: The steward invests in backward provinces of the domain — development sometimes grows.
+  organize_levies: The marshal drills and counts the levies — there are more of them.
+  train_commanders: The marshal trains the commanders — the army fights better.
+  disrupt_schemes: The spymaster protects the ruler and sometimes uncovers plots against the family.
+  fabricate_claims: The spymaster searches neighbours' archives for documents that give claims on their counties.
+  spiritual_guidance: The chaplain guides the ruler — piety grows.
+  promote_learning: The chaplain patronises scholars — lifestyle experience and development grow faster.
+opinion_modifier:
+  dismissed_from_council: Dismissed from the council
+msg:
+  spymaster_claim: "Your spymaster has found documents: you now have a claim on [scope:claim_target]!"

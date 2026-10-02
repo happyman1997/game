@@ -148,14 +148,27 @@ export const builtinOpinionProviders: Record<string, OpinionProviderFn> = {
     if (isSibling(a, b)) parts.push({ label: game.loc.t('opinion.sibling'), value: o.sibling ?? 10 });
     else if (a.dynasty && a.dynasty === b.dynasty && !isParentOf(a, b) && !isParentOf(b, a))
       parts.push({ label: game.loc.t('opinion.same_dynasty'), value: o.same_dynasty ?? 5 });
+    if (parts.length) {
+      const fam = Math.round(stat(game, b, 'family_opinion'));
+      if (fam) parts.push({ label: game.loc.t('opinion.family_bonus'), value: fam });
+    }
     return parts;
   },
 
   liege: (game, a, b) => {
     if (a.liege !== b.id || !a.titles.length) return null;
     const o = game.defines.opinion ?? {};
+    const parts: OpinionPart[] = [];
     const v = Math.round((o.liege_base ?? 0) + stat(game, b, 'vassal_opinion'));
-    return v ? { label: game.loc.t('opinion.liege'), value: v } : null;
+    if (v) parts.push({ label: game.loc.t('opinion.liege'), value: v });
+    // «Недолгое правление»: вассалы присматриваются к новому сюзерену.
+    const hist = b.titles[0] ? game.state.titles[b.titles[0]]?.history : undefined;
+    const since = hist?.length ? hist[hist.length - 1].from : undefined;
+    const years = since !== undefined && hist!.length > 1 ? (game.date - since) / 365 : Infinity;
+    const max = o.short_reign ?? 0;
+    const span = o.short_reign_years ?? 8;
+    if (max && years < span) parts.push({ label: game.loc.t('opinion.short_reign'), value: Math.round(max * (1 - years / span)) });
+    return parts;
   },
 
   claim: (game, a, b) => {

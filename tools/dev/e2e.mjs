@@ -25,7 +25,7 @@ await page.waitForSelector('.game-screen');
 await page.waitForTimeout(800);
 await closeEvents();
 // решения
-await page.click('.tab-btn >> nth=5');
+await page.click('.tab-btn[data-tab=decisions]');
 await page.waitForTimeout(200);
 await shot('01-decisions'); console.log('step', '01-decisions');
 const take = await page.$('.decision.major .btn-gold:not([disabled])');
@@ -42,7 +42,7 @@ await page.click('.cb-card .btn-red >> nth=0');
 await page.waitForTimeout(300);
 await closeEvents();
 // армия
-await page.click('.tab-btn >> nth=2');
+await page.click('.tab-btn[data-tab=military]');
 await page.waitForTimeout(200);
 await page.click('text=Собрать армию');
 await page.waitForTimeout(300);
@@ -65,7 +65,7 @@ await closeEvents();
 const rq2 = await page.$('.event-modal .event-option');
 if (rq2) await rq2.click();
 await shot('05-after-time'); console.log('step', '05-after-time');
-await page.click('.tab-btn >> nth=3');
+await page.click('.tab-btn[data-tab=wars]');
 await page.waitForTimeout(300);
 await shot('06-wars'); console.log('step', '06-wars');
 // дипломатическая карта

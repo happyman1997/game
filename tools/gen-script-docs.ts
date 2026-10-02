@@ -30,6 +30,9 @@ table('Значения', r.values.entries().map(([id, d]) => [`\`${id}\``, (d.s
 table('Ссылки на скоупы', r.links.entries().map(([id, d]) => [`\`${id}\``, (d.from ?? ['любой']).join(', '), d.doc ?? '', owner(r.links, id)]), ['Имя', 'Из скоупа', 'Описание', 'Источник']);
 table('Списки (any_ / every_ / random_ / ordered_)', r.lists.entries().map(([id, d]) => [`\`${id}\``, (d.from ?? ['любой']).join(', '), d.doc ?? '', owner(r.lists, id)]), ['Имя', 'Из скоупа', 'Описание', 'Источник']);
 table('Константы', r.constants.entries().map(([id, v]) => [`\`${id}\``, String(v), '', owner(r.constants, id)]), ['Имя', 'Значение', '', 'Источник']);
+lines.push('## Механики', '', '| Механика | Описание | Включена |', '|---|---|---|');
+for (const [id, f] of engine.features.entries()) lines.push(`| \`${id}\` | ${f.doc ?? ''} | ${engine.hasFeature(id) ? 'да' : 'нет'} |`);
+lines.push('', 'Отключение: `defines.disabled_features: [id, ...]`. Источник `core/<механика>` в таблицах выше — элементы, которые регистрирует механика.', '');
 lines.push('## Реестры движка', '');
 for (const [name, reg] of Object.entries(engine.registries)) lines.push(`- **${name}**: ${reg.ids().map((x) => `\`${x}\``).join(', ')}`);
 lines.push(`- **systems**: ${engine.orderedSystems().map((s) => `\`${s.id}\` (${s.order})`).join(', ')}`);

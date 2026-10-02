@@ -1,0 +1,27 @@
+faction:
+  independence_faction: Фракция за независимость
+  claimant_faction: Фракция претендента
+faction_desc:
+  independence_faction: Вассалы требуют свободы от сюзерена. Если требования примут — все члены фракции станут независимыми правителями.
+  claimant_faction: Вассалы хотят посадить на трон претендента. Если победят — претендент получит основной титул сюзерена.
+casus_belli:
+  independence_revolt: Мятеж за независимость
+  claimant_revolt: Мятеж претендента
+cb:
+  independence_revolt:
+    war_name: "Мятеж [scope:attacker] против [scope:defender]"
+  claimant_revolt:
+    war_name: "Мятеж за права [scope:claimant] на [scope:target]"
+ev:
+  faction.0001:
+    t: Ультиматум
+    desc: "Гонец привозит письмо, скреплённое печатями ваших вассалов. [scope:faction_leader] от имени фракции «[scope:faction]» требует уступить. Если вы откажете, мятежники возьмутся за оружие."
+    a: Уступить требованиям
+    b: Никаких уступок мятежникам!
+ai:
+  content: Довольство жизнью
+  family: Родня сюзерена
+  councillor: Место в совете
+  claimant_opinion: Мнение о претенденте
+  is_claimant: Сам претендент
+  claimant_family: Родня претендента

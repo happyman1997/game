@@ -22,6 +22,8 @@ export class Game {
   private rulersCache: Character[] | null = null;
   private byLiege: Map<string, Character[]> | null = null;
   readonly statCache = new Map<string, Record<string, number>>();
+  /** Кэш на месяц (сбрасывается 1-го числа): для дорогих производных данных механик. */
+  readonly monthCache = new Map<string, unknown>();
   private reportedErrors = new Set<string>();
   /** Слушатели изменений для UI (не сохраняются). */
   readonly listeners = new Set<(kind: string) => void>();
@@ -90,6 +92,8 @@ export class Game {
         return !!this.state.schemes[ref.id];
       case 'army':
         return !!this.state.armies[ref.id];
+      case 'faction':
+        return !!this.state.factions[ref.id];
       default:
         return false;
     }
@@ -217,6 +221,10 @@ export class Game {
         const w = this.state.wars[ref.id];
         return w ? this.text(w.name ?? 'ui.war') : '?';
       }
+      case 'faction': {
+        const f = this.state.factions[ref.id];
+        return f ? this.nameOf('factions', f.type) : '?';
+      }
       default:
         return ref.id;
     }
@@ -230,7 +238,7 @@ export class Game {
     }
     const def = this.content.get(type, id) ?? (type === 'dynasties' ? this.state.dynasties[id] : undefined);
     if (def?.name != null) return this.loc.resolve(def.name);
-    const singular = type.replace(/ies$/, 'y').replace(/s$/, '');
+    const singular = singularOf(type);
     for (const k of [`${singular}.${id}`, `${type}.${id}`, id]) {
       const v = this.loc.raw(k);
       if (v !== undefined) return v;
@@ -250,7 +258,7 @@ export class Game {
   descOf(type: string, id: string): string {
     const def = this.content.get(type, id);
     if (def?.desc != null) return this.loc.resolve(def.desc);
-    const singular = type.replace(/ies$/, 'y').replace(/s$/, '');
+    const singular = singularOf(type);
     return this.loc.raw(`${singular}_desc.${id}`) ?? '';
   }
 
@@ -315,6 +323,7 @@ export class Game {
     const systems = this.engine.orderedSystems();
     for (const s of systems) this.runSystem(s.id, () => s.onDay?.(this));
     if (d === 1) {
+      this.monthCache.clear();
       this.markDirty();
       for (const s of systems) this.runSystem(s.id, () => s.onMonth?.(this));
       if (m === 1) for (const s of systems) this.runSystem(s.id, () => s.onYear?.(this));
@@ -332,6 +341,14 @@ export class Game {
     }
   }
 
+  /** Значение из помесячного кэша (или вычислить и запомнить). */
+  cachedMonthly<T>(key: string, fn: () => T): T {
+    if (this.monthCache.has(key)) return this.monthCache.get(key) as T;
+    const v = fn();
+    this.monthCache.set(key, v);
+    return v;
+  }
+
   /** Для мода: персистентные данные мода в сохранении. */
   modData<T = any>(modId: string, init: () => T): T {
     if (!(modId in this.state.modData)) this.state.modData[modId] = init();
@@ -341,4 +358,11 @@ export class Game {
   isAlive(id: string | undefined): boolean {
     return isAlive(this.char(id));
   }
+}
+
+/** Ключ локализации записи: traits → trait, dynasties → dynasty, focuses → focus. */
+export function singularOf(type: string): string {
+  if (/ies$/.test(type)) return type.replace(/ies$/, 'y');
+  if (/(ss|x|z|sh|ch|us)es$/.test(type)) return type.replace(/es$/, '');
+  return type.replace(/s$/, '');
 }

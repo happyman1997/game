@@ -4,7 +4,7 @@ import type { TextValue } from '../core/localization';
 import type { Game } from '../game';
 import { makeContext } from '../script/context';
 import { evalTrigger, evalValue, runEffect } from '../script/interpreter';
-import type { Character, War } from '../types';
+import type { Character, ScopeRef, War } from '../types';
 import { isAlive } from './characters';
 import { opinion } from './opinion';
 import { costBlockers } from './economy';
@@ -208,8 +208,9 @@ export const builtinCbTargets: Record<string, CbTargetProvider> = {
   },
 };
 
-function cbContext(game: Game, attacker: string, t: Omit<WarTarget, 'cb'>, warId?: string) {
+function cbContext(game: Game, attacker: string, t: Omit<WarTarget, 'cb'>, warId?: string, extra?: Record<string, ScopeRef>) {
   const scopes: Record<string, any> = {
+    ...(extra ?? {}),
     attacker: { type: 'character', id: attacker },
     defender: { type: 'character', id: t.defender },
   };
@@ -223,6 +224,7 @@ export function availableWarTargets(game: Game, attacker: Character, defender?: 
   if (!attacker.titles.length) return [];
   const out: WarTarget[] = [];
   for (const cb of game.content.all<CasusBelliDef>('casus_belli')) {
+    if (cb.manual) continue; // только из скриптов/механик (мятежи фракций)
     const prov = game.engine.registries.cbTargets.get(cb.targets);
     if (!prov) {
       game.scriptError(`Нет поставщика целей войны "${cb.targets}"`);
@@ -265,15 +267,28 @@ export function allyWillJoin(game: Game, ally: Character, leader: Character, ene
   return opinion(game, ally, leader) >= (game.defines.war?.ally_min_opinion ?? -10);
 }
 
-export function declareWar(game: Game, attacker: Character, t: WarTarget): War | null {
+export interface DeclareWarOptions {
+  /** Без цены повода (мятежи, скрипты). */
+  free?: boolean;
+  /** Дополнительные участники на стороне нападения (члены фракции). */
+  attackers?: string[];
+  /** Именованные скоупы войны, доступные в эффектах повода (scope:claimant). */
+  scopes?: Record<string, ScopeRef>;
+  /** Фракция, поднявшая мятеж. */
+  faction?: string;
+}
+
+export function declareWar(game: Game, attacker: Character, t: WarTarget, opts: DeclareWarOptions = {}): War | null {
   const cb = game.content.get<CasusBelliDef>('casus_belli', t.cb);
   const defender = game.char(t.defender);
   if (!cb || !defender || !isAlive(defender)) return null;
-  if (!game.engine.hooks.veto('war.before_declare', { game, attacker, target: t })) return null;
-  const cost = warCost(game, attacker, t);
-  attacker.gold -= cost.gold;
-  attacker.prestige -= cost.prestige;
-  attacker.piety -= cost.piety;
+  if (!game.engine.hooks.veto('war.before_declare', { game, attacker, target: t, options: opts })) return null;
+  if (!opts.free) {
+    const cost = warCost(game, attacker, t);
+    attacker.gold -= cost.gold;
+    attacker.prestige -= cost.prestige;
+    attacker.piety -= cost.piety;
+  }
   const w: War = {
     id: game.newId('war'),
     cb: t.cb,
@@ -287,8 +302,11 @@ export function declareWar(game: Game, attacker: Character, t: WarTarget): War |
     battleScore: 0,
     ticking: 0,
   };
+  if (opts.scopes) w.scopes = { ...opts.scopes };
+  if (opts.faction) w.faction = opts.faction;
+  for (const id of opts.attackers ?? []) if (!w.attackers.includes(id) && id !== defender.id && game.isAlive(id)) w.attackers.push(id);
   game.state.wars[w.id] = w;
-  const ctx = cbContext(game, attacker.id, t, w.id);
+  const ctx = cbContext(game, attacker.id, t, w.id, w.scopes);
   w.name = game.text(cb.war_name ?? 'ui.war_name_default', ctx, {
     attacker: game.scopeName({ type: 'character', id: attacker.id }),
     defender: game.scopeName({ type: 'character', id: defender.id }),
@@ -317,12 +335,26 @@ export interface WarscoreInfo {
   battle: number;
   occupation: number;
   ticking: number;
+  /** Дополнительные слагаемые от механик и модов (хук "war.score"). */
+  extra: { label: string; value: number }[];
 }
 
 export function warscore(game: Game, w: War): WarscoreInfo {
   const g = game.defines.war ?? {};
-  const attSide = new Set(w.attackers.flatMap((id) => (game.char(id) ? realmCounties(game, game.char(id)!) : [])));
-  const defSide = new Set(w.defenders.flatMap((id) => (game.char(id) ? realmCounties(game, game.char(id)!) : [])));
+  // Земли сторон. Державы могут вкладываться друг в друга (мятеж вассалов),
+  // поэтому сторона графства определяется ближайшим участником вверх по цепочке сюзеренов.
+  const attSide = new Set<string>();
+  const defSide = new Set<string>();
+  for (const id of [...w.attackers, ...w.defenders]) {
+    const c = game.char(id);
+    if (!c) continue;
+    for (const county of realmCounties(game, c)) {
+      if (attSide.has(county) || defSide.has(county)) continue;
+      const side = sideOf(game, w, game.state.titles[county]?.holder);
+      if (side === 'att') attSide.add(county);
+      else if (side === 'def') defSide.add(county);
+    }
+  }
   const targets = w.targetCounties.filter((c) => game.state.provinces[c]);
   const targetsOnAtt = targets.length > 0 && targets.filter((c) => attSide.has(c)).length > targets.filter((c) => defSide.has(c)).length;
   const occBy = (c: string, side: 'att' | 'def') => {
@@ -347,8 +379,10 @@ export function warscore(game: Game, w: War): WarscoreInfo {
   const battle = Math.max(-(g.max_battle_score ?? 40), Math.min(g.max_battle_score ?? 40, w.battleScore));
   const ticking = Math.max(-(g.max_ticking ?? 25), Math.min(g.max_ticking ?? 25, w.ticking));
   const occupation = occAtt - occDef;
-  const total = Math.max(-100, Math.min(100, Math.round(occupation + battle + ticking)));
-  return { total, battle: Math.round(battle), occupation: Math.round(occupation), ticking: Math.round(ticking) };
+  const extra = game.engine.hooks.collect<{ label: string; value: number } | { label: string; value: number }[]>('war.score', { game, war: w }).flat();
+  const extraSum = extra.reduce((s, x) => s + (x.value ?? 0), 0);
+  const total = Math.max(-100, Math.min(100, Math.round(occupation + battle + ticking + extraSum)));
+  return { total, battle: Math.round(battle), occupation: Math.round(occupation), ticking: Math.round(ticking), extra };
 }
 
 /** Ежемесячно: «тикающий» счёт за удержание целей войны. */
@@ -383,6 +417,7 @@ export function endWar(game: Game, w: War, outcome: WarOutcome): void {
   if (!game.state.wars[w.id]) return;
   const cb = game.content.get<CasusBelliDef>('casus_belli', w.cb);
   const scopes: Record<string, any> = {
+    ...(w.scopes ?? {}),
     attacker: { type: 'character', id: w.attacker },
     defender: { type: 'character', id: w.defender },
     war: { type: 'war', id: w.id },
@@ -430,6 +465,10 @@ export function validateWars(game: Game): void {
     w.defenders = w.defenders.filter((id) => game.isAlive(id) && game.char(id)!.titles.length);
     if (!game.isAlive(w.attacker) || !game.isAlive(w.defender) || !w.attackers.includes(w.attacker) || !w.defenders.includes(w.defender)) {
       endWar(game, w, 'white_peace');
+      continue;
+    }
+    if (w.faction) {
+      if (game.char(w.attacker)!.liege !== w.defender) endWar(game, w, 'white_peace');
       continue;
     }
     if (w.cb === 'independence' || game.content.get<CasusBelliDef>('casus_belli', w.cb)?.targets === 'independence') {

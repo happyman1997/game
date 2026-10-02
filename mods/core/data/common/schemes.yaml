@@ -18,6 +18,8 @@ schemes:
         - { desc: ai.target_intrigue, value: { value: "scope:target.intrigue", multiply: -2 } }
         - { desc: ai.target_prowess, value: { value: "scope:target.prowess", multiply: -0.5 } }
         - { desc: ai.paranoid_target, limit: { scope:target: { has_trait: paranoid } }, value: -15 }
+        - { desc: ai.scheme_power, value: "scope:owner.scheme_power" }
+        - { desc: ai.target_scheme_defense, value: { value: "scope:target.scheme_defense", multiply: -1 } }
       min: 3
       max: 90
     discovery_chance:
@@ -25,6 +27,7 @@ schemes:
       add:
         - { value: "scope:target.intrigue", multiply: 0.5 }
         - { value: "scope:owner.intrigue", multiply: -0.4 }
+        - { value: "scope:target.scheme_defense", multiply: 0.2 }
       min: 1
     on_success:
       - scope:owner:
@@ -112,6 +115,7 @@ schemes:
         - { desc: ai.chaste_target, limit: { scope:target: { has_trait: chaste } }, value: -35 }
         - { desc: ai.lustful_target, limit: { scope:target: { has_trait: lustful } }, value: 25 }
         - { desc: ai.target_married, limit: { scope:target: { is_married: yes } }, value: -10 }
+        - { desc: ai.scheme_power, value: "scope:owner.scheme_power" }
       min: 3
       max: 90
     discovery_chance: { value: 3 }
@@ -144,6 +148,8 @@ schemes:
       value: 45
       add:
         - { desc: ai.your_learning, value: { value: "scope:owner.learning", multiply: 2 } }
+        - { desc: ai.scheme_power, value: "scope:owner.scheme_power" }
+        - { desc: ai.target_scheme_defense, value: { value: "scope:target.scheme_defense", multiply: -0.5 } }
       min: 10
       max: 95
     on_success:

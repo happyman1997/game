@@ -27,6 +27,7 @@ export function deserializeGame(engine: Engine, json: string): { game: Game; war
   }
   state.modData ??= {};
   state.pendingRequests ??= [];
+  state.factions ??= {};
   state.mods = engine.mods.map((m) => ({ id: m.manifest.id, version: m.manifest.version }));
   const game = new Game(engine, state);
   game.markDirty();

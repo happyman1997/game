@@ -2,6 +2,7 @@ import { realmLevy } from '../../engine/world/economy';
 import { armiesOf, canRaiseArmy, commanderOf, daysToNext, disbandArmy, hostileWarAt, raiseArmy } from '../../engine/world/military';
 import { alliesOf } from '../../engine/world/war';
 import type { App } from '../app';
+import { armyRegimentsBlock, renderRegimentsSection } from './regiments';
 import { fmt, h } from '../dom';
 import { bar, button, charLink, provLink, section } from '../widgets';
 
@@ -23,6 +24,10 @@ export function renderMilitaryPanel(app: App): HTMLElement {
     app.markDirty(true);
   }, { disabled: !canRaiseArmy(g, p), cls: 'btn-big', tip: app.t('ui.raise_army_tip') }));
   root.append(h('p', { class: 'hint' }, app.t('ui.move_hint')));
+  if (g.engine.systems.has('regiments')) {
+    const regs = renderRegimentsSection(app, p);
+    if (regs) root.append(regs);
+  }
   const armies = armiesOf(g, p.id);
   if (armies.length) {
     root.append(section(app.t('ui.armies'), ...armies.map((a) => h('div', { class: 'army-card', onclick: () => { app.selectArmy(a.id); app.map.focus(a.location); } },
@@ -53,6 +58,8 @@ export function renderArmyPanel(app: App, id: string): HTMLElement {
     h('div', null, app.t('ui.location')), h('div', null, provLink(app, a.location)),
     h('div', null, app.t('ui.status')), h('div', null, status),
   ));
+  const regs = armyRegimentsBlock(app, a);
+  if (regs) root.append(regs);
   if (g.isPlayer(a.owner)) {
     root.append(h('p', { class: 'hint' }, app.t('ui.move_hint')));
     root.append(button(app.t('ui.disband'), () => { disbandArmy(g, a.id); app.closePanel(); }, { cls: 'btn-red' }));

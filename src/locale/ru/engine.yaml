@@ -121,6 +121,7 @@ death:
   hunting: "{who} гибнет на охоте"
   stress: "{who} умирает от разрыва сердца"
   plague: "{who} умирает от чумы"
+  execution: "{who} казнён(а)"
 
 opinion:
   traits: Черты характера

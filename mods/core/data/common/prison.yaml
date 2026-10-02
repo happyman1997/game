@@ -1,0 +1,167 @@
+# Темница. Взаимодействия с пленниками помечены prisoner: only — они видны
+# только для персонажей в темнице. requires_feature: prison — запись исчезнет,
+# если механику темницы отключить (defines.disabled_features). Скоупы — как у любых взаимодействий:
+# root = scope:actor, scope:recipient, scope:decider.
+interactions:
+  imprison:
+    requires_feature: prison
+    icon: "⛓"
+    category: hostile
+    is_shown:
+      scope:recipient: { is_adult: yes }
+      OR:
+        - scope:recipient: { is_courtier_of: scope:actor }
+        - scope:recipient: { is_vassal_of: scope:actor }
+    is_valid:
+      scope:recipient: { is_at_war: no }
+    auto_accept: yes
+    cooldown: { months: 6 }
+    on_accept:
+      - if:
+          limit: { has_imprisonment_reason: scope:recipient }
+          imprison: { target: scope:recipient, reason: crime }
+        else:
+          - custom_tooltip:
+              text: ui.tyranny_tooltip
+              effect:
+                every_vassal:
+                  limit: { NOT: { is_same_as: scope:recipient } }
+                  add_opinion: { target: scope:actor, modifier: tyranny }
+          - add_prestige: -50
+          - if:
+              limit: { scope:recipient: { is_ruler: yes } }
+              # Землевладелец может успеть бежать в свои владения.
+              random_list:
+                - weight: 50
+                  imprison: { target: scope:recipient, reason: tyranny }
+                - weight: 50
+                  scope:recipient:
+                    add_opinion: { target: scope:actor, modifier: attempted_imprisonment }
+                    send_message: { text: msg.imprison_failed, kind: bad }
+                  send_message: { text: msg.imprison_failed, kind: bad }
+            else:
+              imprison: { target: scope:recipient, reason: tyranny }
+      - scope:recipient:
+          if:
+            limit: { is_imprisoned_by: scope:actor }
+            add_opinion: { target: scope:actor, modifier: imprisoned_me }
+            every_close_family:
+              limit: { NOT: { is_same_as: scope:actor } }
+              add_opinion: { target: scope:actor, modifier: imprisoned_relative }
+    ai_targets: [vassal, courtier]
+    ai_frequency_months: 6
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { has_imprisonment_reason: scope:recipient }
+          add: 40
+        - limit: { has_trait: [wrathful, vengeful, paranoid] }
+          multiply: 1.5
+        - limit: { has_trait: [forgiving, compassionate] }
+          multiply: 0.3
+
+  release_prisoner:
+    requires_feature: prison
+    icon: "🔓"
+    category: diplomacy
+    prisoner: only
+    is_shown:
+      scope:recipient: { is_imprisoned_by: scope:actor }
+    auto_accept: yes
+    on_accept:
+      - scope:recipient:
+          release_from_prison: yes
+          add_opinion: { target: scope:actor, modifier: released }
+    ai_targets: prisoner
+    ai_frequency_months: 3
+    ai_will_do:
+      value: 0
+      add:
+        - { value: scope:recipient.prison_months, multiply: 0.6 }
+      if:
+        - limit: { scope:recipient: { is_close_family_of: scope:actor } }
+          add: 30
+        - limit: { has_imprisonment_reason: scope:recipient }
+          add: -20
+        - limit: { has_trait: [forgiving, compassionate, just] }
+          add: 10
+
+  execute_prisoner:
+    requires_feature: prison
+    icon: "🪓"
+    category: hostile
+    prisoner: only
+    is_shown:
+      scope:recipient: { is_imprisoned_by: scope:actor }
+    auto_accept: yes
+    on_accept:
+      - if:
+          limit: { NOT: { has_imprisonment_reason: scope:recipient } }
+          custom_tooltip:
+            text: ui.tyranny_tooltip
+            effect:
+              every_vassal:
+                limit: { NOT: { is_same_as: scope:recipient } }
+                add_opinion: { target: scope:actor, modifier: tyranny, value: -30 }
+      - scope:recipient:
+          every_close_family:
+            limit: { NOT: { is_same_as: scope:actor } }
+            add_opinion: { target: scope:actor, modifier: executed_relative }
+      - if:
+          limit: { has_trait: [compassionate, forgiving] }
+          add_stress: 40
+      - scope:recipient: { death: { reason: execution, killer: scope:actor } }
+    ai_targets: prisoner
+    ai_frequency_months: 12
+    ai_will_do:
+      value: 0
+      if:
+        - limit:
+            has_imprisonment_reason: scope:recipient
+            has_trait: [wrathful, vengeful, arbitrary]
+            NOT: { scope:recipient: { is_close_family_of: scope:actor } }
+          add: 15
+        - limit: { has_trait: [compassionate, forgiving, just] }
+          multiply: 0
+
+  demand_ransom:
+    requires_feature: prison
+    icon: "💰"
+    category: diplomacy
+    prisoner: only
+    decider: payer
+    is_shown:
+      scope:recipient: { is_imprisoned_by: scope:actor }
+      NOT: { scope:decider: { is_same_as: scope:actor } }
+    is_valid:
+      custom_tooltip:
+        text: ui.payer_cant_afford
+        trigger:
+          scope:decider: { gold: ">= scope:recipient.ransom_cost" }
+    cooldown: { years: 1 }
+    ai_accept:
+      value: -10
+      add:
+        - { desc: ai.ransom_family, limit: { OR: [{ is_same_as: scope:recipient }, { is_close_family_of: scope:recipient }] }, value: 40 }
+        - { desc: ai.ransom_opinion, value: { value: "opinion(scope:recipient)", multiply: 0.3 } }
+        - { desc: ai.ransom_wealth, value: { value: gold, divide: { value: scope:recipient.ransom_cost, min: 1 }, multiply: 10, max: 30 } }
+    on_accept:
+      - scope:decider: { pay_gold: { target: scope:actor, value: scope:recipient.ransom_cost } }
+      - scope:recipient: { release_from_prison: ransomed }
+    on_decline:
+      - scope:actor: { add_opinion: { target: scope:decider, modifier: refused_ransom } }
+    ai_targets: prisoner
+    ai_frequency_months: 4
+    ai_will_do:
+      value: 20
+      if:
+        - limit: { has_trait: greedy }
+          add: 20
+
+opinion_modifiers:
+  imprisoned_me: { value: -50, decay: 0.3 }
+  imprisoned_relative: { value: -25, years: 10 }
+  executed_relative: { value: -80, decay: 0.2 }
+  attempted_imprisonment: { value: -60, decay: 0.3 }
+  refused_ransom: { value: -10, years: 3 }
+  rebel: { value: -40, years: 10 }

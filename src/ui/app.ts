@@ -30,6 +30,7 @@ import { renderWarsPanel } from './panels/wars';
 import { renderIntriguePanel } from './panels/intrigue';
 import { renderDecisionsPanel } from './panels/decisions';
 import { renderRealmPanel } from './panels/realm';
+import { renderLifestylePanel } from './panels/lifestyle';
 import { renderLogPanel } from './panels/log';
 import { breakdownHtml, button, charLink, portrait, titleCoa } from './widgets';
 import { exportSave, openLoadDialog, openSaveDialog, quickSaveSlot, writeSave } from './screens/saves';
@@ -54,6 +55,8 @@ export class App implements MapHost {
   speed = 2;
   paused = true;
   pickMode = false;
+  /** Какой образ жизни открыт во вкладке «Образ жизни». */
+  lifestyleView?: string;
   panel: PanelRef | null = null;
   history: PanelRef[] = [];
   private selectedArmyId: string | null = null;
@@ -280,7 +283,7 @@ export class App implements MapHost {
     if (m === 1 && d === 1 && y !== this.lastYearSaved && g.state.player) {
       this.lastYearSaved = y;
       try {
-        writeSave(this, 'autosave', serializeGame(g));
+        writeSave(this, 'autosave', serializeGame(g)).catch((e) => console.warn('Автосохранение не удалось', e));
       } catch (e) {
         console.warn('Автосохранение не удалось', e);
       }
@@ -316,11 +319,11 @@ export class App implements MapHost {
 
   quickSave() {
     if (!this.game) return;
+    const fail = (e: unknown) => this.toast(`${this.t('ui.save_failed')}: ${(e as Error).message}`, 'bad');
     try {
-      writeSave(this, quickSaveSlot(), serializeGame(this.game));
-      this.toast(this.t('ui.saved'));
+      writeSave(this, quickSaveSlot(), serializeGame(this.game)).then(() => this.toast(this.t('ui.saved')), fail);
     } catch (e) {
-      this.toast(`${this.t('ui.save_failed')}: ${(e as Error).message}`, 'bad');
+      fail(e);
     }
   }
 
@@ -541,6 +544,7 @@ export class App implements MapHost {
     const g = this.game!;
     const list = [
       { id: 'me', icon: '👤', name: this.t('ui.tab.character') },
+      ...(g.engine.systems.has('lifestyles') && g.content.all('lifestyles').length ? [{ id: 'lifestyle', icon: '🌿', name: this.t('ui.tab.lifestyle') }] : []),
       { id: 'realm', icon: '🏰', name: this.t('ui.tab.realm') },
       { id: 'military', icon: '⚔', name: this.t('ui.tab.military') },
       { id: 'wars', icon: '🔥', name: this.t('ui.tab.wars') },
@@ -559,7 +563,9 @@ export class App implements MapHost {
     if (!this.game!.player) return;
     for (const t of this.tabs()) {
       const active = this.panel?.kind === 'tab' && this.panel.id === t.id;
-      this.bottomBar.append(button(h('span', { class: 'tab-icon' }, t.icon), () => (t.id === 'me' ? this.openCharacter(this.game!.player!.id) : this.openTab(t.id)), { cls: `tab-btn ${active ? 'active' : ''}`, tip: t.name }));
+      const b = button(h('span', { class: 'tab-icon' }, t.icon), () => (t.id === 'me' ? this.openCharacter(this.game!.player!.id) : this.openTab(t.id)), { cls: `tab-btn ${active ? 'active' : ''}`, tip: t.name });
+      b.dataset.tab = t.id;
+      this.bottomBar.append(b);
     }
   }
 
@@ -629,6 +635,7 @@ export class App implements MapHost {
         title = tab?.name ?? '';
         switch (p.id) {
           case 'pick': title = this.t('ui.pick_title'); body = this.renderPickPanel(); break;
+          case 'lifestyle': body = renderLifestylePanel(this); break;
           case 'realm': body = renderRealmPanel(this); break;
           case 'military': body = renderMilitaryPanel(this); break;
           case 'wars': body = renderWarsPanel(this); break;

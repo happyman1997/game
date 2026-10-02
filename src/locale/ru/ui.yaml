@@ -118,6 +118,7 @@ ui:
     hunting: на охоте
     stress: от разрыва сердца
     plague: от чумы
+    execution: казнён(а)
   courtier_of: "Придворный: {who}"
   wanderer: Странник
   lowborn: Безродный

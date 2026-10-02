@@ -15,7 +15,7 @@ import {
   secondaryCandidates,
   targetOptions,
 } from './interactions';
-import { armiesOf, disbandArmy, hostileWarAt, moveArmy, raiseArmy } from './military';
+import { armiesOf, armyStrength, disbandArmy, hostileWarAt, moveArmy, raiseArmy } from './military';
 import { canAffordWar, availableWarTargets, aiWillAcceptSurrender, aiWillAcceptWhitePeace, declareWar, endWar, participantSide, sideOf, warsOf, warscore } from './war';
 import { canCreateTitle, createTitle, isInRealmOf, provinceController, realmCounties, topLiege } from './titles';
 
@@ -157,7 +157,7 @@ export function armyAI(game: Game, a: Army): void {
       if (!es || es === side || e.retreating) continue;
       const len = game.engine.pathLength(a.location, e.location);
       if (!Number.isFinite(len) || len > 6 * 80) continue;
-      const ratio = a.size / Math.max(1, e.size);
+      const ratio = armyStrength(game, a, [e]) / Math.max(1, armyStrength(game, e, [a]));
       if (ratio > 1.15) consider(e.location, 120 * Math.min(2, ratio) - (len / 80) * 8);
     }
     // Осады: цели войны в приоритете, затем любые вражеские графства
@@ -185,7 +185,7 @@ export function armyAI(game: Game, a: Army): void {
       let score = (liberation ? (isMyCapital ? 70 : 20) : tset.has(cty) ? 80 : 40) - (len / 80) * 6;
       // не лезем в провинцию, где стоит вражеская армия сильнее нас
       const danger = Object.values(game.state.armies).some(
-        (e) => e.location === cty && participantSide(w, e.owner) && participantSide(w, e.owner) !== side && e.size > a.size * 0.9,
+        (e) => e.location === cty && participantSide(w, e.owner) && participantSide(w, e.owner) !== side && armyStrength(game, e, [a]) > armyStrength(game, a, [e]) * 0.9,
       );
       if (danger) score -= 200;
       consider(cty, score);

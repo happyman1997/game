@@ -1,5 +1,6 @@
 /**
- * Сохранения в localStorage + экспорт/импорт файлом.
+ * Сохранения: сами данные — в IndexedDB (src/ui/storage.ts), список слотов —
+ * в localStorage; плюс экспорт/импорт файлом.
  */
 import { dateParts } from '../../engine/core/date';
 import { serializeGame } from '../../engine/save';
@@ -7,6 +8,7 @@ import { charFullName } from '../../engine/world/characters';
 import type { App } from '../app';
 import { clear, h } from '../dom';
 import { button } from '../widgets';
+import { kvDelete, kvGet, kvSet } from '../storage';
 
 interface SaveMeta {
   slot: string;
@@ -30,11 +32,11 @@ export function quickSaveSlot() {
   return 'quicksave';
 }
 
-export function writeSave(app: App, slot: string, json: string, name?: string) {
+export async function writeSave(app: App, slot: string, json: string, name?: string): Promise<void> {
   const g = app.game!;
   const p = g.player;
   const { y, m, d } = dateParts(g.date);
-  localStorage.setItem(`cad.save.${slot}`, json);
+  await kvSet(`cad.save.${slot}`, json);
   const meta: SaveMeta = {
     slot,
     name: name ?? (slot === 'autosave' ? app.t('ui.autosave') : slot === 'quicksave' ? app.t('ui.quicksave') : slot),
@@ -47,8 +49,8 @@ export function writeSave(app: App, slot: string, json: string, name?: string) {
   localStorage.setItem(INDEX, JSON.stringify(list));
 }
 
-function deleteSave(slot: string) {
-  localStorage.removeItem(`cad.save.${slot}`);
+async function deleteSave(slot: string) {
+  await kvDelete(`cad.save.${slot}`);
   localStorage.setItem(INDEX, JSON.stringify(listSaves().filter((s) => s.slot !== slot)));
 }
 
@@ -82,14 +84,11 @@ export function openSaveDialog(app: App) {
     input,
     h('div', { class: 'modal-buttons' },
       button(app.t('ui.save'), () => {
-        try {
-          const slot = input.value.trim() || 'save';
-          writeSave(app, slot, serializeGame(app.game!), slot);
-          app.toast(app.t('ui.saved'), 'good');
-          close();
-        } catch (e) {
-          app.toast(`${app.t('ui.save_failed')}: ${(e as Error).message}`, 'bad');
-        }
+        const slot = input.value.trim() || 'save';
+        close();
+        writeSave(app, slot, serializeGame(app.game!), slot)
+          .then(() => app.toast(app.t('ui.saved'), 'good'))
+          .catch((e) => app.toast(`${app.t('ui.save_failed')}: ${(e as Error).message}`, 'bad'));
       }, { cls: 'btn-gold' }),
       button(app.t('ui.cancel'), () => close()),
     ),
@@ -110,11 +109,12 @@ export function openLoadDialog(app: App) {
       body.append(h('div', { class: 'save-row' },
         h('div', null, h('b', null, s.name), h('div', { class: 'muted' }, `${s.player} · ${s.date} · ${s.savedAt}`)),
         button(app.t('ui.load'), () => {
-          const json = localStorage.getItem(`cad.save.${s.slot}`);
           close();
-          if (json) loadJson(app, json);
+          kvGet(`cad.save.${s.slot}`)
+            .then((json) => (json ? loadJson(app, json) : alert(app.t('ui.load_failed'))))
+            .catch((e) => alert(`${app.t('ui.load_failed')}: ${(e as Error).message}`));
         }, { cls: 'btn-small btn-gold' }),
-        button('🗑', () => { deleteSave(s.slot); render(); }, { cls: 'btn-small' }),
+        button('🗑', () => { deleteSave(s.slot).then(render, render); }, { cls: 'btn-small' }),
       ));
     }
     const file = h('input', { type: 'file', accept: '.json,application/json', style: { display: 'none' }, onchange: async (e: Event) => {

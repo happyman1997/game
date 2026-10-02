@@ -1,0 +1,112 @@
+# Строки механик движка: образ жизни, совет, темница, фракции, отряды.
+ui:
+  tab:
+    lifestyle: Образ жизни
+  focus_n: "Фокус: {name}"
+  lifestyle: Образ жизни
+  focus: Фокус
+  no_focus: Фокус не выбран
+  choose_focus: Выбрать фокус
+  current_focus: Текущий фокус
+  focus_cooldown: "Сменить фокус можно будет через {days} дн."
+  lifestyle_xp: "Опыт: {xp} / {cost}"
+  lifestyle_xp_month: "+{n} опыта в месяц"
+  perks_n: "Перков: {n}"
+  perk_owned: Открыт
+  perk_locked: Сначала откройте предыдущий перк
+  perk_need_xp: "Нужно опыта: {cost} (есть {xp})"
+  perk_unlock: Открыть перк
+  perk_grants_trait: "Даёт черту «{trait}»"
+  lifestyle_skill: "Навык: {skill}"
+  lifestyle_all_done: Все перки этого образа жизни открыты
+  council: Совет
+  vacant: Вакантно
+  appoint: Назначить
+  dismiss: Сместить
+  replace: Заменить
+  choose_councillor: "Кого назначить: {position}?"
+  no_council_candidates: Нет подходящих кандидатов (нужны совершеннолетние придворные или вассалы).
+  council_task: Задача
+  task_monthly_chance: "Шанс за месяц: {n}%"
+  councillor_of: "{position} при дворе {liege}"
+  prison: Темница
+  prisoners: Пленники
+  in_prison_of: "В темнице у {jailer}"
+  prison_months: "{n} мес."
+  ransom_n: "Выкуп: {n} 💰"
+  ws_captured_leader: Вражеский лидер в плену
+  factions: Фракции
+  factions_against_you: Фракции против вас
+  factions_against_liege: Фракции против сюзерена
+  faction_power: "Сила: {n}%"
+  faction_discontent: "Недовольство: {n}%"
+  faction_members: "Члены ({n})"
+  faction_leader: Лидер
+  faction_claimant: Претендент
+  join_faction: Вступить
+  leave_faction: Выйти
+  create_faction: Создать
+  send_ultimatum: Предъявить ультиматум
+  faction_cooldown: Недавно вы уже участвовали во фракции
+  faction_hint: "Когда сила фракции превышает {n}% силы сюзерена, растёт недовольство. На 100% фракция предъявляет ультиматум: уступить или мятеж."
+  no_factions: Против вас нет фракций.
+  in_faction: "Во фракции: {faction}"
+  regiments: Профессиональные войска
+  regiments_n: "Отряды: {n} / {cap}"
+  regiment_upkeep: Жалованье отрядов
+  regiment_cap_reached: "Достигнут предел отрядов ({n})"
+  recruit: Нанять
+  recruit_regiment: Нанять отряд
+  regiment_power: "Сила: {n} ополченцев"
+  regiment_stats: "{size} воинов × {power}"
+  regiment_upkeep_n: "Жалованье: {n} 💰/мес. (в походе ×{mult})"
+  regiment_counters: "Сильны против: {list}"
+  regiment_countered_by: "Уязвимы для: {list}"
+  regiment_terrain: "Местность: {list}"
+  regiment_in_army: в походе
+  regiment_reinforcing: пополняется
+  regiments_hint: Отряды идут в поход вместе с ополчением. Каждый воин отряда сильнее ополченца, а правильный подбор типов против врага решает исход битвы.
+  dismiss_regiment: Распустить
+  no_regiments: Отрядов нет.
+  army_regiments: Отряды в армии
+  council_hint: Советники усиливают правителя в зависимости от своих навыков и выбранной задачи.
+msg:
+  faction_created: "{who} основывает «{faction}» против {liege}"
+  faction_demands_accepted: "{liege} уступает требованиям: «{faction}»"
+  faction_ready: Ваша фракция готова предъявить ультиматум сюзерену (вкладка «Владения»).
+  imprisoned: "{who} брошен(а) в темницу: {jailer}"
+  prison_released: "{who} выходит из темницы"
+  prison_ransomed: "{who} выкуплен(а) из плена"
+  prison_escaped: "{who} бежит из темницы!"
+  prison_jailer_died: "{who} освобождается: тюремщик умер"
+  perk_gained: "Открыт перк «{perk}»"
+  perk_available: "Можно открыть новый перк ({lifestyle}) — загляните во вкладку «Образ жизни»."
+tr:
+  is_in_faction: Должен состоять во фракции
+  is_in_faction.not: Не должен состоять во фракции
+  is_imprisoned: Должен быть в темнице
+  is_imprisoned.not: Не должен быть в темнице
+  is_imprisoned_by: Должен быть вашим пленником
+  has_imprisonment_reason: Нужен законный повод (преступление против вас)
+  is_councillor: Должен заседать в совете
+  is_councillor.not: Не должен заседать в совете
+  has_perk: "Нужен перк: {value}"
+  has_focus: "Нужен фокус: {value}"
+  has_lifestyle: "Нужен образ жизни: {value}"
+fx:
+  add_regiment: "Отряд: {value}"
+  faction_enforce_demands: "Требования фракции «{faction}» будут выполнены"
+  faction_start_war: "Фракция «{faction}» поднимет мятеж"
+  imprison: "{who} будет брошен в темницу"
+  release_from_prison: "{who} выходит на свободу"
+  discover_scheme_against: Раскрывает заговор против вас или вашей семьи
+  add_perk: "Открывает перк «{value}»"
+  set_focus: "Фокус: {value}"
+  add_lifestyle_xp: "{value} опыта ({lifestyle})"
+opinion:
+  short_reign: Недолгое правление
+  family_bonus: Почтение к главе рода
+  on_council: Место в совете
+ai:
+  scheme_power: Сила интриг
+  target_scheme_defense: Защита цели
