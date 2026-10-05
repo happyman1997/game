@@ -13,6 +13,10 @@ rank:
     duchy: { m: Эрл, f: Леди }
   norse:
     county: { m: Ярл, f: Ярл }
+  danish:
+    county: { m: Ярл, f: Ярл }
+  swedish:
+    county: { m: Ярл, f: Ярл }
 
 fx:
   add_gold: "{value} 💰"

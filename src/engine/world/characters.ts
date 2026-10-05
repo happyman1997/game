@@ -135,7 +135,7 @@ export function marry(game: Game, a: Character, b: Character): void {
   if (!guest.titles.length) {
     setLiege(game, guest, host.titles.length ? host.id : host.liege);
   }
-  game.markDirty();
+  game.markIndexDirty();
   game.onAction('on_marriage', { type: 'character', id: a.id }, { spouse: { type: 'character', id: b.id } });
   game.emit('character.marriage', { a, b });
 }
@@ -145,7 +145,7 @@ export function divorce(game: Game, a: Character, b: Character): void {
   b.spouses = b.spouses.filter((s) => s !== a.id);
   if (!a.formerSpouses.includes(b.id)) a.formerSpouses.push(b.id);
   if (!b.formerSpouses.includes(a.id)) b.formerSpouses.push(a.id);
-  game.markDirty();
+  game.markIndexDirty();
 }
 
 export function setLiege(game: Game, c: Character, liege: string | undefined): void {
@@ -153,7 +153,9 @@ export function setLiege(game: Game, c: Character, liege: string | undefined): v
   if (c.liege === liege) return;
   const old = c.liege;
   c.liege = liege;
-  game.markDirty();
+  game.markIndexDirty();
+  // мнение о сюзерене зависит от сюзеренитета
+  for (const k of [`op:${c.id}>${old}`, `op:${c.id}>${liege}`]) game.statCache.delete(k);
   game.emit('character.liege_changed', { character: c, old, liege });
 }
 
@@ -292,7 +294,7 @@ export function createCharacter(game: Game, o: NewCharacterOpts): Character {
     assignPersonality(game, c);
     if (isAdult(game, c)) assignEducation(game, c);
   }
-  game.markDirty();
+  game.markIndexDirty();
   return c;
 }
 

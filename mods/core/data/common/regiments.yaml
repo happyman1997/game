@@ -71,7 +71,7 @@ regiment_types:
     cost: { gold: 90 }
     upkeep: 0.6
     counters: { pikemen: 0.4, light_footmen: 0.4 }
-    can_recruit: { culture: [english, norse] }
+    can_recruit: { culture: [english, norse, danish, swedish] }
     ai_will_do: 60
   chevaliers:
     icon: "⚜"

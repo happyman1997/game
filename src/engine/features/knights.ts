@@ -37,7 +37,8 @@ export function isKnightCandidate(game: Game, liege: Character, c: Character): b
 
 /** Рыцари правителя: лучшие по доблести кандидаты из двора и вассалов (кэш на день). */
 export function knightsOf(game: Game, c: Character): Character[] {
-  return game.cachedDaily(`knights:${c.id}`, () => {
+  // Состав рыцарей меняется медленно — пересчитываем раз в месяц (и после сражений).
+  return game.cachedMonthly(`knights:${c.id}`, () => {
     const pool = [...game.courtiersOf(c.id), ...game.vassalsOf(c.id)].filter((x) => isKnightCandidate(game, c, x));
     pool.sort((a, b) => skill(game, b, 'prowess') - skill(game, a, 'prowess'));
     return pool.slice(0, knightCap(game, c));
@@ -45,8 +46,10 @@ export function knightsOf(game: Game, c: Character): Character[] {
 }
 
 export function knightsPower(game: Game, c: Character): number {
-  const k = defs(game).power_per_prowess ?? 8;
-  return knightsOf(game, c).reduce((s, x) => s + skill(game, x, 'prowess') * k, 0) * Math.max(0, 1 + stat(game, c, 'knight_effectiveness'));
+  return game.cachedMonthly(`kpow:${c.id}`, () => {
+    const k = defs(game).power_per_prowess ?? 8;
+    return knightsOf(game, c).reduce((s, x) => s + skill(game, x, 'prowess') * k, 0) * Math.max(0, 1 + stat(game, c, 'knight_effectiveness'));
+  });
 }
 
 /** Главная (самая большая) армия правителя — с ней идут рыцари. */
@@ -71,7 +74,8 @@ function battleCasualties(game: Game, ownerId: string, won: boolean) {
     if (game.rng.chance(wound)) addTrait(game, k, d.wound_trait ?? 'wounded');
     else if (won) k.prestige += d.prestige_per_battle ?? 10;
   }
-  game.dayCache.delete(`knights:${owner.id}`);
+  game.monthCache.delete(`knights:${owner.id}`);
+  game.monthCache.delete(`kpow:${owner.id}`);
 }
 
 export const knightsFeature: EngineFeature = {

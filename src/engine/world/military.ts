@@ -43,6 +43,7 @@ export function raiseArmy(game: Game, c: Character): Army | null {
     progress: 0,
   };
   game.state.armies[a.id] = a;
+  game.dayCache.clear();
   game.emit('army.raised', { army: a });
   game.notify('army');
   return a;
@@ -59,6 +60,7 @@ export function disbandArmy(game: Game, id: string): void {
   }
   for (const p of Object.values(game.state.provinces)) if (p.siege?.army === id) p.siege = undefined;
   delete game.state.armies[id];
+  game.dayCache.clear();
   game.emit('army.disbanded', { army: a });
   game.notify('army');
 }

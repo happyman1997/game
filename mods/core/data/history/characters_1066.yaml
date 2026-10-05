@@ -89,7 +89,7 @@ characters:
     birth: "1026.1.1"
     father: godwin_sr
     mother: gytha_thorkel
-    court: malcolm
+    court: harald_hardrada
     claims: [d_york, d_northumberland]
     traits: [ambitious, wrathful, vengeful, education_martial_3]
   wulfnoth: { name: Wulfnoth, dynasty: godwin, culture: english, faith: catholic, birth: "1040.1.1", father: godwin_sr, mother: gytha_thorkel, court: william }
@@ -171,7 +171,7 @@ characters:
 
   # =========================================================== Франция
   henry_i_france: { name: Henri, dynasty: capet, culture: french, faith: catholic, birth: "1008.5.4", death: "1060.8.4", spouse: anne_kiev }
-  anne_kiev: { name: Anne, female: true, dynasty: rurikid, culture: russian, faith: catholic, birth: "1030.1.1", court: philip, traits: [education_learning_3, zealous, beautiful] }
+  anne_kiev: { name: Anne, female: true, dynasty: rurikid, culture: russian, faith: catholic, birth: "1030.1.1", father: yaroslav_wise, court: philip, traits: [education_learning_3, zealous, beautiful] }
   philip:
     name: Philippe
     dynasty: capet

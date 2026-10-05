@@ -385,9 +385,9 @@ interactions:
 
 ```yaml
 map:
-  width: 1000                                 # ширина растра в пикселях
-  bounds: { lon: [-11, 6.5], lat: [44.3, 59.6] }
-  ref_lat: 52                                 # широта для поправки проекции
+  width: 1400                                 # ширина растра в пикселях
+  bounds: { lon: [-11, 19.5], lat: [44.3, 64.5] }
+  ref_lat: 54                                 # широта для поправки проекции
   border_noise: 0.9                           # «извилистость» границ
   coast_roughness: 0.28                       # «изрезанность» берегов
 
@@ -415,6 +415,15 @@ map_links:                                    # морские переправ�
 Провинции «прорастают» по суше от своих зёрен, поэтому, чтобы **добавить
 провинцию**, достаточно одной строки. Графство-титул создаётся автоматически
 (название — ключ локализации с id провинции).
+
+Регион удобно описывать отдельным файлом — так устроена Скандинавия в
+`core/data/map/scandinavia.yaml`: контуры суши, графства, титулы, переправы,
+непроходимые земли и даже решение «Норвежское вторжение» в одном файле, а
+персонажи и владельцы — в `core/data/history/scandinavia_1066.yaml` (закладка
+дополняется слиянием: `playable: { $append: [...] }`, `holders: {...}`).
+Если область карты расширяется (`bounds`), заселите новые земли зёрнами
+провинций или непроходимыми окраинами (`impassable: true`), иначе их
+захватят ближайшие провинции.
 
 Проверить результат: `npx tsx tools/render-map.ts screenshots/my-map.png` —
 утилита нарисует растр провинций и сообщит о провинциях без соседей.
@@ -495,7 +504,7 @@ export function init(api) {
 | `api.hooks` | `on(name, fn, priority)`. |
 | `api.registries` | `successionAlgorithms`, `cbTargets`, `interactionTargets`, `interactionDeciders`, `modifierProviders`, `provinceModifierProviders`, `opinionProviders`, `contentValidators`. |
 | `api.features` | `add(feature)` — установить свою механику; `list()`; `evalModifiers(ctx, scope, mods)` — модификаторы со скриптовыми значениями. |
-| `api.ui` | `mapModes`, `panels`, `characterSections`, `provinceSections`, `topBar`, `eventThemes`. |
+| `api.ui` | `mapModes`, `panels`, `characterSections`, `provinceSections`, `topBar`, `alerts` (оповещения в верхней панели), `eventThemes`. |
 | `api.world` | Функции мира: `characters` (createCharacter, addTrait, marry…), `titles` (transferTitle, topLiege…), `succession` (killCharacter, heirsOf…), `war` (declareWar, endWar…), `military`, `economy`, `opinion`, `stats`, `interactions`, `schemes`, `decisions`, `ai`. |
 | `api.util` | `Rng`, `hashString`, даты, `deepMerge`, шум `fbm`. |
 
@@ -542,10 +551,13 @@ export function init(api) {
 | `prison.imprisoned`, `prison.released` | `prisoner`, `jailer`, `reason` | |
 | `faction.created`, `faction.joined`, `faction.left`, `faction.dissolved`, `faction.ultimatum` | `faction`, … | |
 | `regiment.recruited` | `character`, `regiment` | |
+| `hook.added`, `hook.used` | `owner`, `target`, `strong` | |
+| `secret.added`, `secret.learned`, `secret.blackmailed`, `secret.exposed` | `owner`, `secret`, `knower`/`exposer` | |
+| `law.changed` | `character`, `law`, `previous` | |
 
 ---
 
-## 10. Механики: образ жизни, совет, темница, фракции, отряды
+## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари
 
 Крупные подсистемы в стиле CK3 устроены как **механики** (`src/engine/features`).
 Механика — модуль, который при запуске регистрирует свои системы, триггеры,
@@ -561,7 +573,8 @@ export function init(api) {
     disabled_features: [council, factions]
   ```
 
-  (доступны `lifestyles`, `council`, `prison`, `factions`, `regiments`;
+  (доступны `lifestyles`, `council`, `prison`, `factions`, `regiments`,
+  `secrets`, `laws`, `knights`;
   интерфейс скрывает вкладки и разделы выключенных механик). Словарь скриптов
   механики (её триггеры, эффекты, значения) остаётся зарегистрированным, так что
   чужие данные, которые его упоминают, не ломаются — на пустом состоянии
@@ -570,7 +583,8 @@ export function init(api) {
   например, взаимодействия с пленниками и поводы к мятежам;
 - **свою механику** мод добавляет через `api.features.add({ id, script(engine) { … }, install(engine) { … } })`.
 
-Все числа механик — в `defines` (`lifestyle`, `council`, `prison`, `factions`, `regiments`).
+Все числа механик — в `defines` (`lifestyle`, `council`, `prison`, `factions`,
+`regiments`, `secrets`, `hooks`, `knights`).
 
 ### Образ жизни
 
@@ -689,6 +703,83 @@ regiment_types:
 добавить свои бонусы (например, от рыцарей-персонажей).
 Скрипт: `has_regiment`, `num_regiments`, `regiment_cap`, `regiment_power`, `add_regiment`.
 
+### Крюки и секреты
+
+**Крюк** — рычаг давления на персонажа (`add_hook: { target, strong: yes, years }`).
+Во взаимодействиях с `ai_accept` игрок может отметить «Использовать крюк» —
+решающий обязан согласиться; слабый крюк при этом тратится, сильный уходит на
+перерыв (`defines.hooks.strong_hook_cooldown_years`). ИИ тоже давит крюками,
+когда очень хочет получить согласие. Запретить крюк во взаимодействии:
+`hookable: no`. Скрипт: `has_hook_on`, `has_strong_hook_on`, `can_use_hook_on`,
+`num_hooks`, `add_hook`, `remove_hook`.
+
+**Секреты** (механика `secrets`) — постыдные тайны персонажей:
+
+```yaml
+secret_types:
+  secret_murder:
+    hook: strong                     # какой крюк даёт шантаж
+    severity: 100                    # шантажируют и разоблачают самым тяжёлым
+    discovered_by: [spouse, close_family, courtier]   # кто может случайно узнать
+    discovery_chance: 0.4            # % в месяц
+    on_expose:                       # root — владелец, scope:exposer, scope:secret_target
+      - add_prestige: -200
+      - liege: { add_opinion: { target: root, modifier: exposed_murderer } }
+```
+
+Секреты появляются из данных: интрига убийства даёт `secret_murder`, удачное
+соблазнение женатого — `secret_lover`, событие о казначее — `secret_embezzler`
+(`add_secret: { type, target }`). Их раскрывают задача тайного советника
+«Поиск секретов» (`discover_secret`) и случайные свидетели. Взаимодействия
+«Шантажировать» и «Разоблачить секрет» используют эффекты `blackmail` и
+`expose_secret`. Скрипт: `has_secret`, `knows_secret_of`, `num_secrets`,
+`num_known_secrets`, список `known_secret_owner`.
+
+### Законы державы
+
+```yaml
+law_groups:
+  crown_authority: { default: crown_authority_1, cooldown_years: 5, is_shown: { tier: ">= duchy" } }
+realm_laws:
+  crown_authority_2:
+    group: crown_authority
+    level: 2
+    modifiers: { vassal_tax_mult: 0.25, vassal_levy_mult: 0.25, vassal_opinion: -5 }
+    change_cost: { prestige: 300 }
+    can_change: { NOT: { any_vassal: { count: ">= 2", opinion: { target: root, value: "< -20" } } } }
+```
+
+Закон меняется на одну ступень за раз. Уровень доступен как значение
+`<группа>_level` (`crown_authority_level`) — так, например, `revoke_title`
+требует власти короны не ниже 1, а на уровне 3 отзыв титулов перестаёт быть
+тиранией. Скрипт: `has_realm_law`, `set_realm_law`. Новая группа законов —
+просто новая запись `law_groups` и её законы.
+
+### Рыцари
+
+Рыцарями правителя становятся самые доблестные придворные и вассалы,
+прошедшие `scripted_triggers.knight_candidate` (её легко заменить — например,
+разрешить женщин-рыцарей). Их число — `defines.knights.cap_by_tier` и
+характеристика `knight_cap`; каждое очко доблести стоит `power_per_prowess`
+ополченцев в главной армии. Рыцари получают раны и гибнут в сражениях.
+Скрипт: `is_knight`, `num_knights`, `knights_power`, список `knight`.
+
+### Оповещения
+
+Значки в верхней панели — реестр `api.ui.alerts`:
+
+```js
+api.ui.alerts.register('my_alert', {
+  id: 'my_alert',
+  check: (game) => game.player.gold > 1000
+    ? { icon: '💰', kind: 'good', text: 'Казна полна!', action: { tab: 'decisions' } }
+    : null,
+});
+```
+
+`action` открывает вкладку (`tab`), персонажа, титул или провинцию.
+Регистрация с id встроенного оповещения заменяет его.
+
 ---
 
 ## 11. Полная замена контента (total conversion)
@@ -711,7 +802,7 @@ regiment_types:
 | Команда | Что делает |
 |---|---|
 | `npm run dev` | Игра с горячей перезагрузкой: правьте YAML — обновите страницу. |
-| `npm run validate` | Проверка всех модов: синтаксис, зависимости, ссылки, неизвестные ключи скриптов, пробный запуск закладок, расхождения локализаций. |
+| `npm run validate` | Проверка всех модов: синтаксис, зависимости, ссылки (в том числе в аргументах скриптов: `has_trait: brave`, `add_opinion: { modifier: … }`), неизвестные ключи скриптов, пробный запуск закладок, расхождения локализаций. |
 | `npm run sim -- --years 50 --seed 1 --verbose` | Безголовая симуляция: войны, смерти, статистика — для баланса. `--mods core,my_mod` — выбрать моды. |
 | `npm run docs:script` | Пересобрать `docs/SCRIPT_REFERENCE.md` (с учётом ваших модов). |
 | `npx tsx tools/render-map.ts out.png` | Картинка растра провинций. |

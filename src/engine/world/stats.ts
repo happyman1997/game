@@ -44,31 +44,32 @@ interface Source {
 /** Персонажи, чьи характеристики считаются прямо сейчас (защита от циклов: совет супругов и т.п.). */
 const computing = new Set<string>();
 
-function sources(game: Game, c: Character, withProviders = true): Source[] {
+/** labels = false — без подписей (быстрее; подписи нужны только для подсказок-разбивок). */
+function sources(game: Game, c: Character, withProviders = true, labels = true): Source[] {
   const out: Source[] = [];
   const base: Record<string, number> = { health: c.health };
   for (const s of skillIds(game)) base[s] = c.skills[s] ?? 0;
   addInto(base, game.defines.character?.base_stats);
-  out.push({ label: game.loc.t('ui.base_value'), mods: base });
+  out.push({ label: labels ? game.loc.t('ui.base_value') : '', mods: base });
   for (const t of c.traits) {
     const d = game.content.get<TraitDef>('traits', t);
-    if (d?.modifiers) out.push({ label: game.nameOf('traits', t), mods: d.modifiers });
+    if (d?.modifiers) out.push({ label: labels ? game.nameOf('traits', t) : '', mods: d.modifiers });
   }
   for (const m of c.modifiers) {
     const d = game.content.get<ModifierDef>('modifiers', m.id);
-    if (d?.modifiers) out.push({ label: game.nameOf('modifiers', m.id), mods: d.modifiers });
+    if (d?.modifiers) out.push({ label: labels ? game.nameOf('modifiers', m.id) : '', mods: d.modifiers });
   }
   const cul = game.content.get('cultures', c.culture);
-  if (cul?.modifiers) out.push({ label: game.nameOf('cultures', c.culture), mods: cul.modifiers });
+  if (cul?.modifiers) out.push({ label: labels ? game.nameOf('cultures', c.culture) : '', mods: cul.modifiers });
   const faith = game.content.get('faiths', c.faith);
-  if (faith?.modifiers) out.push({ label: game.nameOf('faiths', c.faith), mods: faith.modifiers });
+  if (faith?.modifiers) out.push({ label: labels ? game.nameOf('faiths', c.faith) : '', mods: faith.modifiers });
   if (!withProviders) return out;
   for (const [id, p] of game.engine.registries.modifierProviders.entries()) {
     try {
       const mods = p.fn(game, c);
       if (Array.isArray(mods)) {
         for (const m of mods) if (m?.modifiers && Object.keys(m.modifiers).length) out.push({ label: m.label, mods: m.modifiers });
-      } else if (mods && Object.keys(mods).length) out.push({ label: p.label ? game.loc.resolve(p.label) : game.loc.tOr(`modsrc.${id}`, id), mods });
+      } else if (mods && Object.keys(mods).length) out.push({ label: !labels ? '' : p.label ? game.loc.resolve(p.label) : game.loc.tOr(`modsrc.${id}`, id), mods });
     } catch (e) {
       game.scriptError(`Поставщик модификаторов ${id}: ${(e as Error).message}`);
     }
@@ -101,12 +102,12 @@ export function charStats(game: Game, c: Character): Record<string, number> {
   const out: Record<string, number> = {};
   if (computing.has(c.id)) {
     // Циклическая зависимость (A считает навык B, а B — навык A): берём характеристики без поставщиков.
-    for (const s of sources(game, c, false)) addInto(out, s.mods);
+    for (const s of sources(game, c, false, false)) addInto(out, s.mods);
     return out;
   }
   computing.add(c.id);
   try {
-    for (const s of sources(game, c)) addInto(out, s.mods);
+    for (const s of sources(game, c, true, false)) addInto(out, s.mods);
   } finally {
     computing.delete(c.id);
   }

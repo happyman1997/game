@@ -8,7 +8,7 @@ import { DAYS_PER_YEAR } from '../core/date';
 import type { Game } from '../game';
 import type { Character } from '../types';
 import { dailyAI } from '../world/ai';
-import { addTrait, ageOf, assignEducation, createCharacter, isAdult, removeTrait } from '../world/characters';
+import { addTrait, ageOf, assignEducation, createCharacter, isAdult, isCloseFamily, removeTrait } from '../world/characters';
 import { dailyConstruction } from '../world/decisions';
 import { monthlyIncome, monthlyPiety, monthlyPrestige } from '../world/economy';
 import { dailyMilitary, regenLevies } from '../world/military';
@@ -16,7 +16,7 @@ import { decayOpinions } from '../world/opinion';
 import { monthlySchemes } from '../world/schemes';
 import { fillCourt } from '../world/setup';
 import { provStat, skill, stat } from '../world/stats';
-import { killCharacter } from '../world/succession';
+import { heirsOf, killCharacter } from '../world/succession';
 import { updateTicking, validateWars } from '../world/war';
 import { enforceLandedTitles, primaryTier } from '../world/titles';
 
@@ -163,7 +163,11 @@ function monthlyFertility(game: Game, mother: Character) {
   const husband = mother.spouses.map((id) => game.char(id)).find((s) => s && s.death === undefined && !s.female);
   if (!husband) return;
   const alive = mother.children.filter((id) => game.isAlive(id)).length;
-  const p =
+  // Мягкий предел численности мира: при перенаселении рожают реже (держит симуляцию быстрой).
+  const pop = game.living().length;
+  const soft = ch.population_soft_cap ?? 900;
+  const crowd = pop > soft ? Math.max(0.1, (soft / pop) ** 3) : 1;
+  const p = crowd *
     (ch.base_conception ?? 0.05) *
     Math.max(0, stat(game, mother, 'fertility')) *
     Math.max(0, stat(game, husband, 'fertility')) *
@@ -211,18 +215,22 @@ function trimCourt(game: Game, r: Character) {
   const max = (game.defines.court?.max_courtiers_by_tier ?? [0, 8, 12, 16, 20])[primaryTier(game, r)] ?? 10;
   const courtiers = game.courtiersOf(r.id);
   if (courtiers.length <= max) return;
+  // Уходят одинокие взрослые без детей: чужаки, а затем и дальняя родня
+  // (близкие правителя и ближайшие наследники остаются).
+  const keep = new Set(heirsOf(game, r).slice(0, 3));
   const removable = courtiers.filter(
     (c) =>
       !game.isPlayer(c.id) &&
       !c.spouses.length &&
-      !c.children.length &&
-      c.dynasty !== r.dynasty &&
-      c.father !== r.id &&
-      c.mother !== r.id &&
+      !c.children.some((x) => game.isAlive(x)) &&
+      !keep.has(c.id) &&
+      !isCloseFamily(game, c, r) &&
       !r.spouses.includes(c.id) &&
+      !c.prison &&
       isAdult(game, c),
   );
-  game.rng.shuffle(removable);
+  // сначала чужие, потом родня
+  removable.sort((a, b) => Number(a.dynasty === r.dynasty) - Number(b.dynasty === r.dynasty));
   for (const c of removable.slice(0, courtiers.length - max)) {
     for (const pid of [c.father, c.mother]) {
       const p = game.char(pid);
@@ -231,7 +239,8 @@ function trimCourt(game: Game, r: Character) {
     for (const s of Object.values(game.state.schemes)) if (s.owner === c.id || s.target === c.id) delete game.state.schemes[s.id];
     delete game.state.characters[c.id];
   }
-  game.markDirty();
+  game.markIndexDirty();
+  game.monthCache.clear(); // рыцари, советы и т. п. могли ссылаться на ушедших
 }
 
 function pruneDead(game: Game) {
@@ -243,7 +252,7 @@ function pruneDead(game: Game) {
     if (Object.values(game.state.dynasties).some((d) => d.founder === c.id)) continue;
     delete game.state.characters[c.id];
   }
-  game.markDirty();
+  game.markIndexDirty();
 }
 
 export const eventSystem: GameSystem = {

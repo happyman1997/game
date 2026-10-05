@@ -109,10 +109,16 @@ export class Game {
 
   /** Сбрасывает кэши индексов. Вызывайте после прямого изменения liege/titles. */
   markDirty(): void {
+    this.markIndexDirty();
+    this.statCache.clear();
+  }
+
+  /** Сбрасывает только индексы персонажей (без кэша характеристик): рождения, браки, смена двора. */
+  markIndexDirty(): void {
     this.livingCache = null;
     this.rulersCache = null;
     this.byLiege = null;
-    this.statCache.clear();
+    this.dayCache.clear();
   }
 
   living(): Character[] {
@@ -320,7 +326,8 @@ export class Game {
   tick(): void {
     if (this.state.gameOver) return;
     this.state.date += 1;
-    this.statCache.clear();
+    // Характеристики кэшируются до конца месяца: всё, что их меняет (черты,
+    // модификаторы, титулы, перки, законы), сбрасывает кэш явно.
     this.dayCache.clear();
     const { d, m } = dateParts(this.state.date);
     const systems = this.engine.orderedSystems();

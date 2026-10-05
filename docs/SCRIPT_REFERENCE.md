@@ -8,6 +8,7 @@
 | Имя | Скоупы | Описание | Источник |
 |---|---|---|---|
 | `can_marry` | character | Может вступить в брак с персонажем | core |
+| `can_use_hook_on` | character | Крюк на персонажа можно использовать сейчас | core |
 | `capital_has_disease` | character | В столице персонажа (или его сюзерена) эпидемия. | plague |
 | `culture` | character, province | Культура равна | core |
 | `dynasty` | character | Династия равна | core |
@@ -30,8 +31,11 @@
 | `has_perk` | character | Открыт перк | core/lifestyles |
 | `has_province_flag` | province | Есть флаг провинции | core |
 | `has_province_modifier` | province | Есть модификатор провинции | core |
+| `has_realm_law` | character | Действует закон державы | core/laws |
 | `has_regiment` | character | Есть отряд этого типа (или любой: yes) | core/regiments |
 | `has_scheme` | character | Ведёт интригу: has_scheme: murder или { type, target } | core |
+| `has_secret` | character | Есть секрет (yes или тип) | core/secrets |
+| `has_strong_hook_on` | character | Есть сильный крюк на персонажа | core |
 | `has_succession_law` | character | Закон наследования | core |
 | `has_trait_category` | character | Есть черта категории | core |
 | `has_trait` | character | Есть черта | core |
@@ -61,6 +65,7 @@
 | `is_in_faction` | character | Состоит во фракции (yes/no или тип) | core/factions |
 | `is_in_realm_of` | character | Состоит в державе персонажа | core |
 | `is_independent` | character | Независимый правитель | core |
+| `is_knight` | character | Служит рыцарем у своего сюзерена | core/knights |
 | `is_landed` | character | Владеет землями | core |
 | `is_liege_of` | character | Сюзерен персонажа | core |
 | `is_lowborn` | character | Безродный | core |
@@ -78,6 +83,7 @@
 | `is_spouse_of` | character | Супруг(а) персонажа | core |
 | `is_vassal_of` | character | Прямой вассал персонажа | core |
 | `is_vassal` | character | Вассал | core |
+| `knows_secret_of` | character | Знает какой-то секрет персонажа | core/secrets |
 | `province_has_disease` | province | В провинции эпидемия. Аргумент: yes или id болезни. | plague |
 | `random_chance` | любой | Случайный шанс в процентах (используйте осторожно в триггерах) | core |
 | `religion` | character | Религия равна | core |
@@ -110,6 +116,7 @@
 | `add_prestige` | character | Изменить prestige | core |
 | `add_province_modifier` | province | Модификатор провинции | core |
 | `add_regiment` | character | Получить отряд бесплатно (сверх предела) | core/regiments |
+| `add_secret` | character | Персонаж получает секрет: add_secret: тип или { type, target, known_by } | core/secrets |
 | `add_skill` | character | Навсегда изменить навык: { skill, value } | core |
 | `add_stress` | character | Изменить стресс | core |
 | `add_trait` | character | Добавить черту | core |
@@ -117,6 +124,7 @@
 | `appoint_councillor` | character | Назначить в совет: { position, who } | core/council |
 | `become_independent` | character | Стать независимым | core |
 | `become_vassal_of` | character | Стать вассалом | core |
+| `blackmail` | character | Шантажировать персонажа его самым тяжёлым известным секретом (получить крюк) | core/secrets |
 | `break_alliance` | character | Разорвать союз | core |
 | `change_culture` | character, province | Сменить культуру | core |
 | `change_faith` | character, province | Сменить веру | core |
@@ -124,8 +132,10 @@
 | `create_character` | character | Создать персонажа: { culture, faith, female, age, traits, dynasty: new\|none\|path, court, save_scope_as } | core |
 | `death` | character | Смерть: yes, причина или { reason, killer } | core |
 | `discover_scheme_against` | character | Раскрыть случайную враждебную интригу против персонажа или его семьи | core/council |
+| `discover_secret` | character | Узнать случайный секрет кого-то из своей державы | core/secrets |
 | `divorce` | character | Развод | core |
 | `end_war` | любой | Завершить войну: victory/white_peace/defeat | core |
+| `expose_secret` | character | Разоблачить самый тяжёлый известный секрет персонажа | core/secrets |
 | `faction_enforce_demands` | faction | Сюзерен выполняет требования фракции | core/factions |
 | `faction_start_war` | faction | Фракция поднимает мятеж | core/factions |
 | `gain_title` | character | Получить титул | core |
@@ -161,6 +171,7 @@
 | `set_global_var` | любой | Глобальная переменная | core |
 | `set_nickname` | character | Прозвище (ключ локализации или текст) | core |
 | `set_province_flag` | province | Флаг провинции | core |
+| `set_realm_law` | character | Установить закон державы (без цены и перерыва) | core/laws |
 | `set_succession_law` | character | Закон наследования | core |
 | `set_var` | любой | Переменная: { name, value } | core |
 | `start_disease` | province | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
@@ -185,6 +196,7 @@
 | `attraction` | character | Привлекательность | core |
 | `commander_advantage` | character | Характеристика: commander_advantage | core |
 | `council_size` | character | Число занятых мест в совете | core/council |
+| `crown_authority_level` | character | Уровень закона группы crown_authority (−1, если не действует) | core/laws |
 | `current_year` | любой | Текущий год | core |
 | `days_since_start` | любой | Дней с начала партии | core |
 | `development` | province | Развитие провинции | core |
@@ -201,6 +213,7 @@
 | `income` | character | Ежемесячный доход | core |
 | `infected_provinces` | любой | Число заражённых провинций в мире. | plague |
 | `intrigue` | character | Навык: intrigue | core |
+| `knights_power` | character | Сила рыцарей (в ополченцах) | core/knights |
 | `learning` | character | Навык: learning | core |
 | `levies` | character | Ополчение державы | core |
 | `levy_flat` | character | Характеристика: levy_flat | core |
@@ -218,9 +231,13 @@
 | `num_de_jure_counties` | title | Де-юре графств в титуле | core |
 | `num_faction_members` | faction | Число членов фракции | core/factions |
 | `num_holdings` | province | Число владений | core |
+| `num_hooks` | character | Число крюков персонажа на других | core |
+| `num_knights` | character | Число рыцарей | core/knights |
+| `num_known_secrets` | character | Сколько чужих секретов знает персонаж | core/secrets |
 | `num_perks` | character | Число открытых перков | core/lifestyles |
 | `num_prisoners` | character | Число пленников | core/prison |
 | `num_regiments` | character | Число отрядов | core/regiments |
+| `num_secrets` | character | Число секретов персонажа | core/secrets |
 | `num_spouses` | character | Число супругов | core |
 | `num_traits` | character | Число черт | core |
 | `num_vassals` | character | Число прямых вассалов | core |
@@ -305,6 +322,9 @@
 | `grandchild` | character | Внуки | core |
 | `held_title` | character | Титулы | core |
 | `independent_ruler` | любой | Независимые правители | core |
+| `knight` | character | Рыцари правителя | core/knights |
+| `known_secret_owner` | character | Персонажи, чьи секреты известны этому персонажу | core/secrets |
+| `liege` | character | Сюзерен (список из одного персонажа) | core |
 | `living_character` | любой | Все живые персонажи | core |
 | `neighbor` | province | Соседние провинции | core |
 | `neighboring_county` | character | Чужие графства, граничащие с державой | core/council |
@@ -343,6 +363,9 @@
 | `prison` | Темница: заключение, выкуп, казнь, плен на войне | да |
 | `factions` | Фракции вассалов: независимость, претендент; ультиматумы и мятежи | да |
 | `regiments` | Профессиональные войска: найм, жалованье, контры и местность в бою | да |
+| `secrets` | Секреты: раскрытие, шантаж (крюки) и разоблачение | да |
+| `laws` | Законы державы: власть короны и другие группы законов | да |
+| `knights` | Рыцари: доблестные придворные и вассалы усиливают армию правителя | да |
 
 Отключение: `defines.disabled_features: [id, ...]`. Источник `core/<механика>` в таблицах выше — элементы, которые регистрирует механика.
 
@@ -352,9 +375,9 @@
 - **cbTargets**: `claim`, `de_jure`, `independence`, `adjacent_county`, `holy_war`, `faction`
 - **interactionTargets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
 - **interactionDeciders**: `payer`
-- **modifierProviders**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `plague_fear`
+- **modifierProviders**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `plague_fear`
 - **provinceModifierProviders**: 
 - **opinionProviders**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`
-- **contentValidators**: `lifestyles`, `council`, `factions`, `regiments`
-- **systems**: `upkeep` (0), `economy` (10), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `military` (50), `regiments` (52), `war` (55), `factions` (58), `construction` (60), `plague` (65), `ai` (70), `development` (80)
+- **contentValidators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `laws`
+- **systems**: `upkeep` (0), `economy` (10), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `factions` (58), `construction` (60), `plague` (65), `ai` (70), `development` (80), `laws` (85)
 - **ui.mapModes**: `plague`

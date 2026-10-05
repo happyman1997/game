@@ -1,0 +1,108 @@
+# Скандинавия в 1066 году. Харальд Суровый собирает флот, чтобы отнять
+# Англию у Гарольда Годвинсона; Свен Эстридсен правит Данией; в Швеции
+# после смерти Стенкиля христиане и язычники делят страну.
+dynasties:
+  hardrada: { culture: norse, prestige: 500 }
+  estridsen: { culture: danish, prestige: 450 }
+  stenkil: { culture: swedish, prestige: 250 }
+  munso: { culture: swedish, prestige: 200 }
+  ladejarl: { culture: norse, prestige: 150 }
+
+characters:
+  yaroslav_wise: { name: Yaroslav, nickname: nick.wise, dynasty: rurikid, culture: russian, faith: orthodox, birth: "978.1.1", death: "1054.2.20" }
+  # ---------------------------------------------------------------- Норвегия
+  harald_hardrada:
+    name: Harald
+    nickname: nick.hardrada
+    dynasty: hardrada
+    culture: norse
+    faith: catholic
+    birth: "1015.1.1"
+    spouse: elisiv
+    traits: [brave, ambitious, wrathful, education_martial_4]
+    skills: { diplomacy: 8, martial: 18, stewardship: 10, intrigue: 10, learning: 7, prowess: 20 }
+    claims: [k_england]
+    gold: 250
+  elisiv: { name: Elisiv, female: true, dynasty: rurikid, culture: russian, faith: catholic, birth: "1025.1.1", father: yaroslav_wise, traits: [beautiful, zealous, education_learning_2] }
+  tora_torbergsdatter: { name: Tora, female: true, dynasty: arnmodlingar, culture: norse, faith: catholic, birth: "1025.1.1", court: harald_hardrada, traits: [ambitious, gregarious] }
+  magnus_hardrada: { name: Magnus, dynasty: hardrada, culture: norse, faith: catholic, birth: "1048.1.1", father: harald_hardrada, mother: tora_torbergsdatter, traits: [diligent, just, education_stewardship_2] }
+  olaf_kyrre: { name: Olaf, nickname: nick.peaceful, dynasty: hardrada, culture: norse, faith: catholic, birth: "1050.1.1", father: harald_hardrada, mother: tora_torbergsdatter, traits: [content, calm, generous, education_diplomacy_3] }
+  maria_haraldsdotter: { name: Maria, female: true, dynasty: hardrada, culture: norse, faith: catholic, birth: "1047.1.1", father: harald_hardrada, mother: elisiv }
+  ingegerd_haraldsdotter: { name: Ingegerd, female: true, dynasty: hardrada, culture: norse, faith: catholic, birth: "1048.6.1", father: harald_hardrada, mother: elisiv }
+  eystein_orre: { name: Eystein, nickname: nick.orre, dynasty: arnmodlingar, culture: norse, faith: catholic, birth: "1030.1.1", traits: [brave, honest, education_martial_3], skills: { martial: 13, prowess: 15 } }
+  # ---------------------------------------------------------------- Дания
+  ulf_jarl: { name: Ulf, dynasty: estridsen, culture: danish, faith: catholic, birth: "990.1.1", death: "1026.12.25", spouse: estrid_svendsdatter }
+  estrid_svendsdatter: { name: Estrid, female: true, culture: danish, faith: catholic, birth: "995.1.1", death: "1057.1.1" }
+  sweyn_estridsen:
+    name: Sven
+    dynasty: estridsen
+    culture: danish
+    faith: catholic
+    birth: "1019.1.1"
+    father: ulf_jarl
+    mother: estrid_svendsdatter
+    traits: [lustful, ambitious, diligent, education_diplomacy_3]
+    skills: { diplomacy: 13, martial: 9, stewardship: 11, intrigue: 9, learning: 10, prowess: 8 }
+    claims: [k_england]
+    gold: 200
+  asbjorn_ulfsson: { name: Asbjorn, dynasty: estridsen, culture: danish, faith: catholic, birth: "1020.1.1", father: ulf_jarl, mother: estrid_svendsdatter, traits: [greedy, brave, education_martial_2] }
+  harald_hen: { name: Harald, nickname: nick.hen, dynasty: estridsen, culture: danish, faith: catholic, birth: "1041.1.1", father: sweyn_estridsen, traits: [content, calm, lazy] }
+  knud_estridsen: { name: Knud, dynasty: estridsen, culture: danish, faith: catholic, birth: "1042.1.1", father: sweyn_estridsen, traits: [zealous, ambitious, brave, education_martial_3] }
+  oluf_hunger: { name: Oluf, dynasty: estridsen, culture: danish, faith: catholic, birth: "1050.1.1", father: sweyn_estridsen, traits: [stubborn, temperate] }
+  erik_evergood: { name: Erik, dynasty: estridsen, culture: danish, faith: catholic, birth: "1056.1.1", father: sweyn_estridsen, traits: [gregarious, generous] }
+  niels_estridsen: { name: Niels, dynasty: estridsen, culture: danish, faith: catholic, birth: "1065.1.1", father: sweyn_estridsen }
+  ingerid_estridsen: { name: Ingerid, female: true, dynasty: estridsen, culture: danish, faith: catholic, birth: "1046.1.1", father: sweyn_estridsen }
+  # ---------------------------------------------------------------- Швеция
+  stenkil: { name: Stenkil, dynasty: stenkil, culture: swedish, faith: catholic, birth: "1028.1.1", death: "1066.4.1" }
+  erik_stenkilsson: { name: Erik, dynasty: stenkil, culture: swedish, faith: catholic, birth: "1045.1.1", father: stenkil, traits: [brave, ambitious, education_martial_2] }
+  halsten: { name: Halsten, dynasty: stenkil, culture: swedish, faith: catholic, birth: "1050.1.1", father: stenkil, traits: [calm, content] }
+  inge_stenkilsson: { name: Inge, dynasty: stenkil, culture: swedish, faith: catholic, birth: "1053.1.1", father: stenkil, traits: [zealous, just] }
+  erik_pagan: { name: Erik, nickname: nick.pagan, dynasty: munso, culture: swedish, faith: norse_pagan, birth: "1040.1.1", traits: [brave, zealous, wrathful, education_martial_2], skills: { martial: 11, prowess: 14 } }
+  haakon_ivarsson: { name: Haakon, dynasty: ladejarl, culture: norse, faith: catholic, birth: "1027.1.1", traits: [ambitious, honest, education_martial_3], skills: { martial: 12, prowess: 13 } }
+
+bookmarks:
+  b1066:
+    playable: { $append: [harald_hardrada, sweyn_estridsen, erik_stenkilsson] }
+    holders:
+      # Норвегия
+      k_norway: harald_hardrada
+      d_viken: harald_hardrada
+      d_vestlandet: harald_hardrada
+      c_nidaros: harald_hardrada
+      c_oslo: harald_hardrada
+      c_vestfold: harald_hardrada
+      c_bergen: harald_hardrada
+      c_hedmark: harald_hardrada
+      d_trondelag: eystein_orre
+      c_more: eystein_orre
+      c_namdalen: eystein_orre
+      # Дания
+      k_denmark: sweyn_estridsen
+      d_zealand: sweyn_estridsen
+      d_jutland: sweyn_estridsen
+      c_roskilde: sweyn_estridsen
+      c_fyn: sweyn_estridsen
+      c_aarhus: sweyn_estridsen
+      c_schleswig: sweyn_estridsen
+      c_ribe: sweyn_estridsen
+      d_scania: asbjorn_ulfsson
+      c_lund: asbjorn_ulfsson
+      c_halland: asbjorn_ulfsson
+      # Швеция
+      k_sweden: erik_stenkilsson
+      d_gotaland: erik_stenkilsson
+      c_vastergotland: erik_stenkilsson
+      c_ostergotland: erik_stenkilsson
+      c_sodermanland: erik_stenkilsson
+      c_varmland: haakon_ivarsson
+      d_svealand: erik_pagan
+      c_uppsala: erik_pagan
+      c_dalarna: erik_pagan
+      c_vastmanland: erik_pagan
+    vassal_of:
+      eystein_orre: harald_hardrada
+      asbjorn_ulfsson: sweyn_estridsen
+      haakon_ivarsson: erik_stenkilsson
+      erik_pagan: null
+      # ярлы Оркни — вассалы норвежской короны и идут с Харальдом в Англию
+      paul_orkney: harald_hardrada

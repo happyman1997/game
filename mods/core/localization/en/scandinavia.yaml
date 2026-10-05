@@ -1,0 +1,115 @@
+e_scandinavia: Scandinavia
+e_scandinavia_full: Empire of Scandinavia
+k_denmark: Denmark
+k_norway: Norway
+k_sweden: Sweden
+d_jutland: Jutland
+d_zealand: Zealand
+d_scania: Scania
+d_trondelag: Trøndelag
+d_vestlandet: Vestlandet
+d_viken: Viken
+d_oppland: Oppland
+d_svealand: Svealand
+d_gotaland: Götaland
+d_norrland: Norrland
+c_vendsyssel: Vendsyssel
+c_aarhus: Aarhus
+c_viborg: Viborg
+c_ribe: Ribe
+c_schleswig: Schleswig
+c_roskilde: Roskilde
+c_fyn: Funen
+c_lolland: Lolland
+c_bornholm: Bornholm
+c_lund: Lund
+c_halland: Halland
+c_blekinge: Blekinge
+c_nidaros: Nidaros
+c_more: Møre
+c_namdalen: Namdalen
+c_bergen: Bergen
+c_sogn: Sogn
+c_rogaland: Rogaland
+c_oslo: Oslo
+c_vestfold: Vestfold
+c_agder: Agder
+c_ranrike: Ranrike
+c_oppland: Oppland
+c_hedmark: Hedmark
+c_telemark: Telemark
+c_uppsala: Uppsala
+c_sodermanland: Södermanland
+c_vastmanland: Västmanland
+c_dalarna: Dalarna
+c_vastergotland: Västergötland
+c_ostergotland: Östergötland
+c_smaland: Småland
+c_kalmar: Kalmar
+c_varmland: Värmland
+c_gotland: Gotland
+c_halsingland: Hälsingland
+c_medelpad: Medelpad
+c_jamtland: Jämtland
+w_frisia: Frisia (Holy Roman Empire)
+w_westphalia: Westphalia (Holy Roman Empire)
+w_lower_saxony: Lower Saxony (Holy Roman Empire)
+w_holstein: Holstein (Holy Roman Empire)
+w_mecklenburg: Mecklenburg (Obotrites)
+w_pomerania: Pomerania
+w_prussia: Prussia
+w_brandenburg: Brandenburg (Lutici)
+w_greater_poland: Greater Poland
+w_silesia: Silesia
+w_lesser_poland: Lesser Poland
+w_saxony: Saxony (Holy Roman Empire)
+w_thuringia: Thuringia (Holy Roman Empire)
+w_hesse: Hesse (Holy Roman Empire)
+w_rhineland: Rhineland (Holy Roman Empire)
+w_franconia: Franconia (Holy Roman Empire)
+w_swabia: Swabia (Holy Roman Empire)
+w_bavaria: Bavaria (Holy Roman Empire)
+w_bohemia: Bohemia
+w_moravia: Moravia
+w_austria: Austria (Holy Roman Empire)
+w_hungary: Hungary
+w_tyrol: Tyrol (Holy Roman Empire)
+w_switzerland: Switzerland (Holy Roman Empire)
+w_carinthia: Carinthia (Holy Roman Empire)
+w_lombardy: Lombardy (Italy)
+w_piedmont: Piedmont (Italy)
+w_venetia: Venice
+w_croatia: Croatia
+w_romagna: Romagna (Italy)
+
+culture:
+  danish: Danish
+  swedish: Swedish
+
+dynasty:
+  hardrada: Hardrada
+  estridsen: Estridsen
+  stenkil: Stenkilsson
+  munso: Munsö
+  ladejarl: Lade
+
+dynasty_pattern:
+  danish: "{name}sen"
+  swedish: "{name}sson"
+
+nick:
+  hardrada: Hardrada
+  peaceful: the Peaceful
+  hen: Hen
+  pagan: the Pagan
+  wise: the Wise
+  orre: Orre
+
+decision:
+  prepare_norse_invasion: The Norwegian Invasion
+decision_desc:
+  prepare_norse_invasion: "By the pact between Magnus the Good and Harthacnut, the English crown belongs to Norway. It is time to gather the fleet and remind Harold Godwinson of it."
+modifier:
+  viking_host: The Norwegian Fleet
+ui:
+  norse_invasion_tooltip: "Ships and warriors from all over Norway and Orkney flock to you: +6000 soldiers for 3 years."

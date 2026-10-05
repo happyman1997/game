@@ -46,6 +46,10 @@ function isOccupied(game: Game, countyId: string): boolean {
 
 /** Валовый налог с собственного домена (без вассалов). */
 export function domainTax(game: Game, c: Character): number {
+  return game.cachedDaily(`dtax:${c.id}`, () => computeDomainTax(game, c));
+}
+
+function computeDomainTax(game: Game, c: Character): number {
   const e = econ(game);
   const counties = domainCounties(game, c);
   let sum = 0;
@@ -120,6 +124,15 @@ export function domainLevy(game: Game, c: Character): number {
 /** Всё ополчение державы: свой домен + доля вассалов (рекурсивно) + бонусы. */
 export function realmLevy(game: Game, c: Character, depth = 0): number {
   if (depth > 10) return 0;
+  const key = `rlevy:${c.id}`;
+  const cached = game.dayCache.get(key) as number | undefined;
+  if (cached !== undefined) return cached;
+  const v = computeRealmLevy(game, c, depth);
+  game.dayCache.set(key, v);
+  return v;
+}
+
+function computeRealmLevy(game: Game, c: Character, depth: number): number {
   const share = (econ(game).vassal_levy_share ?? 0.35) * Math.max(0, 1 + stat(game, c, 'vassal_levy_mult'));
   let sum = domainLevy(game, c) + stat(game, c, 'levy_flat');
   for (const v of game.vassalsOf(c.id)) if (!inRevolt(game, v.id, c.id)) sum += realmLevy(game, v, depth + 1) * share;
@@ -136,6 +149,10 @@ export function inRevolt(game: Game, vassal: string, liege: string): boolean {
 
 /** Приблизительная «военная сила» для ИИ: ополчение + уже поднятые армии. */
 export function militaryStrength(game: Game, c: Character): number {
+  return game.cachedDaily(`milstr:${c.id}`, () => computeMilitaryStrength(game, c));
+}
+
+function computeMilitaryStrength(game: Game, c: Character): number {
   let raised = 0;
   for (const a of Object.values(game.state.armies)) {
     if (a.owner !== c.id) continue;

@@ -1,0 +1,167 @@
+# Скандинавия: титулы, графства, культуры, династии, имена.
+e_scandinavia: Скандинавия
+e_scandinavia_full: Скандинавская империя
+k_denmark: Дания
+k_norway: Норвегия
+k_sweden: Швеция
+d_jutland: Ютландия
+d_zealand: Зеландия
+d_scania: Сконе
+d_trondelag: Трёнделаг
+d_vestlandet: Вестланн
+d_viken: Вик
+d_oppland: Опланн
+d_svealand: Свеаланд
+d_gotaland: Гёталанд
+d_norrland: Норрланд
+c_vendsyssel: Вендсюссель
+c_aarhus: Орхус
+c_viborg: Виборг
+c_ribe: Рибе
+c_schleswig: Шлезвиг
+c_roskilde: Роскилле
+c_fyn: Фюн
+c_lolland: Лолланн
+c_bornholm: Борнхольм
+c_lund: Лунд
+c_halland: Халланд
+c_blekinge: Блекинге
+c_nidaros: Нидарос
+c_more: Мёре
+c_namdalen: Намдал
+c_bergen: Берген
+c_sogn: Согн
+c_rogaland: Ругаланн
+c_oslo: Осло
+c_vestfold: Вестфолл
+c_agder: Агдер
+c_ranrike: Ранрике
+c_oppland: Опланн
+c_hedmark: Хедмарк
+c_telemark: Телемарк
+c_uppsala: Уппсала
+c_sodermanland: Сёдерманланд
+c_vastmanland: Вестманланд
+c_dalarna: Даларна
+c_vastergotland: Вестергётланд
+c_ostergotland: Эстергётланд
+c_smaland: Смоланд
+c_kalmar: Кальмар
+c_varmland: Вермланд
+c_gotland: Готланд
+c_halsingland: Хельсингланд
+c_medelpad: Медельпад
+c_jamtland: Емтланд
+w_frisia: Фрисландия (Священная Римская империя)
+w_westphalia: Вестфалия (Священная Римская империя)
+w_lower_saxony: Нижняя Саксония (Священная Римская империя)
+w_holstein: Гольштейн (Священная Римская империя)
+w_mecklenburg: Мекленбург (ободриты)
+w_pomerania: Померания
+w_prussia: Пруссия
+w_brandenburg: Бранденбург (лютичи)
+w_greater_poland: Великая Польша
+w_silesia: Силезия
+w_lesser_poland: Малая Польша
+w_saxony: Саксония (Священная Римская империя)
+w_thuringia: Тюрингия (Священная Римская империя)
+w_hesse: Гессен (Священная Римская империя)
+w_rhineland: Рейнланд (Священная Римская империя)
+w_franconia: Франкония (Священная Римская империя)
+w_swabia: Швабия (Священная Римская империя)
+w_bavaria: Бавария (Священная Римская империя)
+w_bohemia: Богемия
+w_moravia: Моравия
+w_austria: Австрия (Священная Римская империя)
+w_hungary: Венгрия
+w_tyrol: Тироль (Священная Римская империя)
+w_switzerland: Швейцария (Священная Римская империя)
+w_carinthia: Каринтия (Священная Римская империя)
+w_lombardy: Ломбардия (Италия)
+w_piedmont: Пьемонт (Италия)
+w_venetia: Венеция
+w_croatia: Хорватия
+w_romagna: Романья (Италия)
+
+culture:
+  danish: Датская
+  swedish: Шведская
+
+dynasty:
+  hardrada: Хардрада
+  estridsen: Эстридсен
+  stenkil: Стенкильсон
+  munso: Мунсё
+  ladejarl: Хладир
+
+dynasty_pattern:
+  danish: "{name}сен"
+  swedish: "{name}ссон"
+
+nick:
+  hardrada: Суровый
+  peaceful: Тихий
+  hen: Точило
+  pagan: Язычник
+  wise: Мудрый
+  orre: Тетерев
+
+name:
+  Yaroslav: Ярослав
+  Elisiv: Елизавета
+  Tora: Тора
+  Maria: Мария
+  Ingegerd: Ингегерд
+  Eystein: Эйстейн
+  Ulf: Ульф
+  Estrid: Эстрид
+  Asbjorn: Асбьёрн
+  Knud: Кнуд
+  Oluf: Олаф
+  Niels: Нильс
+  Ingerid: Ингерид
+  Stenkil: Стенкиль
+  Halsten: Хальстен
+  Inge: Инге
+  Erik: Эрик
+  Toke: Токе
+  Esbern: Эсберн
+  Gorm: Горм
+  Hemming: Хемминг
+  Thorkil: Торкиль
+  Aage: Оге
+  Bjorn: Бьёрн
+  Sune: Суне
+  Thyra: Тюра
+  Bodil: Бодиль
+  Gyrid: Гюрид
+  Margrethe: Маргрете
+  Cecilia: Сесилия
+  Helena: Хелена
+  Astrid: Астрид
+  Tove: Тове
+  Emund: Эмунд
+  Hakon: Хакон
+  Sverker: Сверкер
+  Anund: Анунд
+  Olof: Улоф
+  Karl: Карл
+  Folke: Фольке
+  Joar: Юар
+  Torgils: Торгильс
+  Kristina: Кристина
+  Ulvhild: Ульвхильд
+  Sigrid: Сигрид
+  Ingrid: Ингрид
+  Katarina: Катарина
+  Ragnfrid: Рагнфрид
+  Gunhild: Гунхильд
+
+decision:
+  prepare_norse_invasion: Норвежское вторжение
+decision_desc:
+  prepare_norse_invasion: "По договору Магнуса Доброго с Хардекнудом английская корона принадлежит Норвегии. Пора собрать флот и напомнить об этом Гарольду Годвинсону."
+modifier:
+  viking_host: Норвежский флот
+ui:
+  norse_invasion_tooltip: "Со всей Норвегии и Оркни к вам стекаются корабли и воины: +6000 воинов на 3 года."

@@ -85,6 +85,24 @@ cultures:
     dynasty_pattern: name
     male_names: [Harald, Magnus, Olaf, Sigurd, Thorfinn, Paul, Erlend, Haakon, Sven, Ragnvald, Godred, Sitric, Ivar, Ketil, Thorkel, Einar]
     female_names: [Ingibiorg, Ragnhild, Thora, Gyda, Astrid, Sigrid, Gunnhild, Helga, Ingrid, Thorunn]
+  danish:
+    group: north_germanic
+    color: "#b05a6e"
+    skin: [0.0, 0.15]
+    hair: [0.45, 1.0]
+    succession_law: partition
+    dynasty_pattern: name
+    male_names: [Sven, Knud, Harald, Erik, Oluf, Niels, Asbjorn, Toke, Ulf, Esbern, Gorm, Hemming, Thorkil, Aage, Bjorn, Sune]
+    female_names: [Estrid, Gunhild, Ingerid, Thyra, Bodil, Gyrid, Margrethe, Ragnhild, Cecilia, Helena, Astrid, Tove]
+  swedish:
+    group: north_germanic
+    color: "#c9ab3a"
+    skin: [0.0, 0.12]
+    hair: [0.55, 1.0]
+    succession_law: partition
+    dynasty_pattern: name
+    male_names: [Stenkil, Emund, Erik, Halsten, Inge, Hakon, Sverker, Ragnvald, Anund, Olof, Sven, Karl, Ulf, Folke, Joar, Torgils]
+    female_names: [Ingegerd, Helena, Ragnhild, Kristina, Ulvhild, Estrid, Sigrid, Astrid, Ingrid, Katarina, Ragnfrid]
   flemish:
     group: frankish
     color: "#e0c040"

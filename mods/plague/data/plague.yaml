@@ -4,16 +4,16 @@ diseases:
   bubonic_plague:
     color: "#7a1f1f"
     icon: "☠"
-    outbreak_chance: 0.004     # шанс новой вспышки в месяц
-    spread_chance: 0.07        # шанс перекинуться на соседнюю провинцию в месяц
-    monthly_death_chance: 0.012 # для персонажей в заражённой столице
-    duration_months: 10
+    outbreak_chance: 0.0025    # шанс новой вспышки в месяц
+    spread_chance: 0.05        # шанс перекинуться на соседнюю провинцию в месяц
+    monthly_death_chance: 0.01 # для персонажей в заражённой столице
+    duration_months: 8
     development_loss: 2
   camp_fever:
     color: "#7a6a1f"
     icon: "🤢"
-    outbreak_chance: 0.008
-    spread_chance: 0.035
+    outbreak_chance: 0.006
+    spread_chance: 0.025
     monthly_death_chance: 0.004
     duration_months: 6
     development_loss: 0

@@ -1,0 +1,252 @@
+# Скандинавия: Дания, Норвегия, Швеция. Контуры суши — [широта, долгота].
+landmasses:
+  scandinavia:
+    roughness: 0.25
+    points:
+      - [64.8, 10.6]
+      - [64.3, 10.2]
+      - [63.9, 9.3]
+      - [63.6, 8.6]
+      - [63.4, 8.0]
+      - [63.1, 7.2]
+      - [62.85, 6.6]
+      - [62.6, 6.1]
+      - [62.3, 5.55]
+      - [62.0, 5.1]
+      - [61.6, 4.95]
+      - [61.2, 4.95]
+      - [60.8, 4.9]
+      - [60.4, 5.05]
+      - [60.0, 5.1]
+      - [59.6, 5.3]
+      - [59.3, 5.25]
+      - [59.0, 5.55]
+      - [58.7, 5.6]
+      - [58.45, 5.95]
+      - [58.2, 6.5]
+      - [58.0, 7.1]
+      - [58.0, 7.8]
+      - [58.15, 8.25]
+      - [58.4, 8.8]
+      - [58.7, 9.3]
+      - [58.95, 9.7]
+      - [59.05, 10.15]
+      - [59.35, 10.45]
+      - [59.75, 10.55]
+      - [59.9, 10.75]   # Осло-фьорд
+      - [59.55, 10.75]
+      - [59.2, 10.95]
+      - [59.0, 11.2]
+      - [58.7, 11.15]
+      - [58.35, 11.3]
+      - [58.0, 11.55]
+      - [57.7, 11.9]
+      - [57.4, 12.05]
+      - [57.05, 12.3]
+      - [56.75, 12.65]
+      - [56.5, 12.95]
+      - [56.3, 12.55]
+      - [56.05, 12.7]
+      - [55.85, 12.85]
+      - [55.55, 13.05]
+      - [55.38, 13.2]
+      - [55.4, 13.9]
+      - [55.55, 14.3]
+      - [55.9, 14.25]
+      - [56.05, 14.65]
+      - [56.15, 15.45]
+      - [56.2, 16.1]
+      - [56.55, 16.35]
+      - [57.0, 16.5]
+      - [57.4, 16.6]
+      - [57.8, 16.7]
+      - [58.2, 16.85]
+      - [58.55, 16.8]
+      - [58.65, 17.3]
+      - [58.85, 17.75]
+      - [59.15, 18.1]
+      - [59.35, 18.6]
+      - [59.65, 18.95]
+      - [59.95, 18.85]
+      - [60.25, 18.6]
+      - [60.5, 17.7]
+      - [60.7, 17.25]
+      - [61.2, 17.2]
+      - [61.7, 17.45]
+      - [62.2, 17.45]
+      - [62.6, 17.75]
+      - [63.0, 18.5]
+      - [63.4, 19.2]
+      - [63.7, 19.9]
+      - [64.8, 21.0]
+  zealand:
+    roughness: 0.2
+    points:
+      - [56.12, 12.55]
+      - [55.7, 12.6]
+      - [55.5, 12.25]
+      - [55.25, 12.45]
+      - [55.0, 12.2]
+      - [55.05, 11.75]
+      - [55.2, 11.25]
+      - [55.45, 11.1]
+      - [55.7, 10.9]
+      - [55.8, 11.5]
+      - [56.0, 11.9]
+  funen:
+    roughness: 0.2
+    points:
+      - [55.6, 10.55]
+      - [55.35, 10.85]
+      - [55.05, 10.65]
+      - [55.1, 10.15]
+      - [55.3, 9.9]
+      - [55.5, 9.95]
+  lolland:
+    roughness: 0.2
+    points: [[54.95, 11.0], [54.98, 11.9], [54.62, 12.05], [54.65, 11.2]]
+  gotland:
+    roughness: 0.2
+    points: [[57.95, 18.75], [57.6, 18.95], [57.25, 18.75], [56.95, 18.2], [57.3, 18.1], [57.6, 18.4]]
+  bornholm:
+    roughness: 0.15
+    points: [[55.3, 14.75], [55.25, 15.15], [55.0, 15.1], [55.05, 14.7]]
+
+titles:
+  k_denmark: { tier: kingdom, color: "#c43c6e", capital: c_roskilde }
+  d_jutland: { tier: duchy, liege: k_denmark, color: "#b8345f", capital: c_aarhus }
+  d_zealand: { tier: duchy, liege: k_denmark, color: "#d04a7a", capital: c_roskilde }
+  d_scania: { tier: duchy, liege: k_denmark, color: "#a8305a", capital: c_lund }
+  k_norway: { tier: kingdom, color: "#6a4fb0", capital: c_nidaros }
+  d_trondelag: { tier: duchy, liege: k_norway, color: "#7658bc", capital: c_nidaros }
+  d_vestlandet: { tier: duchy, liege: k_norway, color: "#5e45a2", capital: c_bergen }
+  d_viken: { tier: duchy, liege: k_norway, color: "#7a62c4", capital: c_oslo }
+  d_oppland: { tier: duchy, liege: k_norway, color: "#644aa8", capital: c_hedmark }
+  k_sweden: { tier: kingdom, color: "#d4b02f", capital: c_uppsala }
+  d_svealand: { tier: duchy, liege: k_sweden, color: "#dcbb3c", capital: c_uppsala }
+  d_gotaland: { tier: duchy, liege: k_sweden, color: "#c9a426", capital: c_vastergotland }
+  d_norrland: { tier: duchy, liege: k_sweden, color: "#c4a032", capital: c_halsingland }
+  e_scandinavia: { tier: empire, color: "#5a6f8a", capital: c_roskilde }
+
+provinces:
+  # --------------------------------------------------- Дания: Ютландия
+  c_vendsyssel: { lat: 57.3,  lon: 10.0, duchy: d_jutland, terrain: plains, culture: danish, faith: catholic, development: 6, holdings: [castle, temple] }
+  c_aarhus:     { lat: 56.15, lon: 9.9,  duchy: d_jutland, terrain: farmlands, culture: danish, faith: catholic, development: 9, holdings: [castle, city, temple] }
+  c_viborg:     { lat: 56.45, lon: 9.1,  duchy: d_jutland, terrain: plains, culture: danish, faith: catholic, development: 7, holdings: [castle, temple] }
+  c_ribe:       { lat: 55.4,  lon: 8.95, duchy: d_jutland, terrain: wetlands, culture: danish, faith: catholic, development: 8, holdings: [castle, city, temple] }
+  c_schleswig:  { lat: 54.6,  lon: 9.4,  duchy: d_jutland, terrain: farmlands, culture: danish, faith: catholic, development: 10, holdings: [castle, city] }
+  # Дания: острова
+  c_roskilde:   { lat: 55.55, lon: 11.95, duchy: d_zealand, terrain: farmlands, culture: danish, faith: catholic, development: 11, holdings: [castle, city, temple] }
+  c_fyn:        { lat: 55.3,  lon: 10.35, duchy: d_zealand, terrain: farmlands, culture: danish, faith: catholic, development: 9, holdings: [castle, temple] }
+  c_lolland:    { lat: 54.8,  lon: 11.5, duchy: d_zealand, terrain: farmlands, culture: danish, faith: catholic, development: 6, holdings: [castle] }
+  c_bornholm:   { lat: 55.15, lon: 14.9, duchy: d_scania, terrain: hills, culture: danish, faith: catholic, development: 4, holdings: [castle] }
+  # Дания: Сконе
+  c_lund:       { lat: 55.75, lon: 13.3, duchy: d_scania, terrain: farmlands, culture: danish, faith: catholic, development: 10, holdings: [castle, city, temple] }
+  c_halland:    { lat: 56.75, lon: 12.8, duchy: d_scania, terrain: forest, culture: danish, faith: catholic, development: 6, holdings: [castle] }
+  c_blekinge:   { lat: 56.25, lon: 15.1, duchy: d_scania, terrain: forest, culture: danish, faith: catholic, development: 5, holdings: [castle] }
+  # --------------------------------------------------- Норвегия
+  c_nidaros:    { lat: 63.35, lon: 10.6, duchy: d_trondelag, terrain: hills, culture: norse, faith: catholic, development: 8, holdings: [castle, city, temple] }
+  c_more:       { lat: 62.55, lon: 7.4,  duchy: d_trondelag, terrain: mountains, culture: norse, faith: catholic, development: 5, holdings: [castle] }
+  c_namdalen:   { lat: 64.2,  lon: 11.8, duchy: d_trondelag, terrain: forest, culture: norse, faith: catholic, development: 3, holdings: [castle] }
+  c_bergen:     { lat: 60.45, lon: 5.7,  duchy: d_vestlandet, terrain: hills, culture: norse, faith: catholic, development: 8, holdings: [castle, city, temple] }
+  c_sogn:       { lat: 61.3,  lon: 6.6,  duchy: d_vestlandet, terrain: mountains, culture: norse, faith: catholic, development: 4, holdings: [castle] }
+  c_rogaland:   { lat: 58.85, lon: 6.0,  duchy: d_vestlandet, terrain: hills, culture: norse, faith: catholic, development: 6, holdings: [castle, temple] }
+  c_oslo:       { lat: 59.9,  lon: 10.7, duchy: d_viken, terrain: farmlands, culture: norse, faith: catholic, development: 8, holdings: [castle, city, temple] }
+  c_vestfold:   { lat: 59.3,  lon: 10.1, duchy: d_viken, terrain: farmlands, culture: norse, faith: catholic, development: 7, holdings: [castle] }
+  c_agder:      { lat: 58.4,  lon: 7.9,  duchy: d_viken, terrain: hills, culture: norse, faith: catholic, development: 5, holdings: [castle] }
+  c_ranrike:    { lat: 58.6,  lon: 11.6, duchy: d_viken, terrain: hills, culture: norse, faith: catholic, development: 5, holdings: [castle] }
+  c_oppland:    { lat: 61.2,  lon: 9.6,  duchy: d_oppland, terrain: mountains, culture: norse, faith: catholic, development: 4, holdings: [castle] }
+  c_hedmark:    { lat: 60.8,  lon: 11.5, duchy: d_oppland, terrain: forest, culture: norse, faith: catholic, development: 5, holdings: [castle, temple] }
+  c_telemark:   { lat: 59.5,  lon: 8.5,  duchy: d_oppland, terrain: mountains, culture: norse, faith: catholic, development: 4, holdings: [castle] }
+  # --------------------------------------------------- Швеция
+  c_uppsala:    { lat: 59.9,  lon: 17.6, duchy: d_svealand, terrain: farmlands, culture: swedish, faith: norse_pagan, development: 9, holdings: [castle, temple] }
+  c_sodermanland: { lat: 59.15, lon: 16.8, duchy: d_svealand, terrain: forest, culture: swedish, faith: catholic, development: 7, holdings: [castle] }
+  c_vastmanland: { lat: 59.65, lon: 16.0, duchy: d_svealand, terrain: forest, culture: swedish, faith: norse_pagan, development: 6, holdings: [castle] }
+  c_dalarna:    { lat: 60.75, lon: 14.8, duchy: d_svealand, terrain: forest, culture: swedish, faith: norse_pagan, development: 4, holdings: [castle] }
+  c_vastergotland: { lat: 58.1, lon: 13.3, duchy: d_gotaland, terrain: farmlands, culture: swedish, faith: catholic, development: 8, holdings: [castle, temple] }
+  c_ostergotland: { lat: 58.35, lon: 15.4, duchy: d_gotaland, terrain: farmlands, culture: swedish, faith: catholic, development: 8, holdings: [castle, temple] }
+  c_smaland:    { lat: 57.0,  lon: 14.6, duchy: d_gotaland, terrain: forest, culture: swedish, faith: catholic, development: 5, holdings: [castle] }
+  c_kalmar:     { lat: 56.85, lon: 16.2, duchy: d_gotaland, terrain: plains, culture: swedish, faith: catholic, development: 6, holdings: [castle, city] }
+  c_varmland:   { lat: 59.7,  lon: 13.1, duchy: d_gotaland, terrain: forest, culture: swedish, faith: norse_pagan, development: 4, holdings: [castle] }
+  c_gotland:    { lat: 57.5,  lon: 18.5, duchy: d_gotaland, terrain: plains, culture: swedish, faith: catholic, development: 8, holdings: [castle, city] }
+  c_halsingland: { lat: 61.5, lon: 16.6, duchy: d_norrland, terrain: forest, culture: swedish, faith: norse_pagan, development: 3, holdings: [castle] }
+  c_medelpad:   { lat: 62.4,  lon: 17.0, duchy: d_norrland, terrain: forest, culture: swedish, faith: norse_pagan, development: 3, holdings: [castle] }
+  c_jamtland:   { lat: 63.15, lon: 14.3, duchy: d_norrland, terrain: mountains, culture: swedish, faith: norse_pagan, development: 3, holdings: [castle] }
+
+  # --------------------------------------------------- непроходимые земли за краем карты
+  w_frisia:       { lat: 53.2,  lon: 7.6,  impassable: true, terrain: wetlands }
+  w_westphalia:   { lat: 52.0,  lon: 8.2,  impassable: true, terrain: hills }
+  w_lower_saxony: { lat: 52.7,  lon: 9.9,  impassable: true, terrain: plains }
+  w_holstein:     { lat: 54.0,  lon: 10.0, impassable: true, terrain: farmlands }
+  w_mecklenburg:  { lat: 53.7,  lon: 12.2, impassable: true, terrain: forest }
+  w_pomerania:    { lat: 53.9,  lon: 15.6, impassable: true, terrain: forest }
+  w_prussia:      { lat: 54.0,  lon: 19.0, impassable: true, terrain: forest }
+  w_brandenburg:  { lat: 52.5,  lon: 13.3, impassable: true, terrain: forest }
+  w_greater_poland: { lat: 52.4, lon: 17.2, impassable: true, terrain: plains }
+  w_silesia:      { lat: 50.9,  lon: 16.8, impassable: true, terrain: plains }
+  w_lesser_poland: { lat: 50.2, lon: 19.3, impassable: true, terrain: hills }
+  w_saxony:       { lat: 51.3,  lon: 12.5, impassable: true, terrain: hills }
+  w_thuringia:    { lat: 50.9,  lon: 10.8, impassable: true, terrain: forest }
+  w_hesse:        { lat: 50.6,  lon: 8.8,  impassable: true, terrain: hills }
+  w_rhineland:    { lat: 50.6,  lon: 7.1,  impassable: true, terrain: hills }
+  w_franconia:    { lat: 49.8,  lon: 10.5, impassable: true, terrain: forest }
+  w_swabia:       { lat: 48.6,  lon: 9.2,  impassable: true, terrain: hills }
+  w_bavaria:      { lat: 48.3,  lon: 12.2, impassable: true, terrain: farmlands }
+  w_bohemia:      { lat: 49.9,  lon: 14.6, impassable: true, terrain: hills }
+  w_moravia:      { lat: 49.3,  lon: 17.0, impassable: true, terrain: hills }
+  w_austria:      { lat: 47.9,  lon: 15.6, impassable: true, terrain: hills }
+  w_hungary:      { lat: 47.5,  lon: 19.0, impassable: true, terrain: plains }
+  w_tyrol:        { lat: 47.0,  lon: 11.5, impassable: true, terrain: mountains }
+  w_switzerland:  { lat: 46.9,  lon: 8.3,  impassable: true, terrain: mountains }
+  w_carinthia:    { lat: 46.6,  lon: 14.2, impassable: true, terrain: mountains }
+  w_lombardy:     { lat: 45.4,  lon: 9.4,  impassable: true, terrain: farmlands }
+  w_piedmont:     { lat: 44.8,  lon: 7.6,  impassable: true, terrain: hills }
+  w_venetia:      { lat: 45.6,  lon: 12.3, impassable: true, terrain: plains }
+  w_croatia:      { lat: 45.3,  lon: 15.6, impassable: true, terrain: hills }
+  w_romagna:      { lat: 44.6,  lon: 11.5, impassable: true, terrain: plains }
+
+# Морские переправы.
+map_links:
+  little_belt: { a: c_fyn, b: c_ribe }
+  little_belt_n: { a: c_fyn, b: c_aarhus }
+  als: { a: c_fyn, b: c_schleswig }
+  great_belt: { a: c_fyn, b: c_roskilde }
+  lolland_zealand: { a: c_lolland, b: c_roskilde }
+  lolland_fyn: { a: c_lolland, b: c_fyn }
+  kattegat: { a: c_aarhus, b: c_roskilde }
+  oresund: { a: c_roskilde, b: c_lund }
+  bornholm_scania: { a: c_bornholm, b: c_lund }
+  bornholm_blekinge: { a: c_bornholm, b: c_blekinge }
+  skagerrak: { a: c_vendsyssel, b: c_agder }
+  skagerrak_east: { a: c_vendsyssel, b: c_ranrike }
+  kattegat_halland: { a: c_vendsyssel, b: c_halland }
+  gotland_kalmar: { a: c_gotland, b: c_kalmar }
+  gotland_sodermanland: { a: c_gotland, b: c_sodermanland }
+  # через Северное море: путь Харальда Сурового и датских флотов
+  shetland_route: { a: c_bergen, b: c_orkney }
+  north_sea_humber: { a: c_rogaland, b: c_holderness }
+  north_sea_east_anglia: { a: c_ribe, b: c_norfolk }
+
+# Норвежское вторжение: Харальд Суровый собирает флот, чтобы взять Англию.
+decisions:
+  prepare_norse_invasion:
+    icon: "🛶"
+    major: true
+    is_shown:
+      culture: norse
+      tier: ">= kingdom"
+      has_claim_on: title:k_england
+      NOT: { has_flag: norse_invasion_prepared }
+    is_valid:
+      is_at_war: no
+    cost: { gold: 80 }
+    effect:
+      - set_flag: norse_invasion_prepared
+      - add_prestige: 150
+      - add_modifier: { id: viking_host, years: 3 }
+      - custom_tooltip: ui.norse_invasion_tooltip
+    ai_will_do: 90
+    ai_check_months: 1
+
+modifiers:
+  viking_host: { icon: "🛶", modifiers: { levy_flat: 6000, martial: 2, commander_advantage: 8, prowess: 2 }, good: true }
