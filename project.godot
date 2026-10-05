@@ -1,0 +1,45 @@
+; Корона и Династия — проект Godot.
+; Движок симуляции лежит в engine/, интерфейс — в ui/, игровые данные —
+; в mods/ (базовая игра — тоже мод, core). Веб-прототип — в web/.
+
+config_version=5
+
+[application]
+
+config/name="Корона и Династия"
+config/name_localized={
+"en": "Crown and Dynasty",
+"ru": "Корона и Династия"
+}
+config/description="Модульная средневековая стратегия о королях, наследниках и интригах."
+config/version="0.4.0"
+run/main_scene="res://ui/main.tscn"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Crown and Dynasty"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+boot_splash/bg_color=Color(0.082, 0.067, 0.047, 1)
+boot_splash/show_image=false
+config/icon="res://assets/icon.svg"
+
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+window/size/resizable=true
+window/energy_saving/keep_screen_on=false
+
+[gui]
+
+theme/default_font_antialiasing=1
+timers/tooltip_delay_sec=0.35
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=false
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/canvas_textures/default_texture_filter=1
+environment/defaults/default_clear_color=Color(0.082, 0.067, 0.047, 1)
