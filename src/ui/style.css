@@ -353,3 +353,31 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; margin: 0.2em 0; color
 .reg-shop { display: flex; flex-wrap: wrap; gap: 4px; }
 .reg-buy { font-size: 12px; }
 .section-sub { font-family: var(--serif); font-weight: 700; color: var(--muted); margin: 8px 0 4px; }
+
+/* ---------------------------------------------------- оповещения */
+.tb-alerts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; flex: 1; padding: 0 12px; }
+.alert { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--border); background: radial-gradient(#3a2c18, #1a130a); font-size: 17px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 0; color: var(--text); }
+.alert:hover { filter: brightness(1.3); }
+.alert-good { border-color: var(--good); box-shadow: 0 0 6px rgba(143,209,106,0.45); }
+.alert-bad { border-color: var(--bad); box-shadow: 0 0 6px rgba(239,109,92,0.5); animation: alert-pulse 2s ease-in-out infinite; }
+.alert-info { border-color: var(--border-hi); }
+@keyframes alert-pulse { 50% { box-shadow: 0 0 12px rgba(239,109,92,0.85); } }
+.alert-tip.good { color: var(--good); }
+.alert-tip.bad { color: var(--bad); }
+
+/* ---------------------------------------------------- секреты и крюки */
+.secret-row { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; padding: 1px 0; }
+.secret-icon { font-size: 15px; }
+.secret-owner { font-size: 13px; padding: 2px 0; border-bottom: 1px solid #3e3220; }
+.hook-line { font-size: 13px; padding: 1px 0; }
+.hook-toggle { display: block; margin: 6px 0; padding: 6px 8px; border: 1px dashed var(--border-hi); border-radius: 5px; cursor: pointer; font-size: 13px; }
+
+/* ---------------------------------------------------- законы */
+.law-group { margin: 4px 0 8px; }
+.law-group-name { font-family: var(--serif); font-weight: 700; color: var(--gold); margin-bottom: 4px; }
+.law-ladder { display: flex; flex-wrap: wrap; gap: 4px; }
+.law-step.active { border-color: var(--gold); background: linear-gradient(#6a5020, #3a2a10); }
+
+/* ---------------------------------------------------- рыцари */
+.knight-row { display: flex; align-items: center; gap: 6px; font-size: 13px; padding: 1px 0; }
+.knight-prowess { margin-left: auto; font-weight: 700; }

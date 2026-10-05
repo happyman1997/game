@@ -29,6 +29,7 @@ import {
 import { countyLevy, countyTax, domainLimit, monthlyIncome, realmLevy } from '../world/economy';
 import { provinceFort } from '../world/military';
 import { addOpinion, opinion, removeOpinion } from '../world/opinion';
+import { addHook, canUseHook, hookOn, removeHook } from '../world/hooks';
 import { startScheme } from '../world/schemes';
 import { charStats, stat } from '../world/stats';
 import { heirsOf, killCharacter, lawOf } from '../world/succession';
@@ -113,6 +114,7 @@ export function registerBuiltins(engine: Engine): void {
   const chars = (arr: (Character | undefined)[]) => arr.filter(isAlive).map((c) => ({ type: 'character' as const, id: c.id }));
 
   list('self', undefined, (_ctx, s) => [s], 'Сам этот объект (удобно для списков кандидатов)');
+  list('liege', CHAR, (ctx, s) => chars([ctx.game.char(ch(ctx, s)?.liege)]), 'Сюзерен (список из одного персонажа)');
   list('child', CHAR, (ctx, s) => chars((ch(ctx, s)?.children ?? []).map((id) => ctx.game.char(id))), 'Живые дети');
   list('son', CHAR, (ctx, s) => chars((ch(ctx, s)?.children ?? []).map((id) => ctx.game.char(id)).filter((c) => c && !c.female)), 'Сыновья');
   list('daughter', CHAR, (ctx, s) => chars((ch(ctx, s)?.children ?? []).map((id) => ctx.game.char(id)).filter((c) => c?.female)), 'Дочери');
@@ -290,7 +292,11 @@ export function registerBuiltins(engine: Engine): void {
   ct('is_heir_of', (g, c, arg, ctx, s) => { const o = targetChar(ctx, s, arg); return !!o && heirsOf(g, o)[0] === c.id; }, 'Основной наследник персонажа');
   ct('can_marry', (g, c, arg, ctx, s) => { const o = targetChar(ctx, s, arg); return !!o && canMarry(g, c, o); }, 'Может вступить в брак с персонажем',
     (ctx) => t(ctx.game, 'tr.can_marry'));
-  ct('has_hook_on', (_g, c, arg, ctx, s) => { const o = targetChar(ctx, s, arg); return !!o && c.hooks.some((h) => h.target === o.id); }, 'Есть крюк на персонажа');
+  ct('has_hook_on', (g, c, arg, ctx, s) => { const o = targetChar(ctx, s, arg); return !!o && !!hookOn(g, c, o.id); }, 'Есть крюк на персонажа',
+    (ctx) => t(ctx.game, 'tr.has_hook_on'));
+  ct('has_strong_hook_on', (g, c, arg, ctx, s) => { const o = targetChar(ctx, s, arg); return !!o && !!hookOn(g, c, o.id)?.strong; }, 'Есть сильный крюк на персонажа',
+    (ctx) => t(ctx.game, 'tr.has_strong_hook_on'));
+  ct('can_use_hook_on', (g, c, arg, ctx, s) => { const o = targetChar(ctx, s, arg); return !!o && canUseHook(g, c, o.id); }, 'Крюк на персонажа можно использовать сейчас');
   ct('has_claim_on', (_g, c, arg, ctx, s) => { const r = resolveScope(ctx, s, arg); return !!r && c.claims.includes(r.id); }, 'Есть претензия на титул');
   ct('holds_title', (_g, c, arg, ctx, s) => { const r = resolveScope(ctx, s, arg); return !!r && c.titles.includes(r.id); }, 'Владеет титулом');
   ct('has_scheme', (g, c, arg, ctx, s) => {
@@ -408,16 +414,17 @@ export function registerBuiltins(engine: Engine): void {
     (ctx, s, arg) => { const o = targetChar(ctx, s, arg); return o ? t(ctx.game, 'fx.marry', { a: ctx.game.scopeName(s), b: ctx.game.scopeName({ type: 'character', id: o.id }) }) : null; });
   ce('divorce', (g, c, arg, ctx, s) => { const o = targetChar(ctx, s, arg); if (o) divorce(g, c, o); }, 'Развод');
   ce('add_hook', (g, c, arg, ctx, s) => {
-    const o = targetChar(ctx, s, arg.target ?? arg);
+    const o = targetChar(ctx, s, isPlainObject(arg) ? arg.target : arg);
     if (!o) return;
-    c.hooks = c.hooks.filter((h) => h.target !== o.id);
     const days = isPlainObject(arg) ? durationDays(arg) : 0;
-    c.hooks.push({ target: o.id, strong: isPlainObject(arg) && isYes(arg.strong), expires: days ? g.date + days : undefined });
+    addHook(g, c, o, { strong: isPlainObject(arg) && isYes(arg.strong), days });
   }, 'Крюк на персонажа: path или { target, strong, years }', (ctx, s, arg) => {
-    const o = targetChar(ctx, s, arg.target ?? arg);
-    return o ? t(ctx.game, 'fx.add_hook', { value: ctx.game.scopeName({ type: 'character', id: o.id }) }) : null;
+    const o = targetChar(ctx, s, isPlainObject(arg) ? arg.target : arg);
+    const strong = isPlainObject(arg) && isYes(arg.strong);
+    return o ? t(ctx.game, strong ? 'fx.add_strong_hook' : 'fx.add_hook', { value: ctx.game.scopeName({ type: 'character', id: o.id }) }) : null;
   });
-  ce('remove_hook', (_g, c, arg, ctx, s) => { const o = targetChar(ctx, s, arg); if (o) c.hooks = c.hooks.filter((h) => h.target !== o.id); }, 'Убрать крюк');
+  ce('remove_hook', (_g, c, arg, ctx, s) => { const o = targetChar(ctx, s, arg); if (o) removeHook(c, o.id); }, 'Убрать крюк');
+  cv('num_hooks', (g, c) => c.hooks.filter((h) => h.expires === undefined || h.expires > g.date).length, 'Число крюков персонажа на других');
   ce('become_vassal_of', (g, c, arg, ctx, s) => { const o = targetChar(ctx, s, arg); if (o && o.id !== c.id && !isInRealmOf(g, o, c)) setLiege(g, c, o.id); }, 'Стать вассалом',
     (ctx, s, arg) => { const o = targetChar(ctx, s, arg); return o ? t(ctx.game, 'fx.become_vassal_of', { who: ctx.game.scopeName(s), liege: ctx.game.scopeName({ type: 'character', id: o.id }) }) : null; });
   ce('become_independent', (g, c) => setLiege(g, c, undefined), 'Стать независимым', (ctx, s) => t(ctx.game, 'fx.become_independent', { who: ctx.game.scopeName(s) }));

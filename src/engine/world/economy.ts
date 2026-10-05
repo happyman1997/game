@@ -78,9 +78,13 @@ export function incomeBreakdown(game: Game, c: Character): IncomePart[] {
   parts.push({ label: game.loc.t('ui.domain_tax'), value: dom });
   const share = vassalTaxShare(game);
   let fromVassals = 0;
-  for (const v of game.vassalsOf(c.id)) if (!inRevolt(game, v.id, c.id)) fromVassals += domainTax(game, v) * share;
+  const taxMult = Math.max(0, 1 + stat(game, c, 'vassal_tax_mult'));
+  for (const v of game.vassalsOf(c.id)) if (!inRevolt(game, v.id, c.id)) fromVassals += domainTax(game, v) * share * taxMult;
   if (fromVassals) parts.push({ label: game.loc.t('ui.vassal_tax'), value: fromVassals });
-  if (c.liege) parts.push({ label: game.loc.t('ui.liege_tax'), value: -dom * share });
+  if (c.liege) {
+    const l = game.char(c.liege);
+    parts.push({ label: game.loc.t('ui.liege_tax'), value: -dom * share * (l ? Math.max(0, 1 + stat(game, l, 'vassal_tax_mult')) : 1) });
+  }
   const flat = stat(game, c, 'monthly_income');
   if (flat) parts.push({ label: game.loc.t('ui.other_income'), value: flat });
   const army = armyMaintenance(game, c);
@@ -116,7 +120,7 @@ export function domainLevy(game: Game, c: Character): number {
 /** Всё ополчение державы: свой домен + доля вассалов (рекурсивно) + бонусы. */
 export function realmLevy(game: Game, c: Character, depth = 0): number {
   if (depth > 10) return 0;
-  const share = econ(game).vassal_levy_share ?? 0.35;
+  const share = (econ(game).vassal_levy_share ?? 0.35) * Math.max(0, 1 + stat(game, c, 'vassal_levy_mult'));
   let sum = domainLevy(game, c) + stat(game, c, 'levy_flat');
   for (const v of game.vassalsOf(c.id)) if (!inRevolt(game, v.id, c.id)) sum += realmLevy(game, v, depth + 1) * share;
   return Math.round(sum);

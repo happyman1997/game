@@ -9,6 +9,8 @@ factions:
     can_join:
       is_vassal: yes
       is_imprisoned: no
+      # сюзерен держит вассала сильным крюком — тот не посмеет
+      NOT: { scope:liege: { has_strong_hook_on: root } }
     ai_join:
       value: -10
       add:
@@ -37,6 +39,7 @@ factions:
     can_join:
       is_vassal: yes
       is_imprisoned: no
+      NOT: { scope:liege: { has_strong_hook_on: root } }
     ai_join:
       value: -20
       add:

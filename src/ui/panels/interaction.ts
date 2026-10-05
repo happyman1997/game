@@ -4,7 +4,9 @@ import type { ScopeRef } from '../../engine/types';
 import { ageOf, charFullName } from '../../engine/world/characters';
 import {
   acceptance,
+  deciderOf,
   executeInteraction,
+  hookAvailable,
   interactionBlockers,
   interactionContext,
   interactionCost,
@@ -21,6 +23,7 @@ export function openInteraction(app: App, def: InteractionDef, actorId: string, 
   const g = app.game!;
   let secondary: string | undefined;
   let target: ScopeRef | undefined;
+  let useHook = false;
   const body = h('div', { class: 'interaction' });
   let close: () => void = () => {};
 
@@ -61,7 +64,7 @@ export function openInteraction(app: App, def: InteractionDef, actorId: string, 
       }
       body.append(list);
     }
-    const args = { secondary, target };
+    const args = { secondary, target, useHook };
     const ctx = interactionContext(g, def, actor, recipient, args);
     const cost = interactionCost(g, def, ctx);
     body.append(h('div', { class: 'ia-cost' }, `${app.t('ui.cost')}: ${costText(app, cost)}`));
@@ -73,6 +76,12 @@ export function openInteraction(app: App, def: InteractionDef, actorId: string, 
         const sctx = schemeContext(g, tmp);
         body.append(h('div', { class: 'ia-effects', html: `<div class="tip-title">${esc(app.t('ui.on_success'))}</div>${descLinesHtml(describeEffect(sctx, sctx.root, sdef?.on_success))}` }));
       } else {
+        if (hookAvailable(g, def, actor, recipient)) {
+          const decider = deciderOf(g, def, recipient);
+          const strong = !!actor.hooks.find((x) => x.target === decider.id)?.strong;
+          const box = h('input', { type: 'checkbox', checked: useHook, onchange: () => { useHook = !useHook; render(); } });
+          body.append(h('label', { class: 'hook-toggle' }, box, ` 🪝 ${app.t('ui.use_hook', { kind: app.t(strong ? 'ui.hook_strong' : 'ui.hook_weak') })}`));
+        }
         const acc = acceptance(g, def, actor, recipient, args);
         if (!acc.auto) {
           body.append(h('div', { class: ['ia-accept', acc.total > 0 ? 'good' : 'bad'] },

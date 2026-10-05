@@ -115,6 +115,8 @@ defines:
     marriage_chance: 0.5
     gold_reserve: 60
     build_chance: 0.3
+    use_hook_min_will: 30          # ИИ давит крюком, только если очень хочет
+    use_hook_on_player_min_will: 60
 
   opinion:
     same_culture: 5
@@ -200,7 +202,23 @@ defines:
     ai_gold_reserve: 60
     ai_disband_below_gold: -30
 
-  # Механики движка, которые нужно отключить (lifestyles, council, prison, factions, regiments).
+  knights:
+    cap_by_tier: [0, 3, 5, 8, 12]
+    power_per_prowess: 8            # рыцарь с доблестью 12 стоит ~100 ополченцев
+    loser_death_chance: 0.04
+    loser_wound_chance: 0.12
+    winner_death_chance: 0.01
+    winner_wound_chance: 0.05
+    wound_trait: wounded
+    prestige_per_battle: 10
+
+  hooks:
+    strong_hook_cooldown_years: 5   # сильный крюк можно использовать не чаще
+
+  secrets:
+    max_known_per_secret: 12
+
+  # Механики движка, которые нужно отключить (lifestyles, council, prison, factions, regiments, secrets, laws, knights).
   disabled_features: []
 
   # Характеристики, доступные в скриптах как значения (gold, age и навыки — встроены).

@@ -3,6 +3,7 @@ import { armiesOf, canRaiseArmy, commanderOf, daysToNext, disbandArmy, hostileWa
 import { alliesOf } from '../../engine/world/war';
 import type { App } from '../app';
 import { armyRegimentsBlock, renderRegimentsSection } from './regiments';
+import { renderKnightsSection } from './knights';
 import { fmt, h } from '../dom';
 import { bar, button, charLink, provLink, section } from '../widgets';
 
@@ -28,6 +29,8 @@ export function renderMilitaryPanel(app: App): HTMLElement {
     const regs = renderRegimentsSection(app, p);
     if (regs) root.append(regs);
   }
+  const knights = renderKnightsSection(app, p);
+  if (knights) root.append(knights);
   const armies = armiesOf(g, p.id);
   if (armies.length) {
     root.append(section(app.t('ui.armies'), ...armies.map((a) => h('div', { class: 'army-card', onclick: () => { app.selectArmy(a.id); app.map.focus(a.location); } },

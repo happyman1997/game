@@ -69,8 +69,34 @@ ui:
   dismiss_regiment: Disband
   no_regiments: No regiments.
   army_regiments: Regiments in the army
+  secrets: Secrets
+  my_secrets: My secrets
+  known_secrets: Secrets you know
+  hooks: Hooks
+  my_hooks: Your hooks
+  hooks_on_me: Hooks on you
+  hook_strong: strong
+  hook_weak: weak
+  hook_cooldown: "usable again in {days} days"
+  secret_known_by_n: "known by: {n}"
+  use_hook: "Use your {kind} hook — they must agree"
+  you_have_hook: "You have a {kind} hook on this character"
+  has_hook_on_you: "This character has a {kind} hook on you"
+  no_secrets: No secrets.
+  realm_laws: Realm Laws
+  law_current: This law is already in force
+  law_one_step: A law can only be changed one step at a time
+  change_law_to: "Enact: {law}"
+  knights: Knights
+  knights_hint: "Your most valiant courtiers and vassals march with your main army. Right now they are worth {n} levies. Knights get wounded and die in battle."
+  no_knights: No suitable knights (prowess 6+ required).
   council_hint: Councillors strengthen the ruler depending on their skills and the chosen task.
 msg:
+  law_changed: "{who} enacts the law: {law}"
+  secret_learned: "You learned a secret — {secret}: {who}"
+  secret_known_by: "{who} has learned your secret: {secret}"
+  secret_exposed: "Secret exposed — {secret}: {who} (exposed by {by})"
+  hook_used_on_you: "{who} used a hook on you — you had to agree: {what}"
   faction_created: "{who} founds the {faction} against {liege}"
   faction_demands_accepted: "{liege} yields to the demands of the {faction}"
   faction_ready: Your faction is ready to send an ultimatum to your liege (Realm tab).
@@ -82,6 +108,10 @@ msg:
   perk_gained: "Perk unlocked: “{perk}”"
   perk_available: "A new perk can be unlocked ({lifestyle}) — see the Lifestyle tab."
 tr:
+  has_realm_law: "Requires law: {value}"
+  knows_secret_of: You must know a secret of this character
+  has_hook_on: Requires a hook on this character
+  has_strong_hook_on: Requires a strong hook on this character
   is_in_faction: Must be in a faction
   is_in_faction.not: Must not be in a faction
   is_imprisoned: Must be imprisoned
@@ -94,6 +124,10 @@ tr:
   has_focus: "Requires focus: {value}"
   has_lifestyle: "Requires lifestyle: {value}"
 fx:
+  set_realm_law: "Law: {value}"
+  discover_secret: Learn someone's secret
+  expose_secret: "Exposure: {who} — {secret}"
+  add_strong_hook: "Strong hook on {value}"
   add_regiment: "Regiment: {value}"
   faction_enforce_demands: "The demands of the {faction} will be met"
   faction_start_war: "The {faction} will revolt"
@@ -110,3 +144,18 @@ opinion:
 ai:
   scheme_power: Scheme power
   target_scheme_defense: Target's defenses
+alert:
+  perk_available: "A new perk can be unlocked ({lifestyle})"
+  council_vacant: "Empty council seats: {list}"
+  title_creatable: "You can create a title: {list}"
+  faction_threat: "A faction against you is growing stronger (discontent {n}%)"
+  faction_ready: Your faction is ready to send an ultimatum
+  no_heir: "You have no heir! If you die, the game is over"
+  unmarried: You are unmarried — think of heirs and alliances
+  debt: "The treasury is empty: debt drains prestige"
+  over_domain: "Your domain exceeds the limit ({n} of {limit}) — taxes suffer"
+  occupied: "The enemy holds your counties: {n}"
+  schemes_against: "Plots against you uncovered: {n}"
+  prisoners: "Prisoners in your dungeon: {n}"
+  imprisoned: "You are imprisoned by {jailer}"
+  can_recruit: You can recruit a men-at-arms regiment

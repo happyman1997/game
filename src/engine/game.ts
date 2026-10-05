@@ -22,6 +22,8 @@ export class Game {
   private rulersCache: Character[] | null = null;
   private byLiege: Map<string, Character[]> | null = null;
   readonly statCache = new Map<string, Record<string, number>>();
+  /** Кэш на день (сбрасывается каждый тик): для производных данных механик. */
+  readonly dayCache = new Map<string, unknown>();
   /** Кэш на месяц (сбрасывается 1-го числа): для дорогих производных данных механик. */
   readonly monthCache = new Map<string, unknown>();
   private reportedErrors = new Set<string>();
@@ -319,6 +321,7 @@ export class Game {
     if (this.state.gameOver) return;
     this.state.date += 1;
     this.statCache.clear();
+    this.dayCache.clear();
     const { d, m } = dateParts(this.state.date);
     const systems = this.engine.orderedSystems();
     for (const s of systems) this.runSystem(s.id, () => s.onDay?.(this));
@@ -339,6 +342,14 @@ export class Game {
       console.error(`Ошибка в системе ${id}:`, e);
       this.scriptError(`Система ${id}: ${e?.message ?? e}`);
     }
+  }
+
+  /** Значение из дневного кэша (или вычислить и запомнить). */
+  cachedDaily<T>(key: string, fn: () => T): T {
+    if (this.dayCache.has(key)) return this.dayCache.get(key) as T;
+    const v = fn();
+    this.dayCache.set(key, v);
+    return v;
   }
 
   /** Значение из помесячного кэша (или вычислить и запомнить). */

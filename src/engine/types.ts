@@ -85,6 +85,20 @@ export interface Character {
   prison?: PrisonState;
   /** Профессиональные войска (отряды). */
   regiments?: Regiment[];
+  /** Секреты персонажа (и кто о них знает). */
+  secrets?: Secret[];
+  /** Законы державы: группа законов → закон (если не задан — по умолчанию группы). */
+  laws?: Record<string, string>;
+}
+
+export interface Secret {
+  id: string;
+  type: string;
+  /** Второй участник: жертва убийства, любовник, обворованный сюзерен… */
+  target?: string;
+  /** Кто знает секрет (кроме владельца). */
+  known: string[];
+  since: number;
 }
 
 export interface LifestyleState {

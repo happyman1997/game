@@ -1,5 +1,6 @@
 import { schemeMonthlyProgress, schemeSuccessChance, endScheme } from '../../engine/world/schemes';
 import { prisonersOf, ransomCost } from '../../engine/features/prison';
+import { secretsIntrigueSections } from './secrets';
 import type { App } from '../app';
 import { fmt, h } from '../dom';
 import { bar, button, charLink, portrait, section } from '../widgets';
@@ -23,6 +24,7 @@ export function renderIntriguePanel(app: App): HTMLElement {
   if (against.length) {
     root.append(section(app.t('ui.schemes_against'), ...against.map((s) => h('div', { class: 'scheme-card bad' }, `${g.nameOf('schemes', s.type)}: `, charLink(app, s.owner, true), ` (${Math.floor(s.progress)}%)`))));
   }
+  root.append(...secretsIntrigueSections(app));
   if (g.engine.systems.has('prison')) {
     const prisoners = prisonersOf(g, p.id);
     if (prisoners.length) {

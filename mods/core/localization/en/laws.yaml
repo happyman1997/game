@@ -1,0 +1,20 @@
+law_group:
+  crown_authority: Crown Authority
+law_group_desc:
+  crown_authority: How strong the ruler's power over the vassals is. The higher it is, the more taxes and troops the vassals provide — and the less they like it.
+realm_law:
+  crown_authority_0: Autonomous Vassals
+  crown_authority_1: Limited Authority
+  crown_authority_2: High Authority
+  crown_authority_3: Absolute Authority
+realm_law_desc:
+  crown_authority_0: The vassals are nearly independent. They are content but pay less and send fewer troops.
+  crown_authority_1: The usual order. The ruler may revoke titles, but it is considered tyranny.
+  crown_authority_2: The vassals pay more and send more troops, though they grumble.
+  crown_authority_3: The ruler's word is law. Revoking titles is not considered tyranny.
+stat:
+  vassal_tax_mult: Vassal taxes
+  vassal_levy_mult: Vassal levies
+ui:
+  law_needs_loyal_vassals: Too many discontented vassals
+  revoke_needs_authority: Requires at least Limited crown authority or a lawful reason

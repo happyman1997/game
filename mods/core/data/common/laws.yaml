@@ -1,0 +1,65 @@
+# Законы державы. Группа (law_groups) — набор законов, упорядоченных по level;
+# менять можно на одну ступень за раз, не чаще cooldown_years.
+# Уровень закона доступен в скриптах как значение <группа>_level
+# (crown_authority_level: 0..3) — им проверяются права правителя.
+law_groups:
+  crown_authority:
+    icon: "👑"
+    order: 1
+    default: crown_authority_1
+    cooldown_years: 5
+    is_shown: { tier: ">= duchy" }
+
+realm_laws:
+  crown_authority_0:
+    group: crown_authority
+    level: 0
+    icon: "🕊"
+    modifiers: { vassal_tax_mult: -0.25, vassal_levy_mult: -0.25, vassal_opinion: 10 }
+    change_cost: { prestige: 100 }
+    ai_will_do: 0
+  crown_authority_1:
+    group: crown_authority
+    level: 1
+    icon: "⚖"
+    change_cost: { prestige: 200 }
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { crown_authority_level: 2, any_vassal: { count: ">= 3", opinion: { target: root, value: "< -10" } } }
+          add: 15
+  crown_authority_2:
+    group: crown_authority
+    level: 2
+    icon: "🏛"
+    modifiers: { vassal_tax_mult: 0.25, vassal_levy_mult: 0.25, vassal_opinion: -5 }
+    change_cost: { prestige: { value: 300, add: { value: tier, multiply: 100 } } }
+    can_change:
+      custom_tooltip:
+        text: ui.law_needs_loyal_vassals
+        trigger:
+          NOT: { any_vassal: { count: ">= 2", opinion: { target: root, value: "< -20" } } }
+    ai_will_do:
+      value: 6
+      if:
+        - limit: { has_trait: [ambitious, arbitrary, wrathful] }
+          add: 8
+        - limit: { prestige: ">= 1000" }
+          add: 6
+  crown_authority_3:
+    group: crown_authority
+    level: 3
+    icon: "👑"
+    modifiers: { vassal_tax_mult: 0.5, vassal_levy_mult: 0.5, vassal_opinion: -15 }
+    change_cost: { prestige: { value: 600, add: { value: tier, multiply: 150 } } }
+    can_change:
+      tier: ">= kingdom"
+      custom_tooltip:
+        text: ui.law_needs_loyal_vassals
+        trigger:
+          NOT: { any_vassal: { count: ">= 2", opinion: { target: root, value: "< 0" } } }
+    ai_will_do:
+      value: 3
+      if:
+        - limit: { has_trait: [ambitious, arbitrary] }
+          add: 5

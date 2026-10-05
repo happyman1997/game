@@ -107,3 +107,12 @@ regiment_types:
     can_recruit: { culture: welsh }
     ai_will_do: 60
 
+
+# Кто может служить рыцарем (root — кандидат, scope:liege — правитель).
+scripted_triggers:
+  knight_candidate:
+    is_adult: yes
+    is_imprisoned: no
+    is_female: no
+    prowess: ">= 6"
+    NOT: { has_trait: maimed }

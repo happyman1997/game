@@ -61,7 +61,7 @@ modifiers:
   hunting_trophy: { icon: "🦌", modifiers: { monthly_prestige: 0.3, prowess: 1 }, good: true }
   inspired: { icon: "✨", modifiers: { learning: 2, stewardship: 1 }, good: true }
   heartbroken: { icon: "💔", modifiers: { diplomacy: -2, stress_gain_mult: 0.2 } }
-  norman_host: { icon: "⚓", modifiers: { levy_flat: 5500, martial: 2, commander_advantage: 10 }, good: true }
+  norman_host: { icon: "⚓", modifiers: { levy_flat: 7500, martial: 2, commander_advantage: 10 }, good: true }
   royal_coronation: { icon: "👑", modifiers: { vassal_opinion: 10, monthly_prestige: 1 }, good: true }
   emergency_taxes: { icon: "🪙", modifiers: { vassal_opinion: -15 } }
   well_advised: { icon: "📜", modifiers: { stewardship: 2, diplomacy: 1 }, good: true }

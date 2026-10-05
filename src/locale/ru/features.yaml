@@ -69,8 +69,34 @@ ui:
   dismiss_regiment: Распустить
   no_regiments: Отрядов нет.
   army_regiments: Отряды в армии
+  secrets: Секреты
+  my_secrets: Мои секреты
+  known_secrets: Известные вам секреты
+  hooks: Крюки
+  my_hooks: Ваши крюки
+  hooks_on_me: Крюки на вас
+  hook_strong: сильный
+  hook_weak: слабый
+  hook_cooldown: "можно использовать через {days} дн."
+  secret_known_by_n: "знают: {n}"
+  use_hook: "Использовать крюк ({kind}) — согласие обязательно"
+  you_have_hook: "У вас {kind} крюк на этого персонажа"
+  has_hook_on_you: "У этого персонажа {kind} крюк на вас"
+  no_secrets: Секретов нет.
+  realm_laws: Законы державы
+  law_current: Этот закон уже действует
+  law_one_step: Закон меняется только на одну ступень за раз
+  change_law_to: "Ввести: {law}"
+  knights: Рыцари
+  knights_hint: "Самые доблестные придворные и вассалы идут с вашей главной армией. Сейчас они стоят {n} ополченцев. В бою рыцари получают раны и гибнут."
+  no_knights: Нет подходящих рыцарей (нужна доблесть от 6).
   council_hint: Советники усиливают правителя в зависимости от своих навыков и выбранной задачи.
 msg:
+  law_changed: "{who} вводит закон: «{law}»"
+  secret_learned: "Вы узнали секрет «{secret}»: {who}"
+  secret_known_by: "{who} узнаёт ваш секрет: {secret}"
+  secret_exposed: "Разоблачён секрет «{secret}»: {who} (раскрыл: {by})"
+  hook_used_on_you: "{who} давит на вас крюком — вам пришлось согласиться: {what}"
   faction_created: "{who} основывает «{faction}» против {liege}"
   faction_demands_accepted: "{liege} уступает требованиям: «{faction}»"
   faction_ready: Ваша фракция готова предъявить ультиматум сюзерену (вкладка «Владения»).
@@ -82,6 +108,10 @@ msg:
   perk_gained: "Открыт перк «{perk}»"
   perk_available: "Можно открыть новый перк ({lifestyle}) — загляните во вкладку «Образ жизни»."
 tr:
+  has_realm_law: "Нужен закон: {value}"
+  knows_secret_of: Нужно знать секрет этого персонажа
+  has_hook_on: Нужен крюк на этого персонажа
+  has_strong_hook_on: Нужен сильный крюк на этого персонажа
   is_in_faction: Должен состоять во фракции
   is_in_faction.not: Не должен состоять во фракции
   is_imprisoned: Должен быть в темнице
@@ -94,6 +124,10 @@ tr:
   has_focus: "Нужен фокус: {value}"
   has_lifestyle: "Нужен образ жизни: {value}"
 fx:
+  set_realm_law: "Закон: {value}"
+  discover_secret: Узнать чей-то секрет
+  expose_secret: "Разоблачение: {who} — «{secret}»"
+  add_strong_hook: "Сильный крюк на {value}"
   add_regiment: "Отряд: {value}"
   faction_enforce_demands: "Требования фракции «{faction}» будут выполнены"
   faction_start_war: "Фракция «{faction}» поднимет мятеж"
@@ -110,3 +144,18 @@ opinion:
 ai:
   scheme_power: Сила интриг
   target_scheme_defense: Защита цели
+alert:
+  perk_available: "Можно открыть новый перк ({lifestyle})"
+  council_vacant: "Пустые места в совете: {list}"
+  title_creatable: "Можно создать титул: {list}"
+  faction_threat: "Фракция против вас набирает силу (недовольство {n}%)"
+  faction_ready: Ваша фракция готова предъявить ультиматум
+  no_heir: "У вас нет наследника! Если вы умрёте, игра закончится"
+  unmarried: Вы не состоите в браке — подумайте о наследниках и союзах
+  debt: "Казна пуста: долги снижают престиж"
+  over_domain: "Домен больше лимита ({n} из {limit}) — налоги падают"
+  occupied: "Враг занял ваших графств: {n}"
+  schemes_against: "Раскрыты интриги против вас: {n}"
+  prisoners: "В вашей темнице пленников: {n}"
+  imprisoned: "Вы в темнице у {jailer}"
+  can_recruit: Можно нанять профессиональный отряд

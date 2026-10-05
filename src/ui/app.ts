@@ -31,6 +31,7 @@ import { renderIntriguePanel } from './panels/intrigue';
 import { renderDecisionsPanel } from './panels/decisions';
 import { renderRealmPanel } from './panels/realm';
 import { renderLifestylePanel } from './panels/lifestyle';
+import { invalidateAlerts, registerBuiltinAlerts, renderAlerts } from './alerts';
 import { renderLogPanel } from './panels/log';
 import { breakdownHtml, button, charLink, portrait, titleCoa } from './widgets';
 import { exportSave, openLoadDialog, openSaveDialog, quickSaveSlot, writeSave } from './screens/saves';
@@ -126,6 +127,7 @@ export class App implements MapHost {
       onProgress: (m) => this.showLoading(m),
     });
     registerBuiltinMapModes(this.engine);
+    registerBuiltinAlerts(this.engine);
     this.engine.hooks.onError = (err, hook, owner) => {
       console.error(err);
       this.engine?.reportIssue({ level: 'error', mod: owner, message: `Хук ${hook}: ${(err as Error)?.message ?? err}` });
@@ -242,7 +244,10 @@ export class App implements MapHost {
 
   markDirty(now = false) {
     this.dirty = true;
-    if (now) this.lastRender = 0;
+    if (now) {
+      this.lastRender = 0;
+      invalidateAlerts();
+    }
   }
 
   private blockingPending(): boolean {
@@ -537,7 +542,7 @@ export class App implements MapHost {
       ),
       button('☰', () => this.openGameMenu(), { cls: 'menu-btn', tip: this.t('ui.menu') }),
     );
-    this.topBar.append(left, right);
+    this.topBar.append(left, p ? renderAlerts(this) : h('div'), right);
   }
 
   private tabs(): { id: string; icon: string; name: string }[] {

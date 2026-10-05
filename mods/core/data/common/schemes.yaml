@@ -39,6 +39,7 @@ schemes:
           every_close_family:
             limit: { is_adult: yes }
             add_opinion: { target: scope:owner, modifier: murdered_relative }
+      - scope:owner: { add_secret: { type: secret_murder, target: scope:target } }
       - scope:target: { death: { reason: murder, killer: scope:owner } }
     on_failure:
       - scope:owner:
@@ -122,6 +123,13 @@ schemes:
     on_success:
       - scope:owner: { add_opinion: { target: scope:target, modifier: lover }, add_stress: -20 }
       - scope:target: { add_opinion: { target: scope:owner, modifier: lover } }
+      - if:
+          limit:
+            OR:
+              - scope:owner: { is_married: yes }
+              - scope:target: { is_married: yes }
+          scope:owner: { add_secret: { type: secret_lover, target: scope:target } }
+          scope:target: { add_secret: { type: secret_lover, target: scope:owner } }
       - scope:owner:
           send_message: { text: msg.seduce_success, kind: good }
           if:

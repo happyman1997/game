@@ -12,6 +12,7 @@ import { esc, fmt, h, signed } from '../dom';
 import { breakdownHtml, button, charLink, costText, reasonsHtml, section, titleCoa, titleLink } from '../widgets';
 import { titleActions } from './province';
 import { renderCouncilSection } from './council';
+import { renderLawsSection } from './laws';
 import { renderFactionsSection } from './factions';
 
 export function renderRealmPanel(app: App): HTMLElement {
@@ -51,6 +52,10 @@ export function renderRealmPanel(app: App): HTMLElement {
     succ.append(h('div', { class: 'muted' }, app.t('ui.change_law')), lawBtns);
   }
   root.append(section(app.t('ui.succession'), succ));
+  if (g.engine.hasFeature('laws')) {
+    const laws = renderLawsSection(app, p);
+    if (laws) root.append(laws);
+  }
   if (g.engine.systems.has('council')) {
     const council = renderCouncilSection(app, p);
     if (council) root.append(council);

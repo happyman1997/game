@@ -8,6 +8,7 @@ import type { Character, ScopeRef } from '../types';
 import { isAlive } from './characters';
 import { startScheme } from './schemes';
 import { costBlockers } from './economy';
+import { canUseHook, useHook } from './hooks';
 
 /**
  * Взаимодействия персонажей (брак, подарок, вассалитет, интриги...).
@@ -33,6 +34,8 @@ export interface InteractionDecider {
 export interface InteractionArgs {
   secondary?: string;
   target?: ScopeRef;
+  /** Использовать крюк на решающего — он обязан согласиться. */
+  useHook?: boolean;
 }
 
 export function interactionContext(game: Game, def: InteractionDef, actor: Character, recipient: Character, args: InteractionArgs = {}): ScriptContext {
@@ -140,8 +143,16 @@ export function interactionBlockers(game: Game, def: InteractionDef, actor: Char
   return out;
 }
 
-export function isAutoAccept(game: Game, def: InteractionDef, ctx: ScriptContext, actor: Character, recipient: Character): boolean {
+/** Можно ли в этом взаимодействии надавить крюком на решающего. */
+export function hookAvailable(game: Game, def: InteractionDef, actor: Character, recipient: Character): boolean {
+  if (def.scheme || def.hookable === false || def.ai_accept == null) return false;
+  const decider = deciderOf(game, def, recipient);
+  return decider.id !== actor.id && canUseHook(game, actor, decider.id);
+}
+
+export function isAutoAccept(game: Game, def: InteractionDef, ctx: ScriptContext, actor: Character, recipient: Character, args: InteractionArgs = {}): boolean {
   if (def.scheme) return true;
+  if (args.useHook && hookAvailable(game, def, actor, recipient)) return true;
   if (actor.id === recipient.id || ctx.scopes.decider?.id === actor.id) return true;
   if (def.auto_accept === true || def.auto_accept === 'yes') return true;
   if (def.auto_accept && typeof def.auto_accept === 'object') return evalTrigger(ctx, ctx.root, def.auto_accept);
@@ -150,7 +161,7 @@ export function isAutoAccept(game: Game, def: InteractionDef, ctx: ScriptContext
 
 export function acceptance(game: Game, def: InteractionDef, actor: Character, recipient: Character, args: InteractionArgs = {}) {
   const ctx = interactionContext(game, def, actor, recipient, args);
-  if (isAutoAccept(game, def, ctx, actor, recipient)) return { auto: true, total: 1, parts: [] as { label: string; value: number }[] };
+  if (isAutoAccept(game, def, ctx, actor, recipient, args)) return { auto: true, total: 1, parts: [] as { label: string; value: number }[] };
   const parts: { label: string; value: number }[] = [];
   const total = evalValue(ctx, ctx.scopes.decider, def.ai_accept, parts);
   return { auto: false, total, parts };
@@ -174,7 +185,14 @@ export function executeInteraction(game: Game, def: InteractionDef, actor: Chara
     if (s) runEffect(ctx, ctx.root, def.on_accept);
     return s ? 'scheme' : 'invalid';
   }
-  if (isAutoAccept(game, def, ctx, actor, recipient)) {
+  if (isAutoAccept(game, def, ctx, actor, recipient, args)) {
+    if (args.useHook && hookAvailable(game, def, actor, recipient)) {
+      const decider = deciderOf(game, def, recipient);
+      useHook(game, actor, decider.id);
+      if (game.isPlayer(decider.id)) {
+        game.message(game.loc.t('msg.hook_used_on_you', { who: game.scopeName({ type: 'character', id: actor.id }), what: game.nameOf('interactions', def.id) }), 'bad', { type: 'character', id: actor.id });
+      }
+    }
     runEffect(ctx, ctx.root, def.on_accept);
     game.emit('interaction', { interaction: def.id, actor: actor.id, recipient: recipient.id, accepted: true });
     return 'accepted';

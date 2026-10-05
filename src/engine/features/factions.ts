@@ -23,6 +23,7 @@ import { evalTrigger, evalValue, resolveScope, runEffect } from '../script/inter
 import type { Character, Faction, ScopeRef } from '../types';
 import { isAdult, isAlive } from '../world/characters';
 import { realmLevy } from '../world/economy';
+import { stat } from '../world/stats';
 import { domainCounties, primaryTier, realmCounties, transferTitle } from '../world/titles';
 import { setLiege } from '../world/characters';
 import { declareWar, isAtWar, isAtWarWith } from '../world/war';
@@ -106,7 +107,7 @@ export function aiJoinScore(game: Game, c: Character, def: FactionDef, liege: Ch
 export function factionPower(game: Game, f: Faction): number {
   const liege = game.char(f.target);
   if (!liege) return 0;
-  const share = game.defines.economy?.vassal_levy_share ?? 0.35;
+  const share = (game.defines.economy?.vassal_levy_share ?? 0.35) * Math.max(0, 1 + stat(game, liege, 'vassal_levy_mult'));
   let members = 0;
   for (const id of f.members) {
     const m = game.char(id);

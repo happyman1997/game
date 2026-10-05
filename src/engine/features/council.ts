@@ -230,9 +230,11 @@ export function monthlyCouncil(game: Game): void {
         }
       }
     }
-    // ежемесячные эффекты задач
+    // ежемесячные эффекты задач и «пульс» советников для событий
     for (const [posId, seat] of Object.entries(liege.council ?? {})) {
-      if (!seat.holder || !seat.task) continue;
+      if (!seat.holder) continue;
+      game.onAction('on_councillor_pulse', { type: 'character', id: seat.holder }, { liege: { type: 'character', id: liege.id } });
+      if (!seat.task) continue;
       const t = game.content.get<CouncilTaskDef>('council_tasks', seat.task);
       if (!t?.monthly_effect) continue;
       if (game.rng.next() * 100 >= taskMonthlyChance(game, liege, posId)) continue;

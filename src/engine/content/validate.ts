@@ -35,6 +35,48 @@ export class ScriptValidator {
     }
   }
 
+  /** Аргументы-ссылки на контент: has_trait: brave → traits/brave должна существовать. */
+  private static readonly ARG_REFS: Record<string, { type: string; field?: string }> = {
+    has_trait: { type: 'traits' },
+    add_trait: { type: 'traits' },
+    remove_trait: { type: 'traits' },
+    has_modifier: { type: 'modifiers' },
+    add_modifier: { type: 'modifiers', field: 'id' },
+    remove_modifier: { type: 'modifiers' },
+    add_province_modifier: { type: 'modifiers', field: 'id' },
+    add_opinion: { type: 'opinion_modifiers', field: 'modifier' },
+    reverse_add_opinion: { type: 'opinion_modifiers', field: 'modifier' },
+    has_building: { type: 'buildings' },
+    add_building: { type: 'buildings' },
+    culture: { type: 'cultures' },
+    faith: { type: 'faiths' },
+    change_culture: { type: 'cultures' },
+    change_faith: { type: 'faiths' },
+    set_succession_law: { type: 'succession_laws' },
+    has_perk: { type: 'perks' },
+    add_perk: { type: 'perks' },
+    has_focus: { type: 'focuses' },
+    set_focus: { type: 'focuses' },
+    has_secret: { type: 'secret_types' },
+    has_realm_law: { type: 'realm_laws' },
+    set_realm_law: { type: 'realm_laws' },
+    add_regiment: { type: 'regiment_types' },
+    has_regiment: { type: 'regiment_types' },
+  };
+
+  private checkArgRefs(key: string, arg: unknown, where: string) {
+    const spec = ScriptValidator.ARG_REFS[key];
+    if (!spec) return;
+    let vals: unknown[] = [];
+    if (spec.field && isPlainObject(arg)) vals = [arg[spec.field]];
+    else vals = Array.isArray(arg) ? arg : [arg];
+    for (const x of vals) {
+      if (typeof x !== 'string' || x === 'yes' || x === 'no' || /[:.]/.test(x)) continue;
+      if (spec.type === 'opinion_modifiers' && x === 'generic') continue;
+      if (!this.engine.content.has(spec.type, x)) this.warn(where, `${key}: нет ${spec.type}/${x}`);
+    }
+  }
+
   private warn(where: string, msg: string) {
     const mods = this.engine.content.provenance.get(where.split(' ')[0]) ?? [];
     this.issues.push({ level: 'warning', mod: mods[mods.length - 1], message: `${where}: ${msg}` });
@@ -91,7 +133,10 @@ export class ScriptValidator {
         }
         continue;
       }
-      if (r.triggers.has(k) || this.engine.content.has('scripted_triggers', k)) continue;
+      if (r.triggers.has(k) || this.engine.content.has('scripted_triggers', k)) {
+        this.checkArgRefs(k, v, where);
+        continue;
+      }
       if (this.isValueKey(k)) continue;
       if (this.isPathKey(k)) {
         if (isPlainObject(v) || Array.isArray(v)) this.trigger(v, where);
@@ -168,7 +213,10 @@ export class ScriptValidator {
         }
         continue;
       }
-      if (r.effects.has(k) || this.engine.content.has('scripted_effects', k)) continue;
+      if (r.effects.has(k) || this.engine.content.has('scripted_effects', k)) {
+        this.checkArgRefs(k, v, where);
+        continue;
+      }
       if (this.isPathKey(k)) {
         this.effect(v, where);
         continue;

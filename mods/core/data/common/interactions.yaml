@@ -150,6 +150,14 @@ interactions:
     category: realm
     is_shown:
       scope:recipient: { is_vassal_of: scope:actor }
+    # Отзыв титулов — право сильной короны (или законный повод — преступление вассала).
+    is_valid:
+      custom_tooltip:
+        text: ui.revoke_needs_authority
+        trigger:
+          OR:
+            - crown_authority_level: ">= 1"
+            - has_imprisonment_reason: scope:recipient
     cost: { prestige: 100 }
     target:
       provider: revocable_titles
@@ -158,9 +166,17 @@ interactions:
     on_accept:
       - take_title: { title: scope:target }
       - scope:recipient: { add_opinion: { target: scope:actor, modifier: revoked_title } }
-      - every_vassal:
-          limit: { NOT: { is_same_as: scope:recipient } }
-          add_opinion: { target: scope:actor, modifier: tyranny }
+      - if:
+          limit:
+            NOR:
+              - has_imprisonment_reason: scope:recipient
+              - crown_authority_level: ">= 3"
+          custom_tooltip:
+            text: ui.tyranny_tooltip
+            effect:
+              every_vassal:
+                limit: { NOT: { is_same_as: scope:recipient } }
+                add_opinion: { target: scope:actor, modifier: tyranny }
 
   release_vassal:
     icon: "🕊"

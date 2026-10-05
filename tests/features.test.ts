@@ -180,3 +180,84 @@ describe('все механики выключены', () => {
     expect(g.living().some((c) => c.regiments?.length || c.lifestyle?.focus || c.council)).toBe(false);
   });
 });
+
+describe('секреты и крюки', () => {
+  it('секрет узнают, шантажом получают крюк, крюк заставляет согласиться', async () => {
+    const { addSecret, learnSecret, knownSecretsOf, exposeSecret } = await import('../src/engine/features/secrets');
+    const { executeInteraction, acceptance } = await import('../src/engine/world/interactions');
+    const { hookOn } = await import('../src/engine/world/hooks');
+    const g = newGame();
+    const w = g.char('william')!;
+    const h = g.char('harold')!;
+    const s = addSecret(g, h, 'secret_murder', 'tostig')!;
+    expect(s).toBeTruthy();
+    learnSecret(g, w, h, s);
+    expect(knownSecretsOf(g, h, w.id)).toHaveLength(1);
+    const bm = g.content.get('interactions', 'blackmail')!;
+    expect(executeInteraction(g, bm as any, w, h)).toBe('accepted');
+    expect(hookOn(g, w, h.id)?.strong).toBe(true);
+    // крюк делает несогласного согласным
+    const vas = g.content.get('interactions', 'offer_vassalization')! as any;
+    const plain = acceptance(g, vas, w, h);
+    const forced = acceptance(g, vas, w, h, { useHook: true });
+    expect(forced.auto).toBe(true);
+    expect(plain.auto).toBe(false);
+    // разоблачение убирает секрет и даёт сюзерену повод (у Гарольда сюзерена нет — просто престиж)
+    const before = h.prestige;
+    expect(exposeSecret(g, w, h)).toBe(true);
+    expect(h.secrets).toHaveLength(0);
+    expect(h.prestige).toBeLessThan(before);
+  });
+
+  it('сильный крюк сюзерена не даёт вассалу вступить во фракцию', async () => {
+    const { addHook } = await import('../src/engine/world/hooks');
+    const { canJoinFaction } = await import('../src/engine/features/factions');
+    const g = newGame();
+    const h = g.char('harold')!;
+    const v = g.vassalsOf(h.id)[0];
+    const def = g.content.get('factions', 'independence_faction') as any;
+    expect(canJoinFaction(g, v, def, h)).toBe(true);
+    addHook(g, h, v, { strong: true });
+    expect(canJoinFaction(g, v, def, h)).toBe(false);
+  });
+});
+
+describe('законы державы', () => {
+  it('власть короны меняет налоги вассалов и право отзыва титулов', async () => {
+    const { changeLaw, currentLaw, lawChangeBlockers } = await import('../src/engine/features/laws');
+    const { incomeBreakdown } = await import('../src/engine/world/economy');
+    const { interactionBlockers } = await import('../src/engine/world/interactions');
+    const g = newGame();
+    const h = g.char('harold')!;
+    expect(currentLaw(g, h, 'crown_authority')?.id).toBe('crown_authority_1');
+    const vassalTax = () => incomeBreakdown(g, h).find((p) => p.label === g.loc.t('ui.vassal_tax'))?.value ?? 0;
+    const before = vassalTax();
+    h.prestige = 5000;
+    // через ступень нельзя
+    expect(lawChangeBlockers(g, h, g.content.get('realm_laws', 'crown_authority_3') as any).length).toBeGreaterThan(0);
+    expect(changeLaw(g, h, 'crown_authority_0')).toBe(true);
+    g.statCache.clear();
+    expect(vassalTax()).toBeLessThan(before);
+    // на автономии вассалов отзывать титулы без повода нельзя
+    const v = g.vassalsOf(h.id)[0];
+    const revoke = g.content.get('interactions', 'revoke_title') as any;
+    expect(interactionBlockers(g, revoke, h, v).length).toBeGreaterThan(0);
+    // перерыв между сменами
+    expect(changeLaw(g, h, 'crown_authority_1')).toBe(false);
+  });
+});
+
+describe('рыцари', () => {
+  it('доблестные придворные усиливают главную армию', async () => {
+    const { knightsOf, knightsPower } = await import('../src/engine/features/knights');
+    const { armyStrength } = await import('../src/engine/world/military');
+    const g = newGame();
+    const h = g.char('harold')!;
+    const ks = knightsOf(g, h);
+    expect(ks.length).toBeGreaterThan(0);
+    expect(knightsPower(g, h)).toBeGreaterThan(0);
+    const a = raiseArmy(g, h)!;
+    const regs = (a.regiments ?? []).reduce((s, r) => s + r.size, 0);
+    expect(armyStrength(g, a)).toBeGreaterThan(a.size - regs + knightsPower(g, h) - 1);
+  });
+});

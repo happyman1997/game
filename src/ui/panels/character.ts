@@ -13,6 +13,7 @@ import { breakdownHtml, button, charLink, dynastyCoa, modifiersHtml, portrait, r
 import { openInteraction } from './interaction';
 import { lifestyleSummary } from './lifestyle';
 import { councilBadge } from './council';
+import { secretsCharacterSection } from './secrets';
 import { openDeclareWar } from './wars';
 
 export function renderCharacterPanel(app: App, id: string): HTMLElement {
@@ -95,6 +96,8 @@ export function renderCharacterPanel(app: App, id: string): HTMLElement {
 
   const ls = lifestyleSummary(app, c);
   if (ls) root.append(section(app.t('ui.lifestyle'), ls));
+  const secrets = secretsCharacterSection(app, c);
+  if (secrets) root.append(secrets);
 
   // ---------------------------------------------------- действия
   if (p && alive && !app.pickMode && !g.state.gameOver) {

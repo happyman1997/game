@@ -209,6 +209,8 @@ export interface InteractionDef {
   on_decline?: ScriptBlock;
   /** Кто решает: recipient (по умолчанию), guardian — сюзерен безземельного получателя, или id из registries.interactionDeciders (payer — плательщик выкупа). */
   decider?: string;
+  /** Можно ли надавить крюком (по умолчанию — да, если есть ai_accept). */
+  hookable?: boolean;
   /** Взаимодействие с пленником: never (по умолчанию) — недоступно, only — только с пленником, allowed — с любым. */
   prisoner?: 'never' | 'only' | 'allowed';
   /** Запускает интригу этого типа вместо обычного исполнения. */

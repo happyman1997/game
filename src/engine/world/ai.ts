@@ -1,13 +1,15 @@
 import type { DecisionDef, InteractionDef, TraitDef } from '../content/defs';
 import type { Game } from '../game';
 import { evalValue } from '../script/interpreter';
-import type { Army, Character, War } from '../types';
+import type { Army, Character, ScopeRef, War } from '../types';
 import { canMarry, isAdult, isAlive } from './characters';
 import { decisionBlockers, decisionContext, domainBuildOptions, isDecisionShown, startBuilding, takeDecision } from './decisions';
 import { militaryStrength } from './economy';
 import {
   acceptance,
+  deciderOf,
   executeInteraction,
+  hookAvailable,
   interactionBlockers,
   interactionContext,
   interactionDefs,
@@ -135,6 +137,11 @@ function manageArmies(game: Game, c: Character) {
   if (!atWar) for (const a of armies) disbandArmy(game, a.id);
 }
 
+/** Сила армии для оценок ИИ (без учёта контр), кэшируется на день. */
+function cachedStrength(game: Game, a: Army): number {
+  return game.cachedDaily(`army:${a.id}`, () => armyStrength(game, a));
+}
+
 /** Ежедневно: армии ИИ выбирают цель — вражескую армию послабее или осаду. */
 export function armyAI(game: Game, a: Army): void {
   if (a.retreating) return;
@@ -157,7 +164,7 @@ export function armyAI(game: Game, a: Army): void {
       if (!es || es === side || e.retreating) continue;
       const len = game.engine.pathLength(a.location, e.location);
       if (!Number.isFinite(len) || len > 6 * 80) continue;
-      const ratio = armyStrength(game, a, [e]) / Math.max(1, armyStrength(game, e, [a]));
+      const ratio = cachedStrength(game, a) / Math.max(1, cachedStrength(game, e));
       if (ratio > 1.15) consider(e.location, 120 * Math.min(2, ratio) - (len / 80) * 8);
     }
     // Осады: цели войны в приоритете, затем любые вражеские графства
@@ -185,7 +192,7 @@ export function armyAI(game: Game, a: Army): void {
       let score = (liberation ? (isMyCapital ? 70 : 20) : tset.has(cty) ? 80 : 40) - (len / 80) * 6;
       // не лезем в провинцию, где стоит вражеская армия сильнее нас
       const danger = Object.values(game.state.armies).some(
-        (e) => e.location === cty && participantSide(w, e.owner) && participantSide(w, e.owner) !== side && armyStrength(game, e, [a]) > armyStrength(game, a, [e]) * 0.9,
+        (e) => e.location === cty && participantSide(w, e.owner) && participantSide(w, e.owner) !== side && cachedStrength(game, e) > cachedStrength(game, a) * 0.9,
       );
       if (danger) score -= 200;
       consider(cty, score);
@@ -206,14 +213,20 @@ export function armyAI(game: Game, a: Army): void {
 
 // ------------------------------------------------------------ взаимодействия
 
-function aiTargets(game: Game, c: Character, def: InteractionDef): Character[] {
+function aiTargets(game: Game, c: Character, def: InteractionDef, cache: Map<string, ScopeRef[]>): Character[] {
   const lists = def.ai_targets ? (Array.isArray(def.ai_targets) ? def.ai_targets : [def.ai_targets]) : [];
   const out = new Map<string, Character>();
   const ctx = interactionContext(game, def, c, c);
   for (const name of lists) {
     const list = game.engine.script.lists.get(name);
     if (!list) continue;
-    for (const r of list.list(ctx, ctx.root)) {
+    // Один и тот же список (соседи, вассалы…) за ход правителя считаем один раз.
+    let refs = cache.get(name);
+    if (!refs) {
+      refs = list.list(ctx, ctx.root);
+      cache.set(name, refs);
+    }
+    for (const r of refs) {
       if (r.type !== 'character') continue;
       const x = game.char(r.id);
       if (x && isAlive(x) && x.id !== c.id) out.set(x.id, x);
@@ -228,32 +241,38 @@ function aiTargets(game: Game, c: Character, def: InteractionDef): Character[] {
 function considerInteractions(game: Game, c: Character) {
   const ai = game.defines.ai ?? {};
   const defs = interactionDefs(game).filter((d) => d.ai_will_do != null && (d.ai_targets || d.self));
+  const listCache = new Map<string, ScopeRef[]>();
   for (const def of defs) {
     const freq = def.ai_frequency_months ?? 6;
     if (!game.rng.chance(1 / freq)) continue;
-    let best: { r: Character; sec?: string; target?: any; score: number } | null = null;
-    for (const r of aiTargets(game, c, def)) {
+    let best: { r: Character; sec?: string; target?: any; score: number; useHook?: boolean } | null = null;
+    for (const r of aiTargets(game, c, def, listCache)) {
       if (!isInteractionShown(game, def, c, r)) continue;
       const secs = def.secondary_actor ? secondaryCandidates(game, def, c, r).slice(0, 4).map((x) => x.id) : [undefined];
       const targs = def.target ? targetOptions(game, def, c, r).slice(0, 4) : [undefined];
       for (const sec of secs) {
         for (const t of targs) {
-          const args = { secondary: sec, target: t?.ref };
+          const args: { secondary?: string; target?: any; useHook?: boolean } = { secondary: sec, target: t?.ref };
           if (interactionBlockers(game, def, c, r, args).length) continue;
           const ctx = interactionContext(game, def, c, r, args);
           const will = evalValue(ctx, ctx.root, def.ai_will_do);
           if (will <= 0) continue;
-          // Не предлагаем то, на что заведомо откажут (кроме игрока — тот решает сам).
-          if (!game.isPlayer(r.id)) {
+          // Не предлагаем то, на что заведомо откажут (кроме игрока — тот решает сам),
+          // если только нет крюка, которым можно заставить согласиться.
+          const decider = deciderOf(game, def, r);
+          if (!game.isPlayer(decider.id)) {
             const acc = acceptance(game, def, c, r, args);
-            if (!acc.auto && acc.total <= 0) continue;
-          }
-          if (!best || will > best.score) best = { r, sec, target: t?.ref, score: will };
+            if (!acc.auto && acc.total <= 0) {
+              if (!hookAvailable(game, def, c, r) || will < (game.defines.ai?.use_hook_min_will ?? 30)) continue;
+              args.useHook = true;
+            }
+          } else if (hookAvailable(game, def, c, r) && will >= (game.defines.ai?.use_hook_on_player_min_will ?? 60)) args.useHook = true;
+          if (!best || will > best.score) best = { r, sec, target: t?.ref, score: will, useHook: args.useHook };
         }
       }
     }
     if (best && game.rng.next() * 100 < Math.min(ai.max_interaction_chance ?? 90, best.score)) {
-      executeInteraction(game, def, c, best.r, { secondary: best.sec, target: best.target });
+      executeInteraction(game, def, c, best.r, { secondary: best.sec, target: best.target, useHook: best.useHook });
     }
   }
   arrangeMarriages(game, c);
