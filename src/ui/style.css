@@ -12,6 +12,7 @@
   --warn: #e8b84a;
   --serif: 'Cormorant Garamond', 'PT Serif', Georgia, serif;
   --body: 'PT Serif', Georgia, serif;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }

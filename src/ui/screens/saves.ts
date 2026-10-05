@@ -8,7 +8,7 @@ import { charFullName } from '../../engine/world/characters';
 import type { App } from '../app';
 import { clear, h } from '../dom';
 import { button } from '../widgets';
-import { kvDelete, kvGet, kvSet } from '../storage';
+import { kvDelete, kvGet, kvSet, safeLocal } from '../storage';
 
 interface SaveMeta {
   slot: string;
@@ -22,7 +22,7 @@ const INDEX = 'cad.saves';
 
 export function listSaves(): SaveMeta[] {
   try {
-    return JSON.parse(localStorage.getItem(INDEX) ?? '[]');
+    return JSON.parse(safeLocal.get(INDEX) ?? '[]');
   } catch {
     return [];
   }
@@ -46,12 +46,12 @@ export async function writeSave(app: App, slot: string, json: string, name?: str
   };
   const list = listSaves().filter((s) => s.slot !== slot);
   list.unshift(meta);
-  localStorage.setItem(INDEX, JSON.stringify(list));
+  safeLocal.set(INDEX, JSON.stringify(list));
 }
 
 async function deleteSave(slot: string) {
   await kvDelete(`cad.save.${slot}`);
-  localStorage.setItem(INDEX, JSON.stringify(listSaves().filter((s) => s.slot !== slot)));
+  safeLocal.set(INDEX, JSON.stringify(listSaves().filter((s) => s.slot !== slot)));
 }
 
 function loadJson(app: App, json: string) {

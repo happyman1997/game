@@ -7,6 +7,34 @@ const DB = 'crown-and-dynasty';
 const STORE = 'kv';
 
 let dbPromise: Promise<IDBDatabase | null> | null = null;
+/** Последний запасной вариант: память вкладки (если браузер запретил и IndexedDB, и localStorage). */
+const memory = new Map<string, string>();
+
+/** localStorage, который не бросает исключений (в песочнице доступ к нему может быть запрещён). */
+export const safeLocal = {
+  get(key: string): string | null {
+    try {
+      return localStorage.getItem(key);
+    } catch {
+      return memory.get(key) ?? null;
+    }
+  },
+  set(key: string, value: string): void {
+    try {
+      localStorage.setItem(key, value);
+    } catch {
+      memory.set(key, value);
+    }
+  },
+  remove(key: string): void {
+    memory.delete(key);
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      /* ignore */
+    }
+  },
+};
 
 function openDb(): Promise<IDBDatabase | null> {
   if (dbPromise) return dbPromise;
@@ -27,46 +55,46 @@ function openDb(): Promise<IDBDatabase | null> {
 
 function tx<T>(db: IDBDatabase, mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBRequest<T>): Promise<T> {
   return new Promise((resolve, reject) => {
-    const t = db.transaction(STORE, mode);
-    const r = fn(t.objectStore(STORE));
-    r.onsuccess = () => resolve(r.result);
-    r.onerror = () => reject(r.error);
+    try {
+      const t = db.transaction(STORE, mode);
+      const r = fn(t.objectStore(STORE));
+      r.onsuccess = () => resolve(r.result);
+      r.onerror = () => reject(r.error);
+    } catch (e) {
+      reject(e);
+    }
   });
 }
 
 export async function kvSet(key: string, value: string): Promise<void> {
   const db = await openDb();
   if (db) {
-    await tx(db, 'readwrite', (s) => s.put(value, key));
     try {
-      localStorage.removeItem(key); // старая копия из localStorage больше не нужна
-    } catch {
-      /* ignore */
+      await tx(db, 'readwrite', (s) => s.put(value, key));
+      safeLocal.remove(key); // старая копия из localStorage больше не нужна
+      return;
+    } catch (e) {
+      console.warn('IndexedDB: запись не удалась, используем запасное хранилище', e);
     }
-    return;
   }
-  localStorage.setItem(key, value);
+  safeLocal.set(key, value);
 }
 
 export async function kvGet(key: string): Promise<string | null> {
   const db = await openDb();
   if (db) {
-    const v = await tx<string | undefined>(db, 'readonly', (s) => s.get(key));
-    if (v != null) return v;
+    try {
+      const v = await tx<string | undefined>(db, 'readonly', (s) => s.get(key));
+      if (v != null) return v;
+    } catch {
+      /* читаем из запасного хранилища */
+    }
   }
-  try {
-    return localStorage.getItem(key); // сохранения прежних версий
-  } catch {
-    return null;
-  }
+  return safeLocal.get(key); // сохранения прежних версий
 }
 
 export async function kvDelete(key: string): Promise<void> {
   const db = await openDb();
-  if (db) await tx(db, 'readwrite', (s) => s.delete(key));
-  try {
-    localStorage.removeItem(key);
-  } catch {
-    /* ignore */
-  }
+  if (db) await tx(db, 'readwrite', (s) => s.delete(key)).catch(() => undefined);
+  safeLocal.remove(key);
 }
