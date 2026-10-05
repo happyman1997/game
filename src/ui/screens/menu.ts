@@ -4,7 +4,9 @@ import type { ModPackage } from '../../engine/mods/types';
 import type { App } from '../app';
 import { clear, h } from '../dom';
 import { button } from '../widgets';
-import { openLoadDialog } from './saves';
+import { platform } from '../../platform';
+import { openLoadDialog, showMessage } from './saves';
+import { openSettings, openQuitDialog } from './settings';
 
 function modName(app: App, p: ModPackage): string {
   const n = p.manifest.name;
@@ -29,11 +31,14 @@ export function renderMainMenu(app: App): HTMLElement {
         button(app.t('ui.new_game'), () => openBookmarks(app), { cls: 'btn-big btn-gold' }),
         button(app.t('ui.load_game'), () => openLoadDialog(app), { cls: 'btn-big' }),
         button(`${app.t('ui.mods')} (${e.mods.length})`, () => openModManager(app), { cls: 'btn-big' }),
+        button(app.t('ui.settings'), () => openSettings(app), { cls: 'btn-big' }),
         button(app.lang === 'ru' ? 'Language: English' : 'Язык: русский', () => {
           app.setLanguage(app.lang === 'ru' ? 'en' : 'ru');
           app.showMainMenu();
         }, { cls: 'btn-big' }),
+        platform.quit ? button(app.t('ui.quit_game'), () => openQuitDialog(app), { cls: 'btn-big' }) : null,
       ),
+      platform.version ? h('div', { class: 'menu-version muted' }, `v${platform.version}`) : null,
       h('div', { class: 'menu-mods' },
         app.t('ui.active_mods'), ': ', e.mods.map((m) => modName(app, m)).join(', '),
         errors || warnings ? h('a', { class: ['link', errors ? 'bad' : 'warn'], onclick: () => openIssues(app) }, ` · ${app.t('ui.issues_n', { e: errors, w: warnings })}`) : null,
@@ -44,7 +49,7 @@ export function renderMainMenu(app: App): HTMLElement {
   return root;
 }
 
-function menuModal(app: App, content: HTMLElement): () => void {
+export function menuModal(app: App, content: HTMLElement): () => void {
   const layer = document.querySelector('.menu-modal-layer') as HTMLElement | null;
   const backdrop = h('div', { class: 'modal-backdrop' }, h('div', { class: 'modal' }, content));
   const close = () => backdrop.remove();
@@ -136,12 +141,21 @@ export function openModManager(app: App) {
         }
         render();
       } catch (e) {
-        alert((e as Error).message);
+        showMessage(app, (e as Error).message);
       }
     } }) as HTMLInputElement;
     body.append(input);
+    if (platform.folderPath) body.append(h('p', { class: 'muted small' }, app.t('ui.mods_folder_hint', { path: platform.folderPath('mods') })));
     body.append(h('div', { class: 'modal-buttons' },
-      button(app.t('ui.load_mod_folder'), () => input.click(), { tip: app.t('ui.load_mod_folder_tip') }),
+      platform.openFolder
+        ? button(app.t('ui.open_mods_folder'), () => platform.openFolder!('mods'), { tip: platform.folderPath?.('mods') })
+        : button(app.t('ui.load_mod_folder'), () => input.click(), { tip: app.t('ui.load_mod_folder_tip') }),
+      platform.openFolder
+        ? button(app.t('ui.rescan_mods'), async () => {
+            await app.reloadMods();
+            render();
+          }, { tip: app.t('ui.rescan_mods_tip') })
+        : null,
       button(app.t('ui.apply_mods'), async () => {
         close();
         app.setEnabledMods(new Set(enabled));

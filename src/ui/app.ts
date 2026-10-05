@@ -17,11 +17,12 @@ import { opinion } from '../engine/world/opinion';
 import { provinceController, rankName, titleFullName, topLiege } from '../engine/world/titles';
 import { defaultLocaleSources } from '../locale';
 import * as world from '../engine/world';
-import { bundledPackages } from './bundled';
+import { isDesktop, platform } from '../platform';
 import { type Child, clear, esc, fmt, h, hideTip, initTooltips, signed } from './dom';
 import { registerBuiltinMapModes } from './map/mapModes';
 import { type MapHost, MapView } from './map/mapView';
 import { openIssues, renderMainMenu } from './screens/menu';
+import { openQuitDialog, openSettings } from './screens/settings';
 import { renderEventModal, renderRequestModal } from './panels/events';
 import { renderCharacterPanel } from './panels/character';
 import { renderProvincePanel, renderTitlePanel } from './panels/province';
@@ -67,7 +68,7 @@ export class App implements MapHost {
   private lastRender = 0;
   private acc = 0;
   private lastFrame = 0;
-  private lastYearSaved = -1;
+  private lastAutosave = -1;
   private seenMessages = 0;
 
   readonly root: HTMLElement;
@@ -82,13 +83,9 @@ export class App implements MapHost {
 
   constructor(root: HTMLElement) {
     this.root = root;
-    try {
-      this.lang = localStorage.getItem('cad.lang') ?? (navigator.language.startsWith('ru') ? 'ru' : 'ru');
-      const en = localStorage.getItem('cad.enabledMods');
-      if (en) this.enabled = new Set(JSON.parse(en));
-    } catch {
-      /* localStorage недоступен */
-    }
+    this.lang = platform.settings.get('lang', 'ru');
+    const en = platform.settings.get<string[] | null>('enabledMods', null);
+    if (Array.isArray(en)) this.enabled = new Set(en);
   }
 
   // ------------------------------------------------------------ локализация
@@ -102,11 +99,20 @@ export class App implements MapHost {
   async boot() {
     initTooltips();
     this.showLoading('…');
-    this.packages = await bundledPackages();
+    this.packages = await platform.loadModPackages();
     await this.buildEngine();
     this.showMainMenu();
     this.bindKeys();
+    // Закрытие окна посреди партии: настольная версия спросит подтверждение.
+    window.addEventListener('beforeunload', (e) => {
+      if (this.game?.state.player && isDesktop) e.preventDefault();
+    });
     requestAnimationFrame((t) => this.frame(t));
+  }
+
+  /** Перечитать моды с диска (в настольной версии — после правки файлов). */
+  async reloadMods() {
+    this.packages = await platform.loadModPackages();
   }
 
   allPackages(): ModPackage[] {
@@ -137,21 +143,12 @@ export class App implements MapHost {
 
   setEnabledMods(ids: Set<string> | null) {
     this.enabled = ids;
-    try {
-      if (ids) localStorage.setItem('cad.enabledMods', JSON.stringify([...ids]));
-      else localStorage.removeItem('cad.enabledMods');
-    } catch {
-      /* ignore */
-    }
+    platform.settings.set('enabledMods', ids ? [...ids] : null);
   }
 
   setLanguage(lang: string) {
     this.lang = lang;
-    try {
-      localStorage.setItem('cad.lang', lang);
-    } catch {
-      /* ignore */
-    }
+    platform.settings.set('lang', lang);
     if (this.engine) this.engine.loc.lang = lang;
     this.map?.invalidate();
     this.markDirty();
@@ -219,7 +216,8 @@ export class App implements MapHost {
     this.selectedArmyId = null;
     this.shownEvent = null;
     this.seenMessages = game.state.messages.length;
-    this.lastYearSaved = dateParts(game.date).y;
+    const start = dateParts(game.date);
+    this.lastAutosave = start.y * 12 + start.m;
     const screen = h('div', { class: 'game-screen' });
     const mapWrap = h('div', { class: 'map-wrap' });
     this.topBar = h('div', { class: 'topbar' });
@@ -284,14 +282,17 @@ export class App implements MapHost {
 
   private autosave() {
     const g = this.game!;
+    const mode = platform.settings.get<string>('autosave', 'yearly');
+    if (mode === 'off' || !g.state.player) return;
     const { y, m, d } = dateParts(g.date);
-    if (m === 1 && d === 1 && y !== this.lastYearSaved && g.state.player) {
-      this.lastYearSaved = y;
-      try {
-        writeSave(this, 'autosave', serializeGame(g)).catch((e) => console.warn('Автосохранение не удалось', e));
-      } catch (e) {
-        console.warn('Автосохранение не удалось', e);
-      }
+    if (d !== 1 || !(m === 1 || (mode === 'half_year' && m === 7))) return;
+    const key = y * 12 + m;
+    if (key === this.lastAutosave) return;
+    this.lastAutosave = key;
+    try {
+      writeSave(this, 'autosave', serializeGame(g)).catch((e) => console.warn('Автосохранение не удалось', e));
+    } catch (e) {
+      console.warn('Автосохранение не удалось', e);
     }
   }
 
@@ -694,10 +695,11 @@ export class App implements MapHost {
         button(this.t('ui.resume'), () => { close(); this.paused = wasPaused; }),
         button(this.t('ui.save_game'), () => { close(); openSaveDialog(this); }, { disabled: !g.state.player }),
         button(this.t('ui.load_game'), () => { close(); openLoadDialog(this); }),
-        button(this.t('ui.export_save'), () => exportSave(this)),
-        button(this.lang === 'ru' ? 'English' : 'Русский', () => { this.setLanguage(this.lang === 'ru' ? 'en' : 'ru'); close(); }),
+        isDesktop ? null : button(this.t('ui.export_save'), () => exportSave(this)),
+        button(this.t('ui.settings'), () => { close(); openSettings(this, () => { this.paused = wasPaused; }); }),
         button(this.t('ui.mod_issues'), () => { close(); openIssues(this); }),
         button(this.t('ui.main_menu'), () => { close(); this.showMainMenu(); }),
+        platform.quit ? button(this.t('ui.quit_game'), () => { close(); openQuitDialog(this); }) : null,
       ),
     );
   }

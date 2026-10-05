@@ -15,6 +15,25 @@ month:
 
 
 ui:
+  settings: Настройки
+  quit_game: Выйти из игры
+  quit_confirm: Выйти на рабочий стол? Несохранённый прогресс будет потерян.
+  save_and_quit: Сохранить и выйти
+  quit_without_saving: Выйти без сохранения
+  setting_language: Язык
+  setting_autosave: Автосохранение
+  autosave_yearly: Каждый год
+  autosave_half_year: Каждые полгода
+  autosave_off: Выключено
+  setting_fullscreen: Полноэкранный режим
+  setting_zoom: Масштаб интерфейса
+  open_saves_folder: Папка сохранений
+  open_mods_folder: Папка модов
+  open_builtin_mods_folder: Файлы игры (встроенные моды)
+  mods_folder_hint: "Свои моды кладите в {path} — каждый мод в отдельной папке с mod.json. Встроенные моды можно скопировать туда как образец."
+  rescan_mods: Обновить список
+  rescan_mods_tip: Перечитать папку модов (после того как вы добавили или изменили мод).
+  delete_save: Удалить сохранение
   game_title: Корона и Династия
   game_subtitle: Модульная стратегия о королях, наследниках и интригах
   new_game: Новая игра

@@ -1,32 +1,14 @@
 /**
- * Сохранения: сами данные — в IndexedDB (src/ui/storage.ts), список слотов —
- * в localStorage; плюс экспорт/импорт файлом.
+ * Сохранения. Где они лежат, решает платформа: в настольной версии — файлы
+ * в «Документы/Crown and Dynasty/save games», в браузере — IndexedDB.
  */
 import { dateParts } from '../../engine/core/date';
 import { serializeGame } from '../../engine/save';
 import { charFullName } from '../../engine/world/characters';
+import { isDesktop, platform, type SaveMeta } from '../../platform';
 import type { App } from '../app';
 import { clear, h } from '../dom';
 import { button } from '../widgets';
-import { kvDelete, kvGet, kvSet, safeLocal } from '../storage';
-
-interface SaveMeta {
-  slot: string;
-  name: string;
-  date: string;
-  player: string;
-  savedAt: string;
-}
-
-const INDEX = 'cad.saves';
-
-export function listSaves(): SaveMeta[] {
-  try {
-    return JSON.parse(safeLocal.get(INDEX) ?? '[]');
-  } catch {
-    return [];
-  }
-}
 
 export function quickSaveSlot() {
   return 'quicksave';
@@ -36,7 +18,6 @@ export async function writeSave(app: App, slot: string, json: string, name?: str
   const g = app.game!;
   const p = g.player;
   const { y, m, d } = dateParts(g.date);
-  await kvSet(`cad.save.${slot}`, json);
   const meta: SaveMeta = {
     slot,
     name: name ?? (slot === 'autosave' ? app.t('ui.autosave') : slot === 'quicksave' ? app.t('ui.quicksave') : slot),
@@ -44,14 +25,14 @@ export async function writeSave(app: App, slot: string, json: string, name?: str
     player: p ? charFullName(g, p, true) : '',
     savedAt: new Date().toLocaleString(),
   };
-  const list = listSaves().filter((s) => s.slot !== slot);
-  list.unshift(meta);
-  safeLocal.set(INDEX, JSON.stringify(list));
+  await platform.saves.write(meta, json);
 }
 
-async function deleteSave(slot: string) {
-  await kvDelete(`cad.save.${slot}`);
-  safeLocal.set(INDEX, JSON.stringify(listSaves().filter((s) => s.slot !== slot)));
+/** Сообщение поверх текущего экрана (в игре — уведомление, в меню — окно). */
+export function showMessage(app: App, text: string) {
+  if (app.game) return app.toast(text, 'bad');
+  let close: () => void = () => {};
+  close = dialog(app, h('div', null, h('p', null, text), h('div', { class: 'modal-buttons' }, button(app.t('ui.close'), () => close()))));
 }
 
 function loadJson(app: App, json: string) {
@@ -61,7 +42,7 @@ function loadJson(app: App, json: string) {
     if (game.state.player) app.openCharacter(game.state.player);
     for (const w of warnings) app.toast(w, 'bad');
   } catch (e) {
-    alert(`${app.t('ui.load_failed')}: ${(e as Error).message}`);
+    showMessage(app, `${app.t('ui.load_failed')}: ${(e as Error).message}`);
   }
 }
 
@@ -103,34 +84,46 @@ export function openLoadDialog(app: App) {
   const render = () => {
     clear(body);
     body.append(h('h2', null, app.t('ui.load_game')));
-    const saves = listSaves();
-    if (!saves.length) body.append(h('p', { class: 'muted' }, app.t('ui.no_saves')));
-    for (const s of saves) {
-      body.append(h('div', { class: 'save-row' },
-        h('div', null, h('b', null, s.name), h('div', { class: 'muted' }, `${s.player} · ${s.date} · ${s.savedAt}`)),
+    const list = h('div', { class: 'save-list' }, h('p', { class: 'muted' }, '…'));
+    body.append(list);
+    platform.saves.list().then((saves) => {
+      clear(list);
+      if (!saves.length) list.append(h('p', { class: 'muted' }, app.t('ui.no_saves')));
+      for (const s of saves) list.append(saveRow(s));
+    }, (e) => {
+      clear(list);
+      list.append(h('p', { class: 'bad' }, String((e as Error)?.message ?? e)));
+    });
+    const saveRow = (s: SaveMeta) => {
+      return h('div', { class: 'save-row' },
+        h('div', null, h('b', null, s.name), h('div', { class: 'muted' }, [s.player, s.date, s.savedAt].filter(Boolean).join(' · '))),
         button(app.t('ui.load'), () => {
           close();
-          kvGet(`cad.save.${s.slot}`)
-            .then((json) => (json ? loadJson(app, json) : alert(app.t('ui.load_failed'))))
-            .catch((e) => alert(`${app.t('ui.load_failed')}: ${(e as Error).message}`));
+          platform.saves.read(s.slot)
+            .then((json) => (json ? loadJson(app, json) : showMessage(app, app.t('ui.load_failed'))))
+            .catch((e) => showMessage(app, `${app.t('ui.load_failed')}: ${(e as Error).message}`));
         }, { cls: 'btn-small btn-gold' }),
-        button('🗑', () => { deleteSave(s.slot).then(render, render); }, { cls: 'btn-small' }),
-      ));
-    }
+        button('🗑', () => { platform.saves.remove(s.slot).then(render, render); }, { cls: 'btn-small', tip: app.t('ui.delete_save') }),
+      );
+    };
     const file = h('input', { type: 'file', accept: '.json,application/json', style: { display: 'none' }, onchange: async (e: Event) => {
       const f = (e.target as HTMLInputElement).files?.[0];
       if (!f) return;
       close();
       loadJson(app, await f.text());
     } }) as HTMLInputElement;
-    body.append(file, h('div', { class: 'modal-buttons' }, button(app.t('ui.import_save'), () => file.click()), button(app.t('ui.cancel'), () => close())));
+    body.append(file, h('div', { class: 'modal-buttons' },
+      platform.openFolder ? button(app.t('ui.open_saves_folder'), () => platform.openFolder!('saves'), { tip: platform.folderPath?.('saves') }) : null,
+      button(app.t('ui.import_save'), () => file.click()),
+      button(app.t('ui.cancel'), () => close()),
+    ));
   };
   render();
   close = dialog(app, body);
 }
 
 export function exportSave(app: App) {
-  if (!app.game) return;
+  if (!app.game || isDesktop) return;
   const blob = new Blob([serializeGame(app.game)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);

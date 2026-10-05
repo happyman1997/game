@@ -30,7 +30,7 @@ export interface ModManifest {
  * в браузере, и с файловой системой в Node (тесты, CLI).
  */
 export interface ModSource {
-  readonly kind: 'bundled' | 'folder' | 'node' | 'memory';
+  readonly kind: 'bundled' | 'folder' | 'desktop' | 'node' | 'memory';
   /** Пути файлов относительно корня мода, через "/". */
   listFiles(): Promise<string[]>;
   readText(path: string): Promise<string>;

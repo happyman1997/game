@@ -14,6 +14,25 @@ month:
 
 
 ui:
+  settings: Settings
+  quit_game: Quit game
+  quit_confirm: Quit to desktop? Unsaved progress will be lost.
+  save_and_quit: Save and quit
+  quit_without_saving: Quit without saving
+  setting_language: Language
+  setting_autosave: Autosave
+  autosave_yearly: Every year
+  autosave_half_year: Every six months
+  autosave_off: Off
+  setting_fullscreen: Fullscreen
+  setting_zoom: Interface scale
+  open_saves_folder: Saves folder
+  open_mods_folder: Mods folder
+  open_builtin_mods_folder: Game files (built-in mods)
+  mods_folder_hint: "Put your mods into {path}, each in its own folder with mod.json. Copy a built-in mod there to use it as a template."
+  rescan_mods: Rescan
+  rescan_mods_tip: Re-read the mods folder (after you add or edit a mod).
+  delete_save: Delete save
   game_title: Crown & Dynasty
   game_subtitle: A moddable strategy of kings, heirs and intrigue
   new_game: New Game

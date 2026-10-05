@@ -382,3 +382,15 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 700; margin: 0.2em 0; color
 /* ---------------------------------------------------- рыцари */
 .knight-row { display: flex; align-items: center; gap: 6px; font-size: 13px; padding: 1px 0; }
 .knight-prowess { margin-left: auto; font-weight: 700; }
+
+/* ---------- настройки и выход ---------- */
+.settings { min-width: 420px; max-width: 520px; }
+.settings-list { display: flex; flex-direction: column; gap: 10px; margin: 8px 0 14px; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 6px 0; border-bottom: 1px solid rgba(107, 85, 48, 0.4); cursor: pointer; }
+.settings-label { display: flex; flex-direction: column; gap: 2px; }
+.settings-folders { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.select { background: #120d08; color: var(--text); border: 1px solid var(--border); border-radius: 3px; padding: 4px 8px; font: inherit; min-width: 140px; }
+.select:focus, .text-input:focus { outline: 1px solid var(--border-hi); }
+.quit-dialog { max-width: 460px; }
+.menu-version { position: absolute; right: 12px; bottom: 8px; font-size: 12px; }
+.menu-card { position: relative; }
