@@ -153,6 +153,7 @@ void fragment() {
 		float shade = clamp(1.0 - (grad.x + grad.y) * 3.2, 0.62, 1.3);
 		vec3 terrain = tcol * (0.92 + noise(mp / 40.0) * 0.16) * shade;
 		if (waste) {
+			shade = mix(1.0, shade, 0.45);
 			// непроходимые земли: тёмные, приглушённые, со штриховкой
 			float hatch = smoothstep(0.35, 0.5, abs(fract((mp.x - mp.y) / (5.0 * max(1.0, px))) - 0.5));
 			terrain = mix(vec3(0.33, 0.30, 0.27), vec3(0.45, 0.41, 0.36), noise(mp / 60.0)) * shade * (0.9 + hatch * 0.1);

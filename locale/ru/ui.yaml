@@ -301,3 +301,16 @@ ui:
   vassals: Вассалы
   dynasty: Династия
   members_n: "живых членов: {n}"
+  parent: Родитель
+  child: Ребёнок
+  sibling: Брат/сестра
+  former_spouse: Бывший супруг
+  continue: Продолжить
+  existing_saves: "Сохранения (нажмите, чтобы перезаписать):"
+  loading_save: Загрузка сохранения…
+  military_strength: Военная сила
+  move_army_hint: "ПКМ — отправить выбранную армию сюда"
+  pick_click_hint: "Щёлкните, чтобы посмотреть правителя"
+  setting_vsync: Вертикальная синхронизация
+  speed_down: Медленнее (−)
+  speed_up: Быстрее (+)

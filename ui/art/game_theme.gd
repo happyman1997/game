@@ -151,12 +151,12 @@ static func _buttons(t: Theme) -> void:
 		"hover_pressed": row_hover, "disabled": row_norm,
 	}, light)
 
-	t.set_type_variation("LinkButton", "Button")
+	t.set_type_variation("LinkText", "Button")
 	var link := light.duplicate()
 	link.font_color = UiArt.C_GOLD
 	link.font_hover_color = Color("#fff0b8")
 	var empty := StyleBoxEmpty.new()
-	_button_states(t, "LinkButton", {"normal": empty, "hover": empty, "pressed": empty, "hover_pressed": empty, "disabled": empty}, link)
+	_button_states(t, "LinkText", {"normal": empty, "hover": empty, "pressed": empty, "hover_pressed": empty, "disabled": empty}, link)
 
 	t.set_type_variation("EventOption", "Button")
 	var ink := {

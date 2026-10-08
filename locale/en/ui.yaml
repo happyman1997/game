@@ -300,3 +300,16 @@ ui:
   vassals: Vassals
   dynasty: Dynasty
   members_n: "living members: {n}"
+  parent: Parent
+  child: Child
+  sibling: Sibling
+  former_spouse: Former spouse
+  continue: Continue
+  existing_saves: "Saves (click to overwrite):"
+  loading_save: Loading save…
+  military_strength: Military strength
+  move_army_hint: "Right-click to send the selected army here"
+  pick_click_hint: "Click to view the ruler"
+  setting_vsync: Vertical sync
+  speed_down: Slower (−)
+  speed_up: Faster (+)

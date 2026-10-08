@@ -146,3 +146,13 @@ static func node(icon: Variant, size: int = 20, tint: String = "gold") -> Contro
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.mouse_filter = Control.MOUSE_FILTER_PASS
 	return l
+
+
+## Путь иконки для тега [img] в BBCode: текстура регистрируется в кэше
+## ресурсов под виртуальным путём, RichTextLabel находит её по нему.
+static func bb_path(name: String, size: int = 16, tint: String = "gold") -> String:
+	var path := "res://__icons__/%s_%d_%s.tres" % [name, size, tint]
+	var tex := texture(name, size, tint)
+	if tex.resource_path != path:
+		tex.take_over_path(path)
+	return path
