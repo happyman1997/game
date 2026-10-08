@@ -646,7 +646,7 @@ func modal(content: Control, opts: Dictionary = {}) -> Callable:
 	if entry.closable:
 		dim.gui_input.connect(func(e: InputEvent):
 			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
-				_close_entry(entry))
+				locked(_close_entry.bind(entry)))
 	tooltip.block()
 	return func(): _close_entry(entry)
 
