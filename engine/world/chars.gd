@@ -266,9 +266,14 @@ static func pick_name(game: Game, culture: String, female: bool, father: Variant
 
 
 static func skill_ids(game: Game) -> Array:
+	var cached: Variant = game.engine.cache.get("skill_ids")
+	if cached != null:
+		return cached
 	var skills: Array = game.content.all("skills").duplicate()
 	Data.sort_by(skills, func(s): return Data.num(s.get("order")))
-	return skills.map(func(s): return s.id)
+	var ids: Array = skills.map(func(s): return s.id)
+	game.engine.cache["skill_ids"] = ids
+	return ids
 
 
 ## Новый персонаж. opts: id, culture, faith, female, birth, age, name,

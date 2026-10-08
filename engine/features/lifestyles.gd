@@ -24,18 +24,33 @@ static func state_of(c: Dictionary) -> Dictionary:
 	return c.lifestyle
 
 
+## Списки из контента кэшируются в engine.cache (контент после загрузки не меняется).
 static func all(game: Game) -> Array:
+	var hit: Variant = game.engine.cache.get("lifestyles:all")
+	if hit != null:
+		return hit
 	var l := game.content.all("lifestyles").duplicate()
 	Data.sort_by(l, func(x): return Data.num(x.get("order")))
+	game.engine.cache["lifestyles:all"] = l
 	return l
 
 
 static func focuses_of(game: Game, lifestyle: String) -> Array:
-	return game.content.all("focuses").filter(func(f): return f.get("lifestyle") == lifestyle)
+	var key := "lifestyles:focuses:" + lifestyle
+	var hit: Variant = game.engine.cache.get(key)
+	if hit == null:
+		hit = game.content.all("focuses").filter(func(f): return f.get("lifestyle") == lifestyle)
+		game.engine.cache[key] = hit
+	return hit
 
 
 static func perks_of(game: Game, lifestyle: String) -> Array:
-	return game.content.all("perks").filter(func(p): return p.get("lifestyle") == lifestyle)
+	var key := "lifestyles:perks:" + lifestyle
+	var hit: Variant = game.engine.cache.get(key)
+	if hit == null:
+		hit = game.content.all("perks").filter(func(p): return p.get("lifestyle") == lifestyle)
+		game.engine.cache[key] = hit
+	return hit
 
 
 static func _depth(game: Game, p: Dictionary, seen: Dictionary) -> int:

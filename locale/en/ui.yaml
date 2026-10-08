@@ -43,7 +43,7 @@ ui:
   issues_n: "errors: {e}, warnings: {w}"
   mod_issues: Mod issues
   no_issues: No issues found.
-  mods_hint: "Tick the mods and press Apply. Mods in the /mods folder are bundled automatically; you can also load a mod folder straight from the browser (for this session only)."
+  mods_hint: "Tick the mods and press Apply — the game reloads its content. A mod in your folder with the same id replaces the built-in one."
   depends_on: Requires
   load_mod_folder: Load mod folder…
   load_mod_folder_tip: Choose a folder containing mod.json (or a folder with several mods).

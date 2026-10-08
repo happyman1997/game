@@ -78,6 +78,42 @@ static func _age_adjust(game: Game, c: Dictionary, totals: Dictionary) -> Dictio
 	return adj
 
 
+## То же, что сумма _sources(), но без промежуточных массивов (горячий путь).
+static func _accumulate(game: Game, c: Dictionary, out: Dictionary) -> void:
+	out["health"] = float(c.health)
+	var skills: Dictionary = c.skills
+	for s in Chars.skill_ids(game):
+		out[s] = Data.num(skills.get(s))
+	add_into(out, game.def_val("character.base_stats"))
+	var content := game.content
+	for t in c.traits:
+		var d: Variant = content.get_def("traits", t)
+		if d != null:
+			var m: Variant = d.get("modifiers")
+			if m is Dictionary:
+				add_into(out, m)
+	for md in c.modifiers:
+		var d: Variant = content.get_def("modifiers", md.id)
+		if d != null:
+			var m: Variant = d.get("modifiers")
+			if m is Dictionary:
+				add_into(out, m)
+	var cul: Variant = content.get_def("cultures", c.culture)
+	if cul != null and cul.get("modifiers") is Dictionary:
+		add_into(out, cul.modifiers)
+	var faith: Variant = content.get_def("faiths", c.faith)
+	if faith != null and faith.get("modifiers") is Dictionary:
+		add_into(out, faith.modifiers)
+	for p in game.engine.modifier_providers._map.values():
+		var mods: Variant = p.fn.call(game, c)
+		if mods is Array:
+			for m in mods:
+				if m is Dictionary and m.get("modifiers") is Dictionary:
+					add_into(out, m.modifiers)
+		elif mods is Dictionary:
+			add_into(out, mods)
+
+
 static func char_stats(game: Game, c: Dictionary) -> Dictionary:
 	var cached: Variant = game.stat_cache.get(c.id)
 	if cached != null:
@@ -89,8 +125,7 @@ static func char_stats(game: Game, c: Dictionary) -> Dictionary:
 			add_into(out, s.mods)
 		return out
 	_computing[c.id] = true
-	for s in _sources(game, c, true, false):
-		add_into(out, s.mods)
+	_accumulate(game, c, out)
 	_computing.erase(c.id)
 	add_into(out, _age_adjust(game, c, out))
 	game.stat_cache[c.id] = out

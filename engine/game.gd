@@ -83,23 +83,34 @@ func prov_def(id: Variant) -> Variant:
 	return content.get_def("provinces", id)
 
 
-## Значение из defines по пути "раздел.ключ".
+## Значение из defines по пути "раздел.ключ". Найденные значения кэшируются
+## до конца месяца (моды, меняющие defines на ходу, увидят изменение с нового месяца).
 func def_num(path: String, fallback: float = 0.0) -> float:
-	var cur: Variant = defines
-	for p in path.split("."):
-		if not (cur is Dictionary) or not cur.has(p):
-			return fallback
-		cur = cur[p]
+	var cur: Variant = _def_lookup(path)
 	return float(cur) if (cur is int or cur is float) else fallback
 
 
 func def_val(path: String, fallback: Variant = null) -> Variant:
+	var cur: Variant = _def_lookup(path)
+	return cur if cur != null else fallback
+
+
+const _NO_DEF := "<<нет значения>>"
+
+
+func _def_lookup(path: String) -> Variant:
+	var key := "def:" + path
+	var hit: Variant = month_cache.get(key, _NO_DEF)
+	if not (hit is String and hit == _NO_DEF):
+		return hit
 	var cur: Variant = defines
 	for p in path.split("."):
 		if not (cur is Dictionary) or not cur.has(p):
-			return fallback
+			cur = null
+			break
 		cur = cur[p]
-	return cur if cur != null else fallback
+	month_cache[key] = cur
+	return cur
 
 
 func exists(ref: Variant) -> bool:
@@ -383,13 +394,20 @@ func tick() -> void:
 	if p.d == 1:
 		month_cache.clear()
 		mark_dirty()
+	# Помесячные и годовые обработчики разнесены по первым дням месяца
+	# (system.month_day или по порядку), чтобы не было одного тяжёлого дня.
+	var spread := maxi(1, int(def_num("engine.month_spread_days", 4)))
+	if p.d <= spread:
+		var i := 0
 		for s in systems:
+			var day: int = int(s.get("month_day", 1 + i % spread))
+			i += 1
+			if day != p.d:
+				continue
 			if s.has("on_month"):
 				s.on_month.call(self)
-		if p.m == 1:
-			for s in systems:
-				if s.has("on_year"):
-					s.on_year.call(self)
+			if p.m == 1 and s.has("on_year"):
+				s.on_year.call(self)
 	emit("day")
 	notify("tick")
 

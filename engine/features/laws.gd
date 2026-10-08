@@ -20,15 +20,17 @@ func _init() -> void:
 
 
 static func groups(game: Game) -> Array:
-	var l := game.content.all("law_groups").duplicate()
-	Data.sort_by(l, func(x): return Data.num(x.get("order")))
-	return l
+	return game.engine.sorted_content("law_groups")
 
 
 static func laws_of_group(game: Game, group: String) -> Array:
-	var l := game.content.all("realm_laws").filter(func(x): return x.get("group") == group)
-	Data.sort_by(l, func(x): return Data.num(x.get("level")))
-	return l
+	var key := "laws:group:" + group
+	var hit: Variant = game.engine.cache.get(key)
+	if hit == null:
+		hit = game.content.all("realm_laws").filter(func(x): return x.get("group") == group)
+		Data.sort_by(hit, func(x): return Data.num(x.get("level")))
+		game.engine.cache[key] = hit
+	return hit
 
 
 static func is_group_shown(game: Game, c: Dictionary, g: Dictionary) -> bool:

@@ -36,6 +36,27 @@ var _dist_cache := {}
 var _path_rows := {}
 
 
+## Записи контента, отсортированные по полю order (кэшируется).
+func sorted_content(type: String) -> Array:
+	var key := "sorted:" + type
+	var hit: Variant = cache.get(key)
+	if hit == null:
+		hit = content.all(type).duplicate()
+		Data.sort_by(hit, func(x): return Data.num(x.get("order")) if x is Dictionary else 0.0)
+		cache[key] = hit
+	return hit
+
+
+## Записи контента с полем field == value (кэшируется).
+func content_where(type: String, field: String, value: Variant) -> Array:
+	var key := "where:%s:%s:%s" % [type, field, value]
+	var hit: Variant = cache.get(key)
+	if hit == null:
+		hit = content.all(type).filter(func(x): return x is Dictionary and x.get(field) == value)
+		cache[key] = hit
+	return hit
+
+
 func has_feature(id: String) -> bool:
 	return installed_features.has(id)
 

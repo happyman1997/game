@@ -21,6 +21,16 @@ static func personality(game: Game, c: Dictionary) -> Dictionary:
 	return out
 
 
+static func _think_hash(c: Dictionary) -> int:
+	var h := 0
+	var id: String = c.id
+	for i in id.length():
+		h = (h * 31 + id.unicode_at(i)) & 0xFFFFFFFF
+	if h >= 0x80000000:
+		h -= 0x100000000
+	return absi(h)
+
+
 static func _think_day(c: Dictionary) -> int:
 	var h := 0
 	var id: String = c.id
@@ -32,11 +42,16 @@ static func _think_day(c: Dictionary) -> int:
 
 
 static func daily_ai(game: Game) -> void:
-	var day := (game.date % 365) % 28
+	# Независимые правители думают раз в 4 недели, вассалы — раз в 8 (их решения
+	# реже влияют на мир, а нагрузка на ИИ так снижается почти вдвое).
+	var period := int(game.def_num("ai.think_days", 28))
+	var vassal_period := int(game.def_num("ai.vassal_think_days", 56))
+	var day := game.date % 365
 	for c in game.rulers():
 		if game.is_player(c.id) or c.death != null:
 			continue
-		if _think_day(c) != day:
+		var per := period if c.liege == null else vassal_period
+		if _think_hash(c) % per != day % per:
 			continue
 		think_ruler(game, c)
 	for a in game.state.armies.values():
@@ -253,10 +268,17 @@ static func _ai_targets(game: Game, c: Dictionary, def: Dictionary, cache: Dicti
 	return arr.slice(0, int(game.def_num("ai.max_targets_per_interaction", 12)))
 
 
+static func _ai_interaction_defs(game: Game) -> Array:
+	var cached: Variant = game.engine.cache.get("ai_interaction_defs")
+	if cached == null:
+		cached = Interactions.defs(game).filter(func(d): return d.get("ai_will_do") != null and (d.get("ai_targets") != null or d.get("self", false)))
+		game.engine.cache["ai_interaction_defs"] = cached
+	return cached
+
+
 static func _consider_interactions(game: Game, c: Dictionary) -> void:
-	var defs := Interactions.defs(game).filter(func(d): return d.get("ai_will_do") != null and (d.get("ai_targets") != null or d.get("self", false)))
 	var list_cache := {}
-	for def in defs:
+	for def in _ai_interaction_defs(game):
 		var freq := Data.num(def.get("ai_frequency_months"), 6)
 		if not game.rng.chance(1.0 / freq):
 			continue
@@ -273,11 +295,12 @@ static func _consider_interactions(game: Game, c: Dictionary) -> void:
 			for sec in secs:
 				for t in targs:
 					var args = {"secondary": sec, "target": t.get("ref") if t != null else null}
-					if not Interactions.blockers(game, def, c, r, args).is_empty():
-						continue
+					# Сначала желание (обычно дешевле и чаще всего отсекает), затем условия.
 					var ctx := Interactions.context(game, def, c, r, args)
 					var will = Interp.eval_value(ctx, ctx.root, def.ai_will_do)
-					if will <= 0.0:
+					if will <= 0.0 or (best != null and will <= best.score):
+						continue
+					if not Interactions.blockers(game, def, c, r, args).is_empty():
 						continue
 					# Не предлагаем то, на что заведомо откажут (кроме игрока — тот решает сам),
 					# если только нет крюка, которым можно заставить согласиться.
@@ -290,8 +313,7 @@ static func _consider_interactions(game: Game, c: Dictionary) -> void:
 							args["use_hook"] = true
 					elif Interactions.hook_available(game, def, c, r) and will >= game.def_num("ai.use_hook_on_player_min_will", 60):
 						args["use_hook"] = true
-					if best == null or will > best.score:
-						best = {"r": r, "args": args, "score": will}
+					best = {"r": r, "args": args, "score": will}
 		if best != null and game.rng.next() * 100.0 < minf(game.def_num("ai.max_interaction_chance", 90), best.score):
 			Interactions.execute(game, def, c, best.r, best.args)
 	_arrange_marriages(game, c)
@@ -307,24 +329,30 @@ static func _arrange_marriages(game: Game, c: Dictionary) -> void:
 	if family.is_empty():
 		return
 	var single: Dictionary = game.rng.pick(family)
+	# Кандидаты: дворы случайных правителей, пока не наберётся 15 подходящих.
+	var rulers := game.rulers().duplicate()
+	game.rng.shuffle(rulers)
 	var candidates := []
-	for r in game.rulers():
+	for r in rulers:
 		if r.id == c.id:
 			continue
 		for x in [r] + game.courtiers_of(r.id):
 			if Chars.is_alive(x) and not game.is_player(x.id) and Chars.can_marry(game, single, x):
 				candidates.append(x)
+		if candidates.size() >= 15:
+			break
 	game.rng.shuffle(candidates)
 	for recipient in candidates.slice(0, 15):
 		if not Interactions.is_shown(game, def, c, recipient):
 			continue
 		var args = {"secondary": single.id}
+		var acc := Interactions.acceptance(game, def, c, recipient, args)
+		if not acc.auto and acc.total <= 0.0:
+			continue
 		if not Interactions.blockers(game, def, c, recipient, args).is_empty():
 			continue
-		var acc := Interactions.acceptance(game, def, c, recipient, args)
-		if acc.auto or acc.total > 0.0:
-			Interactions.execute(game, def, c, recipient, args)
-			return
+		Interactions.execute(game, def, c, recipient, args)
+		return
 
 
 static func _consider_decisions(game: Game, c: Dictionary) -> void:

@@ -57,7 +57,26 @@ static func body_of(def: Variant, field: String) -> Variant:
 # ---------------------------------------------------------------- пути
 
 ## Разбивает "scope:a.liege.opinion(scope:b.father)" по точкам вне скобок.
+## Кэши разбора строк скриптов: строк в контенте конечное число, а
+## разбор (регулярные выражения, split) — самая частая работа интерпретатора.
+static var _split_cache := {}
+static var _name_cache := {}
+static var _cmp_cache := {}
+static var _path_kind := {}
+
+
 static func split_path(path: String) -> PackedStringArray:
+	var hit: Variant = _split_cache.get(path)
+	if hit != null:
+		return hit
+	var r := _split_path_raw(path)
+	if _split_cache.size() > 20000:
+		_split_cache.clear()
+	_split_cache[path] = r
+	return r
+
+
+static func _split_path_raw(path: String) -> PackedStringArray:
 	var out := PackedStringArray()
 	if path.find("(") < 0:
 		for s in path.split("."):
@@ -229,10 +248,16 @@ static func _apply_value_ops(ctx: ScriptContext, scope: Variant, start: float, o
 
 
 static func _eval_value_path(ctx: ScriptContext, scope: Variant, s: String) -> float:
+	# Числа в строках («10», « -2.5») разбираем один раз.
+	var num: Variant = _path_kind.get(s)
+	if num is float:
+		return num
 	var trimmed := s.strip_edges()
 	if trimmed == "":
 		return 0.0
 	if trimmed.is_valid_float():
+		if _path_kind.size() < 20000:
+			_path_kind[s] = float(trimmed)
 		return float(trimmed)
 	var game := ctx.game
 	var reg := game.engine.scripting
@@ -261,12 +286,18 @@ static func _eval_value_path(ctx: ScriptContext, scope: Variant, s: String) -> f
 
 static func get_named_value(ctx: ScriptContext, scope: Variant, name_with_arg: String) -> float:
 	var game := ctx.game
-	var m := _re_name().search(name_with_arg)
-	if m == null:
+	var parsed: Variant = _name_cache.get(name_with_arg)
+	if parsed == null:
+		var m := _re_name().search(name_with_arg)
+		parsed = [m.get_string(1), m.get_string(2)] if m != null else []
+		if _name_cache.size() > 20000:
+			_name_cache.clear()
+		_name_cache[name_with_arg] = parsed
+	if parsed.is_empty():
 		game.script_error("Некорректное имя значения \"%s\"" % name_with_arg)
 		return 0.0
-	var vname := m.get_string(1)
-	var arg_path := m.get_string(2)
+	var vname: String = parsed[0]
+	var arg_path: String = parsed[1]
 	if vname.begins_with("var:"):
 		var holder: Variant = game.state.global_vars
 		if scope != null and scope.type == "character" and game.ch(scope.id) != null:
@@ -313,10 +344,17 @@ static func compare(ctx: ScriptContext, scope: Variant, actual: float, cond: Var
 	if cond is bool or (cond is String and (cond == "yes" or cond == "no")):
 		return (actual != 0.0) == ScriptContext.is_yes(cond)
 	if cond is String or cond is StringName:
-		var m := _re_cmp().search(str(cond))
-		if m == null:
+		var cs := str(cond)
+		var parsed: Variant = _cmp_cache.get(cs)
+		if parsed == null:
+			var m := _re_cmp().search(cs)
+			parsed = [m.get_string(1), m.get_string(2)] if m != null else []
+			if _cmp_cache.size() > 20000:
+				_cmp_cache.clear()
+			_cmp_cache[cs] = parsed
+		if parsed.is_empty():
 			return actual >= eval_value(ctx, scope, cond)
-		return _cmp_op(m.get_string(1), actual, eval_value(ctx, scope, m.get_string(2)))
+		return _cmp_op(parsed[0], actual, eval_value(ctx, scope, parsed[1]))
 	if cond is Dictionary:
 		for op in cond:
 			var norm: Variant = OP_ALIASES.get(op)
@@ -403,9 +441,27 @@ static func _effect_in(ctx: ScriptContext, from: Variant, sub: Variant, block: V
 	ctx.depth -= 1
 
 
+const _SPECIAL_TRIGGER_KEYS := {
+	"AND": true, "and": true, "OR": true, "or": true, "NOT": true, "not": true, "NAND": true, "NOR": true, "nor": true,
+	"always": true, "exists": true, "is": true, "this": true, "custom_tooltip": true, "custom_description": true,
+	"desc": true, "text": true,
+}
+
+
 static func eval_trigger_key(ctx: ScriptContext, scope: Variant, key: String, arg: Variant) -> bool:
+	if _SPECIAL_TRIGGER_KEYS.has(key):
+		return _special_trigger(ctx, scope, key, arg)
+	# Быстрый путь: зарегистрированный триггер (самый частый случай).
+	var fast: Variant = ctx.game.engine.scripting.triggers._map.get(key)
+	if fast != null and not key.begins_with("any_"):
+		if fast.has("scopes") and (scope == null or not fast.scopes.has(scope.type)):
+			return false
+		return fast.eval.call(ctx, scope, arg)
+	return _registered_trigger(ctx, scope, key, arg)
+
+
+static func _special_trigger(ctx: ScriptContext, scope: Variant, key: String, arg: Variant) -> bool:
 	var game := ctx.game
-	var reg := game.engine.scripting
 	match key:
 		"AND", "and":
 			return eval_trigger(ctx, scope, arg)
@@ -427,6 +483,12 @@ static func eval_trigger_key(ctx: ScriptContext, scope: Variant, key: String, ar
 			return eval_trigger(ctx, scope, arg.get("trigger")) if arg is Dictionary else true
 		"desc", "text":
 			return true
+	return true
+
+
+static func _registered_trigger(ctx: ScriptContext, scope: Variant, key: String, arg: Variant) -> bool:
+	var game := ctx.game
+	var reg := game.engine.scripting
 	if key.begins_with("scope:") and not key.contains("."):
 		var sname := key.substr(6)
 		if ctx.values.has(sname):

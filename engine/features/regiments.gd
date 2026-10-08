@@ -21,9 +21,7 @@ func _init() -> void:
 
 
 static func types(game: Game) -> Array:
-	var l := game.content.all("regiment_types").duplicate()
-	Data.sort_by(l, func(x): return Data.num(x.get("order")))
-	return l
+	return game.engine.sorted_content("regiment_types")
 
 
 static func regs_of(c: Dictionary) -> Array:

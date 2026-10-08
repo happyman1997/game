@@ -21,13 +21,11 @@ func _init() -> void:
 
 
 static func positions(game: Game) -> Array:
-	var l := game.content.all("council_positions").duplicate()
-	Data.sort_by(l, func(x): return Data.num(x.get("order")))
-	return l
+	return game.engine.sorted_content("council_positions")
 
 
 static func tasks_of(game: Game, position: String) -> Array:
-	return game.content.all("council_tasks").filter(func(t): return t.get("position") == position)
+	return game.engine.content_where("council_tasks", "position", position)
 
 
 static func default_task(game: Game, position: String) -> Variant:

@@ -52,6 +52,8 @@ static func _link(text: String, color: Color, cb: Callable, tip_content: Variant
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	b.add_theme_color_override("font_color", color)
 	b.add_theme_constant_override("h_separation", 0)
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	b.pressed.connect(cb)
 	if tip_content != null:
 		K.tip(b, tip_content)
