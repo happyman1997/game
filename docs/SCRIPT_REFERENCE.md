@@ -1,6 +1,6 @@
 # Справочник скриптового языка
 
-> Файл сгенерирован командой `npm run docs:script` из реестров движка и включённых модов.
+> Файл сгенерирован командой `godot --headless --path . -s tools/script_docs.gd` из реестров движка и включённых модов.
 > Колонка «Источник» показывает, кто зарегистрировал элемент (core — движок, иначе id мода).
 
 ## Триггеры (условия)
@@ -37,8 +37,8 @@
 | `has_secret` | character | Есть секрет (yes или тип) | core/secrets |
 | `has_strong_hook_on` | character | Есть сильный крюк на персонажа | core |
 | `has_succession_law` | character | Закон наследования | core |
-| `has_trait_category` | character | Есть черта категории | core |
 | `has_trait` | character | Есть черта | core |
+| `has_trait_category` | character | Есть черта категории | core |
 | `has_truce_with` | character | Перемирие с персонажем | core |
 | `has_var` | character | Есть переменная | core |
 | `holds_title` | character | Владеет титулом | core |
@@ -46,22 +46,22 @@
 | `is_ai` | character | Персонаж ИИ | core |
 | `is_alive` | character | Жив | core |
 | `is_allied_with` | character | Союзник персонажа | core |
-| `is_at_war_with` | character | Воюет с персонажем | core |
 | `is_at_war` | character | Ведёт войну | core |
-| `is_child_of` | character | Ребёнок персонажа | core |
+| `is_at_war_with` | character | Воюет с персонажем | core |
 | `is_child` | character | Ребёнок | core |
+| `is_child_of` | character | Ребёнок персонажа | core |
 | `is_close_family_of` | character | Близкая семья | core |
 | `is_close_relative_of` | character | Слишком близкое родство для брака | core |
 | `is_coastal` | province | Прибрежная | core |
 | `is_councillor` | character | Заседает в совете (yes) или на должности: is_councillor: marshal | core/council |
-| `is_courtier_of` | character | Придворный персонажа | core |
 | `is_courtier` | character | Придворный | core |
+| `is_courtier_of` | character | Придворный персонажа | core |
 | `is_faction_leader` | character | Возглавляет фракцию | core/factions |
 | `is_female` | character | Женщина | core |
 | `is_heir_of` | character | Основной наследник персонажа | core |
 | `is_held` | title | У титула есть владелец | core |
-| `is_imprisoned_by` | character | В темнице у персонажа | core/prison |
 | `is_imprisoned` | character | В темнице | core/prison |
+| `is_imprisoned_by` | character | В темнице у персонажа | core/prison |
 | `is_in_faction` | character | Состоит во фракции (yes/no или тип) | core/factions |
 | `is_in_realm_of` | character | Состоит в державе персонажа | core |
 | `is_independent` | character | Независимый правитель | core |
@@ -81,8 +81,8 @@
 | `is_scheme_target` | character | Является целью интриги | core |
 | `is_sibling_of` | character | Брат/сестра персонажа | core |
 | `is_spouse_of` | character | Супруг(а) персонажа | core |
-| `is_vassal_of` | character | Прямой вассал персонажа | core |
 | `is_vassal` | character | Вассал | core |
+| `is_vassal_of` | character | Прямой вассал персонажа | core |
 | `knows_secret_of` | character | Знает какой-то секрет персонажа | core/secrets |
 | `province_has_disease` | province | В провинции эпидемия. Аргумент: yes или id болезни. | plague |
 | `random_chance` | любой | Случайный шанс в процентах (используйте осторожно в триггерах) | core |
@@ -96,87 +96,87 @@
 
 ## Эффекты
 
-| Имя | Скоупы | Описание | Источник |
-|---|---|---|---|
-| `add_alliance` | character | Союз с персонажем | core |
-| `add_building` | province | Добавить постройку | core |
-| `add_claim` | character | Претензия на титул | core |
-| `add_courtier` | character | Принять ко двору | core |
-| `add_development` | province | Изменить развитие | core |
-| `add_dynasty_prestige` | character | Престиж династии | core |
-| `add_faction_discontent` | faction | Изменить недовольство фракции | core/factions |
-| `add_gold` | character | Изменить gold | core |
-| `add_health` | character | Изменить базовое здоровье | core |
-| `add_hook` | character | Крюк на персонажа: path или { target, strong, years } | core |
-| `add_lifestyle_xp` | character | Опыт образа жизни: число (текущий образ жизни) или { lifestyle, value } | core/lifestyles |
-| `add_modifier` | character | Добавить модификатор: id или { id, years/months/days } | core |
-| `add_opinion` | character | Мнение этого персонажа о target: { target, modifier, value? } | core |
-| `add_perk` | character | Открыть перк бесплатно | core/lifestyles |
-| `add_piety` | character | Изменить piety | core |
-| `add_prestige` | character | Изменить prestige | core |
-| `add_province_modifier` | province | Модификатор провинции | core |
-| `add_regiment` | character | Получить отряд бесплатно (сверх предела) | core/regiments |
-| `add_secret` | character | Персонаж получает секрет: add_secret: тип или { type, target, known_by } | core/secrets |
-| `add_skill` | character | Навсегда изменить навык: { skill, value } | core |
-| `add_stress` | character | Изменить стресс | core |
-| `add_trait` | character | Добавить черту | core |
-| `annex_war_targets` | character | Присоединить цели войны (в контексте войны) | core |
-| `appoint_councillor` | character | Назначить в совет: { position, who } | core/council |
-| `become_independent` | character | Стать независимым | core |
-| `become_vassal_of` | character | Стать вассалом | core |
-| `blackmail` | character | Шантажировать персонажа его самым тяжёлым известным секретом (получить крюк) | core/secrets |
-| `break_alliance` | character | Разорвать союз | core |
-| `change_culture` | character, province | Сменить культуру | core |
-| `change_faith` | character, province | Сменить веру | core |
-| `change_var` | любой | Изменить переменную: { name, add } | core |
-| `create_character` | character | Создать персонажа: { culture, faith, female, age, traits, dynasty: new\|none\|path, court, save_scope_as } | core |
-| `death` | character | Смерть: yes, причина или { reason, killer } | core |
-| `discover_scheme_against` | character | Раскрыть случайную враждебную интригу против персонажа или его семьи | core/council |
-| `discover_secret` | character | Узнать случайный секрет кого-то из своей державы | core/secrets |
-| `divorce` | character | Развод | core |
-| `end_war` | любой | Завершить войну: victory/white_peace/defeat | core |
-| `expose_secret` | character | Разоблачить самый тяжёлый известный секрет персонажа | core/secrets |
-| `faction_enforce_demands` | faction | Сюзерен выполняет требования фракции | core/factions |
-| `faction_start_war` | faction | Фракция поднимает мятеж | core/factions |
-| `gain_title` | character | Получить титул | core |
-| `give_title` | character | Пожаловать титул: { title, to } — получатель становится вассалом | core |
-| `imprison` | character | Заключить персонажа в свою темницу: imprison: scope:x или { target, reason } | core/prison |
-| `join_faction` | character | Вступить во фракцию против сюзерена (или создать): join_faction: <тип> | core/factions |
-| `leave_faction` | character | Выйти из фракции | core/factions |
-| `lose_all_titles` | character | Потерять все титулы | core |
-| `lose_title` | character | Потерять титул (переходит к сюзерену) | core |
-| `make_pregnant` | character | Беременность: { father } | core |
-| `mark_criminal` | character | Даёт target законный повод заключить этого персонажа: { target, years } | core/prison |
-| `marry` | character | Заключить брак | core |
-| `move_to_court` | character | Переехать ко двору персонажа | core |
-| `pay_gold` | character | Передать золото: { target, value } | core |
-| `release_from_prison` | character | Освободить этого персонажа из темницы | core/prison |
-| `remove_building` | province | Убрать постройку | core |
-| `remove_claim` | character | Убрать претензию | core |
-| `remove_flag` | character | Убрать флаг | core |
-| `remove_global_flag` | любой | Убрать глобальный флаг | core |
-| `remove_hook` | character | Убрать крюк | core |
-| `remove_modifier` | character | Убрать модификатор | core |
-| `remove_opinion` | character | Убрать модификатор мнения: { target, modifier } | core |
-| `remove_perk` | character | Убрать перк | core/lifestyles |
-| `remove_province_modifier` | province | Убрать модификатор провинции | core |
-| `remove_trait` | character | Убрать черту | core |
-| `remove_var` | любой | Удалить переменную | core |
-| `reverse_add_opinion` | character | Мнение target об этом персонаже: { target, modifier, value? } | core |
-| `seize_primary_title` | character | Забрать основной титул персонажа (претендент): прежний владелец становится вассалом | core/factions |
-| `send_message` | character | Сообщение игроку (если этот персонаж — игрок) | core |
-| `set_flag` | character | Установить флаг: name или { name, days/months/years } | core |
-| `set_focus` | character | Сменить фокус образа жизни (без перерыва) | core/lifestyles |
-| `set_global_flag` | любой | Глобальный флаг | core |
-| `set_global_var` | любой | Глобальная переменная | core |
-| `set_nickname` | character | Прозвище (ключ локализации или текст) | core |
-| `set_province_flag` | province | Флаг провинции | core |
-| `set_realm_law` | character | Установить закон державы (без цены и перерыва) | core/laws |
-| `set_succession_law` | character | Закон наследования | core |
-| `set_var` | любой | Переменная: { name, value } | core |
-| `start_disease` | province | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
-| `start_scheme` | character | Начать интригу: { type, target } | core |
-| `take_title` | character | Отобрать титул себе: { title, from? } | core |
+| Имя | Описание | Источник |
+|---|---|---|
+| `add_alliance` | Союз с персонажем | core |
+| `add_building` | Добавить постройку | core |
+| `add_claim` | Претензия на титул | core |
+| `add_courtier` | Принять ко двору | core |
+| `add_development` | Изменить развитие | core |
+| `add_dynasty_prestige` | Престиж династии | core |
+| `add_faction_discontent` | Изменить недовольство фракции | core/factions |
+| `add_gold` | Изменить gold | core |
+| `add_health` | Изменить базовое здоровье | core |
+| `add_hook` | Крюк на персонажа: path или { target, strong, years } | core |
+| `add_lifestyle_xp` | Опыт образа жизни: число (текущий образ жизни) или { lifestyle, value } | core/lifestyles |
+| `add_modifier` | Добавить модификатор: id или { id, years/months/days } | core |
+| `add_opinion` | Мнение этого персонажа о target: { target, modifier, value? } | core |
+| `add_perk` | Открыть перк бесплатно | core/lifestyles |
+| `add_piety` | Изменить piety | core |
+| `add_prestige` | Изменить prestige | core |
+| `add_province_modifier` | Модификатор провинции | core |
+| `add_regiment` | Получить отряд бесплатно (сверх предела) | core/regiments |
+| `add_secret` | Персонаж получает секрет: add_secret: тип или { type, target, known_by } | core/secrets |
+| `add_skill` | Навсегда изменить навык: { skill, value } | core |
+| `add_stress` | Изменить стресс | core |
+| `add_trait` | Добавить черту | core |
+| `annex_war_targets` | Присоединить цели войны (в контексте войны) | core |
+| `appoint_councillor` | Назначить в совет: { position, who } | core/council |
+| `become_independent` | Стать независимым | core |
+| `become_vassal_of` | Стать вассалом | core |
+| `blackmail` | Шантажировать персонажа его самым тяжёлым известным секретом (получить крюк) | core/secrets |
+| `break_alliance` | Разорвать союз | core |
+| `change_culture` | Сменить культуру | core |
+| `change_faith` | Сменить веру | core |
+| `change_var` | Изменить переменную: { name, add } | core |
+| `create_character` | Создать персонажа: { culture, faith, female, age, traits, dynasty: new\|none\|path, court, save_scope_as } | core |
+| `death` | Смерть: yes, причина или { reason, killer } | core |
+| `discover_scheme_against` | Раскрыть случайную враждебную интригу против персонажа или его семьи | core/council |
+| `discover_secret` | Узнать случайный секрет кого-то из своей державы | core/secrets |
+| `divorce` | Развод | core |
+| `end_war` | Завершить войну: victory/white_peace/defeat | core |
+| `expose_secret` | Разоблачить самый тяжёлый известный секрет персонажа | core/secrets |
+| `faction_enforce_demands` | Сюзерен выполняет требования фракции | core/factions |
+| `faction_start_war` | Фракция поднимает мятеж | core/factions |
+| `gain_title` | Получить титул | core |
+| `give_title` | Пожаловать титул: { title, to } — получатель становится вассалом | core |
+| `imprison` | Заключить персонажа в свою темницу: imprison: scope:x или { target, reason } | core/prison |
+| `join_faction` | Вступить во фракцию против сюзерена (или создать): join_faction: <тип> | core/factions |
+| `leave_faction` | Выйти из фракции | core/factions |
+| `lose_all_titles` | Потерять все титулы | core |
+| `lose_title` | Потерять титул (переходит к сюзерену) | core |
+| `make_pregnant` | Беременность: { father } | core |
+| `mark_criminal` | Даёт target законный повод заключить этого персонажа: { target, years } | core/prison |
+| `marry` | Заключить брак | core |
+| `move_to_court` | Переехать ко двору персонажа | core |
+| `pay_gold` | Передать золото: { target, value } | core |
+| `release_from_prison` | Освободить этого персонажа из темницы | core/prison |
+| `remove_building` | Убрать постройку | core |
+| `remove_claim` | Убрать претензию | core |
+| `remove_flag` | Убрать флаг | core |
+| `remove_global_flag` | Убрать глобальный флаг | core |
+| `remove_hook` | Убрать крюк | core |
+| `remove_modifier` | Убрать модификатор | core |
+| `remove_opinion` | Убрать модификатор мнения: { target, modifier } | core |
+| `remove_perk` | Убрать перк | core/lifestyles |
+| `remove_province_modifier` | Убрать модификатор провинции | core |
+| `remove_trait` | Убрать черту | core |
+| `remove_var` | Удалить переменную | core |
+| `reverse_add_opinion` | Мнение target об этом персонаже: { target, modifier, value? } | core |
+| `seize_primary_title` | Забрать основной титул персонажа (претендент): прежний владелец становится вассалом | core/factions |
+| `send_message` | Сообщение игроку (если этот персонаж — игрок) | core |
+| `set_flag` | Установить флаг: name или { name, days/months/years } | core |
+| `set_focus` | Сменить фокус образа жизни (без перерыва) | core/lifestyles |
+| `set_global_flag` | Глобальный флаг | core |
+| `set_global_var` | Глобальная переменная | core |
+| `set_nickname` | Прозвище (ключ локализации или текст) | core |
+| `set_province_flag` | Флаг провинции | core |
+| `set_realm_law` | Установить закон державы (без цены и перерыва) | core/laws |
+| `set_succession_law` | Закон наследования | core |
+| `set_var` | Переменная: { name, value } | core |
+| `start_disease` | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
+| `start_scheme` | Начать интригу: { type, target } | core |
+| `take_title` | Отобрать титул себе: { title, from? } | core |
 
 ## Значения
 
@@ -216,9 +216,9 @@
 | `knights_power` | character | Сила рыцарей (в ополченцах) | core/knights |
 | `learning` | character | Навык: learning | core |
 | `levies` | character | Ополчение державы | core |
+| `levy` | province | Ополчение провинции | core |
 | `levy_flat` | character | Характеристика: levy_flat | core |
 | `levy_ratio` | character | Доля восстановленных ополчений | core |
-| `levy` | province | Ополчение провинции | core |
 | `lifestyle_xp` | character | Опыт текущего образа жизни | core/lifestyles |
 | `martial` | character | Навык: martial | core |
 | `monthly_piety` | character | Характеристика: monthly_piety | core |
@@ -255,10 +255,9 @@
 | `scheme_defense` | character | Характеристика: scheme_defense | core |
 | `scheme_power` | character | Характеристика: scheme_power | core |
 | `scheme_progress` | scheme | Прогресс интриги | core |
-| `stat` | character | Устарело: используйте имя характеристики | core |
 | `stewardship` | character | Навык: stewardship | core |
-| `stress_level` | character | Уровень стресса (стресс / 100) | core |
 | `stress` | character | Стресс | core |
+| `stress_level` | character | Уровень стресса (стресс / 100) | core |
 | `tax` | province | Налог провинции | core |
 | `tier` | character | Ранг основного титула (0 — нет земель, 1 — граф ... 4 — император) | core |
 | `title_tier` | title | Ранг титула | core |
@@ -267,11 +266,11 @@
 
 ## Ссылки на скоупы
 
-| Имя | Из скоупа | Описание | Источник |
+| Имя | Скоупы | Описание | Источник |
 |---|---|---|---|
 | `attacker` | war | Нападающий | core |
-| `capital_province` | title | Столица титула | core |
 | `capital` | character | Столица (провинция) | core |
+| `capital_province` | title | Столица титула | core |
 | `chancellor` | character | Советник на должности chancellor | core/council |
 | `controller` | province | Кто контролирует провинцию | core |
 | `county` | province | Графство провинции | core |
@@ -304,7 +303,7 @@
 
 ## Списки (any_ / every_ / random_ / ordered_)
 
-| Имя | Из скоупа | Описание | Источник |
+| Имя | Скоупы | Описание | Источник |
 |---|---|---|---|
 | `ally` | character | Союзники | core |
 | `child` | character | Живые дети | core |
@@ -340,19 +339,19 @@
 | `son` | character | Сыновья | core |
 | `spouse` | character | Супруги | core |
 | `vassal` | character | Прямые вассалы | core |
+| `war` | любой | Все войны | core |
 | `war_attacker` | war | Участники войны на стороне нападения | core/factions |
 | `war_defender` | war | Участники войны на стороне защиты | core/factions |
 | `war_enemy` | character | Враги по войнам | core |
-| `war` | любой | Все войны | core |
 
 ## Константы
 
-| Имя | Значение |  | Источник |
-|---|---|---|---|
-| `county` | 1 |  | core |
-| `duchy` | 2 |  | core |
-| `empire` | 4 |  | core |
-| `kingdom` | 3 |  | core |
+| Имя | Значение | Источник |
+|---|---|---|
+| `county` | 1 | core |
+| `duchy` | 2 | core |
+| `empire` | 4 | core |
+| `kingdom` | 3 | core |
 
 ## Механики
 
@@ -367,17 +366,17 @@
 | `laws` | Законы державы: власть короны и другие группы законов | да |
 | `knights` | Рыцари: доблестные придворные и вассалы усиливают армию правителя | да |
 
-Отключение: `defines.disabled_features: [id, ...]`. Источник `core/<механика>` в таблицах выше — элементы, которые регистрирует механика.
+Отключение: `defines.disabled_features: [id, ...]`.
 
 ## Реестры движка
 
-- **successionAlgorithms**: `primogeniture`, `partition`, `seniority`, `elective`
-- **cbTargets**: `claim`, `de_jure`, `independence`, `adjacent_county`, `holy_war`, `faction`
-- **interactionTargets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
-- **interactionDeciders**: `payer`
-- **modifierProviders**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `plague_fear`
-- **provinceModifierProviders**: 
-- **opinionProviders**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`
-- **contentValidators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `laws`
+- **succession_algorithms**: `primogeniture`, `partition`, `seniority`, `elective`
+- **cb_targets**: `claim`, `de_jure`, `independence`, `adjacent_county`, `holy_war`, `faction`
+- **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
+- **interaction_deciders**: `payer`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `plague_fear`
+- **province_modifier_providers**: 
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `laws`
 - **systems**: `upkeep` (0), `economy` (10), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `factions` (58), `construction` (60), `plague` (65), `ai` (70), `development` (80), `laws` (85)
-- **ui.mapModes**: `plague`
+- **ui.map_modes**: `plague`

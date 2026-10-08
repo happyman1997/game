@@ -5,5 +5,5 @@
   "author": "Ваше имя",
   "description": { "ru": "Описание мода.", "en": "Mod description." },
   "dependencies": ["core"],
-  "scripts": ["scripts/main.js"]
+  "scripts": ["scripts/main.gd"]
 }

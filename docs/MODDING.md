@@ -11,20 +11,21 @@
 |---|---|---|
 | **Данные** (YAML/JSON) | Редактировать текстовые файлы | Черты, культуры, карта, персонажи, события, решения, взаимодействия, войны, интриги, постройки, законы, режимы карты, баланс |
 | **Скриптовый язык** в данных | Логика «если — то» | Условия и последствия событий, решений, взаимодействий; формулы шансов и согласия ИИ |
-| **JS-скрипты** | JavaScript | Новые механики (системы симуляции), новые триггеры/эффекты для скриптов, алгоритмы наследования, типы войн, режимы карты, панели и виджеты интерфейса |
+| **Скрипты на GDScript** | GDScript (язык Godot, похож на Python) | Новые механики (системы симуляции), новые триггеры/эффекты для скриптов, алгоритмы наследования, типы войн, режимы карты, панели и виджеты интерфейса |
 
 Готовые примеры:
 
 - [`mods/tournaments`](../mods/tournaments) — мод **без кода**: новые черты, постройка, решение с цепочкой событий, режим карты и правки чужого контента директивами слияния;
-- [`mods/plague`](../mods/plague) — **JS-мод**: собственный тип контента `diseases`, система эпидемий, триггеры и эффекты для скриптов, режим карты, виджет, панель;
+- [`mods/plague`](../mods/plague) — **мод со скриптом на GDScript**: собственный тип контента `diseases`, система эпидемий, триггеры и эффекты для скриптов, режим карты, виджет, панель;
 - [`mods/elective_monarchy`](../mods/elective_monarchy) — **расширение реестра**: новый алгоритм наследования (выборы вассалами);
-- [`docs/mod-template`](mod-template) — заготовка: скопируйте в `mods/` и переименуйте.
+- [`docs/mod-template`](mod-template) — заготовка: скопируйте в папку модов и переименуйте.
 
 ---
 
 ## 1. Быстрый старт
 
-1. Создайте папку `mods/my_mod/`.
+1. Создайте папку `my_mod` в папке модов игрока — «Документы/Crown and Dynasty/mods»
+   (или в `mods/` проекта, если работаете с исходниками).
 2. Положите в неё `mod.json`:
 
    ```json
@@ -36,7 +37,7 @@
    }
    ```
 
-3. Создайте `mods/my_mod/data/traits.yaml`:
+3. Создайте `my_mod/data/traits.yaml`:
 
    ```yaml
    traits:
@@ -46,7 +47,7 @@
        modifiers: { prowess: 1, monthly_prestige: 0.2 }
    ```
 
-4. И перевод `mods/my_mod/localization/ru/my_mod.yaml`:
+4. И перевод `my_mod/localization/ru/my_mod.yaml`:
 
    ```yaml
    trait:
@@ -55,11 +56,12 @@
      falconer: Знаток соколиной охоты.
    ```
 
-5. Запустите `npm run validate` — он проверит синтаксис и ссылки.
-6. Запустите игру (`npm run dev`) — мод появится в меню «Моды» и будет включён.
-
-Чтобы попробовать мод **без пересборки**, в меню «Моды» нажмите
-«Загрузить папку мода…» и выберите папку (работает до перезагрузки страницы).
+5. Запустите игру — мод появится в меню «Моды» и будет включён. Если правите
+   файлы при открытой игре, нажмите в менеджере модов «Обновить список» и
+   «Применить» — контент перезагрузится без перезапуска.
+6. Проблемы (опечатки в YAML, ссылки на несуществующие черты, неизвестные ключи
+   скриптов) видны в главном меню («Проблемы модов») или через
+   `godot --headless --path . -s tools/validate.gd` (см. раздел 12).
 
 ---
 
@@ -75,7 +77,7 @@
 | `priority` | При прочих равных меньше — раньше (у `core` = −100). |
 | `data` | Папки с данными, по умолчанию `["data"]`. Вложенность любая. |
 | `localization` | Папка локализации, по умолчанию `localization`. |
-| `scripts` | JS/TS-скрипты, экспортирующие `init(api)`. |
+| `scripts` | Скрипты на GDScript (`.gd`) с функцией `init(api)`. |
 | `default_enabled` | `false` — мод выключен, пока игрок не включит его вручную. |
 
 ---
@@ -162,7 +164,7 @@ defines:
 | `map`, `landmasses`, `provinces`, `map_links` | `core/data/map/` | Карта — см. раздел 7. |
 | `titles` | `core/data/map/titles.yaml` | Иерархия де-юре: `tier`, `liege`, `color`, `capital`, `coa` (герб), `no_create`. Графства создаются из провинций автоматически. |
 | `dynasties`, `characters`, `bookmarks` | `core/data/history/` | Исторические персонажи и стартовые даты. |
-| `succession_laws` | `core/data/common/laws_and_modifiers.yaml` | `algorithm` (`partition`, `primogeniture`, `seniority` или свой из JS), `gender`, `change_cost`, `can_change`. |
+| `succession_laws` | `core/data/common/laws_and_modifiers.yaml` | `algorithm` (`partition`, `primogeniture`, `seniority` или свой из скрипта мода), `gender`, `change_cost`, `can_change`. |
 | `opinion_modifiers`, `modifiers` | там же | Модификаторы мнения (`value`, `decay`, `years`, `stacking`) и временные модификаторы персонажей/провинций. |
 | `casus_belli` | `core/data/common/war.yaml` | Поводы к войне: `targets` (поставщик целей), `is_valid`, `cost`, `on_victory`, `on_white_peace`, `on_defeat`, `ai_will_do`, `truce_years`, `war_name`, `manual` (не предлагать игроку и ИИ — только для скриптов, например мятежей). |
 | `interactions` | `core/data/common/interactions.yaml` | Взаимодействия персонажей (см. раздел 6). |
@@ -175,7 +177,7 @@ defines:
 | `council_positions`, `council_tasks` | `core/data/common/council.yaml` | Совет: должности и задачи — раздел 10. |
 | `factions` | `core/data/common/factions.yaml` | Фракции вассалов и их мятежи — раздел 10. |
 | `regiment_types` | `core/data/common/regiments.yaml` | Профессиональные войска — раздел 10. |
-| **любой свой тип** | `plague/data/plague.yaml` (`diseases`) | Движок сохранит его; читайте из JS: `api.content.all('diseases')`. |
+| **любой свой тип** | `plague/data/plague.yaml` (`diseases`) | Движок сохранит его; читайте из скрипта: `api.content.all("diseases")`. |
 
 Подробные комментарии есть прямо в файлах мода `core` — это лучший справочник по полям.
 
@@ -248,7 +250,7 @@ events:
 Скрипты — это YAML-блоки трёх видов: **триггеры** (условия), **эффекты**
 (действия) и **значения** (числа). Полный список всего, что есть в движке и
 включённых модах, — в [`docs/SCRIPT_REFERENCE.md`](SCRIPT_REFERENCE.md)
-(генерируется командой `npm run docs:script`).
+(генерируется командой `godot --headless --path . -s tools/script_docs.gd`).
 
 ### Скоупы
 
@@ -447,74 +449,104 @@ map_links:                                    # морские переправ�
 Вместо ключа почти везде можно написать текст прямо в данных:
 `name: { ru: "Сокольничий", en: "Falconer" }`.
 
-Строки интерфейса движка лежат в `src/locale/`; мод может переопределить любую
+Строки интерфейса движка лежат в `locale/`; мод может переопределить любую
 из них, просто указав тот же ключ в своих файлах.
 
 ---
 
-## 9. JS-моды
+## 9. Скрипты на GDScript
 
-Скрипт мода — ES-модуль, указанный в `mod.json` → `scripts`. Он экспортирует
-`init(api)` (вызывается после загрузки всех данных) и, при необходимости,
-`preload(api)` (вызывается до разбора данных этого мода — например, чтобы
-зарегистрировать новый формат файлов).
+Скрипт мода — файл `.gd`, указанный в `mod.json` → `scripts`. Это обычный
+класс GDScript (`extends RefCounted`) с функцией `init(api: ModApi)`, которую
+движок вызывает после загрузки данных всех модов. Необязательная
+`preload_mod(info)` вызывается раньше — до разбора данных этого мода
+(например, чтобы зарегистрировать новый формат файлов в `info.formats`).
 
-```js
-export function init(api) {
-  // 1. Скриптовый язык
-  api.script.trigger('is_falconer', { scopes: ['character'], eval: (ctx, scope) => ctx.game.char(scope.id).traits.includes('falconer') });
-  api.script.effect('release_falcon', {
-    apply: (ctx, scope, arg) => { ctx.game.char(scope.id).prestige += Number(arg) || 10; },
-    describe: (ctx, scope, arg) => `+${arg} престижа за сокола`,
-  });
-  api.script.value('falcons_owned', { get: (ctx, scope) => ctx.game.char(scope.id).vars.falcons ?? 0 });
+Весь движок — это классы GDScript с глобальными именами (`Game`, `Chars`,
+`Titles`, `Succession`, `Wars`, `Military`, `Economy`, `Opinion`, `Stats`,
+`Interactions`, `Schemes`, `Decisions`, `Ai`, механики `Lifestyles`,
+`Council`, `Prison`, `Factions`, `Regiments`, `Secrets`, `Laws`, `Knights`),
+поэтому скрипт мода может пользоваться любой функцией мира напрямую.
 
-  // 2. Системы симуляции (вызываются каждый день/месяц/год)
-  api.systems.add({ id: 'falconry', order: 100, onMonth(game) { /* ... */ } });
-  api.systems.replace('development', { onYear(game) { /* свой рост развития */ } });
-  // api.systems.remove('ai');  — отключить встроенную систему целиком
+```gdscript
+extends RefCounted
 
-  // 3. Хуки
-  api.hooks.on('character.death', ({ game, character, reason }) => { /* ... */ });
-  api.hooks.on('war.before_declare', ({ attacker }) => attacker.gold > 0); // false — запретить
 
-  // 4. Реестры
-  api.registries.successionAlgorithms.register('my_law', { heirs(game, ruler, law) { return []; } });
-  api.registries.cbTargets.register('my_cb_targets', { targets(game, attacker) { return []; } });
-  api.registries.modifierProviders.register('my_bonus', { fn: (game, c) => ({ diplomacy: 1 }) });
-  api.registries.opinionProviders.register('my_opinion', { fn: (game, a, b) => ({ label: 'Соколы', value: 5 }) });
+func init(api: ModApi) -> void:
+	# 1. Скриптовый язык
+	api.trigger("is_falconer", {"scopes": ["character"], "doc": "Сокольничий",
+		"eval": func(ctx, scope, _arg): return ctx.game.ch(scope.id).traits.has("falconer")})
+	api.effect("release_falcon", {
+		"apply": func(ctx, scope, arg): ctx.game.ch(scope.id).prestige += Data.num(arg, 10),
+		"describe": func(_ctx, _scope, arg): return "+%s престижа за сокола" % arg,
+	})
+	api.value("falcons_owned", {"get": func(ctx, scope, _arg): return Data.num(ctx.game.ch(scope.id).vars.get("falcons"))})
 
-  // 5. Интерфейс
-  api.ui.mapModes.register('falcons', { id: 'falcons', name: { ru: 'Соколы' }, icon: '🦅', color: (game, prov) => '#aa8844' });
-  api.ui.topBar.register('falcons', { id: 'falcons', render: (game) => ({ icon: '🦅', text: '3' }) });
-  api.ui.panels.register('falcons', { id: 'falcons', name: 'Соколиная охота', icon: '🦅', render: (game, ui) => '<p>HTML</p>' });
-  api.ui.characterSections.register('falcons', { id: 'falcons', title: 'Соколы', render: (game, charId) => '...' });
-  api.ui.provinceSections.register('falcons', { id: 'falcons', title: 'Соколы', render: (game, provId) => '...' });
-}
+	# 2. Системы симуляции (on_day / on_month / on_year / on_character_month)
+	api.add_system({"id": "falconry", "order": 100,
+		"on_character_month": func(game: Game, c: Dictionary): pass})  # каждый персонаж — в свой день месяца
+	api.replace_system("development", {"on_year": func(game: Game): pass})  # своё развитие
+	# api.remove_system("ai")  — отключить встроенную систему целиком
+
+	# 3. Хуки: в обработчик приходит словарь данных (в нём всегда есть game)
+	api.on("character.death", func(p: Dictionary): print(p.character.id, " умер: ", p.reason))
+	api.on("war.before_declare", func(p: Dictionary): return p.attacker.gold > 0)  # false — запретить
+
+	# 4. Реестры мира
+	api.registries.succession_algorithms.register("my_law", {"heirs": func(game, ruler, law): return []}, api.owner)
+	api.registries.cb_targets.register("my_cb_targets", {"targets": func(game, attacker): return []}, api.owner)
+	api.registries.modifier_providers.register("my_bonus", {"fn": func(game, c): return {"diplomacy": 1}}, api.owner)
+	api.registries.opinion_providers.register("my_opinion", {"fn": func(game, a, b): return {"label": "Соколы", "value": 5}}, api.owner)
+
+	# 5. Интерфейс
+	api.ui.map_modes.register("falcons", {"id": "falcons", "name": {"ru": "Соколы", "en": "Falcons"}, "icon": "🦅",
+		"color": func(game: Game, prov: String): return "#aa8844"})
+	api.ui.top_bar.register("falcons", {"id": "falcons", "render": func(game: Game): return {"icon": "🦅", "text": "3"}})
+	api.ui.panels.register("falcons", {"id": "falcons", "name": "Соколиная охота", "icon": "🦅",
+		"render": func(game: Game, ui) -> Control:
+			var l := Label.new()
+			l.text = "Соколов при дворе: 3"
+			return l})
+	api.ui.character_sections.register("falcons", {"id": "falcons", "title": "Соколы",
+		"render": func(game: Game, char_id: String, ui): return "[b]3[/b] сокола"})  # BBCode или Control
+	api.ui.province_sections.register("falcons", {"id": "falcons", "title": "Соколы",
+		"render": func(game: Game, prov_id: String, ui): return null})
 ```
+
+Иконки интерфейса: можно указать эмодзи (`"🦅"`) или имя встроенной
+нарисованной иконки (`"crown"`, `"swords"`, `"castle"`…, полный список —
+`ui/art/icons.gd`); свою иконку добавляет `Icons.register("falcon", "<svg-тело 24×24>")`.
+Панель мода получает `ui` — объект приложения: `ui.open_character(id)`,
+`ui.open_province(id, true)`, `ui.open_tab(id)`, `ui.toast(text)`.
 
 ### Что есть в `api`
 
-| Поле | Назначение |
+| Поле / метод | Назначение |
 |---|---|
-| `api.content` | Хранилище контента: `get(type, id)`, `all(type)`, `ids(type)`, `set`, `delete`, `singleton('defines')`. |
+| `api.owner` | id мода (им помечаются зарегистрированные элементы). |
+| `api.content` | Хранилище контента: `get_def(type, id)`, `all(type)`, `ids(type)`, `has`, `set_def`, `remove`, `singleton("defines")`. |
 | `api.loc` | Локализация: `t(key, params)`, `add(lang, entries)`. |
-| `api.script` | Регистрация `trigger`, `effect`, `value`, `link`, `list`, `constant` + функции интерпретатора (`evalTrigger`, `runEffect`, `evalValue`, `makeContext`…). |
-| `api.systems` | `add`, `replace`, `remove`, `get`, `list`. |
-| `api.hooks` | `on(name, fn, priority)`. |
-| `api.registries` | `successionAlgorithms`, `cbTargets`, `interactionTargets`, `interactionDeciders`, `modifierProviders`, `provinceModifierProviders`, `opinionProviders`, `contentValidators`. |
-| `api.features` | `add(feature)` — установить свою механику; `list()`; `evalModifiers(ctx, scope, mods)` — модификаторы со скриптовыми значениями. |
-| `api.ui` | `mapModes`, `panels`, `characterSections`, `provinceSections`, `topBar`, `alerts` (оповещения в верхней панели), `eventThemes`. |
-| `api.world` | Функции мира: `characters` (createCharacter, addTrait, marry…), `titles` (transferTitle, topLiege…), `succession` (killCharacter, heirsOf…), `war` (declareWar, endWar…), `military`, `economy`, `opinion`, `stats`, `interactions`, `schemes`, `decisions`, `ai`. |
-| `api.util` | `Rng`, `hashString`, даты, `deepMerge`, шум `fbm`. |
+| `api.trigger`, `api.effect`, `api.value`, `api.link`, `api.list`, `api.constant` | Регистрация элементов скриптового языка. Интерпретатор — класс `Interp` (`eval_trigger`, `run_effect`, `eval_value`), контекст — `ScriptContext.make(game, root, scopes)`. |
+| `api.add_system`, `api.replace_system`, `api.remove_system`, `api.get_system`, `api.list_systems` | Системы симуляции. |
+| `api.on(name, fn, priority)`, `api.emit` | Хуки. |
+| `api.registries` | `succession_algorithms`, `cb_targets`, `interaction_targets`, `interaction_deciders`, `modifier_providers`, `province_modifier_providers`, `opinion_providers`, `content_validators`. |
+| `api.add_feature`, `api.has_feature`, `api.list_features` | Механики; `EngineFeature.eval_modifiers(ctx, scope, mods)` — модификаторы со скриптовыми значениями. |
+| `api.ui` | `map_modes`, `panels`, `character_sections`, `province_sections`, `top_bar`, `alerts`, `event_themes`. |
+| `api.formats` | Форматы файлов данных (YAML, JSON и свои). |
+| `api.log(msg)` | Сообщение в консоль с именем мода. |
 
-Используйте функции из `api.world`, а не меняйте состояние напрямую: они
-поддерживают индексы и вызывают хуки. Если всё же меняете `liege`/`titles`
-вручную — вызовите `game.markDirty()`.
+Используйте функции мира (`Chars.add_trait`, `Titles.transfer_title`,
+`Succession.kill_character`, `Wars.declare_war`…), а не меняйте состояние
+напрямую: они поддерживают индексы и вызывают хуки. Если всё же меняете
+`liege`/`titles` вручную — вызовите `game.mark_dirty()`.
 
-**Сохранения.** Всё состояние партии — обычный JSON (`game.state`). Данные мода
-храните в `game.modData('my_mod', () => начальное значение)` — они попадут в
+**Сохранения.** Всё состояние партии — обычные словари (`game.state`),
+сохранение — это их JSON. Данные мода храните в
+`game.mod_data("my_mod", func(): return {начальное значение})` — они попадут в
 сохранение автоматически.
+
+**Ошибки.** Ошибка в скрипте мода прерывает только текущий вызов (хук,
+систему, отрисовку) и пишется в консоль; игра продолжается.
 
 ### Хуки
 
@@ -559,10 +591,10 @@ export function init(api) {
 
 ## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари
 
-Крупные подсистемы в стиле CK3 устроены как **механики** (`src/engine/features`).
+Крупные подсистемы в стиле CK3 устроены как **механики** (`engine/features`).
 Механика — модуль, который при запуске регистрирует свои системы, триггеры,
 эффекты, поставщиков модификаторов и проверки контента — ровно теми же
-средствами, что доступны JS-модам. Поэтому:
+средствами, что доступны скриптам модов. Поэтому:
 
 - **всё содержимое механик — данные** в моде `core`: должности совета, перки,
   фракции, типы отрядов меняются и дополняются обычным YAML со слиянием;
@@ -581,7 +613,8 @@ export function init(api) {
   триггеры просто ложны. А записи с полем `requires_feature: <механика>`
   (у любого типа контента) при отключении механики удаляются — так помечены,
   например, взаимодействия с пленниками и поводы к мятежам;
-- **свою механику** мод добавляет через `api.features.add({ id, script(engine) { … }, install(engine) { … } })`.
+- **свою механику** мод добавляет через `api.add_feature(MyFeature.new())`, где
+  `MyFeature` наследует `EngineFeature` и переопределяет `register_script(engine)` и `install(engine)`.
 
 Все числа механик — в `defines` (`lifestyle`, `council`, `prison`, `factions`,
 `regiments`, `secrets`, `hooks`, `knights`).
@@ -766,15 +799,16 @@ realm_laws:
 
 ### Оповещения
 
-Значки в верхней панели — реестр `api.ui.alerts`:
+Круглые значки слева вверху — реестр `api.ui.alerts`:
 
-```js
-api.ui.alerts.register('my_alert', {
-  id: 'my_alert',
-  check: (game) => game.player.gold > 1000
-    ? { icon: '💰', kind: 'good', text: 'Казна полна!', action: { tab: 'decisions' } }
-    : null,
-});
+```gdscript
+api.ui.alerts.register("my_alert", {
+	"id": "my_alert",
+	"check": func(game: Game):
+		if game.player.gold > 1000:
+			return {"icon": "💰", "kind": "good", "text": "Казна полна!", "action": {"tab": "decisions"}}
+		return null,
+})
 ```
 
 `action` открывает вкладку (`tab`), персонажа, титул или провинцию.
@@ -792,18 +826,21 @@ api.ui.alerts.register('my_alert', {
 - `succession_laws`;
 - `bookmarks` (дата и владельцы титулов; недостающих правителей движок сгенерирует сам).
 
-Строки интерфейса движка уже встроены (`src/locale`), а всё остальное
+Строки интерфейса движка уже встроены (`locale/`), а всё остальное
 (события, решения, войны, интриги) — по желанию.
 
 ---
 
 ## 12. Инструменты
 
+Инструменты запускаются через Godot из папки проекта (с исходниками игры);
+моды берутся встроенные и из «Документы/Crown and Dynasty/mods».
+
 | Команда | Что делает |
 |---|---|
-| `npm run dev` | Игра с горячей перезагрузкой: правьте YAML — обновите страницу. |
-| `npm run validate` | Проверка всех модов: синтаксис, зависимости, ссылки (в том числе в аргументах скриптов: `has_trait: brave`, `add_opinion: { modifier: … }`), неизвестные ключи скриптов, пробный запуск закладок, расхождения локализаций. |
-| `npm run sim -- --years 50 --seed 1 --verbose` | Безголовая симуляция: войны, смерти, статистика — для баланса. `--mods core,my_mod` — выбрать моды. |
-| `npm run docs:script` | Пересобрать `docs/SCRIPT_REFERENCE.md` (с учётом ваших модов). |
-| `npx tsx tools/render-map.ts out.png` | Картинка растра провинций. |
-| `npm test` | Автотесты движка. |
+| `godot --path .` | Запуск игры из исходников (или F5 в редакторе Godot). |
+| `godot --headless --path . -s tools/validate.gd` | Проверка всех модов: синтаксис, зависимости, ссылки (в том числе в аргументах скриптов: `has_trait: brave`, `add_opinion: { modifier: … }`), неизвестные ключи скриптов, пробный запуск закладок, расхождения локализаций. Код возврата 1 при ошибках. |
+| `godot --headless --path . -s tools/sim.gd -- --years 50 --seed 1 --verbose` | Безголовая симуляция: войны, смерти, крупнейшие державы — для баланса. `--mods core,my_mod` — выбрать моды, `--bookmark id` — закладку. |
+| `godot --headless --path . -s tools/script_docs.gd` | Пересобрать `docs/SCRIPT_REFERENCE.md` (с учётом ваших модов). |
+| `godot --headless --path . -s tests/run.gd` | Автотесты движка. |
+| `godot --headless --path . -s tools/make_icons.gd` | Пересобрать иконки приложения из `assets/icon.svg`. |

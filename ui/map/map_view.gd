@@ -438,10 +438,14 @@ func _process(delta: float) -> void:
 		overlay.queue_redraw()
 	if drift != Vector2.ZERO:
 		origin += drift * delta
-		if origin.x > map.width * 0.6 or origin.x < -size.x / zoom * 0.2:
+		# парим только в пределах карты (без тёмных краёв)
+		var max_x := maxf(0.0, map.width - size.x / zoom)
+		var max_y := maxf(0.0, map.height - size.y / zoom)
+		if (origin.x > max_x and drift.x > 0) or (origin.x < 0.0 and drift.x < 0):
 			drift.x = -drift.x
-		if origin.y > map.height * 0.5 or origin.y < -size.y / zoom * 0.2:
+		if (origin.y > max_y and drift.y > 0) or (origin.y < 0.0 and drift.y < 0):
 			drift.y = -drift.y
+		origin = origin.clamp(Vector2(-2, -2), Vector2(max_x + 2, max_y + 2))
 		overlay.queue_redraw()
 	elif interactive:
 		_keyboard_pan(delta)
