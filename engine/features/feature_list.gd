@@ -1,7 +1,7 @@
 class_name FeatureList
 extends RefCounted
-## Встроенные механики движка (порядок важен: позже установленные видят раньше установленные).
+## Встроенные механики движка.
 
 
 static func builtin() -> Array:
-	return []
+	return [Lifestyles.new(), Council.new(), Prison.new(), Factions.new(), Regiments.new(), Secrets.new(), Laws.new(), Knights.new()]

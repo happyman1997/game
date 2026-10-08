@@ -9,6 +9,6 @@
   },
   "dependencies": ["core"],
   "load_after": ["tournaments"],
-  "scripts": ["scripts/main.js"],
-  "tags": ["mechanics", "example", "js"]
+  "scripts": ["scripts/main.gd"],
+  "tags": ["mechanics", "example", "gdscript"]
 }

@@ -4,10 +4,10 @@
   "version": "1.0.0",
   "author": "Пример мода",
   "description": {
-    "ru": "Пример JS-мода: эпидемии распространяются по карте, убивают правителей и придворных. Добавляет свой тип контента (diseases), систему, триггеры и эффекты для скриптов, режим карты, виджет, панель и события.",
-    "en": "JS mod example: epidemics spread across the map and kill rulers and courtiers. Adds a content type (diseases), a system, script triggers and effects, a map mode, a widget, a panel and events."
+    "ru": "Пример мода со скриптом на GDScript: эпидемии распространяются по карте, убивают правителей и придворных. Добавляет свой тип контента (diseases), систему, триггеры и эффекты для скриптов, режим карты, виджет, панель и события.",
+    "en": "GDScript mod example: epidemics spread across the map and kill rulers and courtiers. Adds a content type (diseases), a system, script triggers and effects, a map mode, a widget, a panel and events."
   },
   "dependencies": ["core"],
-  "scripts": ["scripts/main.js"],
-  "tags": ["mechanics", "example", "js"]
+  "scripts": ["scripts/main.gd"],
+  "tags": ["mechanics", "example", "gdscript"]
 }

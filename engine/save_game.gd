@@ -8,7 +8,11 @@ const FORMAT := "crown-and-dynasty-save"
 
 static func serialize(game: Game) -> String:
 	game.emit("game.before_save", {})
-	return JSON.stringify({"format": FORMAT, "version": WorldSetup.SAVE_VERSION, "saved_at": Time.get_datetime_string_from_system(true), "state": game.state})
+	# Кэши сбрасываются и у текущей партии: так она продолжится точно так же,
+	# как загруженная из этого сохранения (детерминированность).
+	game.mark_dirty()
+	game.month_cache.clear()
+	return JSON.stringify({"format": FORMAT, "version": WorldSetup.SAVE_VERSION, "saved_at": Time.get_datetime_string_from_system(true), "state": game.state}, "", false, true)
 
 
 ## {game: Game|null, warnings: Array, error: String}

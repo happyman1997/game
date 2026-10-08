@@ -1,21 +1,8 @@
 extends TestCase
 ## Создание мира и симуляция без окна.
 
-static var _engine: GameEngine
-
-
 static func engine() -> GameEngine:
-	if _engine == null:
-		var issues := []
-		var pkgs := ModPackage.scan_dir("res://mods", "builtin", "встроенный", issues)
-		var defaults := {}
-		for lang in DirAccess.get_directories_at("res://locale"):
-			defaults[lang] = []
-			for f in DirAccess.get_files_at("res://locale/" + lang):
-				if f.ends_with(".yaml"):
-					defaults[lang].append(Yaml.parse(FileAccess.get_file_as_string("res://locale/%s/%s" % [lang, f]), f).value)
-		_engine = GameEngine.create(pkgs, {"default_localization": defaults, "lang": "ru"})
-	return _engine
+	return TestEnv.engine()
 
 
 func test_engine_loads() -> void:
