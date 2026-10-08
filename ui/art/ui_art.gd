@@ -330,3 +330,46 @@ static func flat(color: Color, border: Color = Color(0, 0, 0, 0), width: int = 0
 	if margin >= 0:
 		sb.set_content_margin_all(margin)
 	return sb
+
+
+## Полоса верхней/нижней панели: тёмная ткань с золотой кромкой снизу.
+static func bar_strip_svg() -> String:
+	return """<svg xmlns="http://www.w3.org/2000/svg" width="64" height="48" viewBox="0 0 64 48">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d2529" stop-opacity="0.97"/><stop offset="1" stop-color="#0e1316" stop-opacity="0.97"/></linearGradient>
+<linearGradient id="ln" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="%s"/><stop offset="1" stop-color="%s"/></linearGradient></defs>
+<rect width="64" height="48" fill="url(#bg)"/>
+<rect y="0" width="64" height="1" fill="%s" fill-opacity="0.35"/>
+<rect y="43" width="64" height="3" fill="url(#ln)"/>
+<rect y="46" width="64" height="2" fill="#000" fill-opacity="0.6"/>
+</svg>""" % [GOLD_LIGHT, BRONZE_DARK, GOLD]
+
+
+static func bar_strip_box() -> StyleBoxTexture:
+	var sb := _box(texture("bar_strip", bar_strip_svg()), 0, Vector4(10, 4, 10, 8))
+	sb.texture_margin_top = 2
+	sb.texture_margin_bottom = 6
+	return sb
+
+
+static func check_svg(on: bool) -> String:
+	var mark := '<path d="M5 10.5 L8.5 14 L15.5 6" fill="none" stroke="%s" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>' % GOLD_LIGHT if on else ""
+	return """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+<rect x="1.5" y="1.5" width="17" height="17" rx="2" fill="#0b0f11" stroke="%s" stroke-width="1.4"/>%s
+</svg>""" % [GOLD if on else BRONZE, mark]
+
+
+static func radio_svg(on: bool) -> String:
+	var dot := '<circle cx="10" cy="10" r="4.2" fill="%s"/>' % GOLD_LIGHT if on else ""
+	return """<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+<circle cx="10" cy="10" r="8.3" fill="#0b0f11" stroke="%s" stroke-width="1.4"/>%s
+</svg>""" % [GOLD if on else BRONZE, dot]
+
+
+static func arrow_svg() -> String:
+	return """<svg xmlns="http://www.w3.org/2000/svg" width="14" height="10" viewBox="0 0 14 10">
+<path d="M1.5 2 L7 8 L12.5 2 Z" fill="%s" stroke="%s" stroke-width="0.8"/></svg>""" % [GOLD, INK]
+
+
+static func grabber_svg() -> String:
+	return """<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+<path d="M9 1.5 L16.5 9 L9 16.5 L1.5 9 Z" fill="%s" stroke="%s" stroke-width="1.2"/></svg>""" % [GOLD, INK]
