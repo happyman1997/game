@@ -239,35 +239,42 @@ static func ai_choose_perk(game: Game, c: Dictionary, lifestyle: String) -> Vari
 	return pick.id if pick != null else null
 
 
+## Помесячно для персонажа (в его день): выбор фокуса, опыт, перки ИИ.
+static func monthly_char(game: Game, c: Dictionary) -> void:
+	if not Chars.is_adult(game, c) or c.get("prison") != null:
+		return
+	var st := state_of(c)
+	if st.focus == null or not game.content.has("focuses", st.focus):
+		set_focus(game, c, ai_choose_focus(game, c), true)
+		if st.focus == null:
+			return
+	var l: Variant = current(game, c)
+	if l == null:
+		return
+	if available_perks(game, c, l.id).is_empty():
+		return # всё изучено
+	st.xp[l.id] = xp_of(c, l.id) + monthly_xp(game, c)
+	if st.xp[l.id] < perk_cost(game, c, l.id):
+		return
+	if game.is_player(c.id):
+		if not c.flags.has("tmp:perk_notified"):
+			c.flags["tmp:perk_notified"] = game.date + 3650
+			game.message(game.loc.t("msg.perk_available", {"lifestyle": game.name_of("lifestyles", l.id)}), "good")
+	else:
+		var pick: Variant = ai_choose_perk(game, c, l.id)
+		if pick != null:
+			unlock_perk(game, c, pick)
+
+
+## Все персонажи сразу (для скриптов и тестов).
 static func monthly(game: Game) -> void:
-	for c in game.living():
-		if not Chars.is_adult(game, c) or c.get("prison") != null:
-			continue
-		var st := state_of(c)
-		if st.focus == null or not game.content.has("focuses", st.focus):
-			set_focus(game, c, ai_choose_focus(game, c), true)
-			if st.focus == null:
-				continue
-		var l: Variant = current(game, c)
-		if l == null:
-			continue
-		if available_perks(game, c, l.id).is_empty():
-			continue # всё изучено
-		st.xp[l.id] = xp_of(c, l.id) + monthly_xp(game, c)
-		if st.xp[l.id] < perk_cost(game, c, l.id):
-			continue
-		if game.is_player(c.id):
-			if not c.flags.has("tmp:perk_notified"):
-				c.flags["tmp:perk_notified"] = game.date + 3650
-				game.message(game.loc.t("msg.perk_available", {"lifestyle": game.name_of("lifestyles", l.id)}), "good")
-		else:
-			var pick: Variant = ai_choose_perk(game, c, l.id)
-			if pick != null:
-				unlock_perk(game, c, pick)
+	for c in game.living().duplicate():
+		if c.death == null:
+			monthly_char(game, c)
 
 
 func install(engine: GameEngine) -> void:
-	engine.systems.register("lifestyles", {"id": "lifestyles", "order": 25, "on_month": Lifestyles.monthly}, OWNER)
+	engine.systems.register("lifestyles", {"id": "lifestyles", "order": 25, "on_character_month": Lifestyles.monthly_char}, OWNER)
 	engine.modifier_providers.register("lifestyle", {"fn": func(game: Game, c: Dictionary) -> Variant:
 		var st: Variant = c.get("lifestyle")
 		if st == null:

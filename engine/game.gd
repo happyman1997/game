@@ -394,6 +394,19 @@ func tick() -> void:
 	if p.d == 1:
 		month_cache.clear()
 		mark_dirty()
+	# Помесячная обработка персонажей (system.on_character_month): каждый
+	# персонаж — в свой день месяца (1–28), так нагрузка ровная.
+	if p.d <= 28:
+		var char_systems := []
+		for s in systems:
+			if s.has("on_character_month"):
+				char_systems.append(s)
+		if not char_systems.is_empty():
+			for c in month_bucket(p.d - 1):
+				for s in char_systems:
+					if c.death != null:
+						break
+					s.on_character_month.call(self, c)
 	# Помесячные и годовые обработчики разнесены по первым дням месяца
 	# (system.month_day или по порядку), чтобы не было одного тяжёлого дня.
 	var spread := maxi(1, int(def_num("engine.month_spread_days", 4)))
@@ -410,6 +423,27 @@ func tick() -> void:
 				s.on_year.call(self)
 	emit("day")
 	notify("tick")
+
+
+static var _bucket_cache := {}
+
+
+## День месяца (0–27), в который обрабатывается персонаж id.
+static func bucket_of(id: String) -> int:
+	var b: Variant = _bucket_cache.get(id)
+	if b == null:
+		b = absi(id.hash()) % 28
+		_bucket_cache[id] = b
+	return b
+
+
+## Живые персонажи, чей день месяца — k (0–27).
+func month_bucket(k: int) -> Array:
+	var out := []
+	for c in living():
+		if bucket_of(c.id) == k:
+			out.append(c)
+	return out
 
 
 ## Значение из дневного кэша (или вычислить и запомнить).

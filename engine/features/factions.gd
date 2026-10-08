@@ -250,6 +250,47 @@ static func _faction_at_war(game: Game, f: Dictionary) -> bool:
 	return game.state.wars.values().any(func(w): return w.get("faction") == f.id)
 
 
+## Помесячно для вассала-правителя (в его день): ИИ вступает, создаёт и покидает фракции.
+static func monthly_char(game: Game, v: Dictionary) -> void:
+	var types := game.content.all("factions")
+	if types.is_empty() or v.titles.is_empty():
+		return
+	if v.liege == null or game.is_player(v.id) or v.get("prison") != null or v.death != null:
+		return
+	var liege: Variant = game.ch(v.liege)
+	if liege == null or not Chars.is_alive(liege):
+		return
+	if Wars.is_at_war_with(game, v.id, liege.id):
+		return
+	var cur: Variant = faction_of(game, v)
+	if cur != null:
+		if cur.leader != v.id or cur.members.size() > 1:
+			var cdef: Variant = game.content.get_def("factions", cur.type)
+			if cdef != null and ai_join_score(game, v, cdef, liege, cur) < game.def_num("factions.ai_leave_below", -10) and game.rng.chance(0.3):
+				leave(game, v)
+		return
+	if not game.rng.chance(game.def_num("factions.ai_consider_chance", 0.35)):
+		return
+	var existing := against(game, liege.id)
+	for def in types:
+		var f: Variant = null
+		for x in existing:
+			if x.type == def.id:
+				f = x
+				break
+		var claimant: Variant = f.get("claimant") if f != null else (_best_claimant(game, liege, v) if def.get("claimant", false) else null)
+		if not can_join(game, v, def, liege, claimant):
+			continue
+		var score := ai_join_score(game, v, def, liege, f, claimant)
+		if f != null:
+			if score > 0 and game.rng.chance(game.def_num("factions.ai_join_chance", 0.5)):
+				join(game, v, f)
+				break
+		elif score > game.def_num("factions.ai_create_threshold", 20) and game.rng.chance(game.def_num("factions.ai_create_chance", 0.25)):
+			create(game, def.id, v, claimant)
+			break
+
+
 static func monthly(game: Game) -> void:
 	# 1. чистка
 	for f in game.state.factions.values():
@@ -270,45 +311,6 @@ static func monthly(game: Game) -> void:
 			continue
 		if not f.members.has(f.leader):
 			_update_leader(game, f)
-
-	# 2. ИИ-вассалы вступают, создают и покидают фракции
-	var types := game.content.all("factions")
-	if not types.is_empty():
-		for v in game.rulers().duplicate():
-			if v.liege == null or game.is_player(v.id) or v.get("prison") != null or v.death != null:
-				continue
-			var liege: Variant = game.ch(v.liege)
-			if liege == null or not Chars.is_alive(liege):
-				continue
-			if Wars.is_at_war_with(game, v.id, liege.id):
-				continue
-			var cur: Variant = faction_of(game, v)
-			if cur != null:
-				if cur.leader != v.id or cur.members.size() > 1:
-					var cdef: Variant = game.content.get_def("factions", cur.type)
-					if cdef != null and ai_join_score(game, v, cdef, liege, cur) < game.def_num("factions.ai_leave_below", -10) and game.rng.chance(0.3):
-						leave(game, v)
-				continue
-			if not game.rng.chance(game.def_num("factions.ai_consider_chance", 0.35)):
-				continue
-			var existing := against(game, liege.id)
-			for def in types:
-				var f: Variant = null
-				for x in existing:
-					if x.type == def.id:
-						f = x
-						break
-				var claimant: Variant = f.get("claimant") if f != null else (_best_claimant(game, liege, v) if def.get("claimant", false) else null)
-				if not can_join(game, v, def, liege, claimant):
-					continue
-				var score := ai_join_score(game, v, def, liege, f, claimant)
-				if f != null:
-					if score > 0 and game.rng.chance(game.def_num("factions.ai_join_chance", 0.5)):
-						join(game, v, f)
-						break
-				elif score > game.def_num("factions.ai_create_threshold", 20) and game.rng.chance(game.def_num("factions.ai_create_chance", 0.25)):
-					create(game, def.id, v, claimant)
-					break
 
 	# 3. недовольство и ультиматумы
 	for f in game.state.factions.values():
@@ -372,7 +374,7 @@ static func player_ultimatum(game: Game, f: Dictionary) -> void:
 
 
 func install(engine: GameEngine) -> void:
-	engine.systems.register("factions", {"id": "factions", "order": 58, "on_month": Factions.monthly}, OWNER)
+	engine.systems.register("factions", {"id": "factions", "order": 58, "on_month": Factions.monthly, "on_character_month": Factions.monthly_char}, OWNER)
 	# Поставщик целей для мятежей: в обычных объявлениях войны не участвует.
 	engine.cb_targets.register("faction", {"targets": func(_g, _a): return []}, OWNER)
 	# Конец войны фракции — фракция распадается.

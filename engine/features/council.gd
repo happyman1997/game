@@ -218,52 +218,58 @@ static func fill(game: Game, liege: Dictionary, replace: bool = false) -> void:
 		appoint(game, liege, pos.id, best.id)
 
 
-static func monthly(game: Game) -> void:
+## Помесячно для правителя (в его день): проверка мест, ИИ совета, задачи.
+static func monthly_char(game: Game, liege: Dictionary) -> void:
+	if liege.titles.is_empty():
+		return
 	var month: int = GameDate.parts(game.date).m
-	for liege in game.rulers().duplicate():
-		if liege.death != null:
-			continue
-		# проверка мест
-		if liege.get("council") != null:
-			for pos_id in liege.council:
-				var seat: Dictionary = liege.council[pos_id]
-				if seat.get("holder") == null:
-					continue
-				var c: Variant = game.ch(seat.holder)
-				if c == null or not can_hold_seat(game, liege, c, pos_id):
-					seat.holder = null
-					seat.since = null
-					_invalidate(game, liege)
-		var is_player := game.is_player(liege.id)
-		if not liege.flags.has("council_init"):
-			liege.flags["council_init"] = 0
-			fill(game, liege)
-		elif not is_player and liege.get("prison") == null:
-			fill(game, liege, month == 1)
-			for pos in positions(game):
-				var seat: Variant = seat_of(liege, pos.id)
-				if seat != null and seat.get("holder") != null and game.rng.chance(0.1):
-					var t: Variant = _ai_pick_task(game, liege, pos.id)
-					if t != null and t != seat.get("task"):
-						set_task(game, liege, pos.id, t)
-		# ежемесячные эффекты задач и «пульс» советников для событий
-		if liege.get("council") == null:
-			continue
-		for pos_id in liege.council.keys():
+	# проверка мест
+	if liege.get("council") != null:
+		for pos_id in liege.council:
 			var seat: Dictionary = liege.council[pos_id]
 			if seat.get("holder") == null:
 				continue
-			game.on_action("on_councillor_pulse", {"type": "character", "id": seat.holder}, {"liege": {"type": "character", "id": liege.id}})
-			if seat.get("task") == null or seat.get("holder") == null:
-				continue
-			var t: Variant = game.content.get_def("council_tasks", seat.task)
-			if t == null or t.get("monthly_effect") == null:
-				continue
-			if game.rng.next() * 100.0 >= task_monthly_chance(game, liege, pos_id):
-				continue
-			var ctx := _seat_context(game, liege, seat.holder)
-			Interp.run_effect(ctx, ctx.root, t.monthly_effect)
-			game.emit("council.task_fired", {"liege": liege, "position": pos_id, "task": t.id})
+			var c: Variant = game.ch(seat.holder)
+			if c == null or not can_hold_seat(game, liege, c, pos_id):
+				seat.holder = null
+				seat.since = null
+				_invalidate(game, liege)
+	var is_player := game.is_player(liege.id)
+	if not liege.flags.has("council_init"):
+		liege.flags["council_init"] = 0
+		fill(game, liege)
+	elif not is_player and liege.get("prison") == null:
+		fill(game, liege, month == 1)
+		for pos in positions(game):
+			var seat: Variant = seat_of(liege, pos.id)
+			if seat != null and seat.get("holder") != null and game.rng.chance(0.1):
+				var t: Variant = _ai_pick_task(game, liege, pos.id)
+				if t != null and t != seat.get("task"):
+					set_task(game, liege, pos.id, t)
+	# ежемесячные эффекты задач и «пульс» советников для событий
+	if liege.get("council") == null:
+		return
+	for pos_id in liege.council.keys():
+		var seat: Dictionary = liege.council[pos_id]
+		if seat.get("holder") == null:
+			continue
+		game.on_action("on_councillor_pulse", {"type": "character", "id": seat.holder}, {"liege": {"type": "character", "id": liege.id}})
+		if seat.get("task") == null or seat.get("holder") == null:
+			continue
+		var t: Variant = game.content.get_def("council_tasks", seat.task)
+		if t == null or t.get("monthly_effect") == null:
+			continue
+		if game.rng.next() * 100.0 >= task_monthly_chance(game, liege, pos_id):
+			continue
+		var ctx := _seat_context(game, liege, seat.holder)
+		Interp.run_effect(ctx, ctx.root, t.monthly_effect)
+		game.emit("council.task_fired", {"liege": liege, "position": pos_id, "task": t.id})
+
+
+static func monthly(game: Game) -> void:
+	for liege in game.rulers().duplicate():
+		if liege.death == null:
+			monthly_char(game, liege)
 
 
 ## Раскрыть случайную нераскрытую враждебную интригу против персонажа или его близких.
@@ -286,7 +292,7 @@ static func discover_scheme_against(game: Game, c: Dictionary) -> bool:
 
 
 func install(engine: GameEngine) -> void:
-	engine.systems.register("council", {"id": "council", "order": 15, "on_month": Council.monthly}, OWNER)
+	engine.systems.register("council", {"id": "council", "order": 15, "on_character_month": Council.monthly_char}, OWNER)
 	engine.modifier_providers.register("council", {"fn": func(game: Game, c: Dictionary) -> Variant:
 		if c.get("council") == null:
 			return null

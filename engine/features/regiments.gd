@@ -183,51 +183,57 @@ static func _ai_pick_type(game: Game, c: Dictionary, ignore_cost: bool = false) 
 	return pick.d if pick != null else null
 
 
-static func monthly(game: Game) -> void:
+## Помесячно для правителя (в его день): пополнение, роспуск лишних, найм ИИ.
+static func monthly_char(game: Game, c: Dictionary) -> void:
+	if c.titles.is_empty():
+		return
 	var rate := game.def_num("regiments.reinforce_rate", 0.1)
-	var in_army := _raised_ids(game)
+	var in_army: Dictionary = game.cached_daily("regiments:raised", func(): return _raised_ids(game))
+	# пополнение
+	for r in regs_of(c):
+		if in_army.has(r.id):
+			continue
+		var def: Variant = game.content.get_def("regiment_types", r.type)
+		var mx: int = int(Data.num(def.get("size"), r.size)) if def != null else int(r.size)
+		if r.size < mx:
+			r.size = mini(mx, roundi(r.size + mx * rate))
+	# лишние отряды (например, после потери титулов) распускаются
+	var cp := cap(game, c)
+	while regs_of(c).size() > cp:
+		var victim: Variant = null
+		for x in regs_of(c):
+			if not in_army.has(x.id):
+				victim = x
+				break
+		if victim == null:
+			victim = regs_of(c)[regs_of(c).size() - 1]
+		disband(game, c, victim.id)
+	if game.is_player(c.id) or c.get("prison") != null:
+		return
+	# ИИ: нанять или распустить
+	if c.gold < game.def_num("regiments.ai_disband_below_gold", -30) and not regs_of(c).is_empty():
+		for x in regs_of(c):
+			if not in_army.has(x.id):
+				disband(game, c, x.id)
+				break
+		return
+	if regs_of(c).size() >= cp or not game.rng.chance(game.def_num("regiments.ai_recruit_chance", 0.15)):
+		return
+	var pick: Variant = _ai_pick_type(game, c)
+	if pick == null:
+		return
+	var gold_cost: float = cost(game, c, pick).gold
+	if c.gold < gold_cost + game.def_num("regiments.ai_gold_reserve", 60):
+		return
+	if Economy.monthly_income(game, c) < Data.num(pick.get("upkeep")) * 1.5:
+		return
+	recruit(game, c, pick.id)
+
+
+static func monthly(game: Game) -> void:
 	for c in game.rulers().duplicate():
-		if c.death != null:
-			continue
-		# пополнение
-		for r in regs_of(c):
-			if in_army.has(r.id):
-				continue
-			var def: Variant = game.content.get_def("regiment_types", r.type)
-			var mx: int = int(Data.num(def.get("size"), r.size)) if def != null else int(r.size)
-			if r.size < mx:
-				r.size = mini(mx, roundi(r.size + mx * rate))
-		# лишние отряды (например, после потери титулов) распускаются
-		var cp := cap(game, c)
-		while regs_of(c).size() > cp:
-			var victim: Variant = null
-			for x in regs_of(c):
-				if not in_army.has(x.id):
-					victim = x
-					break
-			if victim == null:
-				victim = regs_of(c)[regs_of(c).size() - 1]
-			disband(game, c, victim.id)
-		if game.is_player(c.id) or c.get("prison") != null:
-			continue
-		# ИИ: нанять или распустить
-		if c.gold < game.def_num("regiments.ai_disband_below_gold", -30) and not regs_of(c).is_empty():
-			for x in regs_of(c):
-				if not in_army.has(x.id):
-					disband(game, c, x.id)
-					break
-			continue
-		if regs_of(c).size() >= cp or not game.rng.chance(game.def_num("regiments.ai_recruit_chance", 0.15)):
-			continue
-		var pick: Variant = _ai_pick_type(game, c)
-		if pick == null:
-			continue
-		var gold_cost: float = cost(game, c, pick).gold
-		if c.gold < gold_cost + game.def_num("regiments.ai_gold_reserve", 60):
-			continue
-		if Economy.monthly_income(game, c) < Data.num(pick.get("upkeep")) * 1.5:
-			continue
-		recruit(game, c, pick.id)
+		if c.death == null:
+			monthly_char(game, c)
 
 
 static func _sync_from_army(game: Game, a: Dictionary) -> void:
@@ -241,7 +247,7 @@ static func _sync_from_army(game: Game, a: Dictionary) -> void:
 
 
 func install(engine: GameEngine) -> void:
-	engine.systems.register("regiments", {"id": "regiments", "order": 52, "on_month": Regiments.monthly}, OWNER)
+	engine.systems.register("regiments", {"id": "regiments", "order": 52, "on_character_month": Regiments.monthly_char}, OWNER)
 	# Жалованье — строка в доходах.
 	engine.hooks.on("economy.income", func(p):
 		var v := Regiments.upkeep(p.game, p.character)

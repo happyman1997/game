@@ -11,10 +11,12 @@ extends RefCounted
 static func builtin() -> Array:
 	return [
 		{"id": "upkeep", "order": 0, "on_month": _upkeep_month},
-		{"id": "economy", "order": 10, "on_month": _economy_month},
-		{"id": "demography", "order": 20, "on_month": _demography_month, "on_year": _demography_year},
+		{"id": "economy", "order": 10, "on_character_month": _economy_char},
+		{"id": "demography", "order": 20, "on_character_month": _demography_char, "on_year": _demography_year},
 		{"id": "events", "order": 30, "on_day": func(game: Game): game.events.process_scheduled(),
-			"on_month": func(game: Game): _pulse(game, "on_monthly_pulse"),
+			"on_character_month": func(game: Game, c: Dictionary):
+				if not c.titles.is_empty():
+					game.on_action("on_monthly_pulse", {"type": "character", "id": c.id}),
 			"on_year": func(game: Game): _pulse(game, "on_yearly_pulse")},
 		{"id": "schemes", "order": 40, "on_month": Schemes.monthly_schemes},
 		{"id": "military", "order": 50, "on_day": Military.daily_military, "on_month": Military.regen_levies},
@@ -56,35 +58,32 @@ static func _upkeep_month(game: Game) -> void:
 	game.stat_cache.clear()
 
 
-static func _economy_month(game: Game) -> void:
-	var decay = game.def_num("character.stress_decay", 2)
-	var deltas := {}
-	for c in game.rulers():
-		deltas[c.id] = [Economy.monthly_income(game, c), Economy.monthly_prestige(game, c), Economy.monthly_piety(game, c)]
-	var share = game.def_num("economy.dynasty_prestige_share", 0.1)
-	for id in deltas:
-		var c: Dictionary = game.ch(id)
-		var d: Array = deltas[id]
-		c.gold += d[0]
-		c.prestige += d[1]
-		c.piety += d[2]
+## Помесячно для персонажа (в его день): доход, престиж и благочестие
+## правителя, доход безземельных, снятие стресса.
+static func _economy_char(game: Game, c: Dictionary) -> void:
+	if not c.titles.is_empty():
+		var gold := Economy.monthly_income(game, c)
+		var prestige := Economy.monthly_prestige(game, c)
+		var piety := Economy.monthly_piety(game, c)
+		c.gold += gold
+		c.prestige += prestige
+		c.piety += piety
 		var dyn: Variant = game.state.dynasties.get(c.dynasty) if c.dynasty != null else null
-		if dyn != null and d[1] > 0:
-			dyn.prestige = float(dyn.prestige) + d[1] * share
-	for c in game.living():
-		if c.titles.is_empty():
-			var flat := Stats.stat(game, c, "monthly_income")
-			if flat != 0.0:
-				c.gold += flat
-		if c.stress > 0:
-			c.stress = maxf(0.0, float(c.stress) - decay)
-		var lvl = floori(float(c.stress) / 100.0)
-		var prev = int(Data.num(c.vars.get("stress_level")))
-		if lvl > prev:
-			c.vars["stress_level"] = lvl
-			game.on_action("on_stress_level", {"type": "character", "id": c.id})
-		elif lvl < prev:
-			c.vars["stress_level"] = lvl
+		if dyn != null and prestige > 0:
+			dyn.prestige = float(dyn.prestige) + prestige * game.def_num("economy.dynasty_prestige_share", 0.1)
+	else:
+		var flat := Stats.stat(game, c, "monthly_income")
+		if flat != 0.0:
+			c.gold += flat
+	if c.stress > 0:
+		c.stress = maxf(0.0, float(c.stress) - game.def_num("character.stress_decay", 2))
+	var lvl = floori(float(c.stress) / 100.0)
+	var prev = int(Data.num(c.vars.get("stress_level")))
+	if lvl > prev:
+		c.vars["stress_level"] = lvl
+		game.on_action("on_stress_level", {"type": "character", "id": c.id})
+	elif lvl < prev:
+		c.vars["stress_level"] = lvl
 
 
 static func _yearly_mortality(game: Game, age: int) -> float:
@@ -108,37 +107,35 @@ static func monthly_death_chance(game: Game, c: Dictionary) -> float:
 	return 1.0 - pow(1.0 - minf(0.95, y), 1.0 / 12.0)
 
 
-static func _demography_month(game: Game) -> void:
+## Помесячно для персонажа (в его день): болезни, смерть, совершеннолетие, дети.
+static func _demography_char(game: Game, c: Dictionary) -> void:
 	var adult = game.def_num("character.adult_age", 16)
-	for c in game.living().duplicate():
-		if c.death != null:
+	# Черты-болезни: шанс смерти и излечения
+	var trait_death := 0.0
+	for t in c.traits.duplicate():
+		var d: Variant = game.content.get_def("traits", t)
+		if d == null:
 			continue
-		# Черты-болезни: шанс смерти и излечения
-		var trait_death := 0.0
-		for t in c.traits.duplicate():
+		trait_death += Data.num(d.get("monthly_death_chance"))
+		var cure := Data.num(d.get("monthly_cure_chance"))
+		if cure > 0.0 and game.rng.chance(cure):
+			Chars.remove_trait(game, c, t)
+	if game.rng.chance(monthly_death_chance(game, c) + trait_death):
+		var illness := false
+		for t in c.traits:
 			var d: Variant = game.content.get_def("traits", t)
-			if d == null:
-				continue
-			trait_death += Data.num(d.get("monthly_death_chance"))
-			var cure := Data.num(d.get("monthly_cure_chance"))
-			if cure > 0.0 and game.rng.chance(cure):
-				Chars.remove_trait(game, c, t)
-		if game.rng.chance(monthly_death_chance(game, c) + trait_death):
-			var illness := false
-			for t in c.traits:
-				var d: Variant = game.content.get_def("traits", t)
-				if d != null and Data.num(d.get("monthly_death_chance")) > 0.0:
-					illness = true
-					break
-			Succession.kill_character(game, c, "illness" if illness else ("childhood" if Chars.age_of(game, c) < adult else "natural"))
-			continue
-		# Совершеннолетие
-		if not c.flags.has("adult") and Chars.age_of(game, c) >= adult:
-			c.flags["adult"] = 0
-			Chars.assign_education(game, c)
-			game.on_action("on_coming_of_age", {"type": "character", "id": c.id})
-		if c.female:
-			_monthly_fertility(game, c)
+			if d != null and Data.num(d.get("monthly_death_chance")) > 0.0:
+				illness = true
+				break
+		Succession.kill_character(game, c, "illness" if illness else ("childhood" if Chars.age_of(game, c) < adult else "natural"))
+		return
+	# Совершеннолетие
+	if not c.flags.has("adult") and Chars.age_of(game, c) >= adult:
+		c.flags["adult"] = 0
+		Chars.assign_education(game, c)
+		game.on_action("on_coming_of_age", {"type": "character", "id": c.id})
+	if c.female:
+		_monthly_fertility(game, c)
 
 
 static func _demography_year(game: Game) -> void:
