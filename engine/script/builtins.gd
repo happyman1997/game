@@ -496,8 +496,11 @@ static func register(engine: GameEngine) -> void:
 	rel.call("is_allied_with", "Союзник персонажа", func(g, c, o): return Wars.is_allied(g, c.id, o.id))
 	rel.call("has_truce_with", "Перемирие с персонажем", func(g, c, o): return Wars.has_truce(g, c.id, o.id))
 	rel.call("is_heir_of", "Основной наследник персонажа", func(g, c, o):
-		var h := Succession.heirs_of(g, o)
-		return not h.is_empty() and h[0] == c.id
+		# Расчёт наследников дорогой — для условий достаточно раз в день.
+		var heir: Variant = g.cached_daily("heir:" + o.id, func():
+			var h := Succession.heirs_of(g, o)
+			return h[0] if not h.is_empty() else null)
+		return heir == c.id
 	)
 	rel.call("can_marry", "Может вступить в брак с персонажем", func(g, c, o): return Chars.can_marry(g, c, o), "tr.can_marry")
 	rel.call("has_hook_on", "Есть крюк на персонажа", func(g, c, o): return Leverage.hook_on(g, c, o.id) != null, "tr.has_hook_on")

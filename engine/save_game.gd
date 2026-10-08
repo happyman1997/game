@@ -12,6 +12,7 @@ static func serialize(game: Game) -> String:
 	# как загруженная из этого сохранения (детерминированность).
 	game.mark_dirty()
 	game.month_cache.clear()
+	game._def_cache.clear()
 	return JSON.stringify({"format": FORMAT, "version": WorldSetup.SAVE_VERSION, "saved_at": Time.get_datetime_string_from_system(true), "state": game.state}, "", false, true)
 
 

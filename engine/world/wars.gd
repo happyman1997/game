@@ -339,7 +339,7 @@ static func declare_war(game: Game, attacker: Dictionary, t: Dictionary, opts: D
 		if ally_will_join(game, game.ch(al), defender, attacker.id) and not w.attackers.has(al) and not w.defenders.has(al):
 			w.defenders.append(al)
 	Interp.run_effect(ctx, ctx.root, cb.get("on_declare"))
-	game.mark_dirty()
+	game.mark_chars_dirty(w.attackers + w.defenders)
 	game.message(game.loc.t("msg.war_declared", {"name": w.name}), "war", {"type": "war", "id": w.id}, w.attackers + w.defenders)
 	game.on_action("on_war_started", {"type": "character", "id": attacker.id}, ctx.scopes)
 	game.emit("war.declared", {"war": w})
@@ -469,7 +469,7 @@ static func end_war(game: Game, w: Dictionary, outcome: String) -> void:
 			if sa != null and sa.get("war") == w.id:
 				p.siege = null
 	game.state.wars.erase(w.id)
-	game.mark_dirty()
+	game.mark_chars_dirty(w.attackers + w.defenders)
 	# ИИ распускает войска, если больше ни с кем не воюет.
 	for id in w.attackers + w.defenders:
 		if game.is_player(id) or is_at_war(game, id):

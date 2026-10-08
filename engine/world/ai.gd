@@ -153,6 +153,52 @@ static func _cached_strength(game: Game, a: Dictionary) -> float:
 	return game.cached_daily("army:" + a.id, func(): return Military.army_strength(game, a))
 
 
+## Армии по провинциям (на день; набор армий меняется — кэш сбрасывается).
+static func _armies_by_location(game: Game) -> Dictionary:
+	return game.cached_daily("ai:armies_by_loc", func():
+		var m := {}
+		for e in game.state.armies.values():
+			if not m.has(e.location):
+				m[e.location] = []
+			m[e.location].append(e)
+		return m)
+
+
+## Графства для осады в войне w для стороны side (и освобождение земель
+## державы top): [{id, liberation, war_target}]. Не зависит от конкретной
+## армии, поэтому считается раз в день на войну, сторону и сюзерена.
+static func _siege_targets(game: Game, w: Dictionary, side: String, top: Dictionary) -> Array:
+	return game.cached_daily("ai:sieges:%s:%s:%s" % [w.id, side, top.id], func():
+		var enemy_leaders: Array = w.defenders if side == "att" else w.attackers
+		var tset := {}
+		for x in w.target_counties:
+			tset[x] = true
+		var cand := {}
+		for id in enemy_leaders:
+			var chd: Variant = game.ch(id)
+			if chd != null:
+				for cty in Titles.realm_counties(game, chd):
+					cand[cty] = true
+		# Освобождение своих земель
+		for cty in Titles.realm_counties(game, top):
+			var pp: Variant = game.state.provinces.get(cty)
+			if pp != null and pp.occupant_war == w.id:
+				cand[cty] = true
+		var out := []
+		for cty in cand:
+			var ctrl: Variant = Titles.province_controller(game, cty)
+			if ctrl == null:
+				continue
+			var theirs: Variant = Wars.side_of(game, w, ctrl.id)
+			var pst: Variant = game.state.provinces.get(cty)
+			if theirs == side and (pst == null or pst.occupant == null):
+				continue
+			if pst != null and pst.occupant_war == w.id and Wars.participant_side(w, pst.occupant) == side:
+				continue
+			out.append({"id": cty, "liberation": theirs == side, "war_target": tset.has(cty)})
+		return out)
+
+
 ## Ежедневно: армии ИИ выбирают цель — вражескую армию послабее или осаду.
 static func army_ai(game: Game, a: Dictionary) -> void:
 	if a.get("retreating", false):
@@ -172,6 +218,7 @@ static func army_ai(game: Game, a: Dictionary) -> void:
 	var my_leader: Dictionary = game.ch(a.owner)
 	var my_top := Titles.top_liege(game, my_leader)
 	var my_str := _cached_strength(game, a)
+	var by_loc := _armies_by_location(game)
 	for w in wars:
 		var side: String = Wars.participant_side(w, a.owner)
 		# Вражеские армии
@@ -189,45 +236,20 @@ static func army_ai(game: Game, a: Dictionary) -> void:
 					best_score = sc
 					best_dest = e.location
 		# Осады: цели войны в приоритете, затем любые вражеские графства
-		var enemy_leaders: Array = w.defenders if side == "att" else w.attackers
-		var tset := {}
-		for x in w.target_counties:
-			tset[x] = true
-		var cand := {}
-		for id in enemy_leaders:
-			var chd: Variant = game.ch(id)
-			if chd != null:
-				for cty in Titles.realm_counties(game, chd):
-					cand[cty] = true
-		# Освобождение своих земель
-		for cty in Titles.realm_counties(game, my_top):
-			var pp: Variant = game.state.provinces.get(cty)
-			if pp != null and pp.occupant_war == w.id:
-				cand[cty] = true
-		for cty in cand:
-			var ctrl: Variant = Titles.province_controller(game, cty)
-			if ctrl == null:
-				continue
-			var theirs: Variant = Wars.side_of(game, w, ctrl.id)
-			var pst: Variant = game.state.provinces.get(cty)
-			var occupied_by_us: bool = pst != null and pst.occupant_war == w.id and Wars.participant_side(w, pst.occupant) == side
-			if theirs == side and (pst == null or pst.occupant == null):
-				continue
-			if occupied_by_us:
-				continue
+		for t in _siege_targets(game, w, side, my_top):
+			var cty: String = t.id
 			var len = game.engine.path_length(a.location, cty)
 			if is_inf(len):
 				continue
-			var liberation: bool = theirs == side
 			var is_my_capital: bool = cty == my_leader.capital or cty == my_top.capital
-			var score = (70.0 if is_my_capital else 20.0) if liberation else (80.0 if tset.has(cty) else 40.0)
+			var score = (70.0 if is_my_capital else 20.0) if t.liberation else (80.0 if t.war_target else 40.0)
 			score -= (len / 80.0) * 6.0
+			if score <= best_score:
+				continue
 			# не лезем в провинцию, где стоит вражеская армия сильнее нас
-			for e in game.state.armies.values():
-				if e.location != cty:
-					continue
+			for e in by_loc.get(cty, []):
 				var es2: Variant = Wars.participant_side(w, e.owner)
-				if es2 != null and es2 != side and _cached_strength(game, e) > my_str * 0.9:
+				if es2 != null and es2 != side and game.state.armies.has(e.id) and _cached_strength(game, e) > my_str * 0.9:
 					score -= 200.0
 					break
 			if score > best_score:

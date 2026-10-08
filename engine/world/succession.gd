@@ -154,7 +154,7 @@ static func kill_character(game: Game, c: Dictionary, reason: String = "natural"
 	c.death = game.date
 	c.death_reason = reason
 	c.killer = killer
-	game.mark_dirty()
+	game.mark_chars_dirty([c.id, c.liege] + c.spouses)
 	game.on_action("on_death", {"type": "character", "id": c.id}, {"killer": {"type": "character", "id": killer}} if killer != null else {})
 
 	for sid in c.spouses:
@@ -177,7 +177,7 @@ static func kill_character(game: Game, c: Dictionary, reason: String = "natural"
 
 	var was_player = game.is_player(c.id)
 	var heir: Variant = inherit(game, c) if not c.titles.is_empty() else null
-	game.mark_dirty()
+	game.mark_chars_dirty([c.id, c.liege, heir.id if heir != null else null])
 
 	var nm = game.scope_name({"type": "character", "id": c.id}, "full_name")
 	game.message(game.loc.t_or("death." + reason, game.loc.t("death.generic", {"who": nm}), {"who": nm}), "death", {"type": "character", "id": c.id}, [c.id, c.liege])
@@ -291,7 +291,7 @@ static func inherit(game: Game, c: Dictionary) -> Variant:
 		if a.commander == c.id:
 			a.commander = null
 	c.titles = []
-	game.mark_dirty()
+	game.mark_chars_dirty([c.id, primary.id] + heir_chars.map(func(h): return h.id))
 	for h in heir_chars:
 		game.on_action("on_inheritance", {"type": "character", "id": h.id}, {"predecessor": {"type": "character", "id": c.id}})
 	game.emit("succession", {"deceased": c, "heirs": heir_chars.map(func(h): return h.id), "primary": primary.id, "distribution": distribution})

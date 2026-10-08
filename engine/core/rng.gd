@@ -28,9 +28,14 @@ static func _imul(a: int, b: int) -> int:
 func next() -> float:
 	var s: int = (int(state["s"]) + 0x6D2B79F5) & 0xFFFFFFFF
 	state["s"] = s
-	var t := s
-	t = _imul(t ^ (t >> 15), t | 1)
-	t ^= (t + _imul(t ^ (t >> 7), t | 61)) & 0xFFFFFFFF
+	# То же, что _imul, но без вызовов функций (горячий путь):
+	# a·b mod 2³² = a·b_lo + ((a·b_hi) mod 2¹⁶)·2¹⁶, все произведения < 2⁴⁸.
+	var a := s ^ (s >> 15)
+	var b := s | 1
+	var t := (a * (b & 0xFFFF) + (((a * (b >> 16)) & 0xFFFF) << 16)) & 0xFFFFFFFF
+	a = t ^ (t >> 7)
+	b = t | 61
+	t ^= (t + ((a * (b & 0xFFFF) + (((a * (b >> 16)) & 0xFFFF) << 16)) & 0xFFFFFFFF)) & 0xFFFFFFFF
 	return float((t ^ (t >> 14)) & 0xFFFFFFFF) / 4294967296.0
 
 

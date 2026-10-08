@@ -72,6 +72,9 @@ static func is_independent(c: Dictionary) -> bool:
 
 ## Правитель и все его вассалы рекурсивно.
 static func realm_members(game: Game, c: Dictionary) -> Array:
+	var hit: Variant = game.realm_cache.get("m:" + c.id)
+	if hit != null:
+		return hit.duplicate()
 	var out := []
 	var stack := [c]
 	var seen := {}
@@ -83,14 +86,19 @@ static func realm_members(game: Game, c: Dictionary) -> Array:
 		out.append(x)
 		for v in game.vassals_of(x.id):
 			stack.append(v)
-	return out
+	game.realm_cache["m:" + c.id] = out
+	return out.duplicate()
 
 
 static func realm_counties(game: Game, c: Dictionary) -> Array:
+	var hit: Variant = game.realm_cache.get("c:" + c.id)
+	if hit != null:
+		return hit.duplicate()
 	var out := []
 	for m in realm_members(game, c):
 		out.append_array(domain_counties(game, m))
-	return out
+	game.realm_cache["c:" + c.id] = out
+	return out.duplicate()
 
 
 ## Состоит ли x в державе ruler (x == ruler или ruler — сюзерен x по цепочке).
@@ -187,6 +195,7 @@ static func transfer_title(game: Game, title_id: String, new_holder_id: Variant,
 	if (old.id if old != null else null) == (neo.id if neo != null else null):
 		return
 	var old_primary_tier = primary_tier(game, neo) if neo != null else 0
+	game.realm_cache.clear()
 
 	if old != null:
 		old.titles = old.titles.filter(func(x): return x != title_id)
@@ -215,7 +224,7 @@ static func transfer_title(game: Game, title_id: String, new_holder_id: Variant,
 		if primary_tier(game, neo) > old_primary_tier:
 			for v in game.vassals_of(neo.id):
 				fix_liege_consistency(game, v)
-	game.mark_dirty()
+	game.mark_chars_dirty([old.id if old != null else null, neo.id if neo != null else null])
 	game.emit("title.transferred", {"title": title_id, "from": old.id if old != null else null, "to": neo.id if neo != null else null})
 	if neo != null:
 		game.on_action("on_title_gained", {"type": "character", "id": neo.id}, {"title": {"type": "title", "id": title_id}})

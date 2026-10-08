@@ -16,6 +16,7 @@ extends EngineFeature
 ## Состояние: c.prison = {by, since, home, war}.
 
 const OWNER := "core/prison"
+const INDEX_KEY := "prison:index"
 
 
 func _init() -> void:
@@ -28,7 +29,17 @@ static func is_imprisoned(c: Variant) -> bool:
 
 
 static func prisoners_of(game: Game, id: String) -> Array:
-	return game.living().filter(func(c): return c.get("prison") != null and c.prison.by == id)
+	# Индекс «тюремщик → пленники» на месяц; новые пленники сбрасывают его
+	# (imprison, смена тюремщика), освобождённые отсеиваются проверкой.
+	var idx: Dictionary = game.cached_monthly(INDEX_KEY, func():
+		var m := {}
+		for c in game.living():
+			if c.get("prison") != null:
+				if not m.has(c.prison.by):
+					m[c.prison.by] = []
+				m[c.prison.by].append(c)
+		return m)
+	return idx.get(id, []).filter(func(c): return c.death == null and c.get("prison") != null and c.prison.by == id)
 
 
 static func imprison(game: Game, jailer: Dictionary, prisoner: Dictionary, reason: Variant = null, war: Variant = null) -> bool:
@@ -37,12 +48,12 @@ static func imprison(game: Game, jailer: Dictionary, prisoner: Dictionary, reaso
 	if not game.engine.hooks.veto("prison.before_imprison", {"game": game, "jailer": jailer, "prisoner": prisoner, "reason": reason}):
 		return false
 	prisoner["prison"] = {"by": jailer.id, "since": game.date, "home": prisoner.liege, "war": war}
+	game.month_cache.erase(INDEX_KEY)
 	# армии остаются без него
 	for a in game.state.armies.values():
 		if a.commander == prisoner.id:
 			a.commander = null
-	game.stat_cache.erase(prisoner.id)
-	game.mark_dirty()
+	game.mark_chars_dirty([prisoner.id, jailer.id])
 	game.message(game.loc.t("msg.imprisoned", {"who": game.scope_name({"type": "character", "id": prisoner.id}), "jailer": game.scope_name({"type": "character", "id": jailer.id})}),
 		"bad", {"type": "character", "id": prisoner.id}, [prisoner.id, jailer.id, prisoner.liege])
 	game.emit("prison.imprisoned", {"jailer": jailer, "prisoner": prisoner, "reason": reason})
@@ -55,8 +66,7 @@ static func release(game: Game, prisoner: Dictionary, reason: String = "released
 		return
 	var jailer: String = prisoner.prison.by
 	prisoner.prison = null
-	game.stat_cache.erase(prisoner.id)
-	game.mark_dirty()
+	game.mark_chars_dirty([prisoner.id, jailer])
 	if Chars.is_alive(prisoner):
 		game.message(game.loc.t("msg.prison_" + reason, {"who": game.scope_name({"type": "character", "id": prisoner.id})}),
 			"info", {"type": "character", "id": prisoner.id}, [prisoner.id, jailer, prisoner.liege])
@@ -170,6 +180,7 @@ func install(engine: GameEngine) -> void:
 		for c in p.game.living():
 			if c.get("prison") != null and c.prison.by == p.deceased.id:
 				c.prison.by = p.primary
+				p.game.month_cache.erase(INDEX_KEY)
 	, 0, OWNER)
 	engine.hooks.on("character.death", func(p):
 		if p.character.get("prison") != null:

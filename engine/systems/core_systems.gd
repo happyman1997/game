@@ -87,6 +87,16 @@ static func _economy_char(game: Game, c: Dictionary) -> void:
 
 
 static func _yearly_mortality(game: Game, age: int) -> float:
+	# Таблица по возрастам 0–120 — раз в месяц (defines могут поменять моды).
+	var by_age: PackedFloat64Array = game.cached_monthly("mortality_by_age", func():
+		var arr := PackedFloat64Array()
+		for a in 121:
+			arr.append(_mortality_at(game, a))
+		return arr)
+	return by_age[clampi(age, 0, 120)]
+
+
+static func _mortality_at(game: Game, age: int) -> float:
 	var table: Array = game.def_val("character.mortality", [[0, 0.03], [5, 0.008], [16, 0.006], [40, 0.015], [60, 0.05], [80, 0.25]])
 	if age <= Data.num(table[0][0]):
 		return Data.num(table[0][1])

@@ -22,6 +22,10 @@ var stat_cache := {}
 var day_cache := {}
 ## Кэш на месяц (сбрасывается 1-го числа): для дорогих производных данных механик.
 var month_cache := {}
+## Разобранные пути defines (сбрасывается вместе с month_cache).
+var _def_cache := {}
+## Состав держав (участники, графства) — до смены титулов/сюзеренов (mark_index_dirty).
+var realm_cache := {}
 var _reported_errors := {}
 ## Во время генерации мира on_action и сообщения отключены.
 var quiet := false
@@ -95,21 +99,16 @@ func def_val(path: String, fallback: Variant = null) -> Variant:
 	return cur if cur != null else fallback
 
 
-const _NO_DEF := "<<нет значения>>"
-
-
 func _def_lookup(path: String) -> Variant:
-	var key := "def:" + path
-	var hit: Variant = month_cache.get(key, _NO_DEF)
-	if not (hit is String and hit == _NO_DEF):
-		return hit
+	if _def_cache.has(path):
+		return _def_cache[path]
 	var cur: Variant = defines
 	for p in path.split("."):
 		if not (cur is Dictionary) or not cur.has(p):
 			cur = null
 			break
 		cur = cur[p]
-	month_cache[key] = cur
+	_def_cache[path] = cur
 	return cur
 
 
@@ -142,11 +141,36 @@ func mark_dirty() -> void:
 	stat_cache.clear()
 
 
+## Точечный сброс: индексы персонажей и кэш характеристик/мнений только
+## указанных персонажей (их характеристики и мнения о них и их самих).
+## Дешевле mark_dirty для частых событий (смерть, передача титула): кэш
+## остальных персонажей живёт до конца месяца.
+func mark_chars_dirty(ids: Array) -> void:
+	mark_index_dirty()
+	var set := {}
+	for id in ids:
+		if id != null:
+			set[str(id)] = true
+	if set.is_empty():
+		return
+	for k in stat_cache.keys():
+		var key := str(k)
+		if set.has(key):
+			stat_cache.erase(k)
+		elif key.begins_with("op:"):
+			var i := key.find(">")
+			if set.has(key.substr(3, i - 3)) or set.has(key.substr(i + 1)):
+				stat_cache.erase(k)
+		elif key.begins_with("ai:") and set.has(key.substr(3)):
+			stat_cache.erase(k)
+
+
 ## Сбрасывает только индексы персонажей (без кэша характеристик): рождения, браки, смена двора.
 func mark_index_dirty() -> void:
 	_living_cache = null
 	_rulers_cache = null
 	_by_liege = null
+	realm_cache.clear()
 	day_cache.clear()
 
 
@@ -393,6 +417,7 @@ func tick() -> void:
 			s.on_day.call(self)
 	if p.d == 1:
 		month_cache.clear()
+		_def_cache.clear()
 		mark_dirty()
 	# Помесячная обработка персонажей (system.on_character_month): каждый
 	# персонаж — в свой день месяца (1–28), так нагрузка ровная.

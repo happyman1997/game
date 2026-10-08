@@ -232,27 +232,61 @@ func _path_row(src: int) -> Dictionary:
 	var pred := PackedInt32Array()
 	pred.resize(n)
 	pred.fill(-1)
-	var done := PackedByteArray()
-	done.resize(n)
 	dist[src] = 0.0
 	if not cache.has("adj"):
 		_build_adjacency()
 	var adj: Array = cache["adj"]
-	while true:
-		var u := -1
-		var best := INF
-		for i in n:
-			if done[i] == 0 and dist[i] < best:
-				best = dist[i]
-				u = i
-		if u < 0:
-			break
-		done[u] = 1
+	# Дейкстра с двоичной кучей (пары «расстояние, вершина» в двух массивах).
+	var hd := PackedFloat32Array([0.0])
+	var hv := PackedInt32Array([src])
+	while not hd.is_empty():
+		var d := hd[0]
+		var u := hv[0]
+		# извлечь минимум
+		var last := hd.size() - 1
+		hd[0] = hd[last]
+		hv[0] = hv[last]
+		hd.resize(last)
+		hv.resize(last)
+		var i := 0
+		while true:
+			var l := i * 2 + 1
+			if l >= last:
+				break
+			var r := l + 1
+			var c := r if r < last and hd[r] < hd[l] else l
+			if hd[c] >= hd[i]:
+				break
+			var td := hd[i]
+			hd[i] = hd[c]
+			hd[c] = td
+			var tv := hv[i]
+			hv[i] = hv[c]
+			hv[c] = tv
+			i = c
+		if d > dist[u]:
+			continue # устаревшая запись
 		for e in adj[u]:
-			var nd: float = best + e[1]
-			if nd < dist[e[0]]:
-				dist[e[0]] = nd
-				pred[e[0]] = u
+			var v: int = e[0]
+			var nd: float = d + e[1]
+			if nd < dist[v]:
+				dist[v] = nd
+				pred[v] = u
+				# добавить в кучу
+				var k := hd.size()
+				hd.append(nd)
+				hv.append(v)
+				while k > 0:
+					var pk := (k - 1) >> 1
+					if hd[pk] <= hd[k]:
+						break
+					var td2 := hd[pk]
+					hd[pk] = hd[k]
+					hd[k] = td2
+					var tv2 := hv[pk]
+					hv[pk] = hv[k]
+					hv[k] = tv2
+					k = pk
 	var row := {"dist": dist, "pred": pred}
 	_path_rows[src] = row
 	return row

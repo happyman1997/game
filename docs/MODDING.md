@@ -538,7 +538,8 @@ func init(api: ModApi) -> void:
 Используйте функции мира (`Chars.add_trait`, `Titles.transfer_title`,
 `Succession.kill_character`, `Wars.declare_war`…), а не меняйте состояние
 напрямую: они поддерживают индексы и вызывают хуки. Если всё же меняете
-`liege`/`titles` вручную — вызовите `game.mark_dirty()`.
+`liege`/`titles` вручную — вызовите `game.mark_dirty()` (сброс всех кэшей)
+или дешевле — `game.mark_chars_dirty([id, ...])` для затронутых персонажей.
 
 **Сохранения.** Всё состояние партии — обычные словари (`game.state`),
 сохранение — это их JSON. Данные мода храните в

@@ -14,6 +14,7 @@ extends EngineFeature
 ## Состояние: c.secrets = [{id, type, target, known: [id], since}].
 
 const OWNER := "core/secrets"
+const INDEX_KEY := "secrets:index"
 
 
 func _init() -> void:
@@ -29,6 +30,26 @@ static func known_secrets_of(_game: Game, owner: Dictionary, knower: String) -> 
 	return secrets_of(owner).filter(func(s): return s.known.has(knower))
 
 
+## Персонажи, чьи секреты известны knower. Индекс «знающий → владельцы» на
+## месяц; новое знание (add_secret, learn) сбрасывает его, забытое и
+## раскрытое отсеивается проверкой.
+static func owners_known_by(game: Game, knower: String) -> Array:
+	var idx: Dictionary = game.cached_monthly(INDEX_KEY, func():
+		var m := {}
+		for o in game.living():
+			for s in secrets_of(o):
+				for k in s.known:
+					if not m.has(k):
+						m[k] = {}
+					m[k][o.id] = o
+		return m)
+	var out := []
+	for o in idx.get(knower, {}).values():
+		if o.death == null and not known_secrets_of(game, o, knower).is_empty():
+			out.append(o)
+	return out
+
+
 static func add_secret(game: Game, owner: Dictionary, type: String, target: Variant = null, known_by: Array = []) -> Variant:
 	if not game.content.has("secret_types", type):
 		game.script_error("Нет типа секрета \"%s\"" % type)
@@ -38,11 +59,13 @@ static func add_secret(game: Game, owner: Dictionary, type: String, target: Vari
 			for k in known_by:
 				if not dup.known.has(k) and k != owner.id:
 					dup.known.append(k)
+			game.month_cache.erase(INDEX_KEY)
 			return dup
 	var s := {"id": game.new_id("sec"), "type": type, "target": target, "known": known_by.filter(func(k): return k != owner.id), "since": game.date}
 	if owner.get("secrets") == null:
 		owner["secrets"] = []
 	owner.secrets.append(s)
+	game.month_cache.erase(INDEX_KEY)
 	game.emit("secret.added", {"owner": owner, "secret": s})
 	return s
 
@@ -52,6 +75,7 @@ static func learn(game: Game, knower: Dictionary, owner: Dictionary, s: Dictiona
 	if knower.id == owner.id or s.known.has(knower.id):
 		return false
 	s.known.append(knower.id)
+	game.month_cache.erase(INDEX_KEY)
 	var mx := int(game.def_num("secrets.max_known_per_secret", 12))
 	if s.known.size() > mx:
 		var alive: Array = s.known.filter(func(id): return game.is_alive(id))
@@ -196,12 +220,12 @@ func register_script(engine: GameEngine) -> void:
 	r.values.register("num_secrets", {"scopes": CH, "doc": "Число секретов персонажа", "get": func(ctx, s, _a): return float(Secrets.secrets_of(ch.call(ctx, s)).size())}, OWNER)
 	r.values.register("num_known_secrets", {"scopes": CH, "doc": "Сколько чужих секретов знает персонаж", "get": func(ctx, s, _a):
 		var n := 0
-		for o in ctx.game.living():
+		for o in Secrets.owners_known_by(ctx.game, s.id):
 			n += Secrets.known_secrets_of(ctx.game, o, s.id).size()
 		return float(n)
 	}, OWNER)
 	r.lists.register("known_secret_owner", {"from": CH, "doc": "Персонажи, чьи секреты известны этому персонажу", "list": func(ctx, s):
-		return ctx.game.living().filter(func(o): return not Secrets.known_secrets_of(ctx.game, o, s.id).is_empty()).map(func(o): return {"type": "character", "id": o.id})
+		return Secrets.owners_known_by(ctx.game, s.id).map(func(o): return {"type": "character", "id": o.id})
 	}, OWNER)
 	r.effects.register("add_secret", {"scopes": CH, "doc": "Персонаж получает секрет: add_secret: тип или { type, target, known_by }",
 		"apply": func(ctx, s, arg):
