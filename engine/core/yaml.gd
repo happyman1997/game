@@ -106,7 +106,7 @@ class _Parser:
 			var line: String = raw[i]
 			var num := i + 1
 			i += 1
-			if i == 1 and line.begins_with("﻿"):
+			if i == 1 and line.length() > 0 and line.unicode_at(0) == 0xFEFF:
 				line = line.substr(1)
 			var stripped := _strip_comment(line).strip_edges(false, true)
 			if stripped.strip_edges() == "" or stripped == "---":

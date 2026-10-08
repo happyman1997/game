@@ -1,0 +1,85 @@
+# Тесты и сборка игры для Windows, Linux и macOS.
+# Готовые сборки — во вкладке Actions (артефакты запуска); при пуше тега v*
+# они же прикрепляются к релизу.
+name: build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: "4.7.2"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Кэш Godot и шаблонов экспорта
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}
+
+      - name: Установка Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot && cd ~/godot
+          base="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
+          wget -q "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q "Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" godot
+          wget -q "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          unzip -q "Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          rm -f templates/android_* templates/ios.zip templates/web_* templates/*arm* templates/*x86_32*
+          rm -f *.zip *.tpz
+
+      - name: Подключение шаблонов
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates
+          ln -sfn ~/godot/templates ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          echo "$HOME/godot" >> "$GITHUB_PATH"
+
+      - name: Импорт ресурсов
+        run: godot --headless --path . --import || true
+
+      - name: Тесты
+        run: godot --headless --path . -s tests/run.gd
+
+      - name: Сборка
+        run: |
+          mkdir -p build/windows build/linux build/macos dist
+          godot --headless --path . --export-release "Windows" build/windows/CrownAndDynasty.exe
+          godot --headless --path . --export-release "Linux" build/linux/CrownAndDynasty.x86_64
+          godot --headless --path . --export-release "macOS" build/macos/CrownAndDynasty.zip
+          test -f build/windows/CrownAndDynasty.exe
+          test -f build/linux/CrownAndDynasty.x86_64
+          test -f build/macos/CrownAndDynasty.zip
+          (cd build/windows && zip -q -9 ../../dist/CrownAndDynasty-windows.zip CrownAndDynasty.exe)
+          (cd build/linux && chmod +x CrownAndDynasty.x86_64 && tar -czf ../../dist/CrownAndDynasty-linux.tar.gz CrownAndDynasty.x86_64)
+          cp build/macos/CrownAndDynasty.zip dist/CrownAndDynasty-macos.zip
+          ls -la dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CrownAndDynasty-windows
+          path: dist/CrownAndDynasty-windows.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CrownAndDynasty-linux
+          path: dist/CrownAndDynasty-linux.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CrownAndDynasty-macos
+          path: dist/CrownAndDynasty-macos.zip
+
+      - name: Релиз (для тегов v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
