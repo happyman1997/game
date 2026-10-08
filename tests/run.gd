@@ -6,7 +6,22 @@ extends SceneTree
 ## Тест — файл tests/test_*.gd с классом, наследующим TestCase,
 ## и методами test_*(). Проверки: check(), check_eq().
 
+class ErrorCatcher extends Logger:
+	var errors: Array[String] = []
+	var mutex := Mutex.new()
+
+	func _log_error(function: String, file: String, line: int, code: String, rationale: String, _editor_notify: bool, error_type: int, _script_backtraces: Array[ScriptBacktrace]) -> void:
+		# Предупреждения (push_warning) не считаем ошибками теста.
+		if error_type == ERROR_TYPE_WARNING:
+			return
+		mutex.lock()
+		errors.append("%s (%s:%d %s)" % [rationale if rationale != "" else code, file.get_file(), line, function])
+		mutex.unlock()
+
+
 func _init() -> void:
+	var catcher := ErrorCatcher.new()
+	OS.add_logger(catcher)
 	var filter := ""
 	var args := OS.get_cmdline_user_args()
 	if args.size() > 0:
@@ -25,7 +40,10 @@ func _init() -> void:
 			var tc: TestCase = script.new()
 			tc.name = "%s::%s" % [f.trim_suffix(".gd"), m]
 			var t := Time.get_ticks_msec()
+			catcher.errors.clear()
 			await tc.call(m)
+			for err in catcher.errors:
+				tc.failures.append("ошибка выполнения: " + err)
 			total += 1
 			if tc.failures.is_empty():
 				print("  ✓ %s (%d мс)" % [tc.name, Time.get_ticks_msec() - t])

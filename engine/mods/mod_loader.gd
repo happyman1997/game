@@ -29,8 +29,8 @@ static func resolve_load_order(packages: Array, issues: Array) -> Array:
 				changed = true
 	var pkgs: Array = by_id.values()
 	pkgs.sort_custom(func(a: ModPackage, b: ModPackage) -> bool:
-		var pa := Data.num(a.manifest.get("priority"))
-		var pb := Data.num(b.manifest.get("priority"))
+		var pa = Data.num(a.manifest.get("priority"))
+		var pb = Data.num(b.manifest.get("priority"))
 		if pa != pb:
 			return pa < pb
 		return a.id < b.id)
@@ -52,7 +52,7 @@ static func resolve_load_order(packages: Array, issues: Array) -> Array:
 				next = p
 				break
 		if next == null:
-			var rest := pkgs.filter(func(p): return not done.has(p.id))
+			var rest = pkgs.filter(func(p): return not done.has(p.id))
 			issues.append({"level": "error", "message": "Циклическая зависимость между модами: " + ", ".join(rest.map(func(p): return p.id))})
 			for p: ModPackage in rest:
 				order.append(p)
@@ -125,7 +125,7 @@ static func load_mods(packages: Array, formats: FormatRegistry, enabled: Variant
 				issues.append({"mod": pkg.id, "file": file, "level": "error", "message": "Файл данных должен быть словарём «тип контента → записи»"})
 				continue
 			for type in parsed:
-				var err := content.merge_section(str(type), parsed[type], pkg.id)
+				var err = content.merge_section(str(type), parsed[type], pkg.id)
 				if err != "":
 					issues.append({"mod": pkg.id, "file": file, "level": "error", "message": "%s: %s" % [type, err]})
 	return {"order": order, "content": content, "loc": loc, "scripts": scripts, "issues": issues}

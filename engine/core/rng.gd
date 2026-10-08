@@ -59,7 +59,7 @@ func weighted(items: Array, weight: Callable) -> Variant:
 	var ws: Array[float] = []
 	for it in items:
 		var w: Variant = weight.call(it)
-		var wf := maxf(0.0, float(w) if w != null else 0.0)
+		var wf = maxf(0.0, float(w) if w != null else 0.0)
 		ws.append(wf)
 		total += wf
 	if total <= 0.0:

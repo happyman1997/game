@@ -97,7 +97,7 @@ static func step_scope(ctx: ScriptContext, cur: Variant, seg: String, first: boo
 		if seg.begins_with(p):
 			var ref := {"type": PREFIXED[p], "id": seg.substr(p.length())}
 			return ref if game.exists(ref) else null
-	var link: Variant = game.engine.script.links.get_item(seg)
+	var link: Variant = game.engine.scripting.links.get_item(seg)
 	if link != null:
 		if cur == null:
 			return null
@@ -117,7 +117,7 @@ static func is_scope_start(ctx: ScriptContext, seg: String) -> bool:
 	for p in PREFIXED:
 		if seg.begins_with(p):
 			return true
-	return ctx.game.engine.script.links.has(seg)
+	return ctx.game.engine.scripting.links.has(seg)
 
 
 ## Разрешает путь к скоупу: "scope:actor.liege", "root.primary_title", "title:k_england".
@@ -235,7 +235,7 @@ static func _eval_value_path(ctx: ScriptContext, scope: Variant, s: String) -> f
 	if trimmed.is_valid_float():
 		return float(trimmed)
 	var game := ctx.game
-	var reg := game.engine.script
+	var reg := game.engine.scripting
 	if reg.constants.has(trimmed):
 		return float(reg.constants.get_item(trimmed))
 	if trimmed.begins_with("scope:") and not trimmed.contains(".") and ctx.values.has(trimmed.substr(6)):
@@ -253,7 +253,7 @@ static func _eval_value_path(ctx: ScriptContext, scope: Variant, s: String) -> f
 		cur = step_scope(ctx, cur, segs[i], i == 0)
 		if cur == null:
 			return 0.0
-	var last := segs[segs.size() - 1]
+	var last = segs[segs.size() - 1]
 	if last.begins_with("scope:") and ctx.values.has(last.substr(6)):
 		return float(ctx.values[last.substr(6)])
 	return get_named_value(ctx, cur, last)
@@ -269,14 +269,14 @@ static func get_named_value(ctx: ScriptContext, scope: Variant, name_with_arg: S
 	var arg_path := m.get_string(2)
 	if vname.begins_with("var:"):
 		var holder: Variant = game.state.global_vars
-		if scope != null and scope.type == "character" and game.char(scope.id) != null:
-			holder = game.char(scope.id).vars
+		if scope != null and scope.type == "character" and game.ch(scope.id) != null:
+			holder = game.ch(scope.id).vars
 		elif scope != null and scope.type == "province" and game.state.provinces.has(scope.id):
 			holder = game.state.provinces[scope.id].vars
 		return Data.num(holder.get(vname.substr(4)))
 	if vname.begins_with("global_var:"):
 		return Data.num(game.state.global_vars.get(vname.substr(11)))
-	var def: Variant = game.engine.script.values.get_item(vname)
+	var def: Variant = game.engine.scripting.values.get_item(vname)
 	if def != null:
 		if scope == null:
 			return 0.0
@@ -298,7 +298,7 @@ static func get_named_value(ctx: ScriptContext, scope: Variant, name_with_arg: S
 
 
 static func has_named_value(ctx: ScriptContext, vname: String) -> bool:
-	return ctx.game.engine.script.values.has(vname) or ctx.game.content.has("script_values", vname) or vname.begins_with("var:") or vname.begins_with("global_var:")
+	return ctx.game.engine.scripting.values.has(vname) or ctx.game.content.has("script_values", vname) or vname.begins_with("var:") or vname.begins_with("global_var:")
 
 
 static func _strip_call(key: String) -> String:
@@ -405,7 +405,7 @@ static func _effect_in(ctx: ScriptContext, from: Variant, sub: Variant, block: V
 
 static func eval_trigger_key(ctx: ScriptContext, scope: Variant, key: String, arg: Variant) -> bool:
 	var game := ctx.game
-	var reg := game.engine.script
+	var reg := game.engine.scripting
 	match key:
 		"AND", "and":
 			return eval_trigger(ctx, scope, arg)
@@ -468,7 +468,7 @@ static func eval_trigger_key(ctx: ScriptContext, scope: Variant, key: String, ar
 		return compare(ctx, scope, get_named_value(ctx, scope, key), arg)
 	if key.contains(".") or is_scope_start(ctx, key):
 		var segs := split_path(key)
-		var last := segs[segs.size() - 1]
+		var last = segs[segs.size() - 1]
 		if has_named_value(ctx, _strip_call(last)):
 			return compare(ctx, scope, _eval_value_path(ctx, scope, key), arg)
 		var sub: Variant = resolve_scope(ctx, scope, key)
@@ -586,7 +586,7 @@ static func _iterator_parts(arg: Variant) -> Dictionary:
 
 static func run_effect_key(ctx: ScriptContext, scope: Variant, key: String, arg: Variant) -> void:
 	var game := ctx.game
-	var reg := game.engine.script
+	var reg := game.engine.scripting
 	match key:
 		"effect", "hidden_effect", "then":
 			run_effect(ctx, scope, arg)
@@ -646,9 +646,9 @@ static func run_effect_key(ctx: ScriptContext, scope: Variant, key: String, arg:
 				_effect_in(ctx, scope, it, parts.effects)
 		else:
 			var ob: Variant = parts.get("order_by")
-			var scored := items.map(func(it): return {"it": it, "v": eval_value(ctx, it, ob if ob != null else 0)})
+			var scored = items.map(func(it): return {"it": it, "v": eval_value(ctx, it, ob if ob != null else 0)})
 			scored.sort_custom(func(a, b): return a.v > b.v)
-			var n := int(eval_value(ctx, scope, parts.max)) if parts.get("max") != null else 1
+			var n = int(eval_value(ctx, scope, parts.max)) if parts.get("max") != null else 1
 			for i in mini(n, scored.size()):
 				_effect_in(ctx, scope, scored[i].it, parts.effects)
 		return
@@ -699,7 +699,7 @@ static func describe_effect(ctx: ScriptContext, scope: Variant, block: Variant, 
 	if block == null or ctx.depth > MAX_DEPTH:
 		return out
 	var game := ctx.game
-	var reg := game.engine.script
+	var reg := game.engine.scripting
 	var prev_describing := ctx.describing
 	ctx.describing = true
 	var if_state := 0
@@ -869,7 +869,7 @@ static func failed_triggers(ctx: ScriptContext, scope: Variant, block: Variant) 
 			continue
 		if eval_trigger_key(ctx, scope, key, arg):
 			continue
-		var trig: Variant = game.engine.script.triggers.get_item(key)
+		var trig: Variant = game.engine.scripting.triggers.get_item(key)
 		var d: Variant = trig.describe.call(ctx, scope, arg) if (trig != null and trig.has("describe")) else null
 		if d != null and str(d) != "":
 			out.append(str(d))

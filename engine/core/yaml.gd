@@ -123,7 +123,7 @@ class _Parser:
 			# Незакрытые [ или { — склеиваем со следующими строками.
 			var depth := _bracket_depth(text)
 			while depth > 0 and i < raw.size():
-				var more := _strip_comment(raw[i]).strip_edges()
+				var more = _strip_comment(raw[i]).strip_edges()
 				i += 1
 				if more != "":
 					text += " " + more
@@ -144,7 +144,7 @@ class _Parser:
 		var i := 0
 		var n := s.length()
 		while i < n:
-			var c := s[i]
+			var c = s[i]
 			if q == "\"":
 				if c == "\\":
 					i += 1
@@ -169,7 +169,7 @@ class _Parser:
 		var i := 0
 		var n := s.length()
 		while i < n:
-			var c := s[i]
+			var c = s[i]
 			if q == "\"":
 				if c == "\\":
 					i += 1
@@ -203,7 +203,7 @@ class _Parser:
 	func parse_block(indent: int) -> Variant:
 		if pos >= lines.size():
 			return null
-		var line := lines[pos]
+		var line = lines[pos]
 		if _is_seq_item(line.text):
 			return parse_seq(line.indent)
 		if _key_split(line.text) >= 0:
@@ -214,20 +214,20 @@ class _Parser:
 	func parse_map(indent: int) -> Dictionary:
 		var out := {}
 		while error == "" and pos < lines.size():
-			var line := lines[pos]
+			var line = lines[pos]
 			if line.indent != indent or _is_seq_item(line.text):
 				break
-			var colon := _key_split(line.text)
+			var colon = _key_split(line.text)
 			if colon < 0:
 				fail("ожидался ключ «ключ: значение»", line.num)
 				break
-			var key := _parse_key(line.text.substr(0, colon).strip_edges(), line.num)
-			var rest := line.text.substr(colon + 1).strip_edges()
+			var key = _parse_key(line.text.substr(0, colon).strip_edges(), line.num)
+			var rest = line.text.substr(colon + 1).strip_edges()
 			pos += 1
 			var value: Variant = null
 			if rest == "":
 				if pos < lines.size():
-					var nxt := lines[pos]
+					var nxt = lines[pos]
 					if nxt.indent > indent or (nxt.indent == indent and _is_seq_item(nxt.text)):
 						value = parse_block(nxt.indent)
 			else:
@@ -243,10 +243,10 @@ class _Parser:
 	func parse_seq(indent: int) -> Array:
 		var out := []
 		while error == "" and pos < lines.size():
-			var line := lines[pos]
+			var line = lines[pos]
 			if line.indent != indent or not _is_seq_item(line.text):
 				break
-			var rest := line.text.substr(1)
+			var rest = line.text.substr(1)
 			var spaces := 0
 			while spaces < rest.length() and rest[spaces] == " ":
 				spaces += 1
@@ -275,7 +275,7 @@ class _Parser:
 		var i := 0
 		var n := t.length()
 		if t[0] == "\"" or t[0] == "'":
-			var q := t[0]
+			var q = t[0]
 			i = 1
 			while i < n:
 				if q == "\"" and t[i] == "\\":
@@ -308,7 +308,7 @@ class _Parser:
 
 	## Значение в той же строке, что и ключ: flow-коллекция, строка в кавычках или скаляр.
 	func parse_inline(t: String, num: int) -> Variant:
-		var c := t[0]
+		var c = t[0]
 		if c == "[" or c == "{" or c == "\"" or c == "'":
 			var fp := _Flow.new(t, self, num)
 			var v: Variant = fp.parse_value(false)
@@ -345,7 +345,7 @@ class _Flow:
 		skip_ws()
 		if i >= s.length():
 			return null
-		var c := s[i]
+		var c = s[i]
 		if c == "[":
 			return parse_list()
 		if c == "{":
@@ -411,7 +411,7 @@ class _Flow:
 		var start := i
 		var n := s.length()
 		while i < n:
-			var c := s[i]
+			var c = s[i]
 			if in_flow and (c == "," or c == "]" or c == "}"):
 				break
 			if is_key and c == ":" and (i + 1 == n or s[i + 1] in [" ", ",", "}", "]"]):
@@ -423,12 +423,12 @@ class _Flow:
 		return t if is_key else Yaml.resolve_plain(t)
 
 	func parse_quoted() -> String:
-		var q := s[i]
+		var q = s[i]
 		i += 1
 		var out := ""
 		var n := s.length()
 		while i < n:
-			var c := s[i]
+			var c = s[i]
 			if q == "'":
 				if c == "'":
 					if i + 1 < n and s[i + 1] == "'":
@@ -444,7 +444,7 @@ class _Flow:
 				i += 1
 				return out
 			if c == "\\" and i + 1 < n:
-				var e := s[i + 1]
+				var e = s[i + 1]
 				i += 2
 				match e:
 					"n": out += "\n"
@@ -458,7 +458,7 @@ class _Flow:
 					"_": out += " "
 					"e": out += char(27)
 					"x", "u", "U":
-						var len := 2 if e == "x" else (4 if e == "u" else 8)
+						var len = 2 if e == "x" else (4 if e == "u" else 8)
 						out += char(s.substr(i, len).hex_to_int())
 						i += len
 					_: out += e

@@ -56,7 +56,7 @@ static func scan_dir(dir: String, kind: String, origin_label: String, issues: Ar
 	names.sort()
 	for n in names:
 		var root: String = dir.trim_suffix("/") + "/" + n
-		var mpath := root + "/mod.json"
+		var mpath = root + "/mod.json"
 		if not FileAccess.file_exists(mpath):
 			continue
 		var r := FormatRegistry.create_default().parse(FileAccess.get_file_as_string(mpath), mpath)

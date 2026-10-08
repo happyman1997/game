@@ -27,7 +27,7 @@ func _walk(dir: String, rel: String, out: PackedStringArray) -> void:
 			name = name.trim_suffix(".gdc") + ".gd"
 		if name.ends_with(".import"):
 			continue
-		var p := (rel + "/" + name) if rel != "" else name
+		var p = (rel + "/" + name) if rel != "" else name
 		if not out.has(p):
 			out.append(p)
 	for d in DirAccess.get_directories_at(dir):

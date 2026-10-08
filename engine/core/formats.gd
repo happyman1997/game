@@ -57,7 +57,7 @@ static func _strip_json_comments(text: String) -> String:
 	var n := text.length()
 	var start := 0
 	while i < n:
-		var c := text[i]
+		var c = text[i]
 		if in_str:
 			if c == "\\":
 				i += 1

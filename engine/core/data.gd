@@ -126,3 +126,71 @@ static func num(v: Variant, fallback: float = 0.0) -> float:
 	if v is String and v.is_valid_float():
 		return float(v)
 	return fallback
+
+
+## Устойчивая сортировка (как Array.sort в JS): cmp(a, b) -> число (<0, 0, >0).
+## Сортирует массив на месте и возвращает его.
+static func stable_sort(arr: Array, cmp: Callable) -> Array:
+	var idx := range(arr.size())
+	var items := arr.duplicate()
+	idx.sort_custom(func(i, j):
+		var r: float = cmp.call(items[i], items[j])
+		return r < 0 or (r == 0 and i < j))
+	for k in idx.size():
+		arr[k] = items[idx[k]]
+	return arr
+
+
+## Устойчивая сортировка по ключу: key(x) -> число. desc — по убыванию.
+static func sort_by(arr: Array, key: Callable, desc: bool = false) -> Array:
+	var keyed := []
+	for i in arr.size():
+		keyed.append([key.call(arr[i]), i, arr[i]])
+	keyed.sort_custom(func(a, b):
+		if a[0] != b[0]:
+			return a[0] > b[0] if desc else a[0] < b[0]
+		return a[1] < b[1])
+	for k in keyed.size():
+		arr[k] = keyed[k][2]
+	return arr
+
+
+## Элемент с наибольшим key(x) (первый при равенстве) или null.
+static func max_by(arr: Array, key: Callable) -> Variant:
+	var best: Variant = null
+	var bv := -INF
+	for x in arr:
+		var v: float = key.call(x)
+		if best == null or v > bv:
+			best = x
+			bv = v
+	return best
+
+
+static func sum(arr: Array, key: Callable = Callable()) -> float:
+	var s := 0.0
+	for x in arr:
+		s += float(key.call(x)) if key.is_valid() else float(x)
+	return s
+
+
+static func count(arr: Array, pred: Callable) -> int:
+	var n := 0
+	for x in arr:
+		if pred.call(x):
+			n += 1
+	return n
+
+
+static func uniq(arr: Array) -> Array:
+	var seen := {}
+	var out := []
+	for x in arr:
+		if not seen.has(x):
+			seen[x] = true
+			out.append(x)
+	return out
+
+
+static func clampf01(x: float) -> float:
+	return clampf(x, 0.0, 1.0)
