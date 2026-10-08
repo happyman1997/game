@@ -30,7 +30,15 @@ var _cluster_sig := ""
 var _tabs_sig := ""
 var _modes_sig := ""
 var _window_key := ""
+var _window_at := 0
 var _seen_messages := 0
+var _res_sig := ""
+var _date_sig := ""
+var _outliner_sig := ""
+var _messages_sig := ""
+
+## Пока игра идёт, открытое окно обновляется не чаще (мс): его перестройка дорогая.
+const LIVE_WINDOW_MS := 1500
 
 
 func _init() -> void:
@@ -169,7 +177,9 @@ func build() -> void:
 
 # ------------------------------------------------------------ обновление
 
-func refresh() -> void:
+## full — полная перерисовка (действие игрока, пауза); иначе — «живое»
+## обновление во время хода игры: перестраивается только изменившееся.
+func refresh(full: bool = true) -> void:
 	var g := app.game
 	var p: Variant = g.player
 	pick_banner.visible = app.pick_mode
@@ -180,30 +190,40 @@ func refresh() -> void:
 	_refresh_modes()
 	_refresh_outliner(p)
 	_refresh_messages()
-	_refresh_window()
+	_refresh_window(full)
 
 
 func _refresh_resources(p: Variant) -> void:
-	K.clear(resources)
 	var g := app.game
-	if p == null:
+	var items: Array = []
+	if p != null:
+		var income := Economy.monthly_income(g, p)
+		items.append(["gold", K.fmt(p.gold), K.signed(income, 1), income >= 0, func():
+			var pl: Variant = app.game.player
+			return BB.title(t("ui.gold")) + ("\n" + BB.breakdown(Economy.income_breakdown(app.game, pl), 1) if pl != null else "")])
+		var mp := Economy.monthly_prestige(g, p)
+		items.append(["prestige", K.fmt(p.prestige), K.signed(mp, 1), mp >= 0, BB.title(t("ui.prestige"))])
+		var pi := Economy.monthly_piety(g, p)
+		items.append(["piety", K.fmt(p.piety), K.signed(pi, 1), pi >= 0, BB.title(t("ui.piety"))])
+		items.append(["levies", K.fmt(Economy.realm_levy(g, p)), "", true, BB.title(t("ui.levies"))])
+		if float(p.stress) > 0:
+			items.append(["stress", K.fmt(p.stress), "", float(p.stress) < 100, BB.title(t("ui.stress"))])
+		var widgets: Array = g.engine.ui.top_bar.values()
+		Data.sort_by(widgets, func(w): return Data.num(w.get("order")))
+		for w in widgets:
+			var r: Variant = w.render.call(g)
+			if r is Dictionary:
+				items.append([r.get("icon", "star"), str(r.get("text", "")), "", true, r.get("tooltip")])
+	# Перестраиваем, только если изменились значения (подсказки — по тексту).
+	var sig := ""
+	for it in items:
+		sig += "%s|%s|%s|%s|%s;" % [it[0], it[1], it[2], it[3], it[4] if it[4] is String else ""]
+	if sig == _res_sig:
 		return
-	var income := Economy.monthly_income(g, p)
-	var gold_tip := BB.title(t("ui.gold")) + "\n" + BB.breakdown(Economy.income_breakdown(g, p), 1)
-	resources.add_child(_res("gold", K.fmt(p.gold), K.signed(income, 1), income >= 0, gold_tip))
-	var mp := Economy.monthly_prestige(g, p)
-	resources.add_child(_res("prestige", K.fmt(p.prestige), K.signed(mp, 1), mp >= 0, BB.title(t("ui.prestige"))))
-	var pi := Economy.monthly_piety(g, p)
-	resources.add_child(_res("piety", K.fmt(p.piety), K.signed(pi, 1), pi >= 0, BB.title(t("ui.piety"))))
-	resources.add_child(_res("levies", K.fmt(Economy.realm_levy(g, p)), "", true, BB.title(t("ui.levies"))))
-	if float(p.stress) > 0:
-		resources.add_child(_res("stress", K.fmt(p.stress), "", float(p.stress) < 100, BB.title(t("ui.stress"))))
-	var widgets: Array = g.engine.ui.top_bar.values()
-	Data.sort_by(widgets, func(w): return Data.num(w.get("order")))
-	for w in widgets:
-		var r: Variant = w.render.call(g)
-		if r is Dictionary:
-			resources.add_child(_res(r.get("icon", "star"), str(r.get("text", "")), "", true, r.get("tooltip")))
+	_res_sig = sig
+	K.clear(resources)
+	for it in items:
+		resources.add_child(_res(it[0], it[1], it[2], it[3], it[4]))
 
 
 func _res(icon_name: Variant, value: String, delta: String, positive: bool, tip_content: Variant) -> Control:
@@ -320,6 +340,10 @@ func _refresh_date() -> void:
 	var g := app.game
 	var d := GameDate.parts(g.date)
 	date_label.text = "%d %s %d" % [d.d, t("month_gen.%d" % d.m) if g.loc.has("month_gen.%d" % d.m) else t("month.%d" % d.m), d.y]
+	var sig := "%s|%d" % [app.paused, app.speed]
+	if sig == _date_sig:
+		return
+	_date_sig = sig
 	pause_btn.icon = Icons.texture("play" if app.paused else "pause", 22)
 	pause_btn.self_modulate = Color(1.0, 0.75, 0.6) if app.paused else Color.WHITE
 	for i in speed_pips.size():
@@ -350,10 +374,11 @@ func _refresh_modes() -> void:
 
 
 func _refresh_outliner(p: Variant) -> void:
-	K.clear(outliner)
 	var g := app.game
 	var panel := outliner.get_parent() as Control
 	if p == null:
+		K.clear(outliner)
+		_outliner_sig = ""
 		panel.visible = false
 		return
 	var wars := Wars.wars_of(g, p.id)
@@ -362,6 +387,17 @@ func _refresh_outliner(p: Variant) -> void:
 	for s in g.state.schemes.values():
 		if s.owner == p.id:
 			schemes.append(s)
+	var sig := "%s|%s|" % [g.loc.lang, app.map_view.selected_army]
+	for w in wars:
+		sig += "w%s:%d;" % [w.id, int(Wars.warscore(g, w).total)]
+	for a in armies:
+		sig += "a%s:%d:%s:%d;" % [a.id, int(a.size), a.location, a.path.size()]
+	for s in schemes:
+		sig += "s%s:%d;" % [s.id, int(s.progress)]
+	if sig == _outliner_sig:
+		return
+	_outliner_sig = sig
+	K.clear(outliner)
 	panel.visible = not (wars.is_empty() and armies.is_empty() and schemes.is_empty())
 	if not wars.is_empty():
 		outliner.add_child(K.label(t("ui.tab.wars"), "SubheaderLabel"))
@@ -392,6 +428,11 @@ func _refresh_outliner(p: Variant) -> void:
 func _refresh_messages() -> void:
 	var g := app.game
 	var all: Array = g.state.messages
+	var last: Variant = all[all.size() - 1] if not all.is_empty() else null
+	var sig := "%s|%d|%s" % [g.loc.lang, all.size(), str(last.date) + str(last.text) if last != null else ""]
+	if sig == _messages_sig:
+		return
+	_messages_sig = sig
 	var fresh := all.size() - _seen_messages
 	_seen_messages = all.size()
 	K.clear(messages)
@@ -420,7 +461,7 @@ func _refresh_messages() -> void:
 		messages.add_child(row)
 
 
-func _refresh_window() -> void:
+func _refresh_window(full: bool = true) -> void:
 	var ref: Variant = app.panel_ref
 	if ref == null:
 		window.visible = false
@@ -428,6 +469,9 @@ func _refresh_window() -> void:
 		return
 	window.visible = true
 	var key: String = ref.kind + ":" + str(ref.id)
+	if not full and key == _window_key and Time.get_ticks_msec() - _window_at < LIVE_WINDOW_MS:
+		return
+	_window_at = Time.get_ticks_msec()
 	var scroll := window_body.scroll_vertical if key == _window_key else 0
 	var built := Panels.build(app, ref)
 	window_title.text = built.title

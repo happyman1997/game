@@ -22,9 +22,10 @@ func _draw() -> void:
 		return
 	_draw_labels()
 	_draw_county_names()
-	_draw_sieges()
-	_draw_path()
-	_draw_armies()
+	var snap := _snapshot()
+	_draw_sieges(snap)
+	_draw_path(snap)
+	_draw_armies(snap)
 
 
 # ------------------------------------------------------------ подписи
@@ -115,45 +116,93 @@ func _draw_county_names() -> void:
 
 
 # ------------------------------------------------------------ армии и осады
+# Армии и осады рисуются по снимку мира (build_snapshot): его готовит поток
+# симуляции после каждого дня, так что отрисовка не трогает живое состояние.
 
-func _army_map_pos(a: Dictionary) -> Vector2:
-	var m := view.map
-	var p := m.center_of(a.location)
-	if not a.path.is_empty():
-		var q := m.center_of(a.path[0])
-		p = p.lerp(q, clampf(float(a.progress), 0.0, 1.0))
-	return p
+## Снимок для карты: армии (позиция, цвет, рамка, подпись, путь) и осады.
+## Вызывается под замком мира (в потоке симуляции или в окне доступа).
+static func build_snapshot(g: Game) -> Dictionary:
+	var m := g.engine.map
+	var player: Variant = g.state.player
+	var player_wars: Array = Wars.wars_of(g, player) if player != null else []
+	var armies: Array = []
+	var ids: Array = g.state.armies.keys()
+	ids.sort()
+	var colors := {}
+	for id in ids:
+		var a: Dictionary = g.state.armies[id]
+		var owner: Variant = g.ch(a.owner)
+		if owner == null or not m.index.has(a.location):
+			continue
+		var top := Titles.top_liege(g, owner)
+		var col: Variant = colors.get(top.id)
+		if col == null:
+			col = Color("#888888")
+			if not top.titles.is_empty():
+				var d: Variant = g.title_def(top.titles[0])
+				if d != null and d.get("color") is String:
+					col = Color(d.color)
+			colors[top.id] = col
+		var kind := "neutral"
+		if a.owner == player:
+			kind = "player"
+		else:
+			for w in player_wars:
+				var ps: Variant = Wars.participant_side(w, player)
+				var os: Variant = Wars.participant_side(w, a.owner)
+				if ps != null and os != null and ps != os:
+					kind = "enemy"
+					break
+		var pos := m.center_of(a.location)
+		if not a.path.is_empty() and m.index.has(a.path[0]):
+			pos = pos.lerp(m.center_of(a.path[0]), clampf(float(a.progress), 0.0, 1.0))
+		var n := int(a.size)
+		armies.append({
+			"id": id, "location": a.location, "pos": pos, "color": col, "kind": kind,
+			"label": ("%.1fk" % (n / 1000.0)) if n >= 1000 else str(n),
+			"retreating": a.get("retreating", false),
+			"path": a.path.duplicate(), "days": Military.days_to_next(g, a) if not a.path.is_empty() else 0,
+		})
+	var sieges: Array = []
+	for p in g.state.provinces.values():
+		if p.get("siege") != null and m.index.has(p.id):
+			sieges.append({"prov": p.id, "progress": clampf(float(p.siege.progress) / 100.0, 0.0, 1.0)})
+	return {"armies": armies, "sieges": sieges}
 
 
-func _draw_sieges() -> void:
-	var g := view.game
+func _snapshot() -> Dictionary:
+	if view.sim != null and view.sim.is_running():
+		return view.sim.get_snapshot()
+	return build_snapshot(view.game)
+
+
+func _draw_sieges(snap: Dictionary) -> void:
 	var m := view.map
 	var tower := Icons.texture("tower", 16)
-	for p in g.state.provinces.values():
-		if p.get("siege") == null:
-			continue
-		if not m.index.has(p.id):
-			continue
-		var c := view.map_to_screen(m.center_of(p.id)) + Vector2(0, 12)
+	for s in snap.get("sieges", []):
+		var c := view.map_to_screen(m.center_of(s.prov)) + Vector2(0, 12)
 		draw_circle(c, 12, Color(0, 0, 0, 0.6))
 		draw_arc(c, 10, 0, TAU, 32, Color(0.2, 0.15, 0.1, 0.9), 3.0, true)
-		var prog := clampf(float(p.siege.progress) / 100.0, 0.0, 1.0)
-		draw_arc(c, 10, -PI / 2, -PI / 2 + TAU * prog, 32, Color("#ffcc33"), 3.0, true)
+		draw_arc(c, 10, -PI / 2, -PI / 2 + TAU * float(s.progress), 32, Color("#ffcc33"), 3.0, true)
 		draw_texture(tower, c - Vector2(8, 8))
 
 
-func _draw_path() -> void:
-	var g := view.game
+func _draw_path(snap: Dictionary) -> void:
 	var id: Variant = view.selected_army
-	if id == null or not g.state.armies.has(id):
+	if id == null:
 		return
-	var a: Dictionary = g.state.armies[id]
-	if a.path.is_empty():
+	var a: Variant = null
+	for x in snap.get("armies", []):
+		if x.id == id:
+			a = x
+			break
+	if a == null or a.path.is_empty():
 		return
 	var m := view.map
-	var pts := PackedVector2Array([view.map_to_screen(_army_map_pos(a))])
+	var pts := PackedVector2Array([view.map_to_screen(a.pos)])
 	for p in a.path:
-		pts.append(view.map_to_screen(m.center_of(p)))
+		if m.index.has(p):
+			pts.append(view.map_to_screen(m.center_of(p)))
 	for i in pts.size() - 1:
 		draw_dashed_line(pts[i], pts[i + 1], Color(0, 0, 0, 0.5), 4.5, 9.0, true)
 		draw_dashed_line(pts[i], pts[i + 1], Color("#ffe9a8"), 2.5, 9.0, true)
@@ -161,63 +210,42 @@ func _draw_path() -> void:
 	draw_circle(last, 6, Color(0, 0, 0, 0.6))
 	draw_circle(last, 4, Color("#ffe9a8"))
 	var font := Fonts.bold()
-	var txt := "%d" % Military.days_to_next(g, a)
+	var txt := "%d" % int(a.days)
 	draw_string_outline(font, last + Vector2(8, -6), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, 4, Color(0, 0, 0, 0.7))
 	draw_string(font, last + Vector2(8, -6), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#ffe9a8"))
 
 
-func _draw_armies() -> void:
-	var g := view.game
-	var player: Variant = g.state.player
-	var player_wars: Array = Wars.wars_of(g, player) if player != null else []
+func _draw_armies(snap: Dictionary) -> void:
 	var by_loc := {}
 	var font := Fonts.bold()
 	var swords := Icons.texture("swords", 14)
 	var flag := Icons.texture("banner", 14, "silver")
 	_army_pos = []
-	var ids: Array = g.state.armies.keys()
-	ids.sort()
-	for id in ids:
-		var a: Dictionary = g.state.armies[id]
-		var owner: Variant = g.ch(a.owner)
-		if owner == null:
-			continue
+	for a in snap.get("armies", []):
 		var k: int = by_loc.get(a.location, 0)
 		by_loc[a.location] = k + 1
-		var pos := view.map_to_screen(_army_map_pos(a)) + Vector2(k * 12, -16 - k * 8)
+		var pos := view.map_to_screen(a.pos) + Vector2(k * 12, -16 - k * 8)
 		if pos.x < -60 or pos.y < -30 or pos.x > size.x + 60 or pos.y > size.y + 30:
 			continue
-		_army_pos.append({"id": id, "pos": pos})
-		var top := Titles.top_liege(g, owner)
-		var col := Color("#888888")
-		if not top.titles.is_empty():
-			var d: Variant = g.title_def(top.titles[0])
-			if d != null and d.get("color") is String:
-				col = Color(d.color)
-		var enemy := false
-		for w in player_wars:
-			var ps: Variant = Wars.participant_side(w, player)
-			var os: Variant = Wars.participant_side(w, a.owner)
-			if ps != null and os != null and ps != os:
-				enemy = true
-		var n := int(a.size)
-		var label := ("%.1fk" % (n / 1000.0)) if n >= 1000 else str(n)
+		_army_pos.append({"id": a.id, "pos": pos})
+		var col: Color = a.color
+		var label: String = a.label
 		var tw := font.get_string_size(label, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
 		var w := tw + 26.0
 		var r := Rect2(pos - Vector2(w / 2, 10), Vector2(w, 20))
-		var selected: bool = id == view.selected_army
+		var selected: bool = a.id == view.selected_army
 		draw_rect(Rect2(r.position + Vector2(2, 3), r.size), Color(0, 0, 0, 0.5))
 		draw_rect(r, col.darkened(0.35))
 		draw_rect(Rect2(r.position, Vector2(r.size.x, 7)), Color(1, 1, 1, 0.12))
 		var border := Color("#1a1208")
 		if selected:
 			border = Color("#fff6c8")
-		elif a.owner == player:
+		elif a.kind == "player":
 			border = Color("#e8c050")
-		elif enemy:
+		elif a.kind == "enemy":
 			border = Color("#ff4a3a")
 		draw_rect(r, border, false, 3.0 if selected else 1.6)
-		draw_texture(flag if a.get("retreating", false) else swords, r.position + Vector2(4, 3))
+		draw_texture(flag if a.retreating else swords, r.position + Vector2(4, 3))
 		draw_string_outline(font, r.position + Vector2(20, 15), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, 3, Color(0, 0, 0, 0.6))
 		draw_string(font, r.position + Vector2(20, 15), label, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
 

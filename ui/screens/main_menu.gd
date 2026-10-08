@@ -58,7 +58,7 @@ static func build(app: App) -> Control:
 	buttons.add_child(big.call(app.t("ui.load_game"), func(): SaveScreens.open_load_dialog(app)))
 	buttons.add_child(big.call("%s (%d)" % [app.t("ui.mods"), e.mods.size()], func(): ModsScreen.open_manager(app)))
 	buttons.add_child(big.call(app.t("ui.settings"), func(): SettingsScreen.open(app)))
-	buttons.add_child(big.call(app.t("ui.quit_game"), func(): app.get_tree().quit()))
+	buttons.add_child(big.call(app.t("ui.quit_game"), func(): app.quit_game()))
 	col.add_child(K.margin(buttons, 30, 6, 30, 6))
 
 	# низ: версия, моды, проблемы

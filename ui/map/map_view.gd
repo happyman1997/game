@@ -49,6 +49,8 @@ var _color_tex: ImageTexture
 var _realm_tex: ImageTexture
 var _flags_tex: ImageTexture
 var _sig_timer := 0.0
+## Поток симуляции: раскраска читает мир только в «окне доступа».
+var sim: SimRunner
 
 ## Державы: индекс → {owner, area, cx, cy, ...}; провинция → индекс державы.
 var realm_of := PackedInt32Array()
@@ -453,13 +455,15 @@ func _process(delta: float) -> void:
 		_clamp_view()
 	# перекраска при изменении мира (проверяем не чаще 5 раз в секунду)
 	_sig_timer -= delta
-	if _dirty or _sig_timer <= 0.0:
+	if (_dirty or _sig_timer <= 0.0) and (sim == null or sim.try_enter()):
 		_sig_timer = 0.2
 		var sig := _compute_signature()
 		if _dirty or sig != _signature:
 			_signature = sig
 			_dirty = false
 			recolor()
+		if sim != null:
+			sim.leave()
 	var m := material_map
 	m.set_shader_parameter("rect_size", size)
 	m.set_shader_parameter("origin", origin)

@@ -70,7 +70,7 @@ static func open_save_dialog(app: App) -> void:
 			app.toast(app.t("ui.saved"), "good")
 		else:
 			app.toast("%s: %s" % [app.t("ui.save_failed"), error_string(err)], "bad")
-	input.text_submitted.connect(do_save)
+	input.text_submitted.connect(func(t): App.locked(do_save, [t]))
 	var existing := K.vbox([], 2)
 	for s in Platform.list_saves().slice(0, 8):
 		var slot: String = s.slot

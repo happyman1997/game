@@ -7,6 +7,8 @@ extends Control
 
 const DELAY := 0.35
 const MAX_W := 400.0
+## Мир сейчас занят симуляцией — подсказку обновим в следующем кадре.
+const BUSY := &"busy"
 
 var panel: PanelContainer
 var text: RichTextLabel
@@ -110,12 +112,21 @@ func _resolve() -> Variant:
 		return null
 	var c: Variant = _owner.get_meta("tip")
 	if c is Callable:
+		# Подсказка читает мир — только в окне доступа к симуляции.
+		var sim: SimRunner = App.instance.sim if App.instance != null else null
+		if sim != null and not sim.try_enter():
+			return BUSY
 		c = (c as Callable).call()
+		if sim != null:
+			sim.leave()
 	return c
 
 
 func _update_content() -> bool:
 	var content: Variant = _resolve()
+	if content is StringName and content == BUSY:
+		_refresh = 0.0
+		return _shown
 	if content == null or (content is String and content == ""):
 		panel.visible = false
 		_last_content = null

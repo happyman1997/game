@@ -54,7 +54,7 @@ static func rich(bbcode: String, wrap: bool = true, variation: String = "") -> R
 	else:
 		r.autowrap_mode = TextServer.AUTOWRAP_OFF
 	r.text = bbcode
-	r.meta_clicked.connect(func(meta): _on_meta(meta))
+	r.meta_clicked.connect(func(meta): App.locked(_on_meta.bind(meta)))
 	r.meta_hover_started.connect(func(_m): pass)
 	return r
 
@@ -182,7 +182,7 @@ static func button(text: Variant, on_press: Callable, opts: Dictionary = {}) -> 
 	b.pressed.connect(func():
 		if b.toggle_mode:
 			b.set_pressed_no_signal(opts.get("toggled", false))
-		on_press.call())
+		App.locked(on_press))
 	return b
 
 
@@ -209,7 +209,7 @@ static func round_button(icon: Variant, on_press: Callable, tip_content: Variant
 	b.pressed.connect(func():
 		if b.toggle_mode:
 			b.set_pressed_no_signal(active)
-		on_press.call())
+		App.locked(on_press))
 	return b
 
 
@@ -302,10 +302,10 @@ static func on_click(node: Control, cb: Callable, right_cb: Callable = Callable(
 	node.gui_input.connect(func(e: InputEvent):
 		if e is InputEventMouseButton and e.pressed:
 			if e.button_index == MOUSE_BUTTON_LEFT:
-				cb.call()
+				App.locked(cb)
 				node.accept_event()
 			elif e.button_index == MOUSE_BUTTON_RIGHT and right_cb.is_valid():
-				right_cb.call()
+				App.locked(right_cb)
 				node.accept_event())
 	return node
 

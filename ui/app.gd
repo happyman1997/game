@@ -4,10 +4,9 @@ extends Control
 ## окна. Состояние игры живёт в Game (движок); интерфейс только читает его
 ## и вызывает функции мира в ответ на действия игрока.
 
-## Секунд реального времени на игровой день для скоростей 1–5.
-const SPEED_SEC := [INF, 0.7, 0.3, 0.12, 0.045, 0.012]
-## Сколько миллисекунд кадра можно тратить на симуляцию.
-const SIM_BUDGET_MS := 14
+## Секунд реального времени на игровой день для скоростей 1–5
+## (на пятой — так быстро, как успевает поток симуляции).
+const SPEED_SEC := [INF, 0.7, 0.3, 0.12, 0.045, 0.004]
 
 static var instance: App
 
@@ -34,12 +33,16 @@ var modal_layer: Control
 var toast_box: VBoxContainer
 var tooltip: TooltipLayer
 
+## Поток симуляции: мир считается в фоне, интерфейс читает его в «окне доступа».
+var sim := SimRunner.new()
+
 var _modals: Array = []
 var _shown_event: Variant = null
 var _dirty := true
 var _dirty_now := false
 var _render_timer := 0.0
 var _acc := 0.0
+var _seen_days := 0
 var _last_autosave := -1
 var _seen_messages := 0
 
@@ -77,9 +80,11 @@ func _ready() -> void:
 	tooltip.scope = func(): return _modals.back().node if not _modals.is_empty() else null
 	add_child(tooltip)
 
-	map_view.province_clicked.connect(_on_province_clicked)
-	map_view.province_right_clicked.connect(_on_province_right_clicked)
-	map_view.army_clicked.connect(select_army)
+	map_view.province_clicked.connect(func(id): locked(_on_province_clicked.bind(id)))
+	map_view.province_right_clicked.connect(func(id): locked(_on_province_right_clicked.bind(id)))
+	sim.snapshot_fn = MapOverlay.build_snapshot
+	map_view.sim = sim
+	map_view.army_clicked.connect(func(id): locked(select_army.bind(id)))
 	map_view.tooltip_provider = province_tooltip
 	map_view.overlay.army_tooltip = army_tooltip
 	boot.call_deferred()
@@ -146,6 +151,10 @@ func set_enabled_mods(ids: Variant) -> void:
 
 
 func set_language(l: String) -> void:
+	locked(_set_language.bind(l))
+
+
+func _set_language(l: String) -> void:
 	lang = l
 	Platform.set_setting("lang", l)
 	if engine != null:
@@ -192,7 +201,20 @@ func show_loading(msg: String) -> void:
 	_set_screen(bg)
 
 
+## Выполнить fn с доступом к миру (блокирующе): для действий игрока.
+## Без запущенного потока — просто вызывает fn.
+static func locked(fn: Callable, args: Array = []) -> Variant:
+	var app := instance
+	if app == null:
+		return fn.callv(args)
+	app.sim.enter()
+	var r: Variant = fn.callv(args)
+	app.sim.leave()
+	return r
+
+
 func show_main_menu() -> void:
+	sim.stop()
 	game = null
 	paused = true
 	_close_all_modals()
@@ -214,6 +236,7 @@ func show_main_menu() -> void:
 
 
 func start_new_game(bookmark: String, player_id: Variant = null) -> void:
+	sim.stop()
 	show_loading(t("ui.generating_world"))
 	await get_tree().process_frame
 	var g := engine.new_game(bookmark)
@@ -244,6 +267,7 @@ func set_player(id: String) -> void:
 
 
 func enter_game(g: Game) -> void:
+	sim.stop()
 	game = g
 	paused = true
 	panel_ref = null
@@ -251,8 +275,7 @@ func enter_game(g: Game) -> void:
 	_shown_event = null
 	_close_all_modals()
 	_seen_messages = g.state.messages.size()
-	var start := GameDate.parts(g.date)
-	_last_autosave = start.y * 12 + start.m
+	_last_autosave = -1
 	map_view.drift = Vector2.ZERO
 	map_view.paper_bias = 0.0
 	map_view.interactive = true
@@ -265,8 +288,12 @@ func enter_game(g: Game) -> void:
 	hud.app = self
 	_set_screen(hud)
 	hud.build()
+	# Сигнал приходит из потока симуляции — обрабатываем в главном потоке.
 	g.changed.connect(func(kind):
-		mark_dirty(kind == "event" or kind == "army"))
+		if kind == "event":
+			mark_dirty(true), CONNECT_DEFERRED)
+	sim.set_snapshot(MapOverlay.build_snapshot(g))
+	sim.start(g)
 	mark_dirty(true)
 
 
@@ -278,51 +305,59 @@ func mark_dirty(now: bool = false) -> void:
 		_dirty_now = true
 
 
-func blocking_pending() -> bool:
-	var g := game
-	if g == null:
-		return true
-	return not g.state.pending_events.is_empty() or not g.state.pending_requests.is_empty() \
-		or g.state.game_over != null or pick_mode or not _modals.is_empty()
-
-
 func _process(delta: float) -> void:
+	sim.begin_frame()
 	var g := game
 	if g == null or hud == null:
 		return
-	if not paused and not blocking_pending():
+	# Время идёт: поток симуляции получает «бюджет» дней по скорости игры.
+	var running := not paused and not pick_mode and _modals.is_empty()
+	sim.allowed = running
+	if running:
 		_acc += delta
 		var step: float = SPEED_SEC[speed]
-		var t0 := Time.get_ticks_msec()
-		while _acc >= step and not blocking_pending():
-			_acc -= step
-			g.tick()
-			_autosave()
-			if Time.get_ticks_msec() - t0 > SIM_BUDGET_MS:
-				_acc = minf(_acc, step)
-				break
+		var n := floori(_acc / step)
+		_acc -= n * step
+		if n > 0:
+			sim.add_days(n, 2 if speed < 4 else 12)
 	else:
 		_acc = 0.0
+		sim.clear_days()
+	if sim.days_done != _seen_days:
+		_seen_days = sim.days_done
+		_dirty = true
 	_render_timer -= delta
 	if _dirty and (_dirty_now or _render_timer <= 0.0):
-		_dirty = false
-		_dirty_now = false
-		_render_timer = 0.03 if paused else 0.25
-		render()
+		# Окно доступа к миру: если поток сейчас считает день, ждём следующего кадра.
+		if sim.try_enter():
+			# Полная перерисовка — после действий игрока и на паузе;
+			# во время хода игры — только изменившееся.
+			var full := _dirty_now or paused or not running
+			_dirty = false
+			_dirty_now = false
+			_render_timer = 0.03 if paused else 0.25
+			sim.set_snapshot(MapOverlay.build_snapshot(g))
+			render(full)
+			_autosave()
+			sim.leave()
 
 
+## Автосохранение: при переходе через 1 января (или 1 июля).
 func _autosave() -> void:
 	var g := game
 	var mode := str(Platform.setting("autosave", "yearly"))
-	if mode == "off" or g.state.player == null:
-		return
 	var p := GameDate.parts(g.date)
-	if p.d != 1 or not (p.m == 1 or (mode == "half_year" and p.m == 7)):
+	var key: int = p.y * 12 + (p.m - 1 if mode != "half_year" else (6 if p.m >= 7 else 0))
+	if mode != "half_year":
+		key = p.y * 12
+	if _last_autosave < 0:
+		_last_autosave = key
 		return
-	var key: int = p.y * 12 + p.m
-	if key == _last_autosave:
+	if key <= _last_autosave:
 		return
 	_last_autosave = key
+	if mode == "off" or g.state.player == null:
+		return
 	SaveScreens.write_save(self, "autosave", SaveGame.serialize(g))
 
 
@@ -337,6 +372,10 @@ func set_speed(s: int) -> void:
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	locked(_handle_key.bind(event))
+
+
+func _handle_key(event: InputEvent) -> void:
 	var k := event as InputEventKey
 	if k == null or not k.pressed or k.echo:
 		return
@@ -379,10 +418,17 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
-		if game != null and game.state.player != null:
+		if game != null and locked(func(): return game.state.player != null):
 			SettingsScreen.open_quit_dialog(self)
 		else:
-			get_tree().quit()
+			quit_game()
+	elif what == NOTIFICATION_PREDELETE:
+		sim.stop()
+
+
+func quit_game() -> void:
+	sim.stop()
+	get_tree().quit()
 
 
 func quick_save() -> void:
@@ -651,10 +697,10 @@ func toast(text: String, kind: String = "info") -> void:
 
 # ------------------------------------------------------------ отрисовка
 
-func render() -> void:
+func render(full: bool = true) -> void:
 	if game == null or hud == null:
 		return
-	hud.refresh()
+	hud.refresh(full)
 	_render_pending()
 
 

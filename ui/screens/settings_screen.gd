@@ -73,7 +73,7 @@ static func open(app: App, on_close: Callable = Callable()) -> void:
 ## Выход из игры. Посреди партии предлагает сохраниться.
 static func open_quit_dialog(app: App) -> void:
 	if app.game == null or app.game.state.player == null:
-		app.get_tree().quit()
+		app.quit_game()
 		return
 	var close_ref := [Callable()]
 	var body := K.vbox([
@@ -84,10 +84,10 @@ static func open_quit_dialog(app: App) -> void:
 				close_ref[0].call()
 				var err := SaveScreens.write_save(app, "autosave", SaveGame.serialize(app.game))
 				if err == OK:
-					app.get_tree().quit()
+					app.quit_game()
 				else:
 					app.toast("%s: %s" % [app.t("ui.save_failed"), error_string(err)], "bad"), {"variation": "GoldButton"}),
-			K.button(app.t("ui.quit_without_saving"), func(): app.get_tree().quit()),
+			K.button(app.t("ui.quit_without_saving"), func(): app.quit_game()),
 			K.button(app.t("ui.cancel"), func(): close_ref[0].call()),
 		], 8),
 	], 12)

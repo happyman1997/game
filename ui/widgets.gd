@@ -18,6 +18,12 @@ static func portrait(app: App, c: Variant, width: int = 72, opts: Dictionary = {
 	v.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	if c == null:
 		return v
+	# Текстуры готовим сразу (под замком мира): отрисовка идёт позже, когда
+	# мир может считаться в потоке симуляции.
+	v.tex = Portraits.texture(app.game, c, maxi(48, width * 2 if width < 64 else width))
+	v.dead = c.death != null
+	if v.show_coa and not c.titles.is_empty():
+		v.coa_tex = Coa.of_title(app.game, c.titles[0], int(width * 0.36))
 	if opts.get("clickable", true):
 		K.on_click(v, func(): app.open_character(c.id))
 	K.tip(v, opts.get("tip", func(): return app.character_tooltip(c.id)))
@@ -54,7 +60,7 @@ static func _link(text: String, color: Color, cb: Callable, tip_content: Variant
 	b.add_theme_constant_override("h_separation", 0)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	b.pressed.connect(cb)
+	b.pressed.connect(func(): App.locked(cb))
 	if tip_content != null:
 		K.tip(b, tip_content)
 	return b
@@ -130,7 +136,8 @@ static func skills(app: App, c: Dictionary) -> Control:
 		var d: Variant = g.content.get_def("skills", s)
 		var v := int(Stats.skill(g, c, s))
 		var ic: Variant = d.get("icon", "star") if d != null else "star"
-		row.add_child(stat(ic, str(v), BB.title(g.name_of("skills", s)) + "\n" + BB.breakdown(Stats.stat_breakdown(g, c, s)), UiArt.C_TEXT, 18))
+		var sid: String = s
+		row.add_child(stat(ic, str(v), func(): return BB.title(g.name_of("skills", sid)) + "\n" + BB.breakdown(Stats.stat_breakdown(g, c, sid)), UiArt.C_TEXT, 18))
 	return row
 
 
@@ -169,6 +176,9 @@ class PortraitView:
 	var character: Variant
 	var round := false
 	var show_coa := false
+	var tex: Texture2D
+	var coa_tex: Texture2D
+	var dead := false
 	static var _frame: StyleBoxTexture
 
 	func _ready() -> void:
@@ -194,11 +204,9 @@ class PortraitView:
 		return _frame
 
 	func _draw() -> void:
-		if character == null or game == null:
+		if tex == null:
 			draw_rect(Rect2(Vector2.ZERO, size), Color(0, 0, 0, 0.4))
 			return
-		var w := int(size.x)
-		var tex := Portraits.texture(game, character, maxi(48, w * 2 if w < 64 else w))
 		if round:
 			var c := size / 2
 			var r := minf(size.x, size.y) / 2 - 1
@@ -216,10 +224,9 @@ class PortraitView:
 		else:
 			draw_texture_rect(tex, Rect2(Vector2.ZERO, size), false)
 			draw_style_box(frame_box(), Rect2(Vector2.ZERO, size))
-		if show_coa and not character.titles.is_empty():
+		if coa_tex != null:
 			var cw := int(size.x * 0.36)
-			var ct := Coa.of_title(game, character.titles[0], cw)
-			draw_texture_rect(ct, Rect2(Vector2(size.x - cw - 1, size.y - cw * 1.12 - 1), Vector2(cw, cw * 1.12)), false)
-		if character.death != null and not round:
+			draw_texture_rect(coa_tex, Rect2(Vector2(size.x - cw - 1, size.y - cw * 1.12 - 1), Vector2(cw, cw * 1.12)), false)
+		if dead and not round:
 			var f := Fonts.bold()
 			draw_string(f, Vector2(4, size.y - 6), "✝", HORIZONTAL_ALIGNMENT_LEFT, -1, int(size.x * 0.22), Color(1, 1, 1, 0.8))

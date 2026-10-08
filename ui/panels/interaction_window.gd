@@ -94,7 +94,7 @@ static func open(app: App, def: Dictionary, actor_id: String, recipient_id: Stri
 					cb.focus_mode = Control.FOCUS_NONE
 					cb.toggled.connect(func(on):
 						st.use_hook = on
-						render_ref[0].call())
+						App.locked(render_ref[0]))
 					body.add_child(cb)
 				var acc := Interactions.acceptance(g, def, actor, recipient, args)
 				if not acc.auto:
