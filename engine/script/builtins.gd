@@ -279,20 +279,25 @@ static func register(engine: GameEngine) -> void:
 			return []
 		var g: Game = ctx.game
 		var top := Titles.top_liege(g, c)
-		var mine := {}
-		for x in Titles.realm_counties(g, top):
-			mine[x] = true
-		var out := {}
-		for p in mine:
-			for n in g.engine.neighbors(p):
-				if mine.has(n):
-					continue
-				var t: Variant = g.state.titles.get(n)
-				var h: Variant = g.ch(t.holder) if t != null else null
-				if h != null:
-					out[Titles.top_liege(g, h).id] = true
-		out.erase(c.id)
-		return _ids_to_chars(g, out.keys())
+		# Соседи зависят только от устройства держав — кэш до смены титулов/сюзеренов.
+		var key: String = "nb:" + str(top.id)
+		var ids: Variant = g.realm_cache.get(key)
+		if ids == null:
+			var mine := {}
+			for x in Titles.realm_counties(g, top):
+				mine[x] = true
+			var out := {}
+			for p in mine:
+				for n in g.engine.neighbors(p):
+					if mine.has(n):
+						continue
+					var t: Variant = g.state.titles.get(n)
+					var h: Variant = g.ch(t.holder) if t != null else null
+					if h != null:
+						out[Titles.top_liege(g, h).id] = true
+			ids = out.keys()
+			g.realm_cache[key] = ids
+		return _ids_to_chars(g, ids.filter(func(x): return x != c.id))
 	)
 	lst.call("ruler", null, "Все правители (глобально)", func(ctx, _s): return _chars(ctx.game.rulers()))
 	lst.call("independent_ruler", null, "Независимые правители", func(ctx, _s): return _chars(ctx.game.rulers().filter(func(r): return r.liege == null)))

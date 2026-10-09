@@ -314,12 +314,17 @@ static func _consider_interactions(game: Game, c: Dictionary) -> void:
 			var targs: Array = [null]
 			if def.get("target") != null:
 				targs = Interactions.target_options(game, def, c, r).slice(0, 4)
+			# Желание, не зависящее от цели и второго участника, считаем раз на получателя.
+			var per_recipient := not _will_uses_args(game, def)
+			var cached_will: Variant = null
 			for sec in secs:
 				for t in targs:
 					var args = {"secondary": sec, "target": t.get("ref") if t != null else null}
 					# Сначала желание (обычно дешевле и чаще всего отсекает), затем условия.
 					var ctx := Interactions.context(game, def, c, r, args)
-					var will = Interp.eval_value(ctx, ctx.root, def.ai_will_do)
+					var will = cached_will if cached_will != null else Interp.eval_value(ctx, ctx.root, def.ai_will_do)
+					if per_recipient:
+						cached_will = will
 					if will <= 0.0 or (best != null and will <= best.score):
 						continue
 					if not Interactions.blockers(game, def, c, r, args).is_empty():
@@ -341,6 +346,23 @@ static func _consider_interactions(game: Game, c: Dictionary) -> void:
 	_arrange_marriages(game, c)
 
 
+## Ссылается ли ai_will_do взаимодействия на цель или второго участника
+## (иначе его можно считать один раз на получателя).
+static func _will_uses_args(game: Game, def: Dictionary) -> bool:
+	var key := "ai:will_args:" + str(def.id)
+	var hit: Variant = game.engine.cache.get(key)
+	if hit == null:
+		var src := var_to_str(def.get("ai_will_do"))
+		hit = src.contains("target") or src.contains("secondary")
+		# скриптовые значения и условия могут ссылаться на цель внутри — не рискуем
+		for kind in ["scripted_values", "scripted_triggers"]:
+			for d in game.content.all(kind):
+				if src.contains(str(d.id)):
+					hit = true
+		game.engine.cache[key] = hit
+	return hit
+
+
 ## Отдельная эвристика для браков членов семьи и двора — самая частая задача ИИ.
 static func _arrange_marriages(game: Game, c: Dictionary) -> void:
 	var def: Variant = game.content.get_def("interactions", "arrange_marriage")
@@ -351,18 +373,25 @@ static func _arrange_marriages(game: Game, c: Dictionary) -> void:
 	if family.is_empty():
 		return
 	var single: Dictionary = game.rng.pick(family)
-	# Кандидаты: дворы случайных правителей, пока не наберётся 15 подходящих.
-	var rulers := game.rulers().duplicate()
-	game.rng.shuffle(rulers)
+	# Кандидаты: случайные свободные взрослые другого пола (кроме своего двора),
+	# пока не наберётся 15 подходящих. Список свободных — на месяц.
+	var pool: Dictionary = game.cached_monthly("ai:marriage_pool", func():
+		var m := {true: [], false: []}
+		for x in game.living():
+			if x.get("prison") == null and not game.is_player(x.id) and Chars.is_adult(game, x) \
+					and (x.spouses.is_empty() or Chars._polygamy(game, x)):
+				m[x.female].append(x)
+		return m)
+	var opp: Array = pool[not single.female]
 	var candidates := []
-	for r in rulers:
-		if r.id == c.id:
+	for i in mini(opp.size(), 80):
+		var x: Dictionary = opp[game.rng.range_int(0, opp.size() - 1)]
+		if x.id == c.id or (x.titles.is_empty() and x.liege == c.id) or candidates.has(x):
 			continue
-		for x in [r] + game.courtiers_of(r.id):
-			if Chars.is_alive(x) and not game.is_player(x.id) and Chars.can_marry(game, single, x):
-				candidates.append(x)
-		if candidates.size() >= 15:
-			break
+		if Chars.can_marry(game, single, x):
+			candidates.append(x)
+			if candidates.size() >= 15:
+				break
 	game.rng.shuffle(candidates)
 	for recipient in candidates.slice(0, 15):
 		if not Interactions.is_shown(game, def, c, recipient):
