@@ -480,6 +480,8 @@ static func _special_trigger(ctx: ScriptContext, scope: Variant, key: String, ar
 		"is", "this":
 			return ScriptContext.same_scope(scope, resolve_scope(ctx, scope, arg))
 		"custom_tooltip", "custom_description":
+			if arg is Array:
+				return arg.all(func(x): return eval_trigger(ctx, scope, x.get("trigger")) if x is Dictionary else true)
 			return eval_trigger(ctx, scope, arg.get("trigger")) if arg is Dictionary else true
 		"desc", "text":
 			return true
@@ -926,8 +928,9 @@ static func failed_triggers(ctx: ScriptContext, scope: Variant, block: Variant) 
 		var key: String = pair[0]
 		var arg: Variant = pair[1]
 		if key == "custom_tooltip" or key == "custom_description":
-			if arg is Dictionary and not eval_trigger(ctx, scope, arg.get("trigger")):
-				out.append(game.text(arg.get("text"), ctx))
+			for x in (arg if arg is Array else [arg]):
+				if x is Dictionary and not eval_trigger(ctx, scope, x.get("trigger")):
+					out.append(game.text(x.get("text"), ctx))
 			continue
 		if eval_trigger_key(ctx, scope, key, arg):
 			continue

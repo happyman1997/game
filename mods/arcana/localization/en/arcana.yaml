@@ -226,6 +226,7 @@ arcana:
   consecrate_tip: "Weakens the dead in all of the realm's lands; cleansed land stays consecrated for long."
   command_dead_tip: "The dead of the worst-stricken province become regiments of risen dead."
   dragon_need_prowess: "Requires prowess of at least 8"
+  dragon_wary: "The dragon is wary after a recent hunt and lets no one near its lair"
   dragon_hunt_tip: "Success depends on prowess, knights and preparation. The prize is the dragon's hoard and glory. Failure may cost your life."
   dark_gift_tip: "Whoever accepts becomes a vampire, bound to you by blood."
   ai_old_age: Fears old age

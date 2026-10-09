@@ -122,6 +122,14 @@ func _register_script(api: ModApi) -> void:
 		"get": func(ctx, s, _a):
 			var c: Variant = ch.call(ctx, s)
 			return thirst(c) if c != null else 0.0})
+	api.value("world_vampires", {"doc": "Сколько вампиров живёт в мире (считается раз в месяц)",
+		"get": func(ctx, _s, _a):
+			var g: Game = ctx.game
+			var hit: Variant = g.month_cache.get("arcana:vampires")
+			if hit == null:
+				hit = float(g.living().filter(func(c): return c.traits.has("vampire")).size())
+				g.month_cache["arcana:vampires"] = hit
+			return hit})
 	api.value("restless_provinces", {"doc": "Провинций с восставшими мертвецами в мире",
 		"get": func(ctx, _s, _a): return float(state_of(ctx.game).risen.size())})
 
@@ -221,6 +229,12 @@ func _register_script(api: ModApi) -> void:
 			var c: Variant = ch.call(ctx, s)
 			var yes: bool = c != null and nearest_lair(ctx.game, c) != null
 			return yes == ScriptContext.is_yes(arg)})
+	api.trigger("dragon_wary", {"scopes": CH, "doc": "Ближайший дракон настороже после недавней охоты",
+		"eval": func(ctx, s, arg):
+			var c: Variant = ch.call(ctx, s)
+			var lair: Variant = nearest_lair(ctx.game, c) if c != null else null
+			var yes: bool = lair != null and int(state_of(ctx.game).dragons[lair].get("wary_until", 0)) > ctx.game.date
+			return yes == ScriptContext.is_yes(arg)})
 	api.trigger("province_restless", {"scopes": ["province"], "doc": "В провинции бродят мертвецы",
 		"eval": func(ctx, s, arg): return state_of(ctx.game).risen.has(s.id) == ScriptContext.is_yes(arg)})
 	api.trigger("is_arcanist", {"scopes": CH, "doc": "Владеет колдовством (дар или навык ≥ 6)",
@@ -302,7 +316,7 @@ static func _setup_world(game: Game) -> void:
 		st.fey.append(p)
 		game.state.provinces[p].modifiers.append({"id": "fey_hills"})
 	# Одарённые.
-	var chance := game.def_num("arcana.gifted_start_chance", 0.04)
+	var chance := game.def_num("arcana.gifted_start_chance", 0.03)
 	for c in game.living():
 		if rng.chance(chance) and not c.traits.has("gifted"):
 			Chars.add_trait(game, c, "gifted")
@@ -644,6 +658,8 @@ static func hunt_dragon(game: Game, c: Dictionary) -> void:
 		return
 	var st := state_of(game)
 	var d: Dictionary = st.dragons[lair]
+	# после любой охоты дракон два года не подпускает к логову
+	d.wary_until = game.date + 365 * 2
 	var chance := 2.0 + Stats.skill(game, c, "prowess") * 1.6 + Knights.power(game, c) / 60.0
 	if c.traits.has("dragonslayer"):
 		chance += 15.0
@@ -706,7 +722,7 @@ static func feed(game: Game, c: Dictionary) -> void:
 		if game.is_player(c.id):
 			game.message(t(game, "msg_feed_beasts"), "info")
 		return
-	if game.rng.next() * 100.0 < game.def_num("arcana.feed_death_chance", 12):
+	if game.rng.next() * 100.0 < game.def_num("arcana.feed_death_chance", 6):
 		if game.is_player(c.id):
 			game.message(t(game, "msg_feed_killed", {"who": cname(game, v.id)}), "bad", {"type": "character", "id": v.id})
 		Succession.kill_character(game, v, "exsanguinated")

@@ -655,7 +655,7 @@ func init(api: ModApi) -> void:
 
 ```yaml
 lifestyles:
-  stewardship_lifestyle: { skill: stewardship, icon: "💰", order: 3 }
+  stewardship_lifestyle: { skill: stewardship, icon: "💰", order: 3 }   # xp_mult: 0.5 — путь вдвое медленнее
 focuses:
   focus_wealth:
     lifestyle: stewardship_lifestyle

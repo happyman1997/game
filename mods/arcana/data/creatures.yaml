@@ -6,7 +6,7 @@ defines:
   arcana:
     thirst_per_month: 10         # жажда вампира (0–100) растёт каждый месяц
     thirst_stress_from: 60       # с этого уровня жажда даёт стресс
-    feed_death_chance: 8         # % жертва не переживёт кормления
+    feed_death_chance: 6         # % жертва не переживёт кормления
     feed_witness_chance: 12      # % кто-то при дворе узнаёт тайну
     full_moon_chance: 30         # % в месяц — полнолуние будит зверя
     restless_outbreak_chance: 0.0025   # шанс в месяц для каждого кургана
@@ -246,9 +246,10 @@ decisions:
     icon: "🐉"
     is_shown: { is_ruler: yes, near_dragon_lair: yes }
     is_valid:
-      is_adult: yes
-      is_imprisoned: no
-      custom_tooltip: { text: arcana.dragon_need_prowess, trigger: { prowess: ">= 8" } }
+      - is_adult: yes
+      - is_imprisoned: no
+      - custom_tooltip: { text: arcana.dragon_need_prowess, trigger: { prowess: ">= 8" } }
+      - custom_tooltip: { text: arcana.dragon_wary, trigger: { dragon_wary: no } }
     cooldown: { years: 1 }
     effect:
       - hunt_dragon: yes
@@ -310,3 +311,6 @@ interactions:
           add: 10
         - limit: { scope:recipient: { is_spouse_of: scope:actor } }
           add: 15
+        # детей ночи должно быть немного: при многочисленном роде вампиры затаиваются
+        - limit: { world_vampires: ">= 6" }
+          multiply: 0

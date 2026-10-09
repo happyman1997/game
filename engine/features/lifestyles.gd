@@ -203,7 +203,8 @@ static func monthly_xp(game: Game, c: Dictionary) -> float:
 	if l == null:
 		return 0.0
 	var base := game.def_num("lifestyle.base_xp", 20) + Stats.skill(game, c, str(l.get("skill"))) * game.def_num("lifestyle.xp_per_skill", 2)
-	return maxf(0.0, base * (1.0 + Stats.stat(game, c, "lifestyle_xp_mult")))
+	# xp_mult образа жизни: трудные пути (колдовство) постигаются дольше
+	return maxf(0.0, base * (1.0 + Stats.stat(game, c, "lifestyle_xp_mult")) * Data.num(l.get("xp_mult"), 1.0))
 
 
 ## ИИ (и стартовый выбор для всех): фокус по навыкам и образованию.
