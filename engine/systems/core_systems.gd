@@ -245,7 +245,7 @@ static func _trim_court(game: Game, r: Dictionary) -> void:
 			if s.owner == c.id or s.target == c.id:
 				game.state.schemes.erase(s.id)
 		game.state.characters.erase(c.id)
-	game.mark_index_dirty()
+	game.mark_people_dirty()
 	game.month_cache.clear() # рыцари, советы и т. п. могли ссылаться на ушедших
 
 
@@ -264,7 +264,7 @@ static func _prune_dead(game: Game) -> void:
 		if founders.has(c.id):
 			continue
 		game.state.characters.erase(c.id)
-	game.mark_index_dirty()
+	game.mark_people_dirty()
 
 
 static func _war_month(game: Game) -> void:

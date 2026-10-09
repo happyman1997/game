@@ -140,7 +140,8 @@ func install(engine: GameEngine) -> void:
 				continue
 			var l: Variant = Laws.current(game, c, gd.id)
 			if l != null and l.get("modifiers") is Dictionary:
-				out.append({"label": game.name_of("realm_laws", l.id), "modifiers": l.modifiers})
+				var lid: String = l.id
+				out.append({"label": func(): return game.name_of("realm_laws", lid), "modifiers": l.modifiers})
 		return out
 	}, OWNER)
 

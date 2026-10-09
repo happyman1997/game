@@ -757,6 +757,7 @@ static func _register_effects(engine: GameEngine) -> void:
 		var r: Variant = Interp.resolve_scope(ctx, s, arg)
 		if r != null and r.type == "title" and not c.claims.has(r.id):
 			c.claims.append(r.id)
+			ctx.game.mark_claims_dirty()
 	, func(ctx, s, arg):
 		var r: Variant = Interp.resolve_scope(ctx, s, arg)
 		return _t(ctx.game, "fx.add_claim", {"value": ctx.game.scope_name(r)}) if r != null else null

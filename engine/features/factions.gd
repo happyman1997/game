@@ -58,7 +58,7 @@ static func claimant_candidates(game: Game, liege: Dictionary) -> Array:
 	if liege.titles.is_empty():
 		return []
 	var t: String = liege.titles[0]
-	return game.living().filter(func(c): return c.id != liege.id and c.claims.has(t) and Chars.is_adult(game, c) and c.get("prison") == null and not game.is_player(c.id))
+	return game.claimants(t).filter(func(c): return c.id != liege.id and Chars.is_adult(game, c) and c.get("prison") == null and not game.is_player(c.id))
 
 
 static func _best_claimant(game: Game, liege: Dictionary, vassal: Dictionary) -> Variant:
@@ -404,6 +404,7 @@ func install(engine: GameEngine) -> void:
 				continue
 			if game.rng.chance(game.def_num("factions.sibling_claim_chance", 0.5)):
 				chd.claims.append(t)
+				game.mark_claims_dirty()
 	, 0, OWNER)
 
 

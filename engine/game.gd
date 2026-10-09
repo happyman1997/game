@@ -174,6 +174,36 @@ func mark_index_dirty() -> void:
 	day_cache.clear()
 
 
+## Живые персонажи с претензией на титул. Индекс на месяц; новые претензии
+## сбрасывают его (mark_claims_dirty), утраченные отсеиваются проверкой.
+func claimants(title_id: String) -> Array:
+	var idx: Dictionary = cached_monthly("claims:index", func():
+		var m := {}
+		for c in living():
+			for t in c.claims:
+				if not m.has(t):
+					m[t] = []
+				m[t].append(c)
+		return m)
+	return idx.get(title_id, []).filter(func(c): return c.death == null and c.claims.has(title_id))
+
+
+func mark_claims_dirty() -> void:
+	month_cache.erase("claims:index")
+
+
+## Изменился только состав людей (рождение, брак, развод, уход со двора):
+## списки персонажей и наследники. Державы, армии и налоги не затронуты —
+## их дневной кэш и состав держав сохраняются.
+func mark_people_dirty() -> void:
+	_living_cache = null
+	_rulers_cache = null
+	_by_liege = null
+	for k in day_cache.keys():
+		if str(k).begins_with("heir:"):
+			day_cache.erase(k)
+
+
 func living() -> Array:
 	if _living_cache == null:
 		var out := []

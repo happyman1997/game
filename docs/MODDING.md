@@ -529,7 +529,7 @@ func init(api: ModApi) -> void:
 | `api.trigger`, `api.effect`, `api.value`, `api.link`, `api.list`, `api.constant` | Регистрация элементов скриптового языка. Интерпретатор — класс `Interp` (`eval_trigger`, `run_effect`, `eval_value`), контекст — `ScriptContext.make(game, root, scopes)`. |
 | `api.add_system`, `api.replace_system`, `api.remove_system`, `api.get_system`, `api.list_systems` | Системы симуляции. |
 | `api.on(name, fn, priority)`, `api.emit` | Хуки. |
-| `api.registries` | `succession_algorithms`, `cb_targets`, `interaction_targets`, `interaction_deciders`, `modifier_providers`, `province_modifier_providers`, `opinion_providers`, `content_validators`. |
+| `api.registries` | `succession_algorithms`, `cb_targets`, `interaction_targets`, `interaction_deciders`, `modifier_providers`, `province_modifier_providers`, `opinion_providers`, `content_validators`. Поставщик модификаторов возвращает словарь или массив `[{label, modifiers}]`; `label` может быть `Callable() -> String` — подпись считается только для подсказки (характеристики пересчитываются часто). |
 | `api.add_feature`, `api.has_feature`, `api.list_features` | Механики; `EngineFeature.eval_modifiers(ctx, scope, mods)` — модификаторы со скриптовыми значениями. |
 | `api.ui` | `map_modes`, `panels`, `character_sections`, `province_sections`, `top_bar`, `alerts`, `event_themes`. |
 | `api.formats` | Форматы файлов данных (YAML, JSON и свои). |

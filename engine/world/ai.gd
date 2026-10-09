@@ -79,20 +79,20 @@ static func think_ruler(game: Game, c: Dictionary) -> void:
 
 static func _consider_war(game: Game, c: Dictionary) -> void:
 	var p := personality(game, c)
-	var targets := Wars.available_war_targets(game, c).filter(func(t): return Wars.can_afford_war(game, c, t))
+	var targets := Wars.available_war_targets(game, c)
 	if targets.is_empty():
 		return
 	var my_str := Economy.military_strength(game, c)
+	var need = game.def_num("ai.war_strength_ratio", 1.3) - Data.num(p.get("boldness")) * 0.02 - Data.num(p.get("aggression")) * 0.02
 	var best: Variant = null
 	var best_score := 0.0
 	for t in targets:
 		var def: Dictionary = game.ch(t.defender)
-		if game.is_player(def.id) and game.rng.chance(game.def_num("ai.spare_player_chance", 0)):
+		# Сначала дешёвое (соотношение сил), потом цена войны и желание.
+		var ratio := my_str / maxf(1.0, Economy.military_strength(game, def))
+		if ratio < need or not Wars.can_afford_war(game, c, t):
 			continue
-		var enemy_str := Economy.military_strength(game, def)
-		var ratio := my_str / maxf(1.0, enemy_str)
-		var need = game.def_num("ai.war_strength_ratio", 1.3) - Data.num(p.get("boldness")) * 0.02 - Data.num(p.get("aggression")) * 0.02
-		if ratio < need:
+		if game.is_player(def.id) and game.rng.chance(game.def_num("ai.spare_player_chance", 0)):
 			continue
 		var cb: Variant = game.content.get_def("casus_belli", t.cb)
 		var ctx := Decisions.context(game, c)

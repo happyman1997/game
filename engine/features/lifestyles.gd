@@ -188,11 +188,13 @@ static func _modifiers(game: Game, c: Dictionary, st: Dictionary) -> Array:
 	var out := []
 	var f: Variant = game.content.get_def("focuses", st.focus) if st.focus != null else null
 	if f != null and f.get("modifiers") is Dictionary and Chars.is_adult(game, c):
-		out.append({"label": game.loc.t("ui.focus_n", {"name": game.name_of("focuses", f.id)}), "modifiers": f.modifiers})
+		var fid: String = f.id
+		out.append({"label": func(): return game.loc.t("ui.focus_n", {"name": game.name_of("focuses", fid)}), "modifiers": f.modifiers})
 	for pid in st.perks:
 		var p: Variant = game.content.get_def("perks", pid)
 		if p != null and p.get("modifiers") is Dictionary:
-			out.append({"label": game.name_of("perks", pid), "modifiers": p.modifiers})
+			var perk_id: String = pid
+			out.append({"label": func(): return game.name_of("perks", perk_id), "modifiers": p.modifiers})
 	return out
 
 

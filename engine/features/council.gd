@@ -167,7 +167,9 @@ static func council_modifiers(game: Game, liege: Dictionary) -> Array:
 		if t == null or t.get("liege_modifiers") == null:
 			continue
 		var ctx := _seat_context(game, liege, seat.holder)
-		out.append({"label": "%s: %s" % [game.name_of("council_positions", pos_id), game.name_of("council_tasks", t.id)], "modifiers": EngineFeature.eval_modifiers(ctx, ctx.root, t.liege_modifiers)})
+		var pid: String = pos_id
+		var tid: String = t.id
+		out.append({"label": func(): return "%s: %s" % [game.name_of("council_positions", pid), game.name_of("council_tasks", tid)], "modifiers": EngineFeature.eval_modifiers(ctx, ctx.root, t.liege_modifiers)})
 	return out
 
 

@@ -5,6 +5,8 @@ extends RefCounted
 ## модификаторов, которые регистрируют моды (engine.modifier_providers).
 ##
 ## Поставщик: {label?, fn: Callable(game, c) -> Dictionary | Array[{label, modifiers}] | null}.
+## label в элементах массива может быть Callable() -> String: подпись нужна
+## только для подсказок, а характеристики считаются часто.
 ## Поставщик провинции: {label?, fn: Callable(game, prov_id) -> Dictionary | null}.
 
 ## Персонажи, чьи характеристики считаются прямо сейчас (защита от циклов: совет супругов и т.п.).
@@ -51,7 +53,11 @@ static func _sources(game: Game, c: Dictionary, with_providers: bool = true, lab
 		if mods is Array:
 			for m in mods:
 				if m is Dictionary and m.get("modifiers") is Dictionary and not m.modifiers.is_empty():
-					out.append({"label": str(m.get("label", "")), "mods": m.modifiers})
+					# подпись может быть ленивой: Callable() -> String
+					var lbl: Variant = m.get("label", "")
+					if labels and lbl is Callable:
+						lbl = (lbl as Callable).call()
+					out.append({"label": str(lbl) if not (lbl is Callable) else "", "mods": m.modifiers})
 		elif mods is Dictionary and not mods.is_empty():
 			var label := ""
 			if labels:

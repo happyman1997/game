@@ -191,7 +191,7 @@ static func marry(game: Game, a: Dictionary, b: Dictionary) -> void:
 		guest = a
 	if guest.titles.is_empty():
 		set_liege(game, guest, host.id if not host.titles.is_empty() else host.liege)
-	game.mark_index_dirty()
+	game.mark_people_dirty()
 	game.on_action("on_marriage", {"type": "character", "id": a.id}, {"spouse": {"type": "character", "id": b.id}})
 	game.emit("character.marriage", {"a": a, "b": b})
 
@@ -203,7 +203,7 @@ static func divorce(game: Game, a: Dictionary, b: Dictionary) -> void:
 		a.former_spouses.append(b.id)
 	if not b.former_spouses.has(a.id):
 		b.former_spouses.append(a.id)
-	game.mark_index_dirty()
+	game.mark_people_dirty()
 
 
 static func set_liege(game: Game, c: Dictionary, liege: Variant) -> void:
@@ -353,7 +353,7 @@ static func create_character(game: Game, o: Dictionary) -> Dictionary:
 		assign_personality(game, c)
 		if is_adult(game, c):
 			assign_education(game, c)
-	game.mark_index_dirty()
+	game.mark_people_dirty()
 	return c
 
 
