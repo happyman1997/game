@@ -56,7 +56,8 @@
      falconer: Знаток соколиной охоты.
    ```
 
-5. Запустите игру — мод появится в меню «Моды» и будет включён. Если правите
+5. Запустите игру — мод появится в меню «Моды» и будет включён (новые моды,
+   появившиеся в папке, включаются сами; выключенные вами остаются выключенными). Если правите
    файлы при открытой игре, нажмите в менеджере модов «Обновить список» и
    «Применить» — контент перезагрузится без перезапуска.
 6. Проблемы (опечатки в YAML, ссылки на несуществующие черты, неизвестные ключи
@@ -156,8 +157,8 @@ defines:
 | Тип | Где пример | Кратко |
 |---|---|---|
 | `defines` | `core/data/common/defines.yaml` | Числовые константы экономики, армии, демографии, ИИ. |
-| `skills` | `core/data/common/skills.yaml` | Навыки. Новый навык автоматически становится значением в скриптах. |
-| `traits` | `core/data/common/traits.yaml` | Черты: `category`, `icon`, `modifiers`, `opposites`, `compatibility`, `genetic`/`birth_chance`/`inherit_chance`, `education`, `ai`, `monthly_death_chance`, `monthly_cure_chance`, `duration_days`, `group`. |
+| `skills` | `core/data/common/skills.yaml` | Навыки. Новый навык автоматически становится значением в скриптах. `mean`/`spread` — среднее и разброс при рождении (по умолчанию 6 и 5), `inherit_spread` — разброс вокруг среднего родителей, `hide_if_zero` — не показывать нулевой навык (редкий дар вроде чародейства). |
+| `traits` | `core/data/common/traits.yaml` | Черты: `category`, `icon`, `modifiers`, `opposites`, `compatibility`, `genetic`/`birth_chance`/`inherit_chance`, `education`, `ai`, `monthly_death_chance`, `monthly_cure_chance`, `duration_days`, `group`, `color` (цвет плашки), `concealed` (скрытая черта — см. «Крюки и секреты»), `portrait` (как черта меняет портрет — см. ниже). |
 | `cultures` | `core/data/common/cultures.yaml` | `color`, `male_names`, `female_names`, `dynasty_pattern` (`name`/`place`), `succession_law`, `skin`/`hair`, `modifiers`. |
 | `faiths` | там же | `religion`, `color`, `icon`, `doctrines` (`polygamy`), `virtues`, `sins`, `modifiers`. |
 | `terrain`, `holdings`, `buildings` | `core/data/common/economy.yaml` | Местность (оборона, скорость, высота рельефа), владения (налог, ополчение, крепость), постройки (`holding`, `requires`, `cost`, `days`, `modifiers`, `owner_modifiers`, `trigger`). |
@@ -180,6 +181,24 @@ defines:
 | **любой свой тип** | `plague/data/plague.yaml` (`diseases`) | Движок сохранит его; читайте из скрипта: `api.content.all("diseases")`. |
 
 Подробные комментарии есть прямо в файлах мода `core` — это лучший справочник по полям.
+
+**Вид на портрете.** Черта может менять процедурный портрет (только видимая
+зрителю черта — тайный вампир выглядит как все, пока его тайна не раскрыта):
+
+```yaml
+traits:
+  vampire:
+    portrait:
+      skin: "#e2d8de"      # оттенок кожи...
+      skin_amount: 0.55    # ...и насколько он перекрывает родной (0–1)
+      pale: true           # без румянца
+      eyes: "#a01018"      # цвет радужки
+      glow: "#ff3030"      # свечение глаз
+      fangs: true          # клыки
+      ageless: 33          # видимый возраст не старше
+      # ещё: undead (пустые глазницы, оскал), aura (сияние за головой), hood (капюшон),
+      # marks (светящиеся руны), hair (цвет волос), no_hair
+```
 
 ---
 
@@ -242,6 +261,11 @@ events:
 | `on_war_started` / `on_war_ended` | нападающий | `scope:attacker`, `scope:defender`, `scope:target` |
 | `on_battle_won` / `on_battle_lost` | владелец армии | `scope:enemy` |
 | `on_stress_level` | персонаж, чей стресс перешёл новую сотню | |
+
+Мод может завести и **свой** on_action: опишите его в `on_actions` и вызывайте
+из скрипта `game.on_action("on_arcane_pulse", {"type": "character", "id": c.id})` (так мод `arcana`
+раз в несколько лет устраивает правителям «мистический» пульс событий) — другие
+моды смогут добавлять туда свои события обычным слиянием (`events: { $append: [...] }`).
 
 ---
 
@@ -775,6 +799,20 @@ secret_types:
 «Шантажировать» и «Разоблачить секрет» используют эффекты `blackmail` и
 `expose_secret`. Скрипт: `has_secret`, `knows_secret_of`, `num_secrets`,
 `num_known_secrets`, список `known_secret_owner`.
+
+**Скрытые черты.** Черта с `concealed: <тип секрета>` видна только тем, кто знает
+этот секрет её владельца (и самому владельцу): остальные не видят её плашку,
+изменённый портрет и не учитывают её в мнении (`compatibility`). Раскрыть черту
+всем — эффект `reveal_trait: <черта>` (обычно в `on_expose` секрета). Триггер
+`has_trait` проверяет истину, `has_known_trait` — то, что видят все:
+
+```yaml
+traits:
+  vampire: { category: supernatural, concealed: secret_vampire }
+secret_types:
+  secret_vampire:
+    on_expose: [ { reveal_trait: vampire }, { add_prestige: -400 } ]
+```
 
 ### Законы державы
 

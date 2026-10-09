@@ -115,7 +115,9 @@ static func builtin_providers() -> Dictionary:
 				if not (comp is Dictionary):
 					continue
 				for t2 in b.traits:
-					v += Data.num(comp.get(t2))
+					# скрытые черты b влияют, только если a о них знает
+					if comp.has(t2) and Chars.trait_visible(game, b, t2, a.id):
+						v += Data.num(comp.get(t2))
 			return _part(game.loc.t("opinion.traits"), v),
 		"general": func(game: Game, _a: Dictionary, b: Dictionary) -> Variant:
 			return _part(game.loc.t("opinion.general"), roundi(Stats.stat(game, b, "general_opinion"))),

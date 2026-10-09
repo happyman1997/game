@@ -131,7 +131,8 @@ static func blockers(game: Game, def: Dictionary, actor: Dictionary, recipient: 
 
 ## Можно ли в этом взаимодействии надавить крюком на решающего.
 static func hook_available(game: Game, def: Dictionary, actor: Dictionary, recipient: Dictionary) -> bool:
-	if def.get("scheme") != null or def.get("hookable") == false or def.get("ai_accept") == null:
+	var hk: Variant = def.get("hookable")
+	if def.get("scheme") != null or (hk is bool and not hk) or (hk is String and hk == "no") or def.get("ai_accept") == null:
 		return false
 	var decider := decider_of(game, def, recipient)
 	return decider.id != actor.id and Leverage.can_use_hook(game, actor, decider.id)

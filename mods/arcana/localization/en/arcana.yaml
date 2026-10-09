@@ -1,0 +1,429 @@
+skill:
+  sorcery: Sorcery
+stat:
+  sorcery: Sorcery
+  arcane_regen: Arcane power recovery
+  arcane_capacity: Arcane power capacity
+  curse_resistance: Curse resistance
+
+trait:
+  gifted: Gifted
+  changeling: Changeling
+  white_mage: White Mage
+  battlemage: Battlemage
+  necromancer: Necromancer
+  hexed: Hexed
+  vampire: Vampire
+  lich: Lich
+  lycanthrope: Werewolf
+  dragonslayer: Dragonslayer
+  monster_hunter: Monster Hunter
+  fey_touched: Fey-Touched
+trait_desc:
+  gifted: An old gift runs in this one's blood. Candles gutter when they are angry, and their dreams sometimes come true.
+  changeling: They say the true child was carried off into the hills, and this was left in the cradle — a child too beautiful, too quiet.
+  white_mage: A healer and a warden whose magic serves life. Even priests sometimes look away.
+  battlemage: One who calls lightning onto the battlefield. Enemies flee before the spears meet.
+  necromancer: Hears the whispers of graves and commands what should lie still. Almost no one knows.
+  hexed: A curse lies on this person. They wither, and physicians cannot say why.
+  vampire: Never ages, never sickens, and avoids the sun. Feeds on the blood of the living and guards the secret closely.
+  lich: Death no longer has dominion here. The flesh has withered, but the will burns with a cold fire.
+  lycanthrope: At the full moon the beast awakens. In the morning they remember nothing — or pretend not to.
+  dragonslayer: Slew a dragon. Bards sing of it in every castle.
+  monster_hunter: Hunted down and destroyed a monster. Common folk pray for them.
+  fey_touched: Went into the fairy hills and came back — changed. Sees more than others do.
+
+lifestyle:
+  sorcery_lifestyle: Sorcery
+focus:
+  focus_arcane_study: Arcane Study
+  focus_witchery: Witchery
+  focus_mysticism: Mysticism
+focus_desc:
+  focus_arcane_study: Nights over old scrolls and the notes of masters — experience grows faster.
+  focus_witchery: Charms, potions and whispers — sorcery in the service of intrigue.
+  focus_mysticism: Contemplation and prayer to other powers — arcane power recovers faster.
+perk_tree:
+  hedge_magic: Hedge Magic
+  elementalism: Elementalism
+  necromancy: Necromancy
+perk:
+  herbalism: Herbalism
+  warding_signs: Warding Signs
+  mending_hands: Mending Hands
+  light_bearer: Light Bearer
+  stormcall: Stormcall
+  fire_in_the_veins: Fire in the Veins
+  weather_lord: Weather Lord
+  master_of_storms: Master of Storms
+  grave_whispers: Grave Whispers
+  raise_dead: Raise the Dead
+  soul_harvest: Soul Harvest
+  deathless_will: Deathless Will
+perk_desc:
+  herbalism: "Unlocks the spell «Healing Draught»."
+  warding_signs: "Unlocks the spell «Ward». Curses and schemes against you are harder."
+  mending_hands: "Unlocks the interaction «Heal with Magic»."
+  light_bearer: "You become a White Mage: your healing lifts even the werewolf's curse."
+  stormcall: "Unlocks the spell «Call the Storm» in wartime."
+  weather_lord: Rain comes when it should — harvests are richer.
+  grave_whispers: "Unlocks the spell «Speak with the Dead». Necromancy is a secret people are burned for."
+  raise_dead: "Unlocks the spell «Raise the Dead» and recruiting risen dead."
+  deathless_will: "You become a Necromancer. The rite of undeath opens."
+
+council_position:
+  court_mage: Court Mage
+council_position_desc:
+  court_mage: A gifted councillor versed in the arcane arts. Requires a candidate with the gift or sorcery skill.
+council_task:
+  warding: Wards
+  stargazing: Stargazing
+  arcane_research: Arcane Research
+council_task_desc:
+  warding: The mage shields the ruler from curses and schemes.
+  stargazing: The mage reads the stars — prestige grows, and prophecies sometimes come true.
+  arcane_research: The mage seeks hidden lore — the ruler learns secrets and gathers arcane power.
+
+building:
+  mage_tower: Wizard's Tower
+building_desc:
+  mage_tower: A tall tower with an observatory and a library of forbidden books. Only one who wields sorcery may build it.
+
+modifier:
+  storm_blessing: Storm's Blessing
+  restored_vigor: Restored Vigor
+  ward_of_protection: Ward
+  favorable_omen: Favorable Omen
+  ill_omen: Ill Omen
+  witch_hunt_fervor: Witch-Hunting Fervor
+  bloodthirst: Bloodthirst
+  drained: Drained
+  beast_unleashed: Beast Unleashed
+  dragon_preparations: Dragon Hunt Preparations
+  restless_dead: Restless Dead
+  haunted_ground: Haunted Ground
+  consecrated_ground: Consecrated Ground
+  ancient_barrow: Ancient Barrow
+  fey_hills: Fairy Hills
+  dragon_lair: Dragon's Lair
+  dragon_scorched: Scorched by a Dragon
+
+opinion_modifier:
+  healed_me: Healed me
+  bewitched: Bewitched
+  cursed_me: Cursed me
+  burned_a_witch: Burned a witch
+  protected_a_witch: Protected a witch
+  witch_hunt_terror: Fear of the witch hunt
+  practises_witchcraft: Witch
+  sire_bond: Blood bond
+  embraced_me: My childe
+  fed_on_me: Drank my blood
+
+secret_type:
+  secret_witchcraft: Witchcraft
+  secret_necromancy: Necromancy
+  secret_vampire: Vampirism
+  secret_werewolf: Werewolf's Curse
+secret_type_desc:
+  secret_witchcraft: Cast curses and love charms. The Church will call it heresy.
+  secret_necromancy: Raises the dead. People are burned for this.
+  secret_vampire: Not human — a vampire feeding on the blood of the living.
+  secret_werewolf: Turns into a beast at the full moon.
+
+decision:
+  spell_healing_draught: Healing Draught
+  spell_ward: Ward
+  spell_stormcall: Call the Storm
+  spell_scrying: Gaze into the Crystal
+  spell_speak_with_dead: Speak with the Dead
+  spell_raise_dead: Raise the Dead
+  lich_ritual: Rite of Undeath
+  witch_hunt: Witch Hunt
+  feed_on_blood: Slake the Thirst
+  exorcism: Exorcism
+  purge_restless_dead: Burn Out the Dead
+  consecrate_lands: Consecrate the Lands
+  command_the_dead: Command the Dead
+  hunt_the_dragon: Hunt the Dragon
+decision_desc:
+  spell_healing_draught: A brew of seven herbs and a word of power lift illness, wounds and curses.
+  spell_ward: Signs on the threshold and whispers over water — curses and plots cannot touch you.
+  spell_stormcall: Clouds gather over the enemy host. Your commanders gain the advantage for half a year.
+  spell_scrying: The mist in the crystal parts, revealing others' secrets and plots against you.
+  spell_speak_with_dead: The dead know much, and gladly tell one who knows how to ask.
+  spell_raise_dead: The graveyard earth stirs. The risen dead take their place in the ranks — and need no pay.
+  lich_ritual: Cast off mortal flesh and become a lich. Should the rite fail — death.
+  witch_hunt: Search the court and the vassals' lands. Sorcerers to the dungeon, monsters to the light. Not every accused will be guilty.
+  feed_on_blood: The thirst is unbearable. Someone at court will be weaker tomorrow — or will not wake at all.
+  exorcism: A priest will drive out the curse or the beast. It does not always work.
+  purge_restless_dead: Gather men, torches and holy water and burn out the dead in the worst-stricken province.
+  consecrate_lands: A procession through all stricken lands. Consecrated ground long keeps the dead from rising.
+  command_the_dead: The dead in your lands bow to the necromancer — and become your army.
+  hunt_the_dragon: With sword and knights — into the dragon's lair. The prize is its hoard. The price of failure is your life.
+
+interaction:
+  cast_curse: Cast a Curse
+  love_charm: Love Charm
+  heal_other: Heal with Magic
+  dark_gift: Offer the Dark Gift
+interaction_desc:
+  cast_curse: A secret curse will wither the victim's health. The stronger your sorcery and the weaker their defenses, the surer the blow. Sorcery leaves traces.
+  love_charm: A potion in the cup — and their heart is drawn to you. May be exposed as witchcraft.
+  heal_other: Lift illness, wounds and curses. A White Mage can heal even the werewolf's curse.
+  dark_gift: Offer immortality — and eternal thirst. Whoever accepts becomes a vampire.
+
+regiment_type:
+  risen_dead: Risen Dead
+  silver_flame: Order of the Silver Flame
+regiment_type_desc:
+  risen_dead: They know no fear, fatigue or pay. Only a necromancer may raise them.
+  silver_flame: Warrior monks sworn to root out the unholy. Especially strong against the dead.
+
+casus_belli:
+  monster_hunt: Holy Hunt
+casus_belli_desc:
+  monster_hunt: The monster is exposed. Victory means its death and its capital.
+cb:
+  monster_hunt:
+    war_name: "Holy Hunt for [scope:defender]"
+
+death:
+  undead: "{who} is torn apart by the risen dead"
+  exsanguinated: "{who} is found dead, without a drop of blood"
+  dragon: "{who} perishes in dragonfire"
+  monster_slain: "{who} is slain by monster hunters"
+  ritual: "{who} dies during a forbidden rite"
+  beast: "{who} is mauled by an unknown beast"
+  fey: "{who} walks into the fairy hills and never returns"
+  burned: "{who} is burned at the stake for witchcraft"
+ui:
+  death_reason:
+    undead: by the dead
+    exsanguinated: drained of blood
+    dragon: in dragonfire
+    monster_slain: by monster hunters
+    ritual: during a rite
+    beast: by a beast
+    fey: taken by the fey
+    burned: burned at the stake
+
+arcana:
+  need_power_20: "Requires 20 arcane power"
+  need_power_25: "Requires 25 arcane power"
+  need_power_30: "Requires 30 arcane power"
+  need_power_35: "Requires 35 arcane power"
+  need_power_40: "Requires 40 arcane power"
+  need_power_60: "Requires 60 arcane power"
+  need_power_full: "Requires 100 arcane power"
+  raise_dead_tip: "Two regiments of risen dead. Someone may see the graveyard earth move."
+  lich_ritual_tip: "The stronger your sorcery, the likelier you become a lich. Otherwise — death."
+  witch_hunt_tip: "Sorcerers at court may end up in the dungeon and monsters' secrets may come out. Vassals, except zealots, will be frightened."
+  thirst_low: "The thirst is still bearable (at least 30 needed)"
+  feed_tip: "The victim is a prisoner or a courtier. They may not survive the night, and someone may see."
+  exorcism_tip: "A curse is always lifted; the werewolf's curse — usually."
+  purge_tip: "The blow depends on the realm's levies, martial skill, knights and the Order of the Silver Flame. An army standing in the province also fights the dead every month."
+  consecrate_tip: "Weakens the dead in all of the realm's lands; cleansed land stays consecrated for long."
+  command_dead_tip: "The dead of the worst-stricken province become regiments of risen dead."
+  dragon_need_prowess: "Requires prowess of at least 8"
+  dragon_hunt_tip: "Success depends on prowess, knights and preparation. The prize is the dragon's hoard and glory. Failure may cost your life."
+  dark_gift_tip: "Whoever accepts becomes a vampire, bound to you by blood."
+  ai_old_age: Fears old age
+  ai_ambitious: Craves power
+  ai_ailing: Tormented by illness
+  ai_faithful: Faith forbids it
+  witnesses: Witnesses
+  msg_exorcism_ok: The rite worked — the beast's curse has withdrawn.
+  msg_exorcism_failed: The rite failed. The moon still calls.
+  msg_alchemy_ok: The alchemist kept his word — gold gleams in the crucible!
+  msg_alchemy_failed: The alchemist vanished in the night with the advance.
+  msg_found_vampire: "You learned the truth: there is a vampire among your courtiers."
+  msg_found_nothing: The inquiry found nothing. Servants whisper in corners.
+  msg_barrow_gold: Ancient gold was found in the barrow.
+  msg_wolf_slain: The great wolf is dead. Its pelt will adorn your hall.
+  msg_wolf_bite: "The wolf fled, leaving the marks of its teeth on your arm. The wound heals too fast…"
+  msg_lich_ok: "Your heart stopped — and you go on living. You have become a lich."
+  msg_dead_rise: "The dead have risen: {place}"
+  msg_dead_cleansed: "The lands are cleansed of the dead: {place}"
+  msg_army_vs_dead: "Battle with the dead ({place}): losses {loss}, the dead left {left}"
+  msg_purge_partial: "The dead are driven back ({place}), but many remain: {left}"
+  msg_command_dead: "The dead bowed to you ({place}): regiments — {n}"
+  msg_dragon_burns: "A dragon burned the villages: {place}"
+  msg_dragon_wakes: "A dragon has woken in the mountains: {place}"
+  msg_dragon_slain: "{who} slew the dragon ({place}) and took its hoard: {gold} gold!"
+  msg_dragon_escape: "The dragon hunt failed ({place}). You barely escaped."
+  msg_feed_beasts: No victim was found — you had to make do with cattle.
+  msg_feed_killed: "{who} did not survive the night."
+  msg_feed_ok: "{who} is pale in the morning and remembers nothing."
+  msg_curse_ok: "The curse took hold of {who}."
+  msg_curse_failed: "{who} was protected — the curse did not take."
+  msg_cursed_me: Someone has cursed you!
+  msg_witch_hunt: "The witch hunt is over: secrets exposed — {found}, taken into custody — {seized}."
+  fx_power: "Arcane power: {value}"
+  fx_cure: Lifts illness, wounds and curses
+  fx_witness: "Risk of witnesses: {n}%"
+  fx_curse: "Curse on {who}"
+  fx_feed: Slake the blood thirst
+  fx_awaken: "The dead rise: {place}"
+  opinion_abomination: Abomination
+  tip_risen: "Restless dead: strength {n}"
+  tip_dragon: "Dragon's lair (hoard: {gold})"
+  tip_barrow: Ancient barrow
+  tip_fey: Fairy hills
+  power_title: Arcane Power
+  power_tip: "Recovers every month (faster with high sorcery, a wizard's tower and Mysticism). Spent on spells: decisions and interactions."
+  thirst_title: Blood Thirst
+  thirst_tip: "Grows every month. From 60% — stress and irritability; at 100% — blood frenzy. Slake it with the «Slake the Thirst» decision."
+  wolf_tip: "A beast lives inside you. At the full moon it strains to get out."
+  no_gift: "You have no gift. But the unseen touches everyone: the dead, dragons and vampires do not ask."
+  open_decisions: Spells and decisions
+  section_you: You
+  section_places: Dark Places
+  section_monsters: Exposed Monsters
+  world_quiet: The world is quiet for now — the dead sleep, the dragons slumber.
+  no_monsters: No one has been exposed yet.
+  chronicle: "Chronicle: the dead have risen {risen} times, dragons slain — {dragons}."
+  alert_dead: "The dead walk your lands: {place} (provinces — {n})"
+  alert_thirst: The blood thirst is becoming unbearable
+  alert_dragon: "A dragon's lair is near: {place}"
+  alert_power_full: Your arcane power is full — time for spells
+
+ev:
+  arcana.0001:
+    t: The Gift Awakens
+    desc: "On the day [scope:child.first_name] came of age, every candle in the hall lit at once under [scope:child|g:his/her] gaze. The court froze. The gift is in the blood, and now it cannot be hidden. [scope:child|g:He/She] looks at you and waits."
+    a: Let them learn. The gift is power
+    b: Hide it. No one must know
+    c: Send them to a monastery — let prayer tame the gift
+  arcana.0002:
+    t: Will-o'-the-Wisps
+    desc: "At night pale lights kindled over the marshes. They circle at the edge of the forest, as if beckoning. The old folk say whoever follows them finds treasure — or never returns."
+    a: Follow the lights
+    b: Order the guards to keep away
+    c: Call the lights to yourself
+  arcana.0003:
+    t: The Village Witch
+    desc: "Peasants dragged an old woman bound with ropes to the gates. They say milk sours at her glance and children die. The crowd demands a pyre. The old woman says nothing and looks straight at you."
+    a: Burn the witch
+    b: Let her go in peace
+    c: Take her into the court — such a gift will be useful
+  arcana.0004:
+    t: The Wandering Mage
+    desc: "A grey-haired traveler in a star-embroidered cloak entered the hall. He offers his services: prophecy, healing, protection from the evil eye. The price — fifty gold and a place at court."
+    a: Hire him
+    b: Learn from him
+    c: Chase the charlatan away
+  arcana.0005:
+    t: The Tailed Star
+    desc: "A star with a fiery tail burns in the sky. People fall to their knees: some whisper of the end of days, others of a great sign for your house."
+    a: It is a sign of favor!
+    b: Repent and pray
+  arcana.0006:
+    t: The Alchemist
+    desc: "A learned man with scorched sleeves swears he knows the secret of the philosopher's stone. He needs only a hundred gold for retorts, sulfur and mercury — and in a month he will return thrice as much."
+    a: Give him the gold
+    b: Refuse
+  arcana.0010:
+    t: The Night Guest
+    desc: "Just before dawn a carriage without arms stopped at the gates. An elegant stranger asks for shelter: he travels only by night — «an ailment of the eyes» — and will reward his host generously."
+    a: Welcome the guest
+    b: Refuse
+  arcana.0011:
+    t: The Bloodless Body
+    desc: "In the morning a maid was found in a far corridor. No wound, no scream in the night — only two tiny marks on her neck and skin pale as wax. There was not a drop of blood left in her."
+    a: Open an inquiry
+    b: Hush it up
+    c: Call a priest
+  arcana.0012:
+    t: Thirst
+    desc: "The courtiers' pulses thunder in your ears like drums. You catch yourself staring at the cupbearer's neck far too long. The thirst will not wait."
+    a: Slake it tonight
+    b: Endure
+  arcana.0013:
+    t: Blood Frenzy
+    desc: "You came to beside a body. Your mouth is full of blood, your fingers cramped. You do not remember how it happened — but someone saw you leave that room."
+    a: What have I done…
+    b: Such is my hunger
+  arcana.0020:
+    t: The Dead Have Risen
+    desc: "Terrible news from [scope:place]: the dead rise from their graves and shamble toward the villages. Peasants flee, abandoning their homes. If nothing is done, the dead will spread to neighboring lands."
+    a: Gather men and burn out the dead
+    b: Pray for deliverance
+    c: Let the dead wander
+  arcana.0021:
+    t: The Barrow
+    desc: "Plowing a new field, peasants struck an ancient barrow. Beneath the earth — a stone chamber, rusted weapons and dull gold. The plowman swears he heard knocking from under the stone."
+    a: Plunder the barrow
+    b: Fill it in and consecrate it
+    c: Study the burial
+  arcana.0022:
+    t: The Ancestor's Ghost
+    desc: "At midnight [scope:ancestor.first_name] stands in your bedchamber — just as you remember him in his last days. The ghost is silent but stretches out a hand, as if wanting to say something."
+    a: Listen
+    b: Order a mass for his soul
+    c: Drive the ghost away
+  arcana.0030:
+    t: Dragon
+    desc: "Over the mountains of [scope:place] a winged shadow the size of a cathedral was seen. At night the peaks glow from within, and herds vanish. A dragon has woken — and it is near."
+    a: Prepare for the hunt
+    b: Pray for protection
+    c: Keep your head down
+  arcana.0031:
+    t: Dragonslayer
+    desc: "The beast is slain. In its lair, among charred bones, lies a mountain of gold hoarded over centuries. Bards are already composing songs of your deed."
+    a: Hang the dragon's head in the great hall
+    b: Share the hoard with your vassals
+  arcana.0032:
+    t: Flame
+    desc: "The dragon was faster than the legends said. The last thing you see is a glowing throat and a light brighter than the sun."
+    a: …
+  arcana.0040:
+    t: The Great Wolf
+    desc: "On the hunt the hounds raised a beast — a wolf the size of a horse. Its eyes burn yellow, and it does not flee but looks straight at you."
+    a: Fight it
+    b: Fall back
+  arcana.0041:
+    t: Full Moon
+    desc: "The moon rises over the forest, and your blood runs hot. Your bones ache, and the night smells of prey. The beast inside begs to be let out."
+    a: Chain yourself
+    b: Give in to the beast
+    c: Restrain it with magic
+  arcana.0050:
+    t: The Fairy Hills
+    desc: "Music drifts from the hills — the kind that cannot be forgotten. [scope:wanderer.first_name] has not slept for three nights and begs to be let go to the revel of the Good Folk."
+    a: Let them go
+    b: Forbid it
+    c: Go yourself
+  arcana.0051:
+    t: Changeling
+    desc: "The midwife crosses herself: the child does not cry but stares unblinking at the fire. Its eyes are green as the water of a forest lake. They say it is a changeling — a fairy child."
+    a: Love it as your own
+    b: Call a priest
+    c: Carry it back to the hills
+  arcana.0060:
+    t: Rite of Undeath
+    desc: "The circle is drawn in blood, candles of dead men's tallow burn green. Only the last words remain — and then the heart will either stop forever, or no longer be needed."
+    a: Speak the last words
+    b: Step back at the last moment
+  arcana.0061:
+    t: Grave Whispers
+    desc: "In the graveyard, where you came for herbs, someone called you by name. The voice came from under the earth. It promises knowledge found in no book."
+    a: Listen to the dead
+    b: Walk away and do not look back
+  arcana.0070:
+    t: The Inquisition
+    desc: "Men in black arrived at the castle with a bishop's writ. They were told of witchcraft at your court. They are polite, patient — and will not leave without someone guilty."
+    a: Pay them off
+    b: Hand over the court sorcerer
+    c: Drive them away
+  arcana.0071:
+    t: The Fires Have Died
+    desc: "The witch hunt is over. Suspects fill the dungeons, ashes the squares. Some whisper that the land is cleansed, others — that innocents burned."
+    a: The land is cleansed
+    b: It had to be done
+    c: So many innocents…
+  arcana.0080:
+    t: A Prophecy
+    desc: "The court mage did not leave the astrolabe all night. In the morning he says: the stars favor your house — if the moment is not missed."
+    a: Heed the prophecy
+    b: Announce it at court

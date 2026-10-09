@@ -42,6 +42,31 @@ static func trait_def(game: Game, t: String) -> Variant:
 	return game.content.get_def("traits", t)
 
 
+## Видна ли черта персонажа наблюдателю viewer_id. Черта с полем
+## concealed: <тип секрета> скрыта: её видят сам носитель, знающие этот его
+## секрет и все — после разоблачения (reveal_trait / флаг revealed:<черта>).
+static func trait_visible(game: Game, c: Dictionary, t: String, viewer_id: Variant = null) -> bool:
+	var d: Variant = trait_def(game, t)
+	var sec: Variant = d.get("concealed") if d != null else null
+	if sec == null:
+		return true
+	if c.flags.has("revealed:" + t):
+		return true
+	if viewer_id == null:
+		return false
+	if viewer_id == c.id:
+		return true
+	for s in Secrets.known_secrets_of(game, c, str(viewer_id)):
+		if s.type == sec:
+			return true
+	return false
+
+
+## Черта скрыта от всех, кроме посвящённых (не разоблачена).
+static func trait_concealed(game: Game, c: Dictionary, t: String) -> bool:
+	return not trait_visible(game, c, t, null)
+
+
 static func add_trait(game: Game, c: Dictionary, t: String) -> bool:
 	var def: Variant = trait_def(game, t)
 	if def == null:
@@ -305,11 +330,15 @@ static func create_character(game: Game, o: Dictionary) -> Dictionary:
 	var skills := {}
 	var given: Dictionary = o.get("skills", {}) if o.get("skills") != null else {}
 	for s in skill_ids(game):
+		# Распределение навыка задаёт его описание: mean, spread (без родителей)
+		# и inherit_spread (разброс вокруг среднего родителей).
+		var sd: Variant = game.content.get_def("skills", s)
 		var base: float
 		if father != null and mother != null:
-			base = (Data.num(father.skills.get(s)) + Data.num(mother.skills.get(s))) / 2.0 + rng.gauss(0, 3)
+			base = (Data.num(father.skills.get(s)) + Data.num(mother.skills.get(s))) / 2.0 \
+				+ rng.gauss(0, Data.num(sd.get("inherit_spread"), 3.0) if sd != null else 3.0)
 		else:
-			base = rng.gauss(6, 5)
+			base = rng.gauss(Data.num(sd.get("mean"), 6.0) if sd != null else 6.0, Data.num(sd.get("spread"), 5.0) if sd != null else 5.0)
 		skills[s] = maxi(0, roundi(Data.num(given.get(s), base)))
 
 	var dna := {}

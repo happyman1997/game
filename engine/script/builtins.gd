@@ -444,6 +444,12 @@ static func register(engine: GameEngine) -> void:
 			return arg.any(func(x): return c.traits.has(x))
 		return c.traits.has(str(arg))
 	, func(ctx, _s, arg): return _t(ctx.game, "tr.has_trait", {"value": " / ".join(Data.as_array(arg).map(func(x): return ctx.game.name_of("traits", x)))}))
+	ct.call("has_known_trait", "Есть черта, известная всем (не скрытая или разоблачённая)", func(g, c, arg, _ctx, _s):
+		for t in Data.as_array(arg):
+			if c.traits.has(t) and Chars.trait_visible(g, c, str(t), null):
+				return true
+		return false
+	, func(ctx, _s, arg): return _t(ctx.game, "tr.has_trait", {"value": " / ".join(Data.as_array(arg).map(func(x): return ctx.game.name_of("traits", x)))}))
 	ct.call("has_trait_category", "Есть черта категории", func(g, c, arg, _ctx, _s):
 		return c.traits.any(func(x):
 			var d: Variant = g.content.get_def("traits", x)
@@ -655,6 +661,10 @@ static func _register_effects(engine: GameEngine) -> void:
 			var c: Variant = _ch(ctx, s)
 			return null if (c != null and c.traits.has(arg)) else _t(ctx.game, "fx.add_trait", {"value": ctx.game.name_of("traits", arg)})
 	)
+	ce.call("reveal_trait", "Разоблачить скрытую черту (concealed): теперь её видят все", func(g, c, arg, _ctx, _s):
+		c.flags["revealed:" + str(arg)] = 0
+		g.mark_chars_dirty([c.id])
+	, silent)
 	ce.call("remove_trait", "Убрать черту", func(g, c, arg, _ctx, _s): Chars.remove_trait(g, c, str(arg)),
 		func(ctx, s, arg):
 			var c: Variant = _ch(ctx, s)

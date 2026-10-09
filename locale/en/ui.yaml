@@ -311,5 +311,6 @@ ui:
   move_army_hint: "Right-click to send the selected army here"
   pick_click_hint: "Click to view the ruler"
   setting_vsync: Vertical sync
+  concealed_trait: "Concealed trait: known only to the initiated"
   speed_down: Slower (−)
   speed_up: Faster (+)

@@ -1,0 +1,476 @@
+# «Тайные искусства»: магия. Дар колдовства редок и передаётся по крови;
+# одарённые копят колдовскую силу (переменная arcane_power, см. скрипт мода)
+# и тратят её на заклинания — решения и взаимодействия ниже.
+# Христианский мир относится к колдовству с подозрением, языческий Север —
+# куда спокойнее (сейд, вёльвы).
+
+defines:
+  arcana:
+    power_base_regen: 2          # силы в месяц у одарённого
+    power_per_sorcery: 0.35      # + за очко колдовства
+    power_base_max: 40           # предел силы
+    power_max_per_sorcery: 3
+    gifted_start_chance: 0.04    # доля одарённых среди персонажей при создании мира
+
+skills:
+  sorcery:
+    icon: "🔮"
+    color: "#7a6ad0"
+    order: 7
+    mean: -4                     # у большинства — ноль
+    spread: 3
+    inherit_spread: 2
+    hide_if_zero: true
+
+traits:
+  gifted:
+    category: congenital
+    icon: "✨"
+    color: "#5a4ab0"
+    genetic: true
+    birth_chance: 0.02
+    inherit_chance: 0.35
+    modifiers: { sorcery: 5, stress_gain_mult: 0.05 }
+  changeling:
+    category: congenital
+    icon: "🧚"
+    color: "#2a7a6a"
+    modifiers: { sorcery: 3, learning: 1, diplomacy: -1, attraction_opinion: 10 }
+    portrait: { eyes: "#5fd8c0", glow: "#7ff0d8" }
+  white_mage:
+    category: lifestyle
+    icon: "🕊"
+    color: "#6a8ab0"
+    modifiers: { sorcery: 2, health: 1, general_opinion: 5, curse_resistance: 40 }
+    portrait: { hood: "#e6e0d0", aura: "#d6ecff" }
+  battlemage:
+    category: lifestyle
+    icon: "⚡"
+    color: "#b0602a"
+    modifiers: { sorcery: 2, prowess: 4, commander_advantage: 8 }
+    portrait: { aura: "#ff8a3a", marks: "#ffc070" }
+  necromancer:
+    category: supernatural
+    concealed: secret_necromancy
+    icon: "💀"
+    color: "#3a6a4a"
+    modifiers: { sorcery: 3, intrigue: 2, health: 0.5, curse_resistance: 25 }
+    portrait: { hood: "#1c1424", marks: "#7cff9a", skin: "#c4cabc", skin_amount: 0.35 }
+    ai: { compassion: -2, zeal: -2 }
+  hexed:
+    category: health
+    icon: "🌀"
+    color: "#5a3a6a"
+    duration_days: 1460
+    modifiers: { health: -1.5, fertility: -0.3, stress_gain_mult: 0.25, diplomacy: -1 }
+    portrait: { skin: "#a0ac94", skin_amount: 0.25 }
+
+  # Колдовство в глазах ревнителей веры — грех; северянам оно привычно.
+  zealous:
+    compatibility: { gifted: -10, necromancer: -40, changeling: -10 }
+  cynical:
+    compatibility: { gifted: 5 }
+
+lifestyles:
+  sorcery_lifestyle:
+    skill: sorcery
+    icon: "🔮"
+    color: "#6a5ac0"
+    order: 6
+    is_shown:
+      OR:
+        - has_trait: [gifted, changeling, necromancer]
+        - sorcery: ">= 5"
+
+focuses:
+  focus_arcane_study:
+    lifestyle: sorcery_lifestyle
+    icon: "📖"
+    modifiers: { sorcery: 2, lifestyle_xp_mult: 0.1 }
+  focus_witchery:
+    lifestyle: sorcery_lifestyle
+    icon: "🧪"
+    modifiers: { sorcery: 1, intrigue: 1, scheme_power: 5 }
+  focus_mysticism:
+    lifestyle: sorcery_lifestyle
+    icon: "🕯"
+    modifiers: { sorcery: 1, learning: 1, arcane_regen: 1 }
+
+perks:
+  # ================================================ белая магия: травы, обереги, исцеление
+  herbalism: { lifestyle: sorcery_lifestyle, tree: hedge_magic, icon: "🌿", modifiers: { health: 0.5 } }
+  warding_signs:
+    lifestyle: sorcery_lifestyle
+    tree: hedge_magic
+    requires: herbalism
+    icon: "🛡"
+    modifiers: { scheme_defense: 15, curse_resistance: 30 }
+  mending_hands: { lifestyle: sorcery_lifestyle, tree: hedge_magic, requires: warding_signs, icon: "🤲", modifiers: { general_opinion: 3 } }
+  light_bearer:
+    lifestyle: sorcery_lifestyle
+    tree: hedge_magic
+    requires: mending_hands
+    icon: "🕊"
+    trait: white_mage
+  # ================================================ стихии: буря, огонь, погода
+  stormcall: { lifestyle: sorcery_lifestyle, tree: elementalism, icon: "⚡", modifiers: { martial: 1 } }
+  fire_in_the_veins: { lifestyle: sorcery_lifestyle, tree: elementalism, requires: stormcall, icon: "🔥", modifiers: { prowess: 3, martial: 1 } }
+  weather_lord: { lifestyle: sorcery_lifestyle, tree: elementalism, requires: fire_in_the_veins, icon: "🌦", modifiers: { development_growth: 0.05, tax_mult: 0.05 } }
+  master_of_storms:
+    lifestyle: sorcery_lifestyle
+    tree: elementalism
+    requires: weather_lord
+    icon: "🌩"
+    trait: battlemage
+  # ================================================ некромантия: тёмный путь
+  grave_whispers:
+    lifestyle: sorcery_lifestyle
+    tree: necromancy
+    icon: "🪦"
+    modifiers: { intrigue: 2 }
+    ai_will_do: { value: 1, if: [ { limit: { has_trait: [compassionate, zealous, just] }, multiply: 0 }, { limit: { has_trait: [callous, ambitious, vengeful] }, add: 2 } ] }
+    effect:
+      - if:
+          limit: { NOT: { has_secret: secret_necromancy } }
+          add_secret: secret_necromancy
+  raise_dead: { lifestyle: sorcery_lifestyle, tree: necromancy, requires: grave_whispers, icon: "💀", modifiers: { stress_gain_mult: -0.1 } }
+  soul_harvest: { lifestyle: sorcery_lifestyle, tree: necromancy, requires: raise_dead, icon: "🌑", modifiers: { health: 1, arcane_regen: 1 } }
+  deathless_will:
+    lifestyle: sorcery_lifestyle
+    tree: necromancy
+    requires: soul_harvest
+    icon: "☠"
+    trait: necromancer
+
+council_positions:
+  court_mage:
+    skill: sorcery
+    icon: "🔮"
+    order: 6
+    candidate:
+      OR:
+        - has_trait: [gifted, changeling, necromancer]
+        - sorcery: ">= 6"
+
+council_tasks:
+  warding:
+    position: court_mage
+    icon: "🛡"
+    default: yes
+    liege_modifiers:
+      scheme_defense: { value: sorcery, multiply: 1 }
+      curse_resistance: { value: sorcery, multiply: 3 }
+    ai_will_do: 10
+  stargazing:
+    position: court_mage
+    icon: "🌠"
+    liege_modifiers:
+      monthly_prestige: { value: sorcery, multiply: 0.05 }
+    monthly_chance: { value: sorcery, multiply: 0.25 }
+    monthly_effect:
+      scope:liege: { trigger_event: arcana.0080 }
+    ai_will_do: 8
+  arcane_research:
+    position: court_mage
+    icon: "📜"
+    liege_modifiers:
+      lifestyle_xp_mult: { value: sorcery, multiply: 0.01 }
+    monthly_chance: { value: sorcery, multiply: 0.4 }
+    monthly_effect:
+      scope:liege:
+        - discover_secret: yes
+        - add_arcane_power: 10
+    ai_will_do: { value: 6, if: { limit: { has_trait: [gifted, paranoid] }, add: 6 } }
+
+buildings:
+  mage_tower:
+    icon: "🗼"
+    holding: castle
+    cost: { gold: 220 }
+    days: 540
+    modifiers: { development_growth: 0.02 }
+    owner_modifiers: { sorcery: 1, arcane_regen: 2, lifestyle_xp_mult: 0.05 }
+    trigger:
+      scope:builder: { has_trait: [gifted, changeling, necromancer, lich] }
+
+modifiers:
+  storm_blessing: { icon: "🌩", modifiers: { commander_advantage: 12 }, good: true }
+  restored_vigor: { icon: "🌿", modifiers: { health: 1 }, good: true }
+  ward_of_protection: { icon: "🛡", modifiers: { curse_resistance: 50, scheme_defense: 10 }, good: true }
+  favorable_omen: { icon: "🌠", modifiers: { monthly_prestige: 0.5, stress_gain_mult: -0.1 }, good: true }
+  ill_omen: { icon: "🌑", modifiers: { stress_gain_mult: 0.15, general_opinion: -5 } }
+  witch_hunt_fervor: { icon: "🔥", modifiers: { monthly_piety: 1, vassal_opinion: -5 } }
+
+opinion_modifiers:
+  healed_me: { value: 30, years: 10 }
+  bewitched: { value: 35, years: 2 }
+  cursed_me: { value: -50, years: 20 }
+  burned_a_witch: { value: -10, years: 5 }
+  protected_a_witch: { value: -10, years: 5 }
+  witch_hunt_terror: { value: -15, years: 5 }
+  practises_witchcraft: { value: -25, years: 30 }
+
+secret_types:
+  secret_witchcraft:
+    icon: "🧪"
+    hook: weak
+    severity: 50
+    discovered_by: [spouse, courtier, close_family]
+    discovery_chance: 0.6
+    on_expose:
+      - add_piety: -100
+      - add_prestige: -100
+      - if:
+          limit: { exists: liege }
+          mark_criminal: { target: liege, years: 5 }
+          liege:
+            if:
+              limit: { religion: christianity }
+              add_opinion: { target: root, modifier: practises_witchcraft }
+  secret_necromancy:
+    icon: "🪦"
+    hook: strong
+    severity: 150
+    discovered_by: [spouse, courtier, close_family]
+    discovery_chance: 0.35
+    on_expose:
+      - reveal_trait: necromancer
+      - add_piety: -300
+      - add_prestige: -300
+      - if:
+          limit: { exists: liege }
+          mark_criminal: { target: liege, years: 20 }
+
+script_values:
+  arcane_spell_cheap: 20
+  arcane_spell_normal: 35
+  arcane_spell_great: 60
+
+scripted_triggers:
+  is_arcanist:
+    OR:
+      - has_trait: [gifted, changeling, necromancer, lich, white_mage, battlemage]
+      - sorcery: ">= 6"
+
+# ---------------------------------------------------------------- заклинания
+decisions:
+  spell_healing_draught:
+    icon: "🧪"
+    is_shown: { has_perk: herbalism }
+    is_valid:
+      custom_tooltip: { text: arcana.need_power_20, trigger: { arcane_power: ">= 20" } }
+    cooldown: { months: 6 }
+    effect:
+      - add_arcane_power: -20
+      - cure_ailments: yes
+      - add_modifier: { id: restored_vigor, years: 1 }
+      - add_stress: -10
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { OR: [ { has_trait_category: health }, { health: "< 4" } ] }
+          add: 60
+    ai_check_months: 3
+
+  spell_ward:
+    icon: "🛡"
+    is_shown: { has_perk: warding_signs }
+    is_valid:
+      NOT: { has_modifier: ward_of_protection }
+      custom_tooltip: { text: arcana.need_power_25, trigger: { arcane_power: ">= 25" } }
+    effect:
+      - add_arcane_power: -25
+      - add_modifier: { id: ward_of_protection, years: 2 }
+    ai_will_do: { value: 10, if: { limit: { has_trait: paranoid }, add: 30 } }
+    ai_check_months: 6
+
+  spell_stormcall:
+    icon: "🌩"
+    is_shown: { has_perk: stormcall }
+    is_valid:
+      is_at_war: yes
+      NOT: { has_modifier: storm_blessing }
+      custom_tooltip: { text: arcana.need_power_40, trigger: { arcane_power: ">= 40" } }
+    effect:
+      - add_arcane_power: -40
+      - add_modifier: { id: storm_blessing, months: 6 }
+      - add_stress: 5
+    ai_will_do: 70
+    ai_check_months: 1
+
+  spell_scrying:
+    icon: "🔮"
+    is_shown: { is_arcanist: yes, sorcery: ">= 8" }
+    is_valid:
+      custom_tooltip: { text: arcana.need_power_20, trigger: { arcane_power: ">= 20" } }
+    cooldown: { months: 6 }
+    effect:
+      - add_arcane_power: -20
+      - discover_secret: yes
+      - discover_scheme_against: yes
+    ai_will_do: { value: 10, if: { limit: { has_trait: paranoid }, add: 40 } }
+    ai_check_months: 6
+
+  spell_speak_with_dead:
+    icon: "🪦"
+    is_shown: { has_perk: grave_whispers }
+    is_valid:
+      custom_tooltip: { text: arcana.need_power_20, trigger: { arcane_power: ">= 20" } }
+    cooldown: { months: 6 }
+    effect:
+      - add_arcane_power: -20
+      - discover_secret: yes
+      - add_lifestyle_xp: 50
+      - add_stress: 5
+    ai_will_do: 20
+    ai_check_months: 6
+
+  spell_raise_dead:
+    icon: "💀"
+    is_shown: { has_perk: raise_dead, is_ruler: yes }
+    is_valid:
+      custom_tooltip: { text: arcana.need_power_60, trigger: { arcane_power: ">= 60" } }
+    cooldown: { years: 1 }
+    effect:
+      - add_arcane_power: -60
+      - add_regiment: risen_dead
+      - add_regiment: risen_dead
+      - add_stress: 15
+      - arcane_witness: { secret: secret_necromancy, chance: 25 }
+      - custom_tooltip: arcana.raise_dead_tip
+    ai_will_do: { value: 20, if: { limit: { is_at_war: yes }, add: 60 } }
+    ai_check_months: 3
+
+  lich_ritual:
+    icon: "☠"
+    major: true
+    is_shown: { has_trait: necromancer, NOT: { has_trait: lich } }
+    is_valid:
+      sorcery: ">= 14"
+      gold: 300
+      custom_tooltip: { text: arcana.need_power_full, trigger: { arcane_power: ">= 100" } }
+    cost: { gold: 300 }
+    effect:
+      - add_arcane_power: -100
+      - trigger_event: arcana.0060
+      - custom_tooltip: arcana.lich_ritual_tip
+    ai_will_do: { value: 5, if: { limit: { age: ">= 50" }, add: 60 } }
+    ai_check_months: 12
+
+  witch_hunt:
+    icon: "🔥"
+    is_shown:
+      is_ruler: yes
+      religion: christianity
+      OR:
+        - has_trait: zealous
+        - piety: ">= 300"
+    is_valid:
+      piety: 100
+      is_at_war: no
+    cost: { piety: 100 }
+    cooldown: { years: 5 }
+    effect:
+      - witch_hunt: yes
+      - add_modifier: { id: witch_hunt_fervor, years: 2 }
+      - custom_tooltip: arcana.witch_hunt_tip
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { has_trait: zealous }
+          add: 25
+        - limit: { has_trait: [compassionate, cynical] }
+          multiply: 0
+    ai_check_months: 12
+
+interactions:
+  cast_curse:
+    icon: "🌀"
+    category: hostile
+    is_shown:
+      scope:actor: { is_arcanist: yes, sorcery: ">= 6" }
+      scope:recipient: { NOT: { has_trait: hexed } }
+    is_valid:
+      scope:actor:
+        custom_tooltip: { text: arcana.need_power_35, trigger: { arcane_power: ">= 35" } }
+    auto_accept: yes
+    hookable: no
+    cooldown: { years: 2 }
+    on_accept:
+      - scope:actor: { cast_curse_on: scope:recipient }
+    ai_targets: [liege, vassal, neighboring_ruler]
+    ai_frequency_months: 12
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { scope:actor: { opinion: { target: scope:recipient, value: "< -40" } } }
+          add: 15
+        - limit: { scope:actor: { has_trait: [vengeful, wrathful, callous] } }
+          add: 15
+        - limit: { scope:actor: { has_trait: [compassionate, just, honest, zealous] } }
+          multiply: 0
+
+  love_charm:
+    icon: "💘"
+    category: personal
+    is_shown:
+      scope:actor: { is_arcanist: yes }
+      scope:recipient: { is_adult: yes }
+    is_valid:
+      scope:actor:
+        custom_tooltip: { text: arcana.need_power_25, trigger: { arcane_power: ">= 25" } }
+    auto_accept: yes
+    hookable: no
+    cooldown: { years: 2 }
+    on_accept:
+      - scope:actor: { add_arcane_power: -25 }
+      - scope:recipient: { add_opinion: { target: scope:actor, modifier: bewitched } }
+      - scope:actor:
+          random:
+            chance: 30
+            if:
+              limit: { NOT: { has_secret: secret_witchcraft } }
+              add_secret: secret_witchcraft
+    ai_targets: [liege, vassal]
+    ai_frequency_months: 12
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { scope:actor: { opinion: { target: scope:recipient, value: "> 0" } } }
+          add: 5
+        - limit: { scope:actor: { has_trait: [deceitful, ambitious, lustful] } }
+          add: 15
+        - limit: { scope:actor: { has_trait: [honest, just] } }
+          multiply: 0
+
+  heal_other:
+    icon: "🤲"
+    category: friendly
+    is_shown:
+      scope:actor: { has_perk: mending_hands }
+      scope:recipient:
+        OR:
+          - has_trait_category: health
+          - has_trait: [hexed, lycanthrope]
+    is_valid:
+      scope:actor:
+        custom_tooltip: { text: arcana.need_power_30, trigger: { arcane_power: ">= 30" } }
+    auto_accept: yes
+    cooldown: { months: 6 }
+    on_accept:
+      - scope:actor: { add_arcane_power: -30, add_lifestyle_xp: 30 }
+      - scope:recipient:
+          cure_ailments: yes
+          if:
+            limit: { scope:actor: { has_trait: white_mage }, has_trait: lycanthrope }
+            remove_trait: lycanthrope
+          add_opinion: { target: scope:actor, modifier: healed_me }
+    ai_targets: [liege, vassal, courtier, spouse, child]
+    ai_frequency_months: 6
+    ai_will_do:
+      value: 10
+      if:
+        - limit: { scope:actor: { opinion: { target: scope:recipient, value: ">= 20" } } }
+          add: 30
+        - limit: { scope:actor: { has_trait: compassionate } }
+          add: 30

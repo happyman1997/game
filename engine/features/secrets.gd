@@ -76,6 +76,8 @@ static func learn(game: Game, knower: Dictionary, owner: Dictionary, s: Dictiona
 		return false
 	s.known.append(knower.id)
 	game.month_cache.erase(INDEX_KEY)
+	# знание тайны меняет отношение (скрытые черты влияют на мнение)
+	game.stat_cache.erase("op:%s>%s" % [knower.id, owner.id])
 	var mx := int(game.def_num("secrets.max_known_per_secret", 12))
 	if s.known.size() > mx:
 		var alive: Array = s.known.filter(func(id): return game.is_alive(id))

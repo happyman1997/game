@@ -135,6 +135,9 @@ static func skills(app: App, c: Dictionary) -> Control:
 	for s in Chars.skill_ids(g):
 		var d: Variant = g.content.get_def("skills", s)
 		var v := int(Stats.skill(g, c, s))
+		# редкие навыки (колдовство) у большинства нулевые — не показываем
+		if v == 0 and d != null and d.get("hide_if_zero", false):
+			continue
 		var ic: Variant = d.get("icon", "star") if d != null else "star"
 		var sid: String = s
 		row.add_child(stat(ic, str(v), func(): return BB.title(g.name_of("skills", sid)) + "\n" + BB.breakdown(Stats.stat_breakdown(g, c, sid)), UiArt.C_TEXT, 18))
@@ -145,15 +148,19 @@ static func skills(app: App, c: Dictionary) -> Control:
 static func traits(app: App, c: Dictionary) -> Control:
 	var g := app.game
 	var f := K.flow([], 4)
+	var viewer: Variant = g.state.player
 	for t in c.traits:
 		var d: Variant = Chars.trait_def(g, t)
-		if d == null:
+		if d == null or not Chars.trait_visible(g, c, t, viewer):
 			continue
 		var name := g.name_of("traits", t)
 		var col: Color = {
 			"personality": Color("#2e3a40"), "education": Color("#24384e"), "congenital": Color("#3e2e48"),
 			"health": Color("#4a2a2a"), "lifestyle": Color("#2e4230"), "fame": Color("#4a3c20"),
+			"supernatural": Color("#3a2448"),
 		}.get(d.get("category", ""), Color("#2e3a40"))
+		if d.get("color") is String:
+			col = Color(d.color).darkened(0.45)
 		var chip := K.panel(K.hbox([K.icon(d.get("icon"), 16), K.label(name, "SmallLabel")], 3))
 		chip.add_theme_stylebox_override("panel", UiArt.flat(col, Color(UiArt.BRONZE, 0.7), 1, 3, 3))
 		var tipbb := BB.title(name)
@@ -163,6 +170,10 @@ static func traits(app: App, c: Dictionary) -> Control:
 		var mods := BB.modifiers(g, d.get("modifiers"))
 		if mods != "":
 			tipbb += "\n" + mods
+		if Chars.trait_concealed(g, c, t):
+			# тайная черта: видна только носителю и посвящённым
+			tipbb += "\n" + BB.muted(app.t("ui.concealed_trait"))
+			chip.modulate = Color(1, 1, 1, 0.8)
 		K.tip(chip, tipbb)
 		f.add_child(chip)
 	return f

@@ -1,0 +1,312 @@
+# «Тайные искусства»: существа ночи. Вампиры и оборотни скрывают свою природу
+# (черты с concealed: видны лишь посвящённым в их тайну); нежить восстаёт
+# в проклятых землях и курганах; в горах просыпаются драконы.
+
+defines:
+  arcana:
+    thirst_per_month: 10         # жажда вампира (0–100) растёт каждый месяц
+    thirst_stress_from: 60       # с этого уровня жажда даёт стресс
+    feed_death_chance: 8         # % жертва не переживёт кормления
+    feed_witness_chance: 12      # % кто-то при дворе узнаёт тайну
+    full_moon_chance: 30         # % в месяц — полнолуние будит зверя
+    restless_outbreak_chance: 0.0025   # шанс в месяц для каждого кургана
+    restless_spread_at: 60       # с этой силы мёртвые расходятся по соседям
+    restless_growth: 6           # рост силы в месяц
+    restless_kill_chance: 0.03   # шанс в месяц для персонажа в столице с нежитью
+    army_vs_dead: 0.02           # сколько силы нежити снимает каждый воин армии в месяц
+    dead_vs_army: 2.5            # сколько воинов гибнет от единицы силы нежити
+    dragon_wake_chance: 0.003    # шанс в месяц пробуждения дракона
+    max_dragons: 2               # больше драконов разом не бывает
+    dragon_burn_chance: 0.15     # шанс в месяц, что дракон сожжёт соседнюю провинцию
+
+traits:
+  vampire:
+    category: supernatural
+    concealed: secret_vampire
+    icon: "🦇"
+    color: "#8a1020"
+    modifiers: { prowess: 4, intrigue: 2, health: 2, fertility: -0.9, attraction_opinion: 12, stress_gain_mult: 0.1 }
+    portrait: { skin: "#e2d8de", skin_amount: 0.55, pale: true, eyes: "#a01018", glow: "#ff3030", fangs: true, ageless: 33 }
+    ai: { compassion: -1, boldness: 1 }
+  lich:
+    category: supernatural
+    icon: "☠"
+    color: "#2a6a6a"
+    modifiers: { sorcery: 5, prowess: 2, health: 3, fertility: -1, vassal_opinion: -15, general_opinion: -20, curse_resistance: 60 }
+    portrait: { undead: true, skin: "#cfc6ac", skin_amount: 0.9, eyes: "#9ff4ff", glow: "#7fe8ff", no_hair: true, ageless: 55, aura: "#2fb4c0" }
+    ai: { compassion: -3, rationality: 2 }
+  lycanthrope:
+    category: supernatural
+    concealed: secret_werewolf
+    icon: "🐺"
+    color: "#6a4a2a"
+    modifiers: { prowess: 5, health: 0.5, stress_gain_mult: 0.15, diplomacy: -1 }
+    portrait: { eyes: "#d8a020", glow: "#ffcf40" }
+  dragonslayer:
+    category: fame
+    icon: "🐉"
+    color: "#a05a20"
+    modifiers: { prowess: 3, martial: 1, monthly_prestige: 1, general_opinion: 10 }
+  monster_hunter:
+    category: fame
+    icon: "🗡"
+    color: "#8a8aa0"
+    modifiers: { prowess: 2, monthly_piety: 0.5, general_opinion: 5, curse_resistance: 20 }
+  fey_touched:
+    category: health
+    icon: "🌸"
+    color: "#2a7a6a"
+    duration_days: 1825
+    modifiers: { learning: 2, diplomacy: 1, stress_gain_mult: -0.15 }
+
+  zealous:
+    compatibility: { lich: -60 }
+  compassionate:
+    compatibility: { lich: -20 }
+
+secret_types:
+  secret_vampire:
+    icon: "🦇"
+    hook: strong
+    severity: 200
+    discovered_by: [spouse, courtier, close_family]
+    discovery_chance: 0.45
+    on_expose:
+      - reveal_trait: vampire
+      - add_prestige: -400
+      - add_piety: -300
+      - if:
+          limit: { exists: liege }
+          mark_criminal: { target: liege, years: 30 }
+  secret_werewolf:
+    icon: "🐺"
+    hook: strong
+    severity: 120
+    discovered_by: [spouse, courtier, close_family]
+    discovery_chance: 0.7
+    on_expose:
+      - reveal_trait: lycanthrope
+      - add_prestige: -200
+      - if:
+          limit: { exists: liege }
+          mark_criminal: { target: liege, years: 10 }
+
+modifiers:
+  bloodthirst: { icon: "🩸", modifiers: { prowess: 2, diplomacy: -2, stress_gain_mult: 0.2 } }
+  drained: { icon: "🩸", modifiers: { health: -1, prowess: -2 } }
+  beast_unleashed: { icon: "🐺", modifiers: { prowess: 4, stress_gain_mult: -0.3 }, good: true }
+  dragon_preparations: { icon: "🐉", modifiers: { prowess: 2, commander_advantage: 5 }, good: true }
+  # провинции
+  restless_dead: { icon: "💀", modifiers: { tax_mult: -0.5, levy_mult: -0.5, development_growth: -0.2 } }
+  haunted_ground: { icon: "👻", modifiers: { tax_mult: -0.1, development_growth: -0.05 } }
+  consecrated_ground: { icon: "✝", modifiers: { development_growth: 0.02 }, good: true }
+  ancient_barrow: { icon: "🪦", modifiers: { development_growth: -0.02 } }
+  fey_hills: { icon: "🧚", modifiers: { development_growth: 0.02 }, good: true }
+  dragon_lair: { icon: "🐉", modifiers: { tax_mult: -0.6, levy_mult: -0.5, development_growth: -0.3 } }
+  dragon_scorched: { icon: "🔥", modifiers: { tax_mult: -0.3, levy_mult: -0.2 } }
+
+opinion_modifiers:
+  sire_bond: { value: 40 }
+  embraced_me: { value: 30 }
+  fed_on_me: { value: -40, years: 10 }
+
+regiment_types:
+  risen_dead:
+    icon: "💀"
+    order: 20
+    size: 120
+    power: 1.7
+    cost: { gold: 15 }
+    upkeep: 0
+    terrain: { wetlands: 0.2 }
+    can_recruit: { has_perk: raise_dead }
+    ai_will_do: { value: 0, if: { limit: { has_perk: raise_dead }, add: 30 } }
+  silver_flame:
+    icon: "🛡"
+    order: 21
+    size: 80
+    power: 3.2
+    cost: { gold: 170 }
+    upkeep: 0.5
+    counters: { risen_dead: 0.8 }
+    can_recruit:
+      religion: christianity
+      piety: ">= 100"
+    ai_will_do: { value: 3, if: { limit: { has_trait: zealous }, add: 6 } }
+
+casus_belli:
+  monster_hunt:
+    icon: "🗡"
+    targets: monster_hunt
+    is_valid:
+      scope:attacker:
+        NOT: { has_trait: [vampire, lich] }
+    cost: { piety: 100 }
+    on_victory:
+      - scope:attacker:
+          add_prestige: 300
+          add_piety: 300
+          add_trait: monster_hunter
+          annex_war_targets: yes
+      - scope:defender: { death: { reason: monster_slain, killer: scope:attacker } }
+    on_white_peace:
+      - scope:attacker: { add_prestige: -50 }
+    on_defeat:
+      - scope:attacker: { add_prestige: -150, add_piety: -100 }
+    ai_will_do: 90
+    truce_years: 3
+    war_name: cb.monster_hunt.war_name
+
+decisions:
+  feed_on_blood:
+    icon: "🩸"
+    is_shown: { has_trait: vampire }
+    is_valid:
+      custom_tooltip: { text: arcana.thirst_low, trigger: { blood_thirst: ">= 30" } }
+    effect:
+      - feed_on_blood: yes
+      - custom_tooltip: arcana.feed_tip
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { blood_thirst: ">= 50" }
+          add: 80
+    ai_check_months: 1
+
+  exorcism:
+    icon: "✝"
+    is_shown:
+      religion: christianity
+      has_trait: [hexed, lycanthrope]
+    is_valid:
+      piety: 150
+    cost: { piety: 150 }
+    cooldown: { years: 2 }
+    effect:
+      - if:
+          limit: { has_trait: hexed }
+          remove_trait: hexed
+      - if:
+          limit: { has_trait: lycanthrope }
+          random_list:
+            - weight: 55
+              remove_trait: lycanthrope
+              send_message: { text: arcana.msg_exorcism_ok, kind: good }
+            - weight: 45
+              add_stress: 20
+              send_message: { text: arcana.msg_exorcism_failed, kind: bad }
+      - custom_tooltip: arcana.exorcism_tip
+    ai_will_do: 50
+    ai_check_months: 6
+
+  purge_restless_dead:
+    icon: "🔥"
+    is_shown: { is_ruler: yes, realm_has_restless_dead: yes }
+    is_valid:
+      gold: 40
+      is_imprisoned: no
+    cost: { gold: 40 }
+    cooldown: { months: 2 }
+    effect:
+      - purge_restless_dead: yes
+      - custom_tooltip: arcana.purge_tip
+    ai_will_do: 80
+    ai_check_months: 1
+
+  consecrate_lands:
+    icon: "✝"
+    is_shown:
+      is_ruler: yes
+      religion: christianity
+      realm_has_restless_dead: yes
+    is_valid:
+      piety: 200
+    cost: { piety: 200 }
+    cooldown: { years: 2 }
+    effect:
+      - consecrate_against_dead: yes
+      - custom_tooltip: arcana.consecrate_tip
+    ai_will_do: { value: 20, if: { limit: { has_trait: zealous }, add: 30 } }
+    ai_check_months: 3
+
+  command_the_dead:
+    icon: "💀"
+    is_shown: { has_trait: [necromancer, lich], realm_has_restless_dead: yes }
+    is_valid:
+      custom_tooltip: { text: arcana.need_power_40, trigger: { arcane_power: ">= 40" } }
+    effect:
+      - add_arcane_power: -40
+      - command_restless_dead: yes
+      - arcane_witness: { secret: secret_necromancy, chance: 30 }
+      - custom_tooltip: arcana.command_dead_tip
+    ai_will_do: 80
+    ai_check_months: 2
+
+  hunt_the_dragon:
+    icon: "🐉"
+    is_shown: { is_ruler: yes, near_dragon_lair: yes }
+    is_valid:
+      is_adult: yes
+      is_imprisoned: no
+      custom_tooltip: { text: arcana.dragon_need_prowess, trigger: { prowess: ">= 8" } }
+    cooldown: { years: 1 }
+    effect:
+      - hunt_dragon: yes
+      - custom_tooltip: arcana.dragon_hunt_tip
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { prowess: ">= 14", has_trait: brave }
+          add: 40
+        - limit: { prowess: ">= 18" }
+          add: 30
+        - limit: { has_trait: craven }
+          multiply: 0
+    ai_check_months: 6
+
+interactions:
+  dark_gift:
+    icon: "🦇"
+    category: personal
+    is_shown:
+      scope:actor: { has_trait: vampire }
+      scope:recipient:
+        is_adult: yes
+        NOT: { has_trait: [vampire, lich] }
+    auto_accept: no
+    hookable: no
+    cooldown: { years: 3 }
+    ai_accept:
+      value: -30
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.6 } }
+        - { desc: arcana.ai_old_age, limit: { age: ">= 45" }, value: { value: age, subtract: 40, multiply: 1.5 } }
+        - { desc: arcana.ai_ambitious, limit: { has_trait: ambitious }, value: 20 }
+        - { desc: arcana.ai_ailing, limit: { has_trait_category: health }, value: 25 }
+        - { desc: arcana.ai_faithful, limit: { has_trait: zealous }, value: -80 }
+        - { desc: arcana.ai_faithful, limit: { piety: ">= 500" }, value: -30 }
+    on_accept:
+      - scope:recipient:
+          add_trait: vampire
+          add_secret: { type: secret_vampire, known_by: [scope:actor] }
+          add_opinion: { target: scope:actor, modifier: sire_bond }
+          cure_ailments: yes
+          set_var: { name: blood_thirst, value: 30 }
+      - scope:actor:
+          add_opinion: { target: scope:recipient, modifier: embraced_me }
+          add_stress: -10
+      - custom_tooltip: arcana.dark_gift_tip
+    on_decline:
+      - scope:recipient:
+          random:
+            chance: 50
+            learn_secret: { owner: scope:actor, type: secret_vampire }
+    ai_targets: [spouse, close_family, courtier, liege, vassal]
+    ai_frequency_months: 36
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { scope:actor: { opinion: { target: scope:recipient, value: ">= 50" } } }
+          add: 10
+        - limit: { scope:recipient: { is_spouse_of: scope:actor } }
+          add: 15

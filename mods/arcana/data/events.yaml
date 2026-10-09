@@ -1,0 +1,542 @@
+# «Тайные искусства»: события. Тексты — в localization (ev.arcana.XXXX.*).
+# Свой пульс on_arcane_pulse (раз в месяц для правителей, см. скрипт) не
+# размывает пул событий основной игры.
+
+event_themes:
+  arcane: { icon: "🔮", color: "#3e3a8a" }
+  blood: { icon: "🦇", color: "#7a1020" }
+  undead: { icon: "💀", color: "#3a4a2a" }
+  dragon: { icon: "🐉", color: "#9a4a1a" }
+  fey: { icon: "🧚", color: "#2a6e62" }
+  moon: { icon: "🌙", color: "#2a3660" }
+
+on_actions:
+  on_arcane_pulse:
+    random_events:
+      chance:
+        value: 1.5
+        if:
+          - limit: { is_player: yes }
+            add: 9
+      events:
+        arcana.0002: 10
+        arcana.0003: 8
+        arcana.0004: 6
+        arcana.0005: 2
+        arcana.0006: 5
+        arcana.0010: 2
+        arcana.0011: 10
+        arcana.0021: 6
+        arcana.0022: 5
+        arcana.0040: 4
+        arcana.0050: 7
+        arcana.0061: 5
+        arcana.0070: 6
+  on_coming_of_age:
+    effect:
+      - if:
+          limit: { has_trait: [gifted, changeling] }
+          save_scope_as: child
+          liege: { trigger_event: arcana.0001 }
+  on_birth:
+    effect:
+      - if:
+          limit:
+            scope:mother: { culture: [irish, welsh, scottish, breton] }
+          random:
+            chance: 1.5
+            add_trait: changeling
+            save_scope_as: child
+            scope:mother: { trigger_event: arcana.0051 }
+
+events:
+  # ------------------------------------------------------------ дар
+  arcana.0001:
+    theme: arcane
+    icon: "✨"
+    triggered_only: true
+    options:
+      - effect:
+          scope:child:
+            set_focus: focus_arcane_study
+            add_lifestyle_xp: 200
+            add_arcane_power: 20
+            add_opinion: { target: root, modifier: supported }
+        ai_chance: { value: 40, if: { limit: { has_trait: zealous }, multiply: 0.2 } }
+      - effect:
+          scope:child: { add_stress: 25 }
+          add_piety: 30
+        ai_chance: { value: 30, if: { limit: { has_trait: zealous }, add: 40 } }
+      - trigger: { religion: christianity }
+        effect:
+          scope:child:
+            add_piety: 50
+            add_opinion: { target: root, modifier: insulted, value: -20 }
+          add_piety: 60
+        ai_chance: 20
+
+  arcana.0002:
+    theme: arcane
+    icon: "✨"
+    cooldown: { years: 4 }
+    options:
+      - effect:
+          random_list:
+            - weight: 40
+              if:
+                limit: { is_arcanist: yes }
+                add_arcane_power: 35
+                else: { add_gold: 70 }
+            - weight: 35
+              add_modifier: { id: ill_omen, years: 1 }
+              add_stress: 15
+            - weight: 25
+              add_lifestyle_xp: 100
+              add_prestige: 25
+        ai_chance: { value: 30, add: { value: ai_boldness, multiply: 10 } }
+      - effect: { add_stress: -5 }
+        ai_chance: 40
+      - trigger: { is_arcanist: yes }
+        effect:
+          add_arcane_power: 25
+          add_stress: 5
+        ai_chance: 30
+
+  # ------------------------------------------------------------ ведьмы и маги
+  arcana.0003:
+    theme: arcane
+    icon: "🧪"
+    cooldown: { years: 5 }
+    options:
+      - effect:
+          add_piety: 50
+          if:
+            limit: { has_trait: compassionate }
+            add_stress: 30
+          every_courtier:
+            limit: { has_trait: compassionate }
+            add_opinion: { target: root, modifier: burned_a_witch }
+        ai_chance: { value: 20, add: { value: ai_zeal, multiply: 15 } }
+      - effect:
+          add_piety: -20
+          add_prestige: 10
+          every_vassal:
+            limit: { has_trait: zealous }
+            add_opinion: { target: root, modifier: protected_a_witch }
+        ai_chance: { value: 30, add: { value: ai_compassion, multiply: 10 } }
+      - effect:
+          add_piety: -40
+          create_character:
+            female: yes
+            age: 42
+            traits: [gifted]
+            dynasty: none
+            save_scope_as: witch
+          scope:witch:
+            add_skill: { skill: sorcery, value: 4 }
+            set_focus: focus_witchery
+            add_arcane_power: 30
+        ai_chance: { value: 15, if: { limit: { has_trait: [cynical, ambitious] }, add: 20 } }
+
+  arcana.0004:
+    theme: arcane
+    icon: "🪄"
+    trigger: { gold: 50 }
+    cooldown: { years: 6 }
+    options:
+      - effect:
+          add_gold: -50
+          create_character:
+            female: no
+            age: 52
+            traits: [gifted]
+            dynasty: none
+            save_scope_as: mage
+          scope:mage:
+            - add_skill: { skill: sorcery, value: 6 }
+            - add_skill: { skill: learning, value: 3 }
+            - add_arcane_power: 40
+            - random_list:
+                - { weight: 50, add_perk: herbalism }
+                - { weight: 50, add_perk: stormcall }
+        ai_chance: { value: 30, if: { limit: { has_trait: zealous }, multiply: 0 } }
+      - trigger: { is_arcanist: yes }
+        effect:
+          add_gold: -30
+          add_lifestyle_xp: 150
+          add_arcane_power: 20
+        ai_chance: 40
+      - effect: { add_prestige: 5 }
+        ai_chance: 30
+
+  arcana.0005:
+    theme: moon
+    icon: "🌠"
+    cooldown: { years: 20 }
+    options:
+      - effect:
+          add_modifier: { id: favorable_omen, years: 2 }
+          add_prestige: 30
+        ai_chance: 50
+      - effect:
+          add_piety: 80
+          add_stress: -10
+        ai_chance: { value: 30, add: { value: ai_zeal, multiply: 10 } }
+
+  arcana.0006:
+    theme: arcane
+    icon: "🧪"
+    trigger: { gold: 100 }
+    cooldown: { years: 8 }
+    options:
+      - effect:
+          add_gold: -100
+          random_list:
+            - weight: { value: 30, add: { value: stewardship, multiply: 1 } }
+              add_gold: 320
+              send_message: { text: arcana.msg_alchemy_ok, kind: good }
+            - weight: 65
+              add_prestige: -20
+              add_stress: 10
+              send_message: { text: arcana.msg_alchemy_failed, kind: bad }
+        ai_chance: { value: 20, add: { value: ai_greed, multiply: 15 } }
+      - effect: { add_prestige: 5 }
+        ai_chance: 60
+
+  # ------------------------------------------------------------ вампиры
+  arcana.0010:
+    theme: blood
+    icon: "🦇"
+    trigger:
+      NOT: { has_trait: vampire }
+    cooldown: { years: 15 }
+    options:
+      - effect:
+          create_character:
+            age: 31
+            traits: [vampire]
+            dynasty: none
+            save_scope_as: guest
+          scope:guest:
+            - add_secret: secret_vampire
+            - add_skill: { skill: intrigue, value: 4 }
+            - add_skill: { skill: diplomacy, value: 3 }
+            - set_var: { name: blood_thirst, value: 30 }
+          add_prestige: 15
+        ai_chance: 40
+      - effect: { add_stress: -5 }
+        ai_chance: 60
+
+  arcana.0011:
+    theme: blood
+    icon: "🩸"
+    trigger:
+      NOT: { has_trait: vampire }
+      any_courtier: { has_trait: vampire }
+    cooldown: { years: 3 }
+    immediate:
+      random_courtier:
+        limit: { has_trait: vampire }
+        save_scope_as: fiend
+    options:
+      - effect:
+          random_list:
+            - weight: { value: 30, add: { value: intrigue, multiply: 4 } }
+              learn_secret: { owner: scope:fiend, type: secret_vampire }
+              send_message: { text: arcana.msg_found_vampire, kind: bad }
+            - weight: 50
+              add_stress: 10
+              send_message: { text: arcana.msg_found_nothing, kind: info }
+        ai_chance: { value: 40, add: { value: ai_rationality, multiply: 10 } }
+      - effect: { add_stress: -5, add_prestige: -10 }
+        ai_chance: 30
+      - trigger: { religion: christianity }
+        effect:
+          add_piety: 25
+          random:
+            chance: 35
+            learn_secret: { owner: scope:fiend, type: secret_vampire }
+        ai_chance: { value: 30, add: { value: ai_zeal, multiply: 10 } }
+
+  arcana.0012:
+    theme: blood
+    icon: "🩸"
+    triggered_only: true
+    options:
+      - effect: { feed_on_blood: yes }
+      - effect: { add_stress: 15 }
+
+  arcana.0013:
+    theme: blood
+    icon: "🦇"
+    triggered_only: true
+    options:
+      - effect: { add_stress: 20 }
+      - trigger: { has_trait: [callous, wrathful] }
+        effect: { add_stress: -10 }
+
+  # ------------------------------------------------------------ нежить
+  arcana.0020:
+    theme: undead
+    icon: "💀"
+    triggered_only: true
+    options:
+      - trigger: { gold: 40 }
+        effect:
+          add_gold: -40
+          purge_restless_dead: yes
+      - trigger: { religion: christianity }
+        effect: { add_piety: 30, add_stress: 5 }
+      - effect: { add_stress: 10 }
+
+  arcana.0021:
+    theme: undead
+    icon: "🪦"
+    cooldown: { years: 6 }
+    options:
+      - effect:
+          random_list:
+            - weight: 55
+              add_gold: 120
+              send_message: { text: arcana.msg_barrow_gold, kind: good }
+            - weight: 45
+              capital: { awaken_dead: 30 }
+              add_stress: 10
+        ai_chance: { value: 25, add: { value: ai_greed, multiply: 15 } }
+      - effect: { add_piety: 30 }
+        ai_chance: 50
+      - trigger: { is_arcanist: yes }
+        effect:
+          add_arcane_power: 30
+          add_lifestyle_xp: 80
+          random:
+            chance: 20
+            capital: { awaken_dead: 20 }
+        ai_chance: 30
+
+  arcana.0022:
+    theme: undead
+    icon: "👻"
+    trigger:
+      exists: father
+      father: { is_alive: no }
+    cooldown: { years: 10 }
+    immediate:
+      father: { save_scope_as: ancestor }
+    options:
+      - effect: { add_lifestyle_xp: 120, add_stress: -10 }
+        ai_chance: 40
+      - trigger: { gold: 20 }
+        effect: { add_piety: 40, add_gold: -20 }
+        ai_chance: 40
+      - effect: { add_stress: 10, add_prestige: 10 }
+        ai_chance: 20
+
+  # ------------------------------------------------------------ драконы
+  arcana.0030:
+    theme: dragon
+    icon: "🐉"
+    triggered_only: true
+    options:
+      - trigger: { gold: 50 }
+        effect:
+          add_gold: -50
+          add_modifier: { id: dragon_preparations, years: 2 }
+      - effect: { add_piety: 40 }
+      - effect: { add_prestige: -20, add_stress: 10 }
+
+  arcana.0031:
+    theme: dragon
+    icon: "🐉"
+    triggered_only: true
+    options:
+      - effect: { add_prestige: 100 }
+      - trigger: { gold: 100 }
+        effect:
+          add_gold: -100
+          every_vassal: { add_opinion: { target: root, modifier: supported } }
+
+  arcana.0032:
+    theme: dragon
+    icon: "🔥"
+    triggered_only: true
+    options:
+      - effect: {}
+
+  # ------------------------------------------------------------ звери и феи
+  arcana.0040:
+    theme: moon
+    icon: "🐺"
+    trigger:
+      is_adult: yes
+      NOT: { has_trait: lycanthrope }
+      capital: { terrain: forest }
+    cooldown: { years: 10 }
+    options:
+      - effect:
+          random_list:
+            - weight: { value: 30, add: { value: prowess, multiply: 3 } }
+              add_prestige: 60
+              send_message: { text: arcana.msg_wolf_slain, kind: good }
+            - weight: 30
+              add_trait: lycanthrope
+              add_secret: secret_werewolf
+              add_stress: 20
+              send_message: { text: arcana.msg_wolf_bite, kind: bad }
+        ai_chance: { value: 40, add: { value: ai_boldness, multiply: 15 } }
+      - effect: { add_prestige: -20, add_stress: 10 }
+        ai_chance: 60
+
+  arcana.0041:
+    theme: moon
+    icon: "🌙"
+    triggered_only: true
+    options:
+      - effect: { add_stress: 15 }
+        ai_chance: { value: 50, add: { value: ai_honor, multiply: 10 } }
+      - effect:
+          add_modifier: { id: beast_unleashed, months: 1 }
+          add_stress: -20
+          random:
+            chance: 30
+            random_courtier:
+              limit: { is_adult: yes, NOT: { is_close_family_of: root } }
+              death: { reason: beast }
+          arcane_witness: { secret: secret_werewolf, chance: 35 }
+        ai_chance: { value: 30, add: { value: ai_vengefulness, multiply: 10 } }
+      - trigger: { is_arcanist: yes, arcane_power: ">= 20" }
+        effect:
+          add_arcane_power: -20
+          add_stress: 5
+        ai_chance: 40
+
+  arcana.0050:
+    theme: fey
+    icon: "🧚"
+    trigger:
+      culture: [irish, welsh, scottish, breton]
+      any_courtier: { is_adult: yes }
+    cooldown: { years: 6 }
+    immediate:
+      random_courtier:
+        limit: { is_adult: yes }
+        save_scope_as: wanderer
+    options:
+      - effect:
+          scope:wanderer:
+            random_list:
+              - { weight: 40, add_trait: fey_touched }
+              - { weight: 25, add_trait: gifted }
+              - { weight: 35, death: { reason: fey } }
+        ai_chance: 30
+      - effect: { add_stress: -5 }
+        ai_chance: 50
+      - effect:
+          random_list:
+            - weight: 45
+              add_trait: fey_touched
+              add_lifestyle_xp: 100
+            - weight: 35
+              add_prestige: 50
+              add_gold: 60
+            - weight: 20
+              add_stress: 30
+              add_modifier: { id: ill_omen, years: 1 }
+        ai_chance: { value: 20, add: { value: ai_boldness, multiply: 10 } }
+
+  arcana.0051:
+    theme: fey
+    icon: "🧚"
+    triggered_only: true
+    options:
+      - effect: { add_stress: -5 }
+      - trigger: { religion: christianity }
+        effect: { add_piety: 20 }
+      - effect:
+          scope:child: { death: { reason: fey } }
+          add_stress: 25
+
+  # ------------------------------------------------------------ тёмные искусства
+  arcana.0060:
+    theme: undead
+    icon: "☠"
+    triggered_only: true
+    options:
+      - effect:
+          random_list:
+            - weight: { value: 35, add: { value: sorcery, multiply: 2.5 } }
+              add_trait: lich
+              add_prestige: 200
+              send_message: { text: arcana.msg_lich_ok, kind: good }
+            - weight: 40
+              death: { reason: ritual }
+        ai_chance: 70
+      - effect: { add_stress: 30 }
+        ai_chance: 30
+
+  arcana.0061:
+    theme: undead
+    icon: "🪦"
+    trigger:
+      is_arcanist: yes
+      NOR:
+        - has_perk: grave_whispers
+        - has_trait: [zealous, compassionate]
+    cooldown: { years: 10 }
+    options:
+      - effect:
+          add_perk: grave_whispers
+          add_arcane_power: 20
+        ai_chance: { value: 20, if: { limit: { has_trait: [callous, ambitious, vengeful] }, add: 30 } }
+      - effect: { add_piety: 30, add_stress: 5 }
+        ai_chance: 60
+
+  arcana.0070:
+    theme: faith
+    icon: "🔥"
+    trigger:
+      religion: christianity
+      NOT: { has_trait: zealous }
+      OR:
+        - has_secret: [secret_witchcraft, secret_necromancy]
+        - any_courtier: { is_arcanist: yes }
+    cooldown: { years: 8 }
+    immediate:
+      random_courtier:
+        limit: { is_arcanist: yes }
+        save_scope_as: mage
+    options:
+      - trigger: { gold: 100 }
+        effect: { add_gold: -100, add_piety: 10 }
+        ai_chance: { value: 40, add: { value: ai_greed, multiply: -10 } }
+      - trigger: { exists: scope:mage }
+        effect:
+          scope:mage: { death: { reason: burned } }
+          add_piety: 60
+          if:
+            limit: { has_trait: compassionate }
+            add_stress: 25
+        ai_chance: { value: 30, add: { value: ai_zeal, multiply: 10 } }
+      - effect: { add_piety: -120, add_prestige: 30 }
+        ai_chance: 20
+
+  arcana.0071:
+    theme: faith
+    icon: "🔥"
+    triggered_only: true
+    options:
+      - trigger: { has_trait: zealous }
+        effect: { add_stress: -15, add_piety: 30 }
+      - effect: { add_stress: 5 }
+      - trigger: { has_trait: compassionate }
+        effect: { add_stress: 10, add_piety: -20 }
+
+  arcana.0080:
+    theme: moon
+    icon: "🌠"
+    triggered_only: true
+    options:
+      - effect: { add_modifier: { id: favorable_omen, years: 1 } }
+        ai_chance: 60
+      - effect: { add_prestige: 20, add_stress: -5 }
+        ai_chance: 40

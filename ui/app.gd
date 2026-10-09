@@ -126,6 +126,16 @@ func boot() -> void:
 func build_engine() -> void:
 	var issues := []
 	packages = Platform.load_mod_packages(issues)
+	# Новые моды (появившиеся после сохранения списка включённых) включаются
+	# по умолчанию; отключённые игроком так и остаются отключёнными.
+	var known: Variant = Platform.setting("known_mods", null)
+	if enabled is Array:
+		var seen: Array = known if known is Array else enabled
+		for p in packages:
+			if not seen.has(p.id) and not enabled.has(p.id) and p.manifest.get("default_enabled", true) != false:
+				enabled.append(p.id)
+		Platform.set_setting("enabled_mods", enabled)
+	Platform.set_setting("known_mods", packages.map(func(p): return p.id))
 	show_loading(tr_fallback("Загрузка модов…", "Loading mods…"))
 	await get_tree().process_frame
 	engine = GameEngine.create(packages, {

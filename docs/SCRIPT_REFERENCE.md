@@ -25,6 +25,7 @@
 | `has_holding` | province | Есть владение типа | core |
 | `has_hook_on` | character | Есть крюк на персонажа | core |
 | `has_imprisonment_reason` | character | Есть законный повод заключить персонажа (преступление против этого персонажа) | core/prison |
+| `has_known_trait` | character | Есть черта, известная всем (не скрытая или разоблачённая) | core |
 | `has_lifestyle` | character | Текущий фокус принадлежит образу жизни | core/lifestyles |
 | `has_modifier` | character | Есть модификатор | core |
 | `has_opinion_modifier` | character | Есть модификатор мнения: { target, modifier } | core |
@@ -46,6 +47,7 @@
 | `is_ai` | character | Персонаж ИИ | core |
 | `is_alive` | character | Жив | core |
 | `is_allied_with` | character | Союзник персонажа | core |
+| `is_arcanist` | character | Владеет колдовством (дар или навык ≥ 6) | arcana |
 | `is_at_war` | character | Ведёт войну | core |
 | `is_at_war_with` | character | Воюет с персонажем | core |
 | `is_child` | character | Ребёнок | core |
@@ -66,6 +68,7 @@
 | `is_in_realm_of` | character | Состоит в державе персонажа | core |
 | `is_independent` | character | Независимый правитель | core |
 | `is_knight` | character | Служит рыцарем у своего сюзерена | core/knights |
+| `is_known_monster` | character | Разоблачённое чудовище (вампир, лич, некромант, оборотень) | arcana |
 | `is_landed` | character | Владеет землями | core |
 | `is_liege_of` | character | Сюзерен персонажа | core |
 | `is_lowborn` | character | Безродный | core |
@@ -84,8 +87,11 @@
 | `is_vassal` | character | Вассал | core |
 | `is_vassal_of` | character | Прямой вассал персонажа | core |
 | `knows_secret_of` | character | Знает какой-то секрет персонажа | core/secrets |
+| `near_dragon_lair` | character | Логово дракона в державе персонажа или по соседству | arcana |
 | `province_has_disease` | province | В провинции эпидемия. Аргумент: yes или id болезни. | plague |
+| `province_restless` | province | В провинции бродят мертвецы | arcana |
 | `random_chance` | любой | Случайный шанс в процентах (используйте осторожно в триггерах) | core |
+| `realm_has_restless_dead` | character | В державе персонажа восстали мертвецы | arcana |
 | `religion` | character | Религия равна | core |
 | `same_culture_as` | character | Та же культура | core |
 | `same_dynasty_as` | character | Та же династия | core |
@@ -99,6 +105,8 @@
 | Имя | Описание | Источник |
 |---|---|---|
 | `add_alliance` | Союз с персонажем | core |
+| `add_arcane_power` | Изменить колдовскую силу: add_arcane_power: -30 | arcana |
+| `add_blood_thirst` | Изменить жажду крови | arcana |
 | `add_building` | Добавить постройку | core |
 | `add_claim` | Претензия на титул | core |
 | `add_courtier` | Принять ко двору | core |
@@ -122,14 +130,20 @@
 | `add_trait` | Добавить черту | core |
 | `annex_war_targets` | Присоединить цели войны (в контексте войны) | core |
 | `appoint_councillor` | Назначить в совет: { position, who } | core/council |
+| `arcane_witness` | Риск свидетелей: { secret, chance } — кто-то при дворе узнаёт тайну | arcana |
+| `awaken_dead` | Мёртвые восстают в провинции: awaken_dead: 30 (сила) | arcana |
 | `become_independent` | Стать независимым | core |
 | `become_vassal_of` | Стать вассалом | core |
 | `blackmail` | Шантажировать персонажа его самым тяжёлым известным секретом (получить крюк) | core/secrets |
 | `break_alliance` | Разорвать союз | core |
+| `cast_curse_on` | Проклясть персонажа (со стоимостью и риском разоблачения) | arcana |
 | `change_culture` | Сменить культуру | core |
 | `change_faith` | Сменить веру | core |
 | `change_var` | Изменить переменную: { name, add } | core |
+| `command_restless_dead` | Некромант подчиняет восставших мёртвых своей державы | arcana |
+| `consecrate_against_dead` | Освятить земли державы против нежити | arcana |
 | `create_character` | Создать персонажа: { culture, faith, female, age, traits, dynasty: new\|none\|path, court, save_scope_as } | core |
+| `cure_ailments` | Снять болезни, раны и порчу | arcana |
 | `death` | Смерть: yes, причина или { reason, killer } | core |
 | `discover_scheme_against` | Раскрыть случайную враждебную интригу против персонажа или его семьи | core/council |
 | `discover_secret` | Узнать случайный секрет кого-то из своей державы | core/secrets |
@@ -138,10 +152,13 @@
 | `expose_secret` | Разоблачить самый тяжёлый известный секрет персонажа | core/secrets |
 | `faction_enforce_demands` | Сюзерен выполняет требования фракции | core/factions |
 | `faction_start_war` | Фракция поднимает мятеж | core/factions |
+| `feed_on_blood` | Вампир утоляет жажду (жертва — пленник или придворный) | arcana |
 | `gain_title` | Получить титул | core |
 | `give_title` | Пожаловать титул: { title, to } — получатель становится вассалом | core |
+| `hunt_dragon` | Выйти на бой с ближайшим драконом | arcana |
 | `imprison` | Заключить персонажа в свою темницу: imprison: scope:x или { target, reason } | core/prison |
 | `join_faction` | Вступить во фракцию против сюзерена (или создать): join_faction: <тип> | core/factions |
+| `learn_secret` | Узнать тайну персонажа: { owner, type } | arcana |
 | `leave_faction` | Выйти из фракции | core/factions |
 | `lose_all_titles` | Потерять все титулы | core |
 | `lose_title` | Потерять титул (переходит к сюзерену) | core |
@@ -150,6 +167,7 @@
 | `marry` | Заключить брак | core |
 | `move_to_court` | Переехать ко двору персонажа | core |
 | `pay_gold` | Передать золото: { target, value } | core |
+| `purge_restless_dead` | Выжечь нежить в самой поражённой провинции державы | arcana |
 | `release_from_prison` | Освободить этого персонажа из темницы | core/prison |
 | `remove_building` | Убрать постройку | core |
 | `remove_claim` | Убрать претензию | core |
@@ -162,6 +180,7 @@
 | `remove_province_modifier` | Убрать модификатор провинции | core |
 | `remove_trait` | Убрать черту | core |
 | `remove_var` | Удалить переменную | core |
+| `reveal_trait` | Разоблачить скрытую черту (concealed): теперь её видят все | core |
 | `reverse_add_opinion` | Мнение target об этом персонаже: { target, modifier, value? } | core |
 | `seize_primary_title` | Забрать основной титул персонажа (претендент): прежний владелец становится вассалом | core/factions |
 | `send_message` | Сообщение игроку (если этот персонаж — игрок) | core |
@@ -177,6 +196,7 @@
 | `start_disease` | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
 | `start_scheme` | Начать интригу: { type, target } | core |
 | `take_title` | Отобрать титул себе: { title, from? } | core |
+| `witch_hunt` | Охота на ведьм в державе | arcana |
 
 ## Значения
 
@@ -193,7 +213,10 @@
 | `ai_sociability` | character | Личность ИИ: sociability | core |
 | `ai_vengefulness` | character | Личность ИИ: vengefulness | core |
 | `ai_zeal` | character | Личность ИИ: zeal | core |
+| `arcane_power` | character | Колдовская сила персонажа | arcana |
+| `arcane_power_max` | character | Предел колдовской силы | arcana |
 | `attraction` | character | Привлекательность | core |
+| `blood_thirst` | character | Жажда крови вампира (0–100) | arcana |
 | `commander_advantage` | character | Характеристика: commander_advantage | core |
 | `council_size` | character | Число занятых мест в совете | core/council |
 | `crown_authority_level` | character | Уровень закона группы crown_authority (−1, если не действует) | core/laws |
@@ -251,10 +274,12 @@
 | `realm_size` | character | Графств в державе | core |
 | `regiment_cap` | character | Предел отрядов | core/regiments |
 | `regiment_power` | character | Сила отрядов, не поднятых в армию (в ополченцах) | core/regiments |
+| `restless_provinces` | любой | Провинций с восставшими мертвецами в мире | arcana |
 | `reverse_opinion` | character | Мнение персонажа-аргумента об этом персонаже | core |
 | `scheme_defense` | character | Характеристика: scheme_defense | core |
 | `scheme_power` | character | Характеристика: scheme_power | core |
 | `scheme_progress` | scheme | Прогресс интриги | core |
+| `sorcery` | character | Навык: sorcery | core |
 | `stewardship` | character | Навык: stewardship | core |
 | `stress` | character | Стресс | core |
 | `stress_level` | character | Уровень стресса (стресс / 100) | core |
@@ -275,6 +300,7 @@
 | `controller` | province | Кто контролирует провинцию | core |
 | `county` | province | Графство провинции | core |
 | `court_chaplain` | character | Советник на должности court_chaplain | core/council |
+| `court_mage` | character | Советник на должности court_mage | core/council |
 | `de_jure_liege` | title | Де-юре сюзеренный титул | core |
 | `defender` | war | Защитник | core |
 | `dynasty` | character | Династия | core |
@@ -371,12 +397,12 @@
 ## Реестры движка
 
 - **succession_algorithms**: `primogeniture`, `partition`, `seniority`, `elective`
-- **cb_targets**: `claim`, `de_jure`, `independence`, `adjacent_county`, `holy_war`, `faction`
+- **cb_targets**: `claim`, `de_jure`, `independence`, `adjacent_county`, `holy_war`, `faction`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
 - **interaction_deciders**: `payer`
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `plague_fear`
 - **province_modifier_providers**: 
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `arcana_abomination`
 - **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `laws`
-- **systems**: `upkeep` (0), `economy` (10), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `factions` (58), `construction` (60), `plague` (65), `ai` (70), `development` (80), `laws` (85)
-- **ui.map_modes**: `plague`
+- **systems**: `upkeep` (0), `economy` (10), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
+- **ui.map_modes**: `arcana`, `plague`

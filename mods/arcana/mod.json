@@ -1,0 +1,13 @@
+{
+  "id": "arcana",
+  "name": { "ru": "Тайные искусства", "en": "Arcane Arts" },
+  "version": "1.0.0",
+  "author": "Корона и Династия",
+  "description": {
+    "ru": "Тёмное фэнтези поверх истории 1066 года. Редкий дар колдовства и три пути магии, придворные маги и башни чародеев; вампиры и оборотни, скрывающие свою природу; восстающие мертвецы, некроманты и личи; драконы в горах и феи в холмах — и Церковь, которая охотится на всех них.",
+    "en": "Dark fantasy woven into 1066. A rare gift of sorcery and three paths of magic, court mages and wizards' towers; vampires and werewolves hiding their nature; restless dead, necromancers and liches; dragons in the mountains and fey in the hills — and the Church hunting them all."
+  },
+  "dependencies": ["core"],
+  "scripts": ["scripts/main.gd"],
+  "tags": ["fantasy", "magic", "mechanics", "events"]
+}
