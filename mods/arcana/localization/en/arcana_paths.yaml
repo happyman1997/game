@@ -1,0 +1,221 @@
+# Paths of progression and legends of the lands (see data/lands.yaml).
+trait:
+  monster_bane: Bane of Monsters
+trait_desc:
+  monster_bane: Six monsters have fallen to this hand. The dead, the bloodsuckers and the wolf-men give these lands a wide berth, and the Order of the Silver Flame stands ready to follow its hero.
+
+modifier:
+  vampire_tier_2: "Blood potency: vampire"
+  vampire_tier_3: "Blood potency: elder"
+  vampire_tier_4: "Blood potency: ancient"
+  night_terror: Creatures of the Night
+  dragon_blood_bath: Bathed in Dragon's Blood
+  wolf_feral: The Beast Takes Over
+  wolf_tamed: Tamed Beast
+  wolf_alpha: Leader of the Pack
+  pack_hunt: Hunting Pack
+  wolf_hunt_glory: Moonlit Hunt
+  blessed_land: Blessed Land
+  norns_favor: Favour of the Norns
+  rune_warded: Rune Ward
+  draugr_blade: Draugr's Blade
+  fey_war_blessing: Blessing of the Fair Folk
+  fey_wisdom: Wisdom of the Hills
+  fey_toll: Tithe to the Fey
+  rode_with_the_hunt: Rode with the Wild Hunt
+  melusine_blessing: Blessing of Melusine
+  elixir_of_life: Elixir of Life
+  philosophers_stone: Philosopher's Stone
+  runestone: Runestone
+
+opinion_modifier:
+  mesmerized: Mesmerized
+
+decision:
+  summon_night: Summon the Creatures of the Night
+  lead_the_pack: Lead the Pack
+  wolf_hunt: Moonlit Hunt
+  purifying_light: Purifying Light
+  bless_the_land: Bless the Land
+  firestorm: Firestorm
+  plague_of_the_dead: Plague of the Dead
+  seidr_ritual: Seiðr of the Völva
+  raise_runestone: Raise a Runestone
+  fey_bargain: Bargain with the Fair Folk
+  call_of_the_hills: Call of the Hills
+  patron_alchemists: Patronise Alchemists
+  hunt_monsters: Hunt the Monsters
+decision_desc:
+  summon_night: Bats blot out the moon and wolves howl around the enemy camps. Your commanders gain an advantage for half a year, but your thirst grows.
+  lead_the_pack: In wolf form you lead the pack against the enemy's baggage trains. Your commanders gain an advantage for half a year.
+  wolf_hunt: A night in the forest in beast form, and by morning you are calmer than ever. The beast learns to obey.
+  purifying_light: Light born of sorcery burns away the dead in the worst-stricken province — no levies or torches needed.
+  bless_the_land: The white mage walks the land. For five years harvests are richer, taxes higher, and the dead stay in their graves.
+  firestorm: The sky above an enemy army near your borders bursts into flame. Up to a third of the army burns.
+  plague_of_the_dead: The graveyards of your chief enemy split open — the dead rise in his capital.
+  seidr_ritual: Summon a völva and ask her about fate. If there is no gifted soul at court, you must work the seiðr yourself.
+  raise_runestone: A carver will cut runes in memory of your forebears and to the glory of your house. The stone will stand for centuries.
+  fey_bargain: Climb the fairy hill and ask the Fair Folk for a gift. The price comes later.
+  call_of_the_hills: The changeling hears the music that played by its cradle. It is time to learn where it truly came from.
+  patron_alchemists: Build a laboratory and invite alchemists. In a year you will know whether it was worth it.
+  hunt_monsters: Set huntsmen and hounds on the trail. Every court hides someone with fangs, wolf's hair or grave-dirt under their nails.
+
+interaction:
+  mesmerize: Mesmerizing Gaze
+  blood_bond: Blood Bond
+interaction_desc:
+  mesmerize: One long look and they forget what they were arguing about. You gain a hook on them; they gain a strange fondness for you.
+  blood_bond: A drop of your blood in their cup and they are yours forever. A strong hook on a courtier or vassal.
+
+death:
+  beast_within: "{who} runs into the forest on all fours and never returns as a man"
+  wild_hunt: "{who} is swept away into the storm with the Wild Hunt"
+ui:
+  death_reason:
+    beast_within: the beast took over
+    wild_hunt: taken by the Wild Hunt
+
+arcana:
+  cauldron_tip: Fallen warriors rise from the cauldron alive — but mute. Without a necromancer's power they slowly fade.
+  need_power_80: "Requires 80 arcane power"
+  fx_potency: "Blood potency: {value}"
+  fx_beast_up: "Control over the beast: {value}"
+  fx_beast_down: "The beast grows stronger: {value}"
+  fx_hunter: Renown as a monster hunter
+  fx_bless: "Your domain is blessed for 5 years: development and taxes grow, the dead do not rise"
+  fx_firestorm: A firestorm strikes the largest enemy army near your borders
+  fx_plague_dead: The dead rise in the capital of your chief enemy
+  fx_hunt_monsters: Huntsmen search for monsters at court and among your vassals
+  vampire_tier_1: Fledgling
+  vampire_tier_2: Vampire
+  vampire_tier_3: Elder
+  vampire_tier_4: Ancient
+  vampire_powers_1: A fledgling is hungry and careless — thirst grows fast and you cannot yet turn others.
+  vampire_powers_2: "Unlocked: the Dark Gift and Mesmerizing Gaze. Thirst grows more slowly."
+  vampire_powers_3: "Unlocked: Blood Bond — a strong hook on a courtier or vassal. Witnesses notice you less often."
+  vampire_powers_4: "Unlocked: Summon the Creatures of the Night in war. An ancient never loses itself to blood frenzy."
+  msg_tier_vampire: "Your blood grows stronger: you are now {tier}. {powers}"
+  potency_title: Blood potency
+  potency_next: "to {tier}: {n}"
+  beast_title: The beast within
+  stage_wolf_torn: on the edge
+  stage_wolf_feral: the beast takes over
+  stage_wolf_tamed: tamed beast
+  stage_wolf_alpha: leader of the pack
+  msg_wolf_feral: The beast takes over more and more often. The moon calls louder.
+  msg_wolf_tamed: You have tamed the beast — it serves you, not the other way round.
+  msg_wolf_alpha: You lead the pack. The beast answers your call on any night.
+  msg_fey_sight: "Glamour cannot hide the truth from a changeling: {who} is not what they seem."
+  msg_monster_hunter: Your first monster is slain. People call you a monster hunter.
+  msg_monster_bane: Your fame runs ahead of you — you are the Bane of Monsters. The Order of the Silver Flame stands ready to serve.
+  hunter_title: Monsters slain
+  hunter_next: "To become the Bane of Monsters: {n} more"
+  msg_firestorm: "A firestorm fell upon the enemy army ({place}): {loss} perished"
+  msg_firestorm_none: There is nothing for the storm to strike — no enemy armies near your borders.
+  msg_plague_dead: "The enemy's graveyards split open: the dead rise ({place})"
+  msg_draugr_gold: "Ancient gold was found in the draugr's barrow ({place}): {gold}"
+  msg_hunt_nothing: The huntsmen found no monsters — only a great boar. The court enjoyed the hunt.
+  opinion_saint_healer: Holy healer
+  opinion_sinful_gift: Sinful gift
+  opinion_ulfhednar: Úlfheðinn
+  opinion_seidr: Knows seiðr
+  purifying_light_tip: The strength of the light depends on sorcery. The cleansing counts towards your renown as a hunter.
+  firestorm_tip: The storm strikes the largest enemy army in your realm or near its borders; the stronger your sorcery, the heavier the losses.
+  plague_dead_tip: The target is the capital of your highest-ranking enemy. The stronger your sorcery, the more dead rise.
+  mesmerize_tip: Every such gaze stirs the thirst, and an attentive courtier may notice something.
+  blood_bond_tip: The one bound by blood will be devoted to you without knowing why.
+  summon_night_tip: Someone may see you speaking with wolves.
+  lead_pack_tip: Someone may see you slipping into the forest before dawn.
+  need_volva: "Requires the gift of seiðr: your own or a gifted courtier's"
+  seidr_tip: "The völva will look into the threads of the Norns: luck in battle, peace of mind or the secrets of your foes."
+  fey_debt_open: Your debt to the Fair Folk is not yet paid
+  fey_bargain_tip: The fey will grant wealth, victory or wisdom. In four years they will come to collect.
+  call_hills_tip: The changeling will learn where it came from. It may return with gifts — or not return at all.
+  alchemy_running: The alchemists are still at work
+  alchemy_tip: "In a year you will see what came of it: gold, an elixir, an explosion — or the philosopher's stone."
+  hunt_monsters_tip: The higher your prowess, intrigue and renown as a hunter, the likelier you are to find a monster. Every monster exposed counts towards your renown.
+  msg_barenton_knight: A Black Knight rode out of the storm. You crossed swords — and he knelt and swore to serve you.
+  msg_barenton_vision: A rainbow rose over the spring, and in the water you saw things no book could teach.
+  msg_barenton_storm: The storm broke over the whole countryside — hail ruined the fields.
+  msg_draugr_won: The draugr is slain! Its sword and gold are yours.
+  msg_draugr_lost: The draugr was stronger. You barely escaped the barrow alive.
+  msg_hunt_rode: You rode with the Wild Hunt until dawn — and came back. Songs will be sung of it.
+  msg_hunt_lost: You returned at dawn with white hair and no memory of where you had been.
+  msg_alchemy_gold: Gold gleams in the crucible — the alchemists kept their word!
+  msg_alchemy_elixir: The elixir is bitter, but afterwards you feel younger.
+  msg_alchemy_boom: The laboratory blew up along with half the quarter.
+  msg_alchemy_stone: The philosopher's stone! Dull red and warm, as if alive.
+
+ev:
+  arcana.0057:
+    t: The Cauldron of Rebirth
+    desc: The bards sing of the Pair Dadeni — the cauldron brought from Ireland. Cast a dead warrior into it and by morning he rises alive, only mute forever. Fishermen have hauled a huge black cauldron, patterned with entwined serpents, out of the lake.
+    a: Drink from the cauldron yourself
+    b: Revive fallen warriors
+    c: Smash the cauldron — this is not for Christians
+  arcana.0042:
+    t: The Beast Won
+    desc: The moon was full too many nights. You no longer remember where the man ends. In the morning they found you in the forest — naked, bloodied, among torn sheep. Now everyone knows.
+    a: I am what I am
+  arcana.0052:
+    t: Call of the Hills
+    desc: At night you dream of the music you heard in your cradle. The road to the hills lies open. Those who once left you among mortals are waiting there.
+    a: Return with the gifts of the Fair Folk
+    b: Remain human
+    c: Go to your own kind forever
+  arcana.0053:
+    t: Bargain with the Fair Folk
+    desc: "In the stone circle on the hill a tall figure in a cloak of leaves awaits you. Its voice rings like a brook: \"Ask, mortal. We will give. But we always come back for our price.\""
+    a: The gold of the hills
+    b: Victory in battle
+    c: The wisdom of the ancients
+    d: Ask for nothing
+  arcana.0054:
+    t: The Fey Come to Collect
+    desc: The years have passed, and at midnight the music plays at your gates once more. The Fair Folk have come for their price — and will not leave empty-handed.
+    a: Give them years of your life
+    b: "Give them [scope:tithe.first_name] — let them dance in the hills"
+    c: Drive them off with iron and the cross
+  arcana.0055:
+    t: The Banshee's Wail
+    desc: "For the third night a woman's wailing is heard beneath the windows — long and inhuman. The old nurse whispers that it is the banshee, and she weeps for [scope:doomed.first_name]. The banshee is never wrong."
+    a: Gather the family by the hearth
+    b: Send for the finest physicians
+    c: Go out to her with cold iron
+  arcana.0056:
+    t: The Spring of Barenton
+    desc: In the forest of Brocéliande, by a spring beneath an old oak, lies a flat stone. They say that if you pour the spring's water on it, a storm breaks and the Black Knight who guards the place appears. The Knights of the Round Table tested themselves here.
+    a: Pour water on the stone
+    b: Leave the ancient place undisturbed
+  arcana.0090:
+    t: Seiðr of the Völva
+    desc: "The völva takes the high seat, her face hidden by a hood of black lambskin. The women sing the varðlokkur, and she looks through the world — to where the Norns spin the threads of fate. \"Ask,\" she says."
+    a: What awaits me in battle?
+    b: Will my line know peace?
+    c: What do my enemies hide?
+  arcana.0091:
+    t: The Draugr
+    desc: At night a dead man walks out of the barrow at the edge of your lands — huge and blue as a drowned corpse. The draugr guards the gold it was buried with and strangles the cattle. The skalds say only one who enters the barrow can defeat it.
+    a: Enter the barrow with a sword
+    b: Seal the barrow with runes
+    c: Give it a wide berth
+  arcana.0092:
+    t: The Wild Hunt
+    desc: On a stormy night the sky filled with the baying of hounds and the thunder of hooves. A cavalcade of ghostly riders swept over the forest, and their leader — horned and taller than any man — reined in by your walls. He looks at you and waits.
+    a: Mount up and ride with them
+    b: Bar the gates and do not look
+    c: Pray until dawn
+  arcana.0100:
+    t: The Lady of the Spring
+    desc: "Out hunting, you fell behind your retinue and came upon a forest spring. By the water sits a maiden of unearthly beauty, and she knows your name. \"I will be your wife and bring wealth to your house,\" she says. \"But swear that on Saturdays you will not seek me out nor enter my chambers.\""
+    a: I swear it — be my wife
+    b: This is a glamour. Ride away
+  arcana.0101:
+    t: The Saturday Secret
+    desc: For five years [scope:melusine.first_name] has been a good wife and a wise mistress, and your lands have grown rich. But every Saturday she locks herself in her chambers, and the court whispers. Today is Saturday. The door is not locked.
+    a: Keep the oath
+    b: Look through the keyhole
+  arcana.0110:
+    t: The Fruits of Alchemy
+    desc: For a year the alchemists never left their laboratory. Green fire burned in the windows day and night and the smell of sulphur crept through the castle. Today the master asks you to come down — he is ready to show what he has achieved.
+    a: Let us see

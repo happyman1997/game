@@ -60,6 +60,39 @@ static func is_shown(game: Game, def: Dictionary, actor: Dictionary, recipient: 
 	return Interp.eval_trigger(ctx, ctx.root, def.get("is_shown"))
 
 
+## Часть is_shown только про действующее лицо — блок scope:actor, который не
+## ссылается на получателя, цель или второго участника (и на именованные
+## условия/значения, внутри которых такая ссылка могла бы прятаться). ИИ
+## проверяет её один раз до перебора целей. null — такой части нет.
+static func actor_gate(game: Game, def: Dictionary) -> Variant:
+	var key := "ia:gate:" + str(def.id)
+	var hit: Variant = game.engine.cache.get(key)
+	if hit == null:
+		hit = false
+		var shown: Variant = def.get("is_shown")
+		var block: Variant = shown.get("scope:actor") if shown is Dictionary else null
+		if block != null:
+			var src := var_to_str(block)
+			var safe := not (src.contains("recipient") or src.contains("target") or src.contains("secondary") or src.contains("decider"))
+			for kind in ["scripted_values", "scripted_triggers"]:
+				for d in game.content.all(kind):
+					if safe and src.contains(str(d.id)):
+						safe = false
+			if safe:
+				hit = block
+		game.engine.cache[key] = hit
+	return hit if not (hit is bool) else null
+
+
+## Проходит ли действующее лицо свою часть is_shown (true, если её нет).
+static func actor_passes(game: Game, def: Dictionary, actor: Dictionary) -> bool:
+	var gate: Variant = actor_gate(game, def)
+	if gate == null:
+		return true
+	var ctx := context(game, def, actor, actor)
+	return Interp.eval_trigger(ctx, ctx.root, gate)
+
+
 static func _cooldown_key(def: Dictionary, recipient: Dictionary) -> String:
 	return "ia:%s:%s" % [def.id, recipient.id]
 

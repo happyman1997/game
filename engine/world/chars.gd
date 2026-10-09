@@ -67,6 +67,25 @@ static func trait_concealed(game: Game, c: Dictionary, t: String) -> bool:
 	return not trait_visible(game, c, t, null)
 
 
+## Виден ли модификатор персонажа наблюдателю. Модификатор с полем
+## concealed: <черта> выдаёт скрытую природу (жажда крови вампира) и потому
+## виден лишь тем, кто видит эту черту.
+static func modifier_visible(game: Game, c: Dictionary, m_id: String, viewer_id: Variant = null) -> bool:
+	var d: Variant = game.content.get_def("modifiers", m_id)
+	var tr: Variant = d.get("concealed") if d != null else null
+	return tr == null or trait_visible(game, c, str(tr), viewer_id)
+
+
+## Случайное значение навыка без родителей. Распределение задаёт описание
+## навыка (mean, spread), иначе — значения по умолчанию; bonus — сдвиг
+## среднего (исторические персонажи чуть искуснее прочих).
+static func random_skill(game: Game, s: String, bonus: float = 0.0, def_mean: float = 6.0, def_spread: float = 5.0) -> float:
+	var sd: Variant = game.content.get_def("skills", s)
+	var mean := Data.num(sd.get("mean"), def_mean) if sd != null else def_mean
+	var spread := Data.num(sd.get("spread"), def_spread) if sd != null else def_spread
+	return game.rng.gauss(mean + bonus, spread)
+
+
 static func add_trait(game: Game, c: Dictionary, t: String) -> bool:
 	var def: Variant = trait_def(game, t)
 	if def == null:
@@ -330,15 +349,13 @@ static func create_character(game: Game, o: Dictionary) -> Dictionary:
 	var skills := {}
 	var given: Dictionary = o.get("skills", {}) if o.get("skills") != null else {}
 	for s in skill_ids(game):
-		# Распределение навыка задаёт его описание: mean, spread (без родителей)
-		# и inherit_spread (разброс вокруг среднего родителей).
-		var sd: Variant = game.content.get_def("skills", s)
 		var base: float
 		if father != null and mother != null:
+			var sd: Variant = game.content.get_def("skills", s)
 			base = (Data.num(father.skills.get(s)) + Data.num(mother.skills.get(s))) / 2.0 \
 				+ rng.gauss(0, Data.num(sd.get("inherit_spread"), 3.0) if sd != null else 3.0)
 		else:
-			base = rng.gauss(Data.num(sd.get("mean"), 6.0) if sd != null else 6.0, Data.num(sd.get("spread"), 5.0) if sd != null else 5.0)
+			base = random_skill(game, s)
 		skills[s] = maxi(0, roundi(Data.num(given.get(s), base)))
 
 	var dna := {}

@@ -80,9 +80,10 @@ static func build(app: App, id: String) -> Control:
 	# ---------------------------------------------------- черты и модификаторы
 	if not c.traits.is_empty():
 		root.add_child(W.traits(app, c))
-	if not c.modifiers.is_empty():
+	var shown_mods: Array = c.modifiers.filter(func(m): return Chars.modifier_visible(g, c, m.id, g.state.player))
+	if not shown_mods.is_empty():
 		var mods := K.flow([], 4)
-		for m in c.modifiers:
+		for m in shown_mods:
 			var def: Variant = g.content.get_def("modifiers", m.id)
 			var left: Variant = null
 			if m.get("expires") != null:

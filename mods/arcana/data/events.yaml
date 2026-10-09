@@ -1,6 +1,7 @@
 # «Тайные искусства»: события. Тексты — в localization (ev.arcana.XXXX.*).
-# Свой пульс on_arcane_pulse (раз в месяц для правителей, см. скрипт) не
-# размывает пул событий основной игры.
+# Свой пульс on_arcane_pulse не размывает пул событий основной игры: игрок
+# получает его каждый месяц, правители ИИ — раз в год (см. скрипт), поэтому
+# и шансы разные. Легенды отдельных народов — в lands.yaml.
 
 event_themes:
   arcane: { icon: "🔮", color: "#3e3a8a" }
@@ -14,10 +15,10 @@ on_actions:
   on_arcane_pulse:
     random_events:
       chance:
-        value: 1.5
+        value: 16                # ИИ: раз в год
         if:
           - limit: { is_player: yes }
-            add: 9
+            add: -6              # игрок: каждый месяц
       events:
         arcana.0002: 10
         arcana.0003: 8
@@ -209,6 +210,7 @@ events:
     icon: "🦇"
     trigger:
       NOT: { has_trait: vampire }
+      world_vampires: "< 6"        # дети ночи немногочисленны
     cooldown: { years: 15 }
     options:
       - effect:
@@ -219,6 +221,7 @@ events:
             save_scope_as: guest
           scope:guest:
             - add_secret: secret_vampire
+            - add_blood_potency: 30
             - add_skill: { skill: intrigue, value: 4 }
             - add_skill: { skill: diplomacy, value: 3 }
             - set_var: { name: blood_thirst, value: 30 }
@@ -355,6 +358,11 @@ events:
         effect:
           add_gold: -100
           every_vassal: { add_opinion: { target: root, modifier: supported } }
+      # как Зигфрид: кровь дракона закаляет кожу — и меняет человека
+      - effect:
+          add_modifier: dragon_blood_bath
+          add_stress: 15
+          add_piety: -30
 
   arcana.0032:
     theme: dragon
@@ -377,6 +385,7 @@ events:
           random_list:
             - weight: { value: 30, add: { value: prowess, multiply: 3 } }
               add_prestige: 60
+              add_monster_kill: 1
               send_message: { text: arcana.msg_wolf_slain, kind: good }
             - weight: 30
               add_trait: lycanthrope
@@ -392,11 +401,12 @@ events:
     icon: "🌙"
     triggered_only: true
     options:
-      - effect: { add_stress: 15 }
+      - effect: { add_stress: 15, add_beast_control: 12 }
         ai_chance: { value: 50, add: { value: ai_honor, multiply: 10 } }
       - effect:
           add_modifier: { id: beast_unleashed, months: 1 }
           add_stress: -20
+          add_beast_control: -15
           random:
             chance: 30
             random_courtier:
@@ -408,7 +418,15 @@ events:
         effect:
           add_arcane_power: -20
           add_stress: 5
+          add_beast_control: 8
         ai_chance: 40
+
+  arcana.0042:
+    theme: moon
+    icon: "🐺"
+    triggered_only: true
+    options:
+      - effect: {}
 
   arcana.0050:
     theme: fey
@@ -503,7 +521,7 @@ events:
     cooldown: { years: 8 }
     immediate:
       random_courtier:
-        limit: { is_arcanist: yes }
+        limit: { is_arcanist: yes, NOT: { has_trait: white_mage } }
         save_scope_as: mage
     options:
       - trigger: { gold: 100 }

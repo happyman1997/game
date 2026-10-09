@@ -30,14 +30,23 @@ static func _sources(game: Game, c: Dictionary, with_providers: bool = true, lab
 		base[s] = Data.num(c.skills.get(s))
 	add_into(base, game.def_val("character.base_stats"))
 	out.append({"label": game.loc.t("ui.base_value") if labels else "", "mods": base})
+	# В подписях (разбивка для игрока) скрытые черты и модификаторы не называются:
+	# их вклад растворяется в базовом значении, иначе подсказка выдаст тайну.
+	var viewer: Variant = game.state.player if labels else null
 	for t in c.traits:
 		var d: Variant = game.content.get_def("traits", t)
 		if d != null and d.get("modifiers") is Dictionary:
-			out.append({"label": game.name_of("traits", t) if labels else "", "mods": d.modifiers})
+			if labels and d.get("concealed") != null and not Chars.trait_visible(game, c, t, viewer):
+				add_into(base, d.modifiers)
+			else:
+				out.append({"label": game.name_of("traits", t) if labels else "", "mods": d.modifiers})
 	for m in c.modifiers:
 		var d: Variant = game.content.get_def("modifiers", m.id)
 		if d != null and d.get("modifiers") is Dictionary:
-			out.append({"label": game.name_of("modifiers", m.id) if labels else "", "mods": d.modifiers})
+			if labels and d.get("concealed") != null and not Chars.modifier_visible(game, c, m.id, viewer):
+				add_into(base, d.modifiers)
+			else:
+				out.append({"label": game.name_of("modifiers", m.id) if labels else "", "mods": d.modifiers})
 	var cul: Variant = game.content.get_def("cultures", c.culture)
 	if cul != null and cul.get("modifiers") is Dictionary:
 		out.append({"label": game.name_of("cultures", c.culture) if labels else "", "mods": cul.modifiers})

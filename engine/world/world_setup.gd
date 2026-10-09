@@ -72,7 +72,8 @@ static func setup_new_game(engine: GameEngine, bookmark_id: String, seed: int = 
 		var skills := {}
 		var dsk: Dictionary = d.get("skills") if d.get("skills") is Dictionary else {}
 		for s in Chars.skill_ids(game):
-			skills[s] = dsk[s] if dsk.has(s) else maxi(0, roundi(game.rng.gauss(7, 4)))
+			# неуказанные навыки — по распределению навыка, на ступень выше среднего
+			skills[s] = dsk[s] if dsk.has(s) else maxi(0, roundi(Chars.random_skill(game, s, 1.0, 6.0, 4.0)))
 		var c := Chars.new_character_record()
 		c.id = d.id
 		c.name = d.name

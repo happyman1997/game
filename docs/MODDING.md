@@ -157,7 +157,7 @@ defines:
 | Тип | Где пример | Кратко |
 |---|---|---|
 | `defines` | `core/data/common/defines.yaml` | Числовые константы экономики, армии, демографии, ИИ. |
-| `skills` | `core/data/common/skills.yaml` | Навыки. Новый навык автоматически становится значением в скриптах. `mean`/`spread` — среднее и разброс при рождении (по умолчанию 6 и 5), `inherit_spread` — разброс вокруг среднего родителей, `hide_if_zero` — не показывать нулевой навык (редкий дар вроде чародейства). |
+| `skills` | `core/data/common/skills.yaml` | Навыки. Новый навык автоматически становится значением в скриптах. `mean`/`spread` — среднее и разброс при рождении (по умолчанию 6 и 5; историческим персонажам без указанного навыка — на 1 выше), `inherit_spread` — разброс вокруг среднего родителей, `hide_if_zero` — не показывать нулевой навык (редкий дар вроде чародейства). |
 | `traits` | `core/data/common/traits.yaml` | Черты: `category`, `icon`, `modifiers`, `opposites`, `compatibility`, `genetic`/`birth_chance`/`inherit_chance`, `education`, `ai`, `monthly_death_chance`, `monthly_cure_chance`, `duration_days`, `group`, `color` (цвет плашки), `concealed` (скрытая черта — см. «Крюки и секреты»), `portrait` (как черта меняет портрет — см. ниже). |
 | `cultures` | `core/data/common/cultures.yaml` | `color`, `male_names`, `female_names`, `dynasty_pattern` (`name`/`place`), `succession_law`, `skin`/`hair`, `modifiers`. |
 | `faiths` | там же | `religion`, `color`, `icon`, `doctrines` (`polygamy`), `virtues`, `sins`, `modifiers`. |
@@ -671,8 +671,8 @@ perks:
     effect: { add_prestige: 100 }       # эффект при открытии (необязательно)
 ```
 
-Взрослые персонажи копят опыт текущего образа жизни: `(base_xp + навык × xp_per_skill) × (1 + lifestyle_xp_mult)`
-в месяц; перк стоит `perk_cost + perk_cost_growth × открытых перков`. ИИ выбирает
+Взрослые персонажи копят опыт текущего образа жизни: `(base_xp + навык × xp_per_skill) × (1 + lifestyle_xp_mult) × xp_mult`
+в месяц (`xp_mult` — поле образа жизни, по умолчанию 1); перк стоит `perk_cost + perk_cost_growth × открытых перков`. ИИ выбирает
 фокус и перки сам (по `ai_will_do`), игрок — во вкладке «Образ жизни».
 Скрипт: `has_perk`, `has_focus`, `has_lifestyle`, `num_perks`, `lifestyle_xp`,
 `add_perk`, `remove_perk`, `set_focus`, `add_lifestyle_xp`.
@@ -803,7 +803,14 @@ secret_types:
 **Скрытые черты.** Черта с `concealed: <тип секрета>` видна только тем, кто знает
 этот секрет её владельца (и самому владельцу): остальные не видят её плашку,
 изменённый портрет и не учитывают её в мнении (`compatibility`). Раскрыть черту
-всем — эффект `reveal_trait: <черта>` (обычно в `on_expose` секрета). Триггер
+всем — эффект `reveal_trait: <черта>` (обычно в `on_expose` секрета). В разбивке
+характеристик вклад скрытой черты растворяется в базовом значении. Модификатор,
+который выдаёт тайную природу, помечается `concealed: <черта>` — его видят только
+те, кто видит эту черту (`bloodthirst: { concealed: vampire, ... }`).
+
+Модификатор провинции с `wards_off_dead: yes` (мод `arcana`: освящённая
+земля, благословение светлого чародея) не даёт мёртвым восстать — так любой мод
+может добавить свою защиту от нежити. Триггер
 `has_trait` проверяет истину, `has_known_trait` — то, что видят все:
 
 ```yaml

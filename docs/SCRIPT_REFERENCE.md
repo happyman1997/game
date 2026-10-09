@@ -11,6 +11,7 @@
 | `can_use_hook_on` | character | Крюк на персонажа можно использовать сейчас | core |
 | `capital_has_disease` | character | В столице персонажа (или его сюзерена) эпидемия. | plague |
 | `culture` | character, province | Культура равна | core |
+| `dragon_wary` | character | Ближайший дракон настороже после недавней охоты | arcana |
 | `dynasty` | character | Династия равна | core |
 | `faction_type` | faction | Тип фракции | core/factions |
 | `faith` | character, province | Вера равна | core |
@@ -91,6 +92,8 @@
 | `province_has_disease` | province | В провинции эпидемия. Аргумент: yes или id болезни. | plague |
 | `province_restless` | province | В провинции бродят мертвецы | arcana |
 | `random_chance` | любой | Случайный шанс в процентах (используйте осторожно в триггерах) | core |
+| `realm_has_barrow` | character | В державе персонажа есть древний курган | arcana |
+| `realm_has_fey_hills` | character | В державе персонажа есть холмы фей | arcana |
 | `realm_has_restless_dead` | character | В державе персонажа восстали мертвецы | arcana |
 | `religion` | character | Религия равна | core |
 | `same_culture_as` | character | Та же культура | core |
@@ -106,6 +109,8 @@
 |---|---|---|
 | `add_alliance` | Союз с персонажем | core |
 | `add_arcane_power` | Изменить колдовскую силу: add_arcane_power: -30 | arcana |
+| `add_beast_control` | Сдвинуть власть оборотня над зверем (+ укрощение, − одичание) | arcana |
+| `add_blood_potency` | Изменить силу крови вампира | arcana |
 | `add_blood_thirst` | Изменить жажду крови | arcana |
 | `add_building` | Добавить постройку | core |
 | `add_claim` | Претензия на титул | core |
@@ -118,6 +123,7 @@
 | `add_hook` | Крюк на персонажа: path или { target, strong, years } | core |
 | `add_lifestyle_xp` | Опыт образа жизни: число (текущий образ жизни) или { lifestyle, value } | core/lifestyles |
 | `add_modifier` | Добавить модификатор: id или { id, years/months/days } | core |
+| `add_monster_kill` | Засчитать уничтоженное чудовище: add_monster_kill: 2 (слава охотника) | arcana |
 | `add_opinion` | Мнение этого персонажа о target: { target, modifier, value? } | core |
 | `add_perk` | Открыть перк бесплатно | core/lifestyles |
 | `add_piety` | Изменить piety | core |
@@ -135,6 +141,7 @@
 | `become_independent` | Стать независимым | core |
 | `become_vassal_of` | Стать вассалом | core |
 | `blackmail` | Шантажировать персонажа его самым тяжёлым известным секретом (получить крюк) | core/secrets |
+| `bless_domain` | Светлый чародей благословляет земли домена | arcana |
 | `break_alliance` | Разорвать союз | core |
 | `cast_curse_on` | Проклясть персонажа (со стоимостью и риском разоблачения) | arcana |
 | `change_culture` | Сменить культуру | core |
@@ -153,9 +160,11 @@
 | `faction_enforce_demands` | Сюзерен выполняет требования фракции | core/factions |
 | `faction_start_war` | Фракция поднимает мятеж | core/factions |
 | `feed_on_blood` | Вампир утоляет жажду (жертва — пленник или придворный) | arcana |
+| `firestorm` | Огненная буря на крупнейшее вражеское войско у границ | arcana |
 | `gain_title` | Получить титул | core |
 | `give_title` | Пожаловать титул: { title, to } — получатель становится вассалом | core |
 | `hunt_dragon` | Выйти на бой с ближайшим драконом | arcana |
+| `hunt_monsters` | Выследить чудовище в державе: найденная тайна раскрывается | arcana |
 | `imprison` | Заключить персонажа в свою темницу: imprison: scope:x или { target, reason } | core/prison |
 | `join_faction` | Вступить во фракцию против сюзерена (или создать): join_faction: <тип> | core/factions |
 | `learn_secret` | Узнать тайну персонажа: { owner, type } | arcana |
@@ -167,7 +176,8 @@
 | `marry` | Заключить брак | core |
 | `move_to_court` | Переехать ко двору персонажа | core |
 | `pay_gold` | Передать золото: { target, value } | core |
-| `purge_restless_dead` | Выжечь нежить в самой поражённой провинции державы | arcana |
+| `plague_of_the_dead` | Лич поднимает мёртвых в столице главного врага | arcana |
+| `purge_restless_dead` | Выжечь нежить в самой поражённой провинции державы (purge_restless_dead: { magic: yes } — светом чар, а не ополчением) | arcana |
 | `release_from_prison` | Освободить этого персонажа из темницы | core/prison |
 | `remove_building` | Убрать постройку | core |
 | `remove_claim` | Убрать претензию | core |
@@ -214,8 +224,9 @@
 | `ai_vengefulness` | character | Личность ИИ: vengefulness | core |
 | `ai_zeal` | character | Личность ИИ: zeal | core |
 | `arcane_power` | character | Колдовская сила персонажа | arcana |
-| `arcane_power_max` | character | Предел колдовской силы | arcana |
 | `attraction` | character | Привлекательность | core |
+| `beast_control` | character | Власть оборотня над зверем: −100 (одичал) … 100 (вожак стаи) | arcana |
+| `blood_potency` | character | Сила крови вампира (растёт с годами и кормлением) | arcana |
 | `blood_thirst` | character | Жажда крови вампира (0–100) | arcana |
 | `commander_advantage` | character | Характеристика: commander_advantage | core |
 | `council_size` | character | Число занятых мест в совете | core/council |
@@ -244,6 +255,7 @@
 | `levy_ratio` | character | Доля восстановленных ополчений | core |
 | `lifestyle_xp` | character | Опыт текущего образа жизни | core/lifestyles |
 | `martial` | character | Навык: martial | core |
+| `monsters_slain` | character | Сколько чудовищ уничтожил персонаж (слава охотника) | arcana |
 | `monthly_piety` | character | Характеристика: monthly_piety | core |
 | `monthly_prestige` | character | Характеристика: monthly_prestige | core |
 | `num_buildings` | province | Число построек | core |
@@ -274,7 +286,6 @@
 | `realm_size` | character | Графств в державе | core |
 | `regiment_cap` | character | Предел отрядов | core/regiments |
 | `regiment_power` | character | Сила отрядов, не поднятых в армию (в ополченцах) | core/regiments |
-| `restless_provinces` | любой | Провинций с восставшими мертвецами в мире | arcana |
 | `reverse_opinion` | character | Мнение персонажа-аргумента об этом персонаже | core |
 | `scheme_defense` | character | Характеристика: scheme_defense | core |
 | `scheme_power` | character | Характеристика: scheme_power | core |
@@ -286,8 +297,10 @@
 | `tax` | province | Налог провинции | core |
 | `tier` | character | Ранг основного титула (0 — нет земель, 1 — граф ... 4 — император) | core |
 | `title_tier` | title | Ранг титула | core |
+| `vampire_tier` | character | Уровень вампира: 1 птенец, 2 вампир, 3 старейшина, 4 древний (0 — не вампир) | arcana |
 | `vassal_opinion` | character | Характеристика: vassal_opinion | core |
 | `war_duration_days` | war | Длительность войны | core |
+| `world_vampires` | любой | Сколько вампиров живёт в мире (считается раз в месяц) | arcana |
 
 ## Ссылки на скоупы
 
@@ -402,7 +415,7 @@
 - **interaction_deciders**: `payer`
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `plague_fear`
 - **province_modifier_providers**: 
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `arcana_abomination`
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `arcana_faith`
 - **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `laws`
 - **systems**: `upkeep` (0), `economy` (10), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

@@ -21,8 +21,10 @@ static func cost(game: Game, def: Dictionary, c: Dictionary) -> Dictionary:
 	return _cost_of(context(game, c), def.get("cost"))
 
 
-static func is_shown(game: Game, def: Dictionary, c: Dictionary) -> bool:
-	var ctx := context(game, c)
+## ctx — готовый контекст персонажа (ИИ переиспользует один на все решения).
+static func is_shown(game: Game, def: Dictionary, c: Dictionary, ctx: ScriptContext = null) -> bool:
+	if ctx == null:
+		ctx = context(game, c)
 	return Interp.eval_trigger(ctx, ctx.root, def.get("is_shown"))
 
 
@@ -34,6 +36,23 @@ static func blockers(game: Game, def: Dictionary, c: Dictionary) -> Array:
 	if cd != null and (cd == 0 or cd > game.date):
 		out.append(game.loc.t("ui.on_cooldown", {"days": "∞" if cd == 0 else str(int(cd) - game.date)}))
 	return out
+
+
+## Быстрая проверка для ИИ — то же, что blockers().is_empty(), но без текстов
+## причин: сначала перезарядка, затем условия, затем цена.
+static func can_take(game: Game, def: Dictionary, c: Dictionary, ctx: ScriptContext = null) -> bool:
+	var cd: Variant = c.flags.get("dec:" + str(def.id))
+	if cd != null and (cd == 0 or cd > game.date):
+		return false
+	if ctx == null:
+		ctx = context(game, c)
+	if not Interp.eval_trigger(ctx, ctx.root, def.get("is_valid")):
+		return false
+	if def.get("cost") == null:
+		return true
+	var cst := _cost_of(ctx, def.cost)
+	return (cst.gold <= 0 or float(c.gold) >= cst.gold) and (cst.prestige <= 0 or float(c.prestige) >= cst.prestige) \
+		and (cst.piety <= 0 or float(c.piety) >= cst.piety)
 
 
 static func take(game: Game, def: Dictionary, c: Dictionary) -> bool:

@@ -1,0 +1,448 @@
+# «Тайные искусства»: легенды земель. У каждого народа и веры — своё тайное:
+#   Север (норвежцы, датчане, шведы) — сейд вёльв (крещёным — грех), рунные
+#     камни, драугры в курганах; язычники чтят сейд и ульфхеднаров (мнение вер
+#     — в скрипте);
+#   кельты (ирландцы, валлийцы, шотландцы, бретонцы) — сделки с Дивным народом,
+#     зов холмов для подменышей; ирландцы и шотландцы — плач банши; валлийцы —
+#     котёл возрождения; бретонцы — источник Барентона в Броселианде;
+#   англичане — Дикая охота;
+#   нормандцы, французы, окситанцы — дама у источника (Мелюзина);
+#   фламандцы и окситанцы — алхимики;
+#   христиане — инквизиция, охота на ведьм, экзорцизм, освящение земель,
+#     Орден Серебряного пламени (magic/creatures).
+# И путь для всех — охота на нечисть.
+
+modifiers:
+  norns_favor: { icon: "🧶", good: true, modifiers: { commander_advantage: 8, monthly_prestige: 0.5 } }
+  rune_warded: { icon: "ᚱ", good: true, modifiers: { curse_resistance: 40, prowess: 1, monthly_prestige: 1 } }
+  draugr_blade: { icon: "🗡", good: true, modifiers: { prowess: 3, curse_resistance: 20 } }
+  fey_war_blessing: { icon: "🧚", good: true, modifiers: { commander_advantage: 10, prowess: 2 } }
+  fey_wisdom: { icon: "🧚", good: true, modifiers: { learning: 2, diplomacy: 1, sorcery: 1 } }
+  fey_toll: { icon: "🧚", modifiers: { health: -1 } }
+  rode_with_the_hunt: { icon: "🏇", good: true, modifiers: { prowess: 2, monthly_prestige: 1, stress_gain_mult: -0.1 } }
+  melusine_blessing: { icon: "🐍", good: true, modifiers: { stewardship: 2, tax_mult: 0.1, fertility: 0.2 } }
+  elixir_of_life: { icon: "🧪", good: true, modifiers: { health: 1 } }
+  philosophers_stone: { icon: "💎", good: true, modifiers: { tax_mult: 0.2, health: 0.5, learning: 1 } }
+  # провинции
+  runestone: { icon: "ᚱ", good: true, modifiers: { development_growth: 0.02 } }
+
+decisions:
+  # ------------------------------------------------------------ Север
+  seidr_ritual:
+    icon: "🧶"
+    is_shown:
+      is_ruler: yes
+      OR:
+        - culture: [norse, danish, swedish]
+        - religion: germanic
+    is_valid:
+      gold: 40
+      custom_tooltip:
+        text: arcana.need_volva
+        trigger:
+          OR:
+            - is_arcanist: yes
+            - any_courtier: { has_trait: gifted }
+    cost: { gold: 40 }
+    cooldown: { years: 3 }
+    effect:
+      - if:
+          limit: { religion: christianity }
+          add_piety: -40
+      - trigger_event: arcana.0090
+      - custom_tooltip: arcana.seidr_tip
+    ai_will_do:
+      value: 15
+      if:
+        - limit: { is_at_war: yes }
+          add: 30
+        - limit: { religion: christianity, has_trait: zealous }
+          multiply: 0
+    ai_check_months: 6
+
+  raise_runestone:
+    icon: "ᚱ"
+    is_shown:
+      is_ruler: yes
+      OR:
+        - culture: [norse, danish, swedish]
+        - religion: germanic
+    is_valid:
+      gold: 80
+    cost: { gold: 80 }
+    cooldown: { years: 10 }
+    effect:
+      - add_modifier: { id: rune_warded, years: 10 }
+      - capital: { add_province_modifier: runestone }
+      - add_prestige: 50
+    ai_will_do: 25
+    ai_check_months: 12
+
+  # ------------------------------------------------------------ кельты
+  fey_bargain:
+    icon: "🧚"
+    is_shown:
+      is_ruler: yes
+      realm_has_fey_hills: yes
+      OR:
+        - culture: [irish, welsh, scottish, breton]
+        - has_trait: changeling
+    is_valid:
+      custom_tooltip: { text: arcana.fey_debt_open, trigger: { NOT: { has_var: fey_debt } } }
+    cooldown: { years: 15 }
+    effect:
+      - trigger_event: arcana.0053
+      - custom_tooltip: arcana.fey_bargain_tip
+    ai_will_do: { value: 6, if: { limit: { has_trait: [ambitious, greedy] }, add: 10 } }
+    ai_check_months: 12
+
+  call_of_the_hills:
+    icon: "🌿"
+    is_shown:
+      has_trait: changeling
+      is_adult: yes
+      NOT: { has_flag: answered_the_call }
+    is_valid:
+      is_imprisoned: no
+    effect:
+      - set_flag: answered_the_call
+      - trigger_event: arcana.0052
+      - custom_tooltip: arcana.call_hills_tip
+    ai_will_do: 10
+    ai_check_months: 12
+
+  # ------------------------------------------------------------ фламандцы и окситанцы
+  patron_alchemists:
+    icon: "⚗"
+    is_shown:
+      is_ruler: yes
+      culture: [flemish, occitan]
+    is_valid:
+      gold: 100
+      custom_tooltip: { text: arcana.alchemy_running, trigger: { NOT: { has_flag: alchemists_at_work } } }
+    cost: { gold: 100 }
+    cooldown: { years: 4 }
+    effect:
+      - set_flag: { name: alchemists_at_work, years: 1 }
+      - trigger_event: { id: arcana.0110, years: 1 }
+      - custom_tooltip: arcana.alchemy_tip
+    ai_will_do: { value: 10, if: { limit: { stewardship: ">= 10" }, add: 15 } }
+    ai_check_months: 12
+
+  # ------------------------------------------------------------ для всех
+  hunt_monsters:
+    icon: "🗡"
+    is_shown:
+      is_ruler: yes
+      NOT: { has_trait: [vampire, lich, necromancer] }
+      OR:
+        - has_trait: [monster_hunter, monster_bane, zealous]
+        - prowess: ">= 12"
+    is_valid:
+      gold: 50
+      is_at_war: no
+    cost: { gold: 50 }
+    cooldown: { years: 3 }
+    effect:
+      - hunt_monsters: yes
+      - custom_tooltip: arcana.hunt_monsters_tip
+    ai_will_do: { value: 8, if: { limit: { has_trait: [monster_hunter, monster_bane, zealous] }, add: 20 } }
+    ai_check_months: 12
+
+on_actions:
+  on_arcane_pulse:
+    random_events:
+      events:
+        arcana.0055: 6
+        arcana.0056: 5
+        arcana.0091: 6
+        arcana.0092: 5
+        arcana.0100: 4
+        arcana.0057: 5
+
+events:
+  # ------------------------------------------------------------ подменыш: зов холмов
+  arcana.0052:
+    theme: fey
+    icon: "🌿"
+    triggered_only: true
+    options:
+      - effect:
+          random_list:
+            - weight: 60
+              if:
+                limit: { NOT: { has_trait: gifted } }
+                add_trait: gifted
+              add_arcane_power: 40
+              add_modifier: fey_wisdom
+            - weight: 40
+              add_gold: 150
+              add_prestige: 80
+        ai_chance: 70
+      - effect: { add_stress: -20, add_piety: 30 }
+        ai_chance: 25
+      - effect: { death: { reason: fey } }
+        ai_chance: 5
+
+  # ------------------------------------------------------------ кельты: сделка с феями
+  arcana.0053:
+    theme: fey
+    icon: "🧚"
+    triggered_only: true
+    options:
+      - effect:
+          add_gold: 250
+          set_var: { name: fey_debt, value: 1 }
+          trigger_event: { id: arcana.0054, years: 4 }
+        ai_chance: { value: 30, add: { value: ai_greed, multiply: 15 } }
+      - effect:
+          add_modifier: { id: fey_war_blessing, years: 4 }
+          set_var: { name: fey_debt, value: 1 }
+          trigger_event: { id: arcana.0054, years: 4 }
+        ai_chance: { value: 25, add: { value: ai_boldness, multiply: 10 } }
+      - effect:
+          add_modifier: fey_wisdom
+          set_var: { name: fey_debt, value: 1 }
+          trigger_event: { id: arcana.0054, years: 4 }
+        ai_chance: { value: 25, add: { value: ai_rationality, multiply: 10 } }
+      - effect: { add_stress: -5 }
+        ai_chance: 20
+
+  arcana.0054:
+    theme: fey
+    icon: "🧚"
+    triggered_only: true
+    immediate:
+      remove_var: fey_debt
+      random_courtier:
+        limit: { is_adult: yes, NOT: { is_close_family_of: root } }
+        save_scope_as: tithe
+    options:
+      - effect: { add_modifier: fey_toll }
+        ai_chance: 40
+      - trigger: { exists: scope:tithe }
+        effect:
+          scope:tithe: { death: { reason: fey } }
+          add_stress: 20
+        ai_chance: { value: 30, if: { limit: { has_trait: [callous, arbitrary] }, add: 30 } }
+      - effect:
+          add_trait: hexed
+          add_modifier: { id: ill_omen, years: 3 }
+        ai_chance: 20
+
+  # ------------------------------------------------------------ ирландцы и шотландцы: банши
+  arcana.0055:
+    theme: fey
+    icon: "👻"
+    trigger:
+      culture: [irish, scottish]
+      any_close_family: { age: ">= 55" }
+    cooldown: { years: 10 }
+    immediate:
+      random_close_family:
+        limit: { age: ">= 55" }
+        save_scope_as: doomed
+    options:
+      - effect: { add_prestige: 20, add_stress: -5 }
+        ai_chance: 40
+      - trigger: { gold: 40 }
+        effect:
+          add_gold: -40
+          scope:doomed: { add_health: 1.5 }
+        ai_chance: 40
+      - effect:
+          add_stress: 10
+          random:
+            chance: 50
+            scope:doomed: { add_health: -1 }
+        ai_chance: 20
+
+  # ------------------------------------------------------------ валлийцы: котёл возрождения
+  arcana.0057:
+    theme: fey
+    icon: "🧪"
+    trigger: { culture: welsh }
+    cooldown: { years: 15 }
+    options:
+      - effect:
+          cure_ailments: yes
+          add_health: 1
+          add_stress: -10
+        ai_chance: 40
+      - trigger: { is_ruler: yes }
+        effect:
+          - add_regiment: risen_dead
+          - add_regiment: risen_dead
+          - custom_tooltip: arcana.cauldron_tip
+        ai_chance: { value: 30, if: { limit: { is_at_war: yes }, add: 40 } }
+      - effect: { add_piety: 50, add_prestige: 20 }
+        ai_chance: { value: 30, add: { value: ai_zeal, multiply: 10 } }
+
+  # ------------------------------------------------------------ бретонцы: источник Барентона
+  arcana.0056:
+    theme: fey
+    icon: "⛲"
+    trigger: { culture: breton }
+    cooldown: { years: 12 }
+    options:
+      - effect:
+          random_list:
+            - weight: 40
+              add_prestige: 80
+              create_character:
+                female: no
+                age: 30
+                dynasty: none
+                save_scope_as: knight
+              scope:knight:
+                - add_skill: { skill: prowess, value: 10 }
+                - add_skill: { skill: martial, value: 3 }
+              send_message: { text: arcana.msg_barenton_knight, kind: good }
+            - weight: 35
+              add_prestige: 40
+              add_lifestyle_xp: 120
+              send_message: { text: arcana.msg_barenton_vision, kind: good }
+            - weight: 25
+              capital: { add_development: -1 }
+              add_stress: 10
+              send_message: { text: arcana.msg_barenton_storm, kind: bad }
+        ai_chance: { value: 30, add: { value: ai_boldness, multiply: 15 } }
+      - effect: { add_piety: 20 }
+        ai_chance: 50
+
+  # ------------------------------------------------------------ Север: сейд, драугр
+  arcana.0090:
+    theme: moon
+    icon: "🧶"
+    triggered_only: true
+    options:
+      - effect: { add_modifier: { id: norns_favor, years: 2 } }
+        ai_chance: { value: 30, if: { limit: { is_at_war: yes }, add: 50 } }
+      - effect:
+          add_piety: 40
+          add_stress: -15
+        ai_chance: 30
+      - effect: { discover_secret: yes }
+        ai_chance: { value: 20, add: { value: ai_rationality, multiply: 10 } }
+
+  arcana.0091:
+    theme: undead
+    icon: "🪦"
+    trigger:
+      culture: [norse, danish, swedish]
+      realm_has_barrow: yes
+    cooldown: { years: 10 }
+    options:
+      - effect:
+          random_list:
+            - weight: { value: 20, add: { value: prowess, multiply: 3 } }
+              add_gold: 120
+              add_prestige: 60
+              add_modifier: { id: draugr_blade, years: 10 }
+              add_monster_kill: 1
+              send_message: { text: arcana.msg_draugr_won, kind: good }
+            - weight: 35
+              add_stress: 25
+              add_trait: wounded
+              send_message: { text: arcana.msg_draugr_lost, kind: bad }
+        ai_chance: { value: 30, add: { value: ai_boldness, multiply: 15 } }
+      - trigger: { gold: 30 }
+        effect:
+          add_gold: -30
+          add_prestige: 20
+        ai_chance: 40
+      - effect: { add_stress: 5 }
+        ai_chance: 20
+
+  # ------------------------------------------------------------ англичане: Дикая охота
+  arcana.0092:
+    theme: moon
+    icon: "🏇"
+    trigger:
+      culture: english
+      is_adult: yes
+    cooldown: { years: 15 }
+    options:
+      - effect:
+          random_list:
+            - weight: { value: 30, add: { value: prowess, multiply: 3 } }
+              add_prestige: 100
+              add_modifier: { id: rode_with_the_hunt, years: 5 }
+              send_message: { text: arcana.msg_hunt_rode, kind: good }
+            - weight: 30
+              add_stress: 30
+              send_message: { text: arcana.msg_hunt_lost, kind: bad }
+            - weight: 5
+              death: { reason: wild_hunt }
+        ai_chance: { value: 20, add: { value: ai_boldness, multiply: 15 } }
+      - effect: { add_stress: 10 }
+        ai_chance: 50
+      - trigger: { religion: christianity }
+        effect: { add_piety: 40 }
+        ai_chance: 30
+
+  # ------------------------------------------------------------ нормандцы, французы, окситанцы: Мелюзина
+  arcana.0100:
+    theme: fey
+    icon: "🐍"
+    trigger:
+      culture: [norman, french, occitan]
+      is_male: yes
+      is_adult: yes
+      is_married: no
+    cooldown: { years: 30 }
+    options:
+      - effect:
+          create_character:
+            female: yes
+            age: 22
+            traits: [gifted]
+            dynasty: none
+            save_scope_as: melusine
+          scope:melusine:
+            - set_flag: melusine
+            - add_skill: { skill: stewardship, value: 5 }
+            - add_skill: { skill: diplomacy, value: 3 }
+          marry: scope:melusine
+          trigger_event: { id: arcana.0101, years: 5 }
+        ai_chance: 50
+      - effect: { add_piety: 20 }
+        ai_chance: 50
+
+  arcana.0101:
+    theme: fey
+    icon: "🐍"
+    triggered_only: true
+    trigger:
+      scope:melusine: { is_alive: yes }
+    options:
+      - effect: { add_modifier: melusine_blessing }
+        ai_chance: { value: 50, add: { value: ai_honor, multiply: 10 } }
+      - effect:
+          scope:melusine: { death: { reason: fey } }
+          add_stress: 30
+          add_prestige: 30
+        ai_chance: { value: 30, add: { value: ai_vengefulness, multiply: 10 } }
+
+  # ------------------------------------------------------------ фламандцы и окситанцы: алхимики
+  arcana.0110:
+    theme: arcane
+    icon: "⚗"
+    triggered_only: true
+    options:
+      - effect:
+          random_list:
+            - weight: { value: 30, add: { value: stewardship, multiply: 2 } }
+              add_gold: 260
+              send_message: { text: arcana.msg_alchemy_gold, kind: good }
+            - weight: 20
+              add_modifier: { id: elixir_of_life, years: 10 }
+              send_message: { text: arcana.msg_alchemy_elixir, kind: good }
+            - weight: 30
+              capital: { add_development: -1 }
+              add_stress: 10
+              send_message: { text: arcana.msg_alchemy_boom, kind: bad }
+            - weight: { value: 2, add: { value: learning, multiply: 0.2 } }
+              add_modifier: philosophers_stone
+              add_prestige: 150
+              send_message: { text: arcana.msg_alchemy_stone, kind: good }

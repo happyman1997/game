@@ -64,12 +64,13 @@ perk_desc:
   herbalism: "Unlocks the spell «Healing Draught»."
   warding_signs: "Unlocks the spell «Ward». Curses and schemes against you are harder."
   mending_hands: "Unlocks the interaction «Heal with Magic»."
-  light_bearer: "You become a White Mage: your healing lifts even the werewolf's curse."
+  light_bearer: "You become a White Mage: your healing lifts even the werewolf's curse. Unlocks Purifying Light and Bless the Land; the Church honours holy healers."
   stormcall: "Unlocks the spell «Call the Storm» in wartime."
+  master_of_storms: "You become a Battlemage. Unlocks Firestorm — a strike against an enemy army near your borders."
   weather_lord: Rain comes when it should — harvests are richer.
   grave_whispers: "Unlocks the spell «Speak with the Dead». Necromancy is a secret people are burned for."
   raise_dead: "Unlocks the spell «Raise the Dead» and recruiting risen dead."
-  deathless_will: "You become a Necromancer. The rite of undeath opens."
+  deathless_will: "You become a Necromancer. The rite of undeath opens. Your arcane power holds the dead together — without it they rot."
 
 council_position:
   court_mage: Court Mage
@@ -116,8 +117,8 @@ opinion_modifier:
   protected_a_witch: Protected a witch
   witch_hunt_terror: Fear of the witch hunt
   practises_witchcraft: Witch
-  sire_bond: Blood bond
-  embraced_me: My childe
+  sire_bond: Inexplicable devotion
+  embraced_me: Secret closeness
   fed_on_me: Drank my blood
 
 secret_type:
@@ -233,7 +234,6 @@ arcana:
   ai_ambitious: Craves power
   ai_ailing: Tormented by illness
   ai_faithful: Faith forbids it
-  witnesses: Witnesses
   msg_exorcism_ok: The rite worked — the beast's curse has withdrawn.
   msg_exorcism_failed: The rite failed. The moon still calls.
   msg_alchemy_ok: The alchemist kept his word — gold gleams in the crucible!
@@ -275,7 +275,7 @@ arcana:
   power_tip: "Recovers every month (faster with high sorcery, a wizard's tower and Mysticism). Spent on spells: decisions and interactions."
   thirst_title: Blood Thirst
   thirst_tip: "Grows every month. From 60% — stress and irritability; at 100% — blood frenzy. Slake it with the «Slake the Thirst» decision."
-  wolf_tip: "A beast lives inside you. At the full moon it strains to get out."
+  wolf_tip: "At the full moon the beast strains to get out. Holding it back tames it: at 50 you unlock Lead the Pack and the Moonlit Hunt, at 90 you change at will. Giving in makes you feral; at −100 the beast wins."
   no_gift: "You have no gift. But the unseen touches everyone: the dead, dragons and vampires do not ask."
   open_decisions: Spells and decisions
   section_you: You
@@ -374,6 +374,7 @@ ev:
     desc: "The beast is slain. In its lair, among charred bones, lies a mountain of gold hoarded over centuries. Bards are already composing songs of your deed."
     a: Hang the dragon's head in the great hall
     b: Share the hoard with your vassals
+    c: Bathe in the dragon's blood
   arcana.0032:
     t: Flame
     desc: "The dragon was faster than the legends said. The last thing you see is a glowing throat and a light brighter than the sun."

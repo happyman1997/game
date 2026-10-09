@@ -304,6 +304,9 @@ static func _consider_interactions(game: Game, c: Dictionary) -> void:
 		var freq := Data.num(def.get("ai_frequency_months"), 6)
 		if not game.rng.chance(1.0 / freq):
 			continue
+		# условия самого действующего лица — один раз, а не на каждую цель
+		if not Interactions.actor_passes(game, def, c):
+			continue
 		var best: Variant = null
 		for r in _ai_targets(game, c, def, list_cache):
 			if not Interactions.is_shown(game, def, c, r):
@@ -407,14 +410,18 @@ static func _arrange_marriages(game: Game, c: Dictionary) -> void:
 
 
 static func _consider_decisions(game: Game, c: Dictionary) -> void:
+	# один контекст на все проверки; сохранённые условиями скоупы сбрасываются
+	var ctx := Decisions.context(game, c)
+	var base_scopes := ctx.scopes.duplicate()
 	for def in game.content.all("decisions"):
 		if def.get("ai_will_do") == null:
 			continue
 		if not game.rng.chance(1.0 / Data.num(def.get("ai_check_months"), 6)):
 			continue
-		if not Decisions.is_shown(game, def, c) or not Decisions.blockers(game, def, c).is_empty():
+		if ctx.scopes.size() != base_scopes.size() or not ctx.values.is_empty():
+			ctx = Decisions.context(game, c)
+		if not Decisions.is_shown(game, def, c, ctx) or not Decisions.can_take(game, def, c, ctx):
 			continue
-		var ctx := Decisions.context(game, c)
 		if game.rng.next() * 100.0 < Interp.eval_value(ctx, ctx.root, def.ai_will_do):
 			Decisions.take(game, def, c)
 

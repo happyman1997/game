@@ -54,7 +54,7 @@ traits:
     concealed: secret_necromancy
     icon: "💀"
     color: "#3a6a4a"
-    modifiers: { sorcery: 3, intrigue: 2, health: 0.5, curse_resistance: 25 }
+    modifiers: { sorcery: 3, intrigue: 2, health: 0.5, curse_resistance: 25, regiment_cap: 1 }
     portrait: { hood: "#1c1424", marks: "#7cff9a", skin: "#c4cabc", skin_amount: 0.35 }
     ai: { compassion: -2, zeal: -2 }
   hexed:
@@ -65,9 +65,10 @@ traits:
     modifiers: { health: -1.5, fertility: -0.3, stress_gain_mult: 0.25, diplomacy: -1 }
     portrait: { skin: "#a0ac94", skin_amount: 0.25 }
 
-  # Колдовство в глазах ревнителей веры — грех; северянам оно привычно.
+  # Как веры смотрят на дар (христиане-ревнители, северный сейд) — в
+  # поставщике мнения скрипта; здесь — то, в чём сходятся все.
   zealous:
-    compatibility: { gifted: -10, necromancer: -40, changeling: -10 }
+    compatibility: { necromancer: -40 }
   cynical:
     compatibility: { gifted: 5 }
 
@@ -201,6 +202,8 @@ modifiers:
   favorable_omen: { icon: "🌠", modifiers: { monthly_prestige: 0.5, stress_gain_mult: -0.1 }, good: true }
   ill_omen: { icon: "🌑", modifiers: { stress_gain_mult: 0.15, general_opinion: -5 } }
   witch_hunt_fervor: { icon: "🔥", modifiers: { monthly_piety: 1, vassal_opinion: -5 } }
+  # провинции
+  blessed_land: { icon: "🕊", wards_off_dead: yes, good: true, modifiers: { development_growth: 0.08, tax_mult: 0.1 } }
 
 opinion_modifiers:
   healed_me: { value: 30, years: 10 }
@@ -241,17 +244,6 @@ secret_types:
       - if:
           limit: { exists: liege }
           mark_criminal: { target: liege, years: 20 }
-
-script_values:
-  arcane_spell_cheap: 20
-  arcane_spell_normal: 35
-  arcane_spell_great: 60
-
-scripted_triggers:
-  is_arcanist:
-    OR:
-      - has_trait: [gifted, changeling, necromancer, lich, white_mage, battlemage]
-      - sorcery: ">= 6"
 
 # ---------------------------------------------------------------- заклинания
 decisions:
@@ -297,7 +289,7 @@ decisions:
       - add_modifier: { id: storm_blessing, months: 6 }
       - add_stress: 5
     ai_will_do: 70
-    ai_check_months: 1
+    ai_check_months: 3
 
   spell_scrying:
     icon: "🔮"
@@ -357,6 +349,62 @@ decisions:
       - custom_tooltip: arcana.lich_ritual_tip
     ai_will_do: { value: 5, if: { limit: { age: ">= 50" }, add: 60 } }
     ai_check_months: 12
+
+  # ---------------------------------------------- вершины путей чародея
+  purifying_light:
+    icon: "🕊"
+    is_shown: { has_trait: white_mage, realm_has_restless_dead: yes }
+    is_valid:
+      custom_tooltip: { text: arcana.need_power_40, trigger: { arcane_power: ">= 40" } }
+    cooldown: { months: 3 }
+    effect:
+      - add_arcane_power: -40
+      - purge_restless_dead: { magic: yes }
+      - custom_tooltip: arcana.purifying_light_tip
+    ai_will_do: 90
+    ai_check_months: 2
+
+  bless_the_land:
+    icon: "🌾"
+    is_shown: { has_trait: white_mage, is_ruler: yes }
+    is_valid:
+      custom_tooltip: { text: arcana.need_power_60, trigger: { arcane_power: ">= 60" } }
+    cooldown: { years: 5 }
+    effect:
+      - add_arcane_power: -60
+      - bless_domain: yes
+      - add_piety: 50
+    ai_will_do: 70
+    ai_check_months: 6
+
+  firestorm:
+    icon: "🔥"
+    is_shown: { has_trait: battlemage }
+    is_valid:
+      is_at_war: yes
+      custom_tooltip: { text: arcana.need_power_60, trigger: { arcane_power: ">= 60" } }
+    cooldown: { years: 1 }
+    effect:
+      - add_arcane_power: -60
+      - firestorm: yes
+      - add_stress: 10
+      - custom_tooltip: arcana.firestorm_tip
+    ai_will_do: 70
+    ai_check_months: 3
+
+  plague_of_the_dead:
+    icon: "☠"
+    is_shown: { has_trait: lich }
+    is_valid:
+      is_at_war: yes
+      custom_tooltip: { text: arcana.need_power_80, trigger: { arcane_power: ">= 80" } }
+    cooldown: { years: 2 }
+    effect:
+      - add_arcane_power: -80
+      - plague_of_the_dead: yes
+      - custom_tooltip: arcana.plague_dead_tip
+    ai_will_do: 70
+    ai_check_months: 2
 
   witch_hunt:
     icon: "🔥"
