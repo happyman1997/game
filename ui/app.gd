@@ -340,6 +340,9 @@ func _process(delta: float) -> void:
 			render(full)
 			_autosave()
 			sim.leave()
+	elif hud.window_due() and sim.try_enter():
+		hud.live_window()
+		sim.leave()
 
 
 ## Автосохранение: при переходе через 1 января (или 1 июля).

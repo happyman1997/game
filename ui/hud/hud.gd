@@ -31,14 +31,15 @@ var _tabs_sig := ""
 var _modes_sig := ""
 var _window_key := ""
 var _window_at := 0
+var _window_due := false
 var _seen_messages := 0
 var _res_sig := ""
 var _date_sig := ""
 var _outliner_sig := ""
 var _messages_sig := ""
 
-## Пока игра идёт, открытое окно обновляется не чаще (мс): его перестройка дорогая.
-const LIVE_WINDOW_MS := 1500
+## Пока игра идёт, открытое окно обновляется не чаще (мс).
+const LIVE_WINDOW_MS := 1000
 
 
 func _init() -> void:
@@ -190,7 +191,22 @@ func refresh(full: bool = true) -> void:
 	_refresh_modes()
 	_refresh_outliner(p)
 	_refresh_messages()
-	_refresh_window(full)
+	if full:
+		_refresh_window(true)
+	else:
+		# Во время хода игры окно обновляется в отдельном кадре (live_window),
+		# чтобы его сборка не складывалась с остальным HUD.
+		_window_due = true
+
+
+func window_due() -> bool:
+	return _window_due
+
+
+## Отложенное «живое» обновление окна (вызывается в кадре без перерисовки HUD).
+func live_window() -> void:
+	_window_due = false
+	_refresh_window(false)
 
 
 func _refresh_resources(p: Variant) -> void:
@@ -472,15 +488,20 @@ func _refresh_window(full: bool = true) -> void:
 	if not full and key == _window_key and Time.get_ticks_msec() - _window_at < LIVE_WINDOW_MS:
 		return
 	_window_at = Time.get_ticks_msec()
-	var scroll := window_body.scroll_vertical if key == _window_key else 0
 	var built := Panels.build(app, ref)
 	window_title.text = built.title
 	window_back.visible = not app.history.is_empty()
-	K.clear(window_body)
 	var body: Control = built.body
 	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var m := K.margin(body, 4, 2, 10, 8)
 	m.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# То же окно: переносим новое содержимое в показанное, если структура
+	# совпала (без вставки в сцену — нет рывка, прокрутка сохраняется).
+	if key == _window_key and window_body.get_child_count() == 1 and Morph.apply(window_body.get_child(0), m):
+		m.free()
+		return
+	var scroll := window_body.scroll_vertical if key == _window_key else 0
+	K.clear(window_body)
 	window_body.add_child(m)
 	_window_key = key
 	if scroll > 0:
