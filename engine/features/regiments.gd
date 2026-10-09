@@ -167,6 +167,16 @@ static func idle_power(game: Game, c: Dictionary) -> float:
 	return total
 
 
+## То же, что recruit_blockers(...).is_empty(), но без текстов причин (для ИИ).
+static func _can_recruit_fast(game: Game, c: Dictionary, def: Dictionary, ctx: ScriptContext) -> bool:
+	if c.titles.is_empty() or regs_of(c).size() >= cap(game, c):
+		return false
+	if not Interp.eval_trigger(ctx, ctx.root, def.get("can_recruit")):
+		return false
+	var cst := cost(game, c, def)
+	return (cst.gold <= 0 or float(c.gold) >= cst.gold) and (cst.prestige <= 0 or float(c.prestige) >= cst.prestige)
+
+
 static func _ai_pick_type(game: Game, c: Dictionary, ignore_cost: bool = false) -> Variant:
 	var ctx := ScriptContext.make(game, {"type": "character", "id": c.id})
 	var opts := []
@@ -174,7 +184,7 @@ static func _ai_pick_type(game: Game, c: Dictionary, ignore_cost: bool = false) 
 		if ignore_cost:
 			if not is_type_shown(game, c, d):
 				continue
-		elif not recruit_blockers(game, c, d).is_empty():
+		elif not _can_recruit_fast(game, c, d, ctx):
 			continue
 		var w := maxf(0.0, Interp.eval_value(ctx, ctx.root, d.ai_will_do) if d.get("ai_will_do") != null else 10.0)
 		if w > 0.0:

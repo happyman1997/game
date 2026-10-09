@@ -240,11 +240,13 @@ static func monthly_char(game: Game, liege: Dictionary) -> void:
 	if not liege.flags.has("council_init"):
 		liege.flags["council_init"] = 0
 		fill(game, liege)
-	elif not is_player and liege.get("prison") == null:
+	elif not is_player and liege.get("prison") == null and month % 3 == 1:
+		# Пустые места ИИ заполняет раз в квартал (в январе — и заменяет слабых):
+		# подбор кандидатов дорогой, а совет меняется нечасто.
 		fill(game, liege, month == 1)
 		for pos in positions(game):
 			var seat: Variant = seat_of(liege, pos.id)
-			if seat != null and seat.get("holder") != null and game.rng.chance(0.1):
+			if seat != null and seat.get("holder") != null and game.rng.chance(0.27):
 				var t: Variant = _ai_pick_task(game, liege, pos.id)
 				if t != null and t != seat.get("task"):
 					set_task(game, liege, pos.id, t)
