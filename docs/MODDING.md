@@ -398,6 +398,7 @@ interactions:
     on_decline: {}
     ai_targets: [liege, vassal]        # кого рассматривает ИИ
     ai_frequency_months: 12
+    ai_potential: { piety: 100 }       # только для ИИ: условия на него самого (root), проверяются до перебора целей
     ai_will_do: 30
     cooldown: { years: 1 }
     # scheme: murder                   # вместо on_accept — запустить интригу
@@ -638,7 +639,7 @@ func init(api: ModApi) -> void:
   ```
 
   (доступны `lifestyles`, `council`, `prison`, `factions`, `regiments`,
-  `secrets`, `laws`, `knights`;
+  `secrets`, `laws`, `knights`, `politics`;
   интерфейс скрывает вкладки и разделы выключенных механик). Словарь скриптов
   механики (её триггеры, эффекты, значения) остаётся зарегистрированным, так что
   чужие данные, которые его упоминают, не ломаются — на пустом состоянии
@@ -849,6 +850,39 @@ realm_laws:
 характеристика `knight_cap`; каждое очко доблести стоит `power_per_prowess`
 ополченцев в главной армии. Рыцари получают раны и гибнут в сражениях.
 Скрипт: `is_knight`, `num_knights`, `knights_power`, список `knight`.
+
+### Политика двора
+
+Механика `politics` (данные — `core/data/common/politics.yaml`, события —
+`core/data/events/politics.yaml`):
+
+```yaml
+vassal_obligations:                 # условия службы, ровно один default
+  privileged: { level: -1, tax: -0.5, levy: -0.5, opinion: 20 }
+  standard: { level: 0, default: yes }
+  heavy: { level: 1, tax: 0.5, levy: 0.4, opinion: -25 }
+```
+
+- **Условия службы** — свои у каждого вассала: `tax`/`levy` меняют его взнос
+  сюзерену (характеристики вассала `vassal_contribution_tax` и
+  `vassal_contribution_levy` — их можно давать и чертами, и модификаторами),
+  `opinion` — его мнение. Скрипт: `vassal_obligation: heavy`,
+  `set_vassal_obligation: privileged`.
+- **Влиятельные вассалы** — у кого больше всего графств, их число —
+  `defines.politics.powerful_vassals_by_tier`. В совете они довольны, вне его —
+  обижены. ИИ ценит их при выборе советников (хук `council.candidate_score`:
+  любой мод может так же надбавить кандидату). Скрипт: `is_powerful_vassal`,
+  `has_snubbed_powerful_vassal`, списки `powerful_vassal`,
+  `snubbed_powerful_vassal`, эффект `seat_in_council: <персонаж>`.
+- **Страх** (`dread`, 0–100) растёт от `add_dread` (в данных — казни, бессудные
+  аресты, отзыв титулов, подавленные мятежи) и спадает каждый месяц. Робкие
+  подданные получают плюс к мнению, храбрые и гневливые (`defiant_traits`) —
+  минус; фракции учитывают страх в `ai_join`.
+- **Прошения** — события из `on_actions.on_vassal_petition` (root — сюзерен):
+  игроку — с шансом `petition_chance_player` в месяц, ИИ — раз в год.
+- Ещё эффекты: `sow_discord: <вассал>` (рассорить с ближайшим союзником),
+  `calm_factions: <число>`, `remove_from_council`, `grant_minor_county: <персонаж>`
+  и, в механике законов, `shift_realm_law: { group, by }`.
 
 ### Оповещения
 

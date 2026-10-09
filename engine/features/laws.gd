@@ -175,6 +175,26 @@ func register_script(engine: GameEngine) -> void:
 				Laws.change(ctx.game, c, str(arg), true),
 		"describe": func(ctx, _s, arg): return ctx.game.loc.t("fx.set_realm_law", {"value": ctx.game.name_of("realm_laws", str(arg))}),
 	}, OWNER)
+	r.effects.register("shift_realm_law", {"scopes": CH, "doc": "Сдвинуть закон группы на ступени: shift_realm_law: { group: crown_authority, by: -1 } (без цены)",
+		"apply": func(ctx, s, arg):
+			var c: Variant = ch.call(ctx, s)
+			if c == null or not (arg is Dictionary):
+				return
+			var gid := str(arg.get("group"))
+			var cur: Variant = Laws.current(ctx.game, c, gid)
+			if cur == null:
+				return
+			var list := Laws.laws_of_group(ctx.game, gid)
+			var i := list.find(cur)
+			var j := clampi(i + int(Interp.eval_value(ctx, s, arg.get("by", -1))), 0, list.size() - 1)
+			if j != i:
+				Laws.change(ctx.game, c, list[j].id, true),
+		"describe": func(ctx, s, arg):
+			if not (arg is Dictionary):
+				return null
+			var by := int(Interp.eval_value(ctx, s, arg.get("by", -1)))
+			return ctx.game.loc.t("fx.shift_realm_law_down" if by < 0 else "fx.shift_realm_law_up", {"value": ctx.game.name_of("law_groups", str(arg.get("group")))}),
+	}, OWNER)
 	engine.content_validators.register("laws", func(e: GameEngine, v: ScriptValidator):
 		for gd in e.content.all("law_groups"):
 			v.ref("realm_laws", gd.get("default"), "law_groups/%s default" % gd.id)

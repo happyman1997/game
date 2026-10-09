@@ -1,0 +1,55 @@
+# Court politics feature: engine and UI strings.
+stat:
+  vassal_contribution_tax: Tax owed to liege
+  vassal_contribution_levy: Levies owed to liege
+opinion:
+  powerful_seated: "Powerful: has a council seat"
+  powerful_snubbed: "Powerful: passed over for the council"
+  intimidated: Fear of the ruler
+  defiant: Hates a tyrant
+ai:
+  crown_authority: Strong crown
+  heavy_duties: Heavy duties
+  privileges: Privileges
+  snubbed: Passed over for the council
+  dread: Fear of the liege
+  rival_leader: A rival leads the faction
+  swore_fealty: Swore fealty at the council
+tr:
+  is_powerful_vassal: Powerful vassal
+  not_powerful_vassal: Not a powerful vassal
+  vassal_obligation: "Obligations: {value}"
+fx:
+  add_dread: "Dread: {value}"
+  set_vassal_obligation: "{who}: obligations become {value}"
+  seat_in_council: "{who} gains a council seat"
+  remove_from_council: "{who} loses their council seat"
+  sow_discord: The vassal and their closest ally become rivals (if the intrigue succeeds)
+  calm_factions: "Faction discontent: −{value}"
+  grant_minor_county: "{who} receives a county from your domain"
+  shift_realm_law_down: "{value}: one step down"
+  shift_realm_law_up: "{value}: one step up"
+msg:
+  discord_sown: "Discord sown: {a} and {b} are now rivals."
+  discord_failed: "{who} saw through your scheme and will not forgive it."
+  complaint_true: The inquiry confirmed the complaint — the councillor is dismissed.
+  complaint_false: The accusation proved false. The councillor now bears a grudge against the accuser.
+ui:
+  politics: Court Politics
+  dread: Dread
+  dread_tip: "The fear a ruler inspires. It grows with executions, imprisonment without cause, revoked titles and crushed revolts, and fades over time. Timid subjects grow more loyal and stay out of factions; the brave and the wrathful hate a tyrant."
+  powerful_vassals: Powerful vassals
+  powerful_tip: "The vassals with the largest holdings expect a council seat: seated, they are content; passed over, they resent it and join factions more readily."
+  in_council: on the council
+  not_in_council: not on the council
+  obligation: Obligations
+  obligation_tip: "Privileges: half the taxes and levies, and a grateful vassal. Heavy duties: half as much again, a resentful vassal more likely to join the Liberty Party."
+  privileges_tip: The vassal will pay half the taxes and send half the troops — and will be more loyal for it.
+  heavy_duties_needs_right: "Requires a strong crown (at least High Authority), a strong hook on the vassal, or a lawful reason"
+  heavy_duties_tip: The vassal will pay half as much again and bear a grudge. Your dread grows.
+  discord_needs_intrigue: Requires intrigue of 8 or a spymaster at work
+  discord_tip: "The chance depends on your intrigue and your spymaster's against the vassal's. If caught, they will not forgive it."
+  great_council_tip: "Your vassals gather, and you choose what to ask for: an oath (vassals back claimants less), money, reconciliation (faction discontent falls) or — in wartime — troops."
+  no_powerful: No powerful vassals — the realm is too small.
+alert:
+  powerful_snubbed: "Powerful vassals not on the council: {list}"

@@ -45,12 +45,16 @@ static func context(game: Game, root: Dictionary, liege: Dictionary, f: Variant 
 		"vassal": {"type": "character", "id": root.id},
 	}
 	if f != null:
-		scopes["faction"] = fref(f)
-		scopes["faction_leader"] = {"type": "character", "id": f.leader}
+		_faction_scopes(scopes, f)
 	var cl: Variant = claimant if claimant != null else (f.get("claimant") if f != null else null)
 	if cl != null:
 		scopes["claimant"] = {"type": "character", "id": cl}
 	return ScriptContext.make(game, {"type": "character", "id": root.id}, scopes)
+
+
+static func _faction_scopes(scopes: Dictionary, f: Dictionary) -> void:
+	scopes["faction"] = fref(f)
+	scopes["faction_leader"] = {"type": "character", "id": f.leader}
 
 
 ## Кандидаты в претенденты: у кого есть претензия на основной титул сюзерена.
@@ -72,7 +76,8 @@ static func _best_claimant(game: Game, liege: Dictionary, vassal: Dictionary) ->
 	return cands[0].id if not cands.is_empty() else null
 
 
-static func can_join(game: Game, c: Dictionary, def: Dictionary, liege: Dictionary, claimant: Variant = null) -> bool:
+## ctx — готовый контекст (context(...)), чтобы не собирать его дважды.
+static func can_join(game: Game, c: Dictionary, def: Dictionary, liege: Dictionary, claimant: Variant = null, ctx: ScriptContext = null) -> bool:
 	if not Chars.is_alive(c) or c.liege != liege.id or c.titles.is_empty() or c.get("prison") != null:
 		return false
 	var cd: Variant = c.flags.get("faction_cooldown")
@@ -80,13 +85,17 @@ static func can_join(game: Game, c: Dictionary, def: Dictionary, liege: Dictiona
 		return false
 	if def.get("claimant", false) and claimant == null:
 		return false
-	var ctx := context(game, c, liege, null, claimant)
+	if ctx == null:
+		ctx = context(game, c, liege, null, claimant)
 	return Interp.eval_trigger(ctx, ctx.root, def.get("can_join"))
 
 
-static func ai_join_score(game: Game, c: Dictionary, def: Dictionary, liege: Dictionary, f: Variant = null, claimant: Variant = null) -> float:
-	var ctx := context(game, c, liege, f, claimant)
-	return Interp.eval_value(ctx, ctx.root, def.ai_join) if def.get("ai_join") != null else 0.0
+static func ai_join_score(game: Game, c: Dictionary, def: Dictionary, liege: Dictionary, f: Variant = null, claimant: Variant = null, ctx: ScriptContext = null) -> float:
+	if def.get("ai_join") == null:
+		return 0.0
+	if ctx == null:
+		ctx = context(game, c, liege, f, claimant)
+	return Interp.eval_value(ctx, ctx.root, def.ai_join)
 
 
 ## Сила фракции в процентах от силы сюзерена (без её членов).
@@ -264,9 +273,9 @@ static func monthly_char(game: Game, v: Dictionary) -> void:
 		return
 	var cur: Variant = faction_of(game, v)
 	if cur != null:
-		if cur.leader != v.id or cur.members.size() > 1:
+		if (cur.leader != v.id or cur.members.size() > 1) and game.rng.chance(0.3):
 			var cdef: Variant = game.content.get_def("factions", cur.type)
-			if cdef != null and ai_join_score(game, v, cdef, liege, cur) < game.def_num("factions.ai_leave_below", -10) and game.rng.chance(0.3):
+			if cdef != null and ai_join_score(game, v, cdef, liege, cur) < game.def_num("factions.ai_leave_below", -10):
 				leave(game, v)
 		return
 	if not game.rng.chance(game.def_num("factions.ai_consider_chance", 0.35)):
@@ -279,9 +288,12 @@ static func monthly_char(game: Game, v: Dictionary) -> void:
 				f = x
 				break
 		var claimant: Variant = f.get("claimant") if f != null else (_best_claimant(game, liege, v) if def.get("claimant", false) else null)
-		if not can_join(game, v, def, liege, claimant):
+		var ctx := context(game, v, liege, null, claimant)
+		if not can_join(game, v, def, liege, claimant, ctx):
 			continue
-		var score := ai_join_score(game, v, def, liege, f, claimant)
+		if f != null:
+			_faction_scopes(ctx.scopes, f)
+		var score := ai_join_score(game, v, def, liege, f, claimant, ctx)
 		if f != null:
 			if score > 0 and game.rng.chance(game.def_num("factions.ai_join_chance", 0.5)):
 				join(game, v, f)

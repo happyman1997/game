@@ -22,6 +22,9 @@ factions:
         - { desc: ai.family, limit: { is_close_family_of: scope:liege }, value: -30 }
         - { desc: ai.rank, value: { value: tier, multiply: 6 } }
         - { desc: ai.councillor, limit: { is_councillor: yes }, value: -15 }
+        # политика двора (условия службы уже сказались на мнении): страх, вражда с лидером
+        - { desc: ai.dread, value: { value: fear_of_liege, multiply: -0.6 } }
+        - { desc: ai.rival_leader, limit: { exists: scope:faction_leader, has_opinion_modifier: { target: scope:faction_leader, modifier: rival } }, value: -60 }
     ai_accept_demands:
       value: -60
       add: { value: scope:faction.faction_power, multiply: 0.35 }
@@ -49,6 +52,9 @@ factions:
         - { desc: ai.claimant_family, limit: { is_close_family_of: scope:claimant }, value: 20 }
         - { desc: ai.ambitious, limit: { has_trait: ambitious }, value: 10 }
         - { desc: ai.councillor, limit: { is_councillor: yes }, value: -15 }
+        - { desc: ai.swore_fealty, limit: { has_opinion_modifier: { target: scope:liege, modifier: swore_fealty } }, value: -30 }
+        - { desc: ai.dread, value: { value: fear_of_liege, multiply: -0.6 } }
+        - { desc: ai.rival_leader, limit: { exists: scope:faction_leader, has_opinion_modifier: { target: scope:faction_leader, modifier: rival } }, value: -60 }
     ai_accept_demands:
       value: -90
       add: { value: scope:faction.faction_power, multiply: 0.35 }
@@ -78,6 +84,7 @@ casus_belli:
             scope:defender: { add_opinion: { target: prev, modifier: rebel } }
       - scope:defender:
           add_prestige: 150
+          add_dread: 15
           imprison: { target: scope:attacker, reason: rebellion }
     truce_years: 5
     war_name: cb.independence_revolt.war_name
@@ -99,6 +106,7 @@ casus_belli:
             scope:defender: { add_opinion: { target: prev, modifier: rebel } }
       - scope:defender:
           add_prestige: 150
+          add_dread: 15
           imprison: { target: scope:attacker, reason: rebellion }
       - if:
           limit: { exists: scope:claimant }

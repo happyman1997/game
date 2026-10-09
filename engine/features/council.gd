@@ -92,8 +92,18 @@ static func candidates(game: Game, liege: Dictionary, pos_id: String) -> Array:
 			pool[sp.id] = sp
 	var out := pool.values().filter(func(c): return can_hold_seat(game, liege, c, pos_id))
 	var sk: String = str(pos.get("skill"))
-	Data.sort_by(out, func(c): return Stats.skill(game, c, sk), true)
+	Data.sort_by(out, func(c): return candidate_score(game, liege, c, sk), true)
 	return out
+
+
+## Насколько ИИ хочет видеть кандидата на должности: навык плюс надбавки
+## механик и модов (хук council.candidate_score — например, влиятельным
+## вассалам, которых опасно обходить).
+static func candidate_score(game: Game, liege: Dictionary, c: Dictionary, skill: String) -> float:
+	var v := Stats.skill(game, c, skill)
+	for extra in game.engine.hooks.collect("council.candidate_score", {"game": game, "liege": liege, "candidate": c, "skill": skill}):
+		v += Data.num(extra)
+	return v
 
 
 static func appoint(game: Game, liege: Dictionary, pos_id: String, cand_id: String) -> bool:
@@ -215,7 +225,7 @@ static func fill(game: Game, liege: Dictionary, replace: bool = false) -> void:
 		if best == null:
 			continue
 		var sk: String = str(pos.get("skill"))
-		if cur != null and Stats.skill(game, best, sk) < Stats.skill(game, cur, sk) + gap:
+		if cur != null and candidate_score(game, liege, best, sk) < candidate_score(game, liege, cur, sk) + gap:
 			continue
 		appoint(game, liege, pos.id, best.id)
 
@@ -327,13 +337,14 @@ func register_script(engine: GameEngine) -> void:
 			return pos != null and (arg == null or ScriptContext.is_yes(arg) or pos.position == arg),
 		"describe": func(ctx, _s, arg): return ctx.game.loc.t("tr.is_councillor.not" if ((arg is String and arg == "no") or (arg is bool and not arg)) else "tr.is_councillor"),
 	}, OWNER)
-	r.triggers.register("has_council_task", {"scopes": CH, "doc": "Сюзерен: на какой-то должности выбрана задача",
+	r.triggers.register("has_council_task", {"scopes": CH, "doc": "Сюзерен: на какой-то должности выбрана задача (или одна из списка)",
 		"eval": func(ctx, s, arg):
 			var c: Variant = ch.call(ctx, s)
 			if c == null or c.get("council") == null:
 				return false
+			var want := Data.as_array(arg)
 			for pos in c.council:
-				if c.council[pos].get("holder") != null and c.council[pos].get("task") == arg:
+				if c.council[pos].get("holder") != null and want.has(c.council[pos].get("task")):
 					return true
 			return false,
 	}, OWNER)

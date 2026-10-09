@@ -4,6 +4,60 @@ extends RefCounted
 ## профессиональные войска, тайны и крюки, рыцари.
 
 
+# ------------------------------------------------------------ политика двора
+
+## Страх и влиятельные вассалы правителя (механика politics).
+static func politics(app: App, liege: Dictionary) -> Variant:
+	var g := app.game
+	if not g.engine.has_feature("politics") or liege.titles.is_empty():
+		return null
+	var box := K.vbox([], 6)
+	var d := Politics.dread(liege)
+	if d >= 1.0:
+		var row := K.hbox([K.icon("chain", 20), K.label(app.t("ui.dread"), "SubheaderLabel")], 6)
+		K.tip(row, BB.title(app.t("ui.dread")) + "\n" + BB.esc(app.t("ui.dread_tip")))
+		box.add_child(row)
+		box.add_child(K.bar(d, g.def_num("politics.dread_max", 100), Color("#8a2a2a"), 8, str(roundi(d))))
+	var pw := Politics.powerful_vassals(g, liege)
+	var head := K.hbox([K.icon("crown", 20), K.label(app.t("ui.powerful_vassals"), "SubheaderLabel")], 6)
+	K.tip(head, BB.title(app.t("ui.powerful_vassals")) + "\n" + BB.esc(app.t("ui.powerful_tip")))
+	box.add_child(head)
+	if pw.is_empty():
+		box.add_child(K.label(app.t("ui.no_powerful"), "MutedLabel"))
+	for id in pw:
+		var v: Variant = g.ch(id)
+		if v == null:
+			continue
+		var seated := Politics.is_seated(g, liege, v)
+		var status := K.label(app.t("ui.in_council") if seated else app.t("ui.not_in_council"), "GoodLabel" if seated else "BadLabel")
+		box.add_child(W.char_row(app, v, [status], [K.rich(BB.signed(Opinion.opinion(g, v, liege)), false)], 40))
+	if d < 1.0 and pw.is_empty():
+		return null
+	return K.section(app.t("ui.politics"), [box], "council")
+
+
+## Подпись условий службы вассала (для строк списка вассалов).
+static func obligation_chip(app: App, v: Dictionary) -> Variant:
+	var g := app.game
+	if not g.engine.has_feature("politics") or v.liege == null:
+		return null
+	var ob: Variant = Politics.obligation_of(g, v)
+	if ob == null:
+		return null
+	var text := g.name_of("vassal_obligations", ob.id)
+	if Politics.is_powerful(g, v):
+		text = app.t("tr.is_powerful_vassal") + " · " + text
+	var l := K.label(text, "SmallLabel")
+	var lvl := Data.num(ob.get("level"))
+	if lvl > 0:
+		l.add_theme_color_override("font_color", UiArt.C_BAD)
+	elif lvl < 0:
+		l.add_theme_color_override("font_color", UiArt.C_GOOD)
+	K.tip(l, BB.title(app.t("ui.obligation")) + "\n" + BB.esc(app.t("ui.obligation_tip")))
+	l.mouse_filter = Control.MOUSE_FILTER_PASS
+	return l
+
+
 # ------------------------------------------------------------ совет
 
 static func council(app: App, liege: Dictionary) -> Variant:

@@ -65,6 +65,7 @@ static func validate(engine: GameEngine) -> Array:
 		var w = "interactions/" + d.id
 		v.trigger(d.get("is_shown"), w + " is_shown")
 		v.trigger(d.get("is_valid"), w + " is_valid")
+		v.trigger(d.get("ai_potential"), w + " ai_potential")
 		v.effect(d.get("on_accept"), w + " on_accept")
 		v.effect(d.get("on_decline"), w + " on_decline")
 		var sa: Variant = d.get("secondary_actor")

@@ -1,0 +1,111 @@
+vassal_obligation:
+  privileged: Privileges
+  standard: Standard Obligations
+  heavy: Heavy Duties
+vassal_obligation_desc:
+  privileged: The vassal pays half the taxes and sends half the troops — and is grateful for it.
+  standard: The usual terms of service.
+  heavy: The vassal pays half as much again and sends more troops. They will not forget it.
+
+opinion_modifier:
+  refused_council_seat: Refused me a council seat
+  compensated: Paid me off
+  won_dispute: Ruled in my favour
+  lost_dispute: Ruled against me
+  fair_judgment: Fair judgment
+  ignored_dispute: Refused to judge us
+  refused_privileges: Refused my privileges
+  privileges_revoked: Revoked my privileges
+  duties_lightened: Lightened my duties
+  caught_sowing_discord: Sowed discord
+  false_accusation: Slandered me
+  trusted_me: Trusted me
+  refused_land: Refused me land
+  swore_fealty: Swore fealty at the Great Council
+  taxed_by_council: Extraordinary levy
+  heard_grievances: Heard our grievances
+  levied_by_council: Called us to arms
+  amnesty: Amnesty
+
+modifier:
+  council_war_levy: Great Council's Call to Arms
+  iron_hand: Iron Hand
+
+interaction:
+  grant_privileges: Grant Privileges
+  impose_heavy_duties: Impose Heavy Duties
+  restore_obligations: Restore Standard Obligations
+  sow_discord: Sow Discord
+interaction_desc:
+  grant_privileges: Release the vassal from part of their taxes and service. They will grow more loyal and listen less to troublemakers.
+  impose_heavy_duties: Make the vassal pay and serve more. Requires a strong crown, a hook or a lawful reason.
+  restore_obligations: Return the vassal to the usual terms of service.
+  sow_discord: Use secret agents to set the vassal against their closest ally. Rivals do not join factions the other leads.
+
+decision:
+  convene_great_council: Convene a Great Council
+decision_desc:
+  convene_great_council: "Gather your vassals in council — the English call it the witenagemot, the Norse the thing. The council can bring an oath, money, peace at court or troops."
+
+faction:
+  liberty_faction: Liberty Party
+faction_desc:
+  liberty_faction: The vassals resent a strong crown and heavy duties. If their demands are met, crown authority drops one step and heavy duties become standard obligations.
+casus_belli:
+  liberty_revolt: Liberty Revolt
+casus_belli_desc:
+  liberty_revolt: A rebel victory lowers crown authority by two steps and grants the rebels privileges.
+cb:
+  liberty_revolt:
+    war_name: "Liberty Revolt against [scope:defender]"
+
+ev:
+  politics.0001:
+    t: A Seat at the Table
+    desc: "[scope:vassal] has come to court uninvited. \"My lands feed half your army,\" they say, \"while the council is full of men whose names no one knows. I demand a seat among your councillors.\""
+    a: Give them a council seat
+    b: Pay them off with gold
+    c: Show them the door
+  politics.0002:
+    t: A Boundary Dispute
+    desc: "[scope:first] and [scope:second] quarrel over a mill and a wood on the border of their lands. Both have brought witnesses, both swear on the Gospels. The court awaits your judgment."
+    a: "[scope:first] is in the right"
+    b: "[scope:second] is in the right"
+    c: Split the land and compensate both
+    d: Let them settle it with swords
+  politics.0003:
+    t: A Petition for Liberties
+    desc: "[scope:vassal] asks to be released from part of their taxes and service. \"My people are worn down by levies,\" they write. \"Grant me liberties and I will be the most loyal of your servants.\""
+    a: Grant the liberties
+    b: Refuse
+    c: Remind them whom they serve
+  politics.0004:
+    t: A Complaint Against a Councillor
+    desc: "Before the whole court, [scope:accuser] accuses [scope:accused] of dipping into the treasury and selling your favours. The accused goes pale but says nothing."
+    a: Hold an inquiry
+    b: Dismiss the councillor
+    c: Reject the complaint
+  politics.0005:
+    t: A Kinsman Asks for Land
+    desc: "[scope:petitioner] is tired of living at court on your charity. \"I am of your blood,\" they say, \"and I do not own so much as a village. Grant me a county and I will be your pillar.\""
+    a: Grant a county
+    b: Refuse
+    c: Give money and promises
+  politics.0006:
+    t: Whispers of Tyranny
+    desc: "When you enter the hall, the talk falls silent. They say the taverns call you the butcher and mothers use your name to frighten children. Fear keeps the vassals in line — but for how long?"
+    a: Declare an amnesty
+    b: Let them fear
+  politics.0007:
+    t: The Informant
+    desc: "At night [scope:informant] is brought to you. They confess to plotting against you and offer to name names — for money and a pardon."
+    a: Pay them and let them leave the plot
+    b: Let them stay among the plotters — as our eyes
+    c: Send the traitor away
+  politics.0010:
+    t: The Great Council
+    desc: "Vassals from across the realm have gathered in the great hall — with retinues, banners and old grievances. They will hear you, but they will want to be heard as well. What will you ask of the council?"
+    a: An oath to your house and heir
+    b: An extraordinary levy
+    c: Hear grievances and make peace
+    d: Call the vassals to arms

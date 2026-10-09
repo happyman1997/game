@@ -1,0 +1,239 @@
+# Политика двора: прошения и тяжбы вассалов (on_vassal_petition, root —
+# сюзерен) и Великий совет (решение convene_great_council).
+events:
+  # ---------------------------------------------------------- влиятельный вассал требует места в совете
+  politics.0001:
+    requires_feature: politics
+    theme: court
+    icon: "🏛"
+    trigger: { has_snubbed_powerful_vassal: yes }
+    cooldown: { years: 3 }
+    immediate:
+      random_snubbed_powerful_vassal: { save_scope_as: vassal }
+    options:
+      - effect: { seat_in_council: scope:vassal }
+        ai_chance: 50
+      - trigger: { gold: 50 }
+        effect:
+          add_gold: -50
+          scope:vassal: { add_opinion: { target: root, modifier: compensated } }
+        ai_chance: { value: 25, add: { value: ai_greed, multiply: -10 } }
+      - effect:
+          scope:vassal:
+            - add_opinion: { target: root, modifier: refused_council_seat }
+            - if:
+                limit: { liege: { crown_authority_level: ">= 1" } }
+                random: { chance: 35, join_faction: liberty_faction }
+        ai_chance: { value: 15, add: { value: ai_vengefulness, multiply: 10 } }
+
+  # ---------------------------------------------------------- тяжба двух вассалов
+  politics.0002:
+    requires_feature: politics
+    theme: court
+    icon: "⚖"
+    trigger: { num_vassals: ">= 2" }
+    cooldown: { years: 3 }
+    immediate:
+      - random_vassal: { save_scope_as: first }
+      - random_vassal:
+          limit: { NOT: { is_same_as: scope:first } }
+          save_scope_as: second
+    options:
+      - trigger: { exists: scope:second }
+        effect:
+          scope:first: { add_opinion: { target: root, modifier: won_dispute } }
+          scope:second: { add_opinion: { target: root, modifier: lost_dispute } }
+        ai_chance: { value: 25, if: { limit: { scope:first: { is_powerful_vassal: yes } }, add: 20 } }
+      - trigger: { exists: scope:second }
+        effect:
+          scope:second: { add_opinion: { target: root, modifier: won_dispute } }
+          scope:first: { add_opinion: { target: root, modifier: lost_dispute } }
+        ai_chance: { value: 25, if: { limit: { scope:second: { is_powerful_vassal: yes } }, add: 20 } }
+      - trigger: { gold: 40, exists: scope:second }
+        effect:
+          add_gold: -40
+          scope:first: { add_opinion: { target: root, modifier: fair_judgment } }
+          scope:second: { add_opinion: { target: root, modifier: fair_judgment } }
+        ai_chance: { value: 25, add: { value: ai_compassion, multiply: 10 } }
+      # «Пусть решают мечом» — и двое сильных вассалов уже не сговорятся против вас
+      - trigger: { exists: scope:second }
+        effect:
+          add_prestige: -30
+          scope:first:
+            - add_opinion: { target: root, modifier: ignored_dispute }
+            - add_opinion: { target: scope:second, modifier: rival }
+          scope:second:
+            - add_opinion: { target: root, modifier: ignored_dispute }
+            - add_opinion: { target: scope:first, modifier: rival }
+        ai_chance: { value: 5, if: { limit: { has_trait: [deceitful, schemer, paranoid] }, add: 25 } }
+
+  # ---------------------------------------------------------- прошение о привилегиях
+  politics.0003:
+    requires_feature: politics
+    theme: court
+    icon: "🕊"
+    trigger:
+      any_vassal:
+        vassal_obligation: standard
+        OR:
+          - is_powerful_vassal: yes
+          - has_trait: [ambitious, greedy, arrogant]
+    cooldown: { years: 4 }
+    immediate:
+      random_vassal:
+        limit:
+          vassal_obligation: standard
+          OR:
+            - is_powerful_vassal: yes
+            - has_trait: [ambitious, greedy, arrogant]
+        save_scope_as: vassal
+    options:
+      - effect: { scope:vassal: { set_vassal_obligation: privileged } }
+        ai_chance: { value: 15, if: { limit: { scope:vassal: { is_powerful_vassal: yes, is_in_faction: yes } }, add: 35 } }
+      - effect: { scope:vassal: { add_opinion: { target: root, modifier: refused_privileges } } }
+        ai_chance: { value: 35, add: { value: ai_greed, multiply: 10 } }
+      - effect:
+          add_dread: 8
+          add_prestige: 20
+          scope:vassal: { add_opinion: { target: root, modifier: humiliated } }
+        ai_chance: { value: 10, add: { value: ai_vengefulness, multiply: 10 } }
+
+  # ---------------------------------------------------------- жалоба на советника
+  politics.0004:
+    requires_feature: politics
+    theme: court
+    icon: "📜"
+    trigger:
+      council_size: ">= 1"
+      num_vassals: ">= 1"
+    cooldown: { years: 4 }
+    immediate:
+      - random_councillor: { save_scope_as: accused }
+      - random_vassal:
+          limit: { NOT: { is_same_as: scope:accused } }
+          save_scope_as: accuser
+    options:
+      - trigger: { gold: 20, exists: scope:accuser }
+        effect:
+          add_gold: -20
+          random_list:
+            - weight: { value: 45, add: { value: intrigue, multiply: 2 } }
+              scope:accused: { remove_from_council: yes }
+              scope:accuser: { add_opinion: { target: root, modifier: trusted_me } }
+              send_message: { text: msg.complaint_true, kind: good }
+            - weight: 55
+              scope:accused:
+                - add_opinion: { target: scope:accuser, modifier: false_accusation }
+                - add_opinion: { target: scope:accuser, modifier: rival }
+              send_message: { text: msg.complaint_false, kind: info }
+        ai_chance: { value: 40, add: { value: ai_rationality, multiply: 10 } }
+      - trigger: { exists: scope:accuser }
+        effect:
+          scope:accused: { remove_from_council: yes }
+          scope:accuser: { add_opinion: { target: root, modifier: trusted_me } }
+        ai_chance: { value: 20, if: { limit: { scope:accuser: { is_powerful_vassal: yes } }, add: 20 } }
+      - trigger: { exists: scope:accuser }
+        effect:
+          scope:accuser: { add_opinion: { target: root, modifier: ignored_dispute } }
+          scope:accused: { add_opinion: { target: root, modifier: trusted_me } }
+        ai_chance: 30
+
+  # ---------------------------------------------------------- родич просит земли
+  politics.0005:
+    requires_feature: politics
+    theme: family
+    icon: "🏰"
+    trigger:
+      num_counties: ">= 3"
+      any_courtier: { is_close_family_of: root, is_adult: yes, is_ruler: no }
+    cooldown: { years: 5 }
+    immediate:
+      random_courtier:
+        limit: { is_close_family_of: root, is_adult: yes, is_ruler: no }
+        save_scope_as: petitioner
+    options:
+      - effect:
+          grant_minor_county: scope:petitioner
+          scope:petitioner: { add_opinion: { target: root, modifier: granted_title } }
+        ai_chance: { value: 25, if: { limit: { num_counties: "> domain_limit" }, add: 50 } }
+      - effect: { scope:petitioner: { add_opinion: { target: root, modifier: refused_land } } }
+        ai_chance: 40
+      - trigger: { gold: 60 }
+        effect:
+          add_gold: -60
+          scope:petitioner: { add_opinion: { target: root, modifier: compensated } }
+        ai_chance: 20
+
+  # ---------------------------------------------------------- шёпот о тирании
+  politics.0006:
+    requires_feature: politics
+    theme: court
+    icon: "⛓"
+    trigger: { dread: ">= 40" }
+    cooldown: { years: 3 }
+    options:
+      - effect:
+          add_dread: -25
+          add_prestige: -20
+          every_vassal: { add_opinion: { target: root, modifier: amnesty } }
+        ai_chance: { value: 20, add: { value: ai_compassion, multiply: 15 } }
+      - effect:
+          add_dread: 5
+          add_modifier: { id: iron_hand, years: 3 }
+        ai_chance: { value: 30, add: { value: ai_vengefulness, multiply: 10 } }
+
+  # ---------------------------------------------------------- осведомитель из фракции
+  politics.0007:
+    requires_feature: politics
+    theme: intrigue
+    icon: "🗝"
+    trigger:
+      any_vassal: { is_in_faction: yes, is_faction_leader: no }
+    cooldown: { years: 3 }
+    immediate:
+      random_vassal:
+        limit: { is_in_faction: yes, is_faction_leader: no }
+        save_scope_as: informant
+    options:
+      - trigger: { gold: 60 }
+        effect:
+          add_gold: -60
+          calm_factions: 25
+          scope:informant:
+            - leave_faction: yes
+            - add_opinion: { target: root, modifier: compensated }
+        ai_chance: 50
+      - effect:
+          add_hook: { target: scope:informant }
+          calm_factions: 10
+        ai_chance: { value: 25, if: { limit: { has_trait: [deceitful, schemer] }, add: 20 } }
+      - effect: { add_prestige: 10 }
+        ai_chance: 25
+
+  # ---------------------------------------------------------- Великий совет
+  politics.0010:
+    requires_feature: politics
+    theme: court
+    icon: "🏛"
+    triggered_only: true
+    options:
+      - effect:
+          add_prestige: 40
+          every_vassal:
+            limit: { opinion: { target: root, value: ">= -10" } }
+            add_opinion: { target: root, modifier: swore_fealty }
+        ai_chance: { value: 30, if: { limit: { any_vassal: { is_in_faction: yes } }, add: 30 } }
+      - effect:
+          add_gold: { value: num_vassals, multiply: 30 }
+          every_vassal: { add_opinion: { target: root, modifier: taxed_by_council } }
+        ai_chance: { value: 20, add: { value: ai_greed, multiply: 10 } }
+      - effect:
+          add_prestige: -40
+          calm_factions: 40
+          every_vassal: { add_opinion: { target: root, modifier: heard_grievances } }
+        ai_chance: { value: 25, add: { value: ai_compassion, multiply: 10 } }
+      - trigger: { is_at_war: yes }
+        effect:
+          add_modifier: { id: council_war_levy, years: 1 }
+          every_vassal: { add_opinion: { target: root, modifier: levied_by_council } }
+        ai_chance: 40

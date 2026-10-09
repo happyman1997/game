@@ -177,6 +177,7 @@ interactions:
               every_vassal:
                 limit: { NOT: { is_same_as: scope:recipient } }
                 add_opinion: { target: scope:actor, modifier: tyranny }
+      - add_dread: 10
 
   release_vassal:
     icon: "🕊"

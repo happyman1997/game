@@ -80,13 +80,14 @@ static func income_breakdown(game: Game, c: Dictionary) -> Array:
 	var tax_mult := maxf(0.0, 1.0 + Stats.stat(game, c, "vassal_tax_mult"))
 	for v in game.vassals_of(c.id):
 		if not in_revolt(game, v.id, c.id):
-			from_vassals += domain_tax(game, v) * share * tax_mult
+			# vassal_contribution_tax — личные условия службы вассала (привилегии, повинности)
+			from_vassals += domain_tax(game, v) * share * tax_mult * maxf(0.0, 1.0 + Stats.stat(game, v, "vassal_contribution_tax"))
 	if from_vassals != 0.0:
 		parts.append({"label": game.loc.t("ui.vassal_tax"), "value": from_vassals})
 	if c.liege != null:
 		var l: Variant = game.ch(c.liege)
 		var lm = maxf(0.0, 1.0 + Stats.stat(game, l, "vassal_tax_mult")) if l != null else 1.0
-		parts.append({"label": game.loc.t("ui.liege_tax"), "value": -dom * share * lm})
+		parts.append({"label": game.loc.t("ui.liege_tax"), "value": -dom * share * lm * maxf(0.0, 1.0 + Stats.stat(game, c, "vassal_contribution_tax"))})
 	var flat := Stats.stat(game, c, "monthly_income")
 	if flat != 0.0:
 		parts.append({"label": game.loc.t("ui.other_income"), "value": flat})
@@ -138,7 +139,7 @@ static func realm_levy(game: Game, c: Dictionary, depth: int = 0) -> int:
 	var total := domain_levy(game, c) + Stats.stat(game, c, "levy_flat")
 	for v in game.vassals_of(c.id):
 		if not in_revolt(game, v.id, c.id):
-			total += realm_levy(game, v, depth + 1) * share
+			total += realm_levy(game, v, depth + 1) * share * maxf(0.0, 1.0 + Stats.stat(game, v, "vassal_contribution_levy"))
 	var r := roundi(total)
 	game.day_cache[key] = r
 	return r

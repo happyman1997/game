@@ -249,16 +249,24 @@ static func _apply_value_ops(ctx: ScriptContext, scope: Variant, start: float, o
 
 static func _eval_value_path(ctx: ScriptContext, scope: Variant, s: String) -> float:
 	# Числа в строках («10», « -2.5») разбираем один раз.
+	# Числа запоминаем как float, остальное — как обрезанную строку (без
+	# повторных strip_edges/is_valid_float на горячем пути).
 	var num: Variant = _path_kind.get(s)
 	if num is float:
 		return num
-	var trimmed := s.strip_edges()
-	if trimmed == "":
-		return 0.0
-	if trimmed.is_valid_float():
+	var trimmed: String
+	if num is String:
+		trimmed = num
+	else:
+		trimmed = s.strip_edges()
+		if trimmed == "":
+			return 0.0
+		if trimmed.is_valid_float():
+			if _path_kind.size() < 20000:
+				_path_kind[s] = float(trimmed)
+			return float(trimmed)
 		if _path_kind.size() < 20000:
-			_path_kind[s] = float(trimmed)
-		return float(trimmed)
+			_path_kind[s] = trimmed
 	var game := ctx.game
 	var reg := game.engine.scripting
 	if reg.constants.has(trimmed):
@@ -321,8 +329,13 @@ static func get_named_value(ctx: ScriptContext, scope: Variant, name_with_arg: S
 			return 0.0
 		if not (sv is Dictionary):
 			return eval_value(ctx, scope, sv)
-		var expr: Dictionary = sv.duplicate()
-		expr.erase("id")
+		# формула без служебного id — один раз на движок
+		var key := "sv:" + vname
+		var expr: Variant = game.engine.cache.get(key)
+		if expr == null:
+			expr = sv.duplicate()
+			expr.erase("id")
+			game.engine.cache[key] = expr
 		return eval_value(ctx, scope, expr)
 	game.script_error("Неизвестное значение \"%s\"" % vname)
 	return 0.0

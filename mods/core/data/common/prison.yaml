@@ -28,6 +28,7 @@ interactions:
                   limit: { NOT: { is_same_as: scope:recipient } }
                   add_opinion: { target: scope:actor, modifier: tyranny }
           - add_prestige: -50
+          - add_dread: 8
           - if:
               limit: { scope:recipient: { is_ruler: yes } }
               # Землевладелец может успеть бежать в свои владения.
@@ -110,6 +111,11 @@ interactions:
       - if:
           limit: { has_trait: [compassionate, forgiving] }
           add_stress: 40
+      # казнь внушает страх, а казнь знатного — вдвойне
+      - add_dread: 15
+      - if:
+          limit: { scope:recipient: { is_ruler: yes } }
+          add_dread: 10
       - scope:recipient: { death: { reason: execution, killer: scope:actor } }
     ai_targets: prisoner
     ai_frequency_months: 12

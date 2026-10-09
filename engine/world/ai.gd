@@ -307,6 +307,12 @@ static func _consider_interactions(game: Game, c: Dictionary) -> void:
 		# условия самого действующего лица — один раз, а не на каждую цель
 		if not Interactions.actor_passes(game, def, c):
 			continue
+		# ai_potential: стоит ли ИИ вообще об этом думать (только действующее лицо)
+		var pot: Variant = def.get("ai_potential")
+		if pot != null:
+			var pctx := Interactions.context(game, def, c, c)
+			if not Interp.eval_trigger(pctx, pctx.root, pot):
+				continue
 		var best: Variant = null
 		for r in _ai_targets(game, c, def, list_cache):
 			if not Interactions.is_shown(game, def, c, r):

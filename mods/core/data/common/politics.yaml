@@ -1,0 +1,303 @@
+# Политика двора (механика politics). Скоупы взаимодействий — как обычно:
+# root = scope:actor, scope:recipient. События прошений срабатывают на
+# сюзерена (root) из on_action on_vassal_petition.
+
+defines:
+  politics:
+    powerful_vassals_by_tier: [0, 0, 2, 3, 4]   # сколько вассалов ждут места в совете (по рангу сюзерена)
+    powerful_seat_opinion: 10       # влиятельный вассал в совете
+    powerful_snub_opinion: -15      # влиятельный вассал вне совета
+    council_seat_bonus: 4           # ИИ ценит влиятельного кандидата, как будто тот на 4 искуснее
+    dread_max: 100
+    dread_decay: 0.75               # страх в месяц
+    dread_decay_compassionate: 1.5
+    intimidated_per_dread: 0.3      # робкие подданные: + мнение за очко страха
+    defiant_per_dread: -0.15        # храбрые и гневливые: − мнение
+    defiant_traits: [brave, wrathful]
+    petition_chance_ai: 30          # % в год, что к правителю ИИ придут с прошением
+    petition_chance_player: 5       # % в месяц для игрока
+    discord_base_chance: 35
+
+# Условия службы вассала. tax/levy — доля к взносу (налог и ополчение),
+# opinion — мнение вассала о сюзерене.
+vassal_obligations:
+  privileged: { level: -1, icon: "🕊", tax: -0.5, levy: -0.5, opinion: 20 }
+  standard: { level: 0, icon: "⚖", default: yes }
+  heavy: { level: 1, icon: "⛓", tax: 0.5, levy: 0.4, opinion: -25 }
+
+opinion_modifiers:
+  refused_council_seat: { value: -20, years: 5 }
+  compensated: { value: 15, years: 3 }
+  won_dispute: { value: 20, years: 5 }
+  lost_dispute: { value: -25, years: 5 }
+  fair_judgment: { value: 10, years: 5 }
+  ignored_dispute: { value: -10, years: 3 }
+  refused_privileges: { value: -15, years: 4 }
+  privileges_revoked: { value: -20, years: 8 }
+  duties_lightened: { value: 10, years: 5 }
+  caught_sowing_discord: { value: -40, years: 10 }
+  false_accusation: { value: -15, years: 4 }
+  trusted_me: { value: 15, years: 5 }
+  refused_land: { value: -20, years: 5 }
+  swore_fealty: { value: 10, years: 10 }
+  taxed_by_council: { value: -10, years: 3 }
+  heard_grievances: { value: 15, years: 5 }
+  levied_by_council: { value: -5, years: 2 }
+  amnesty: { value: 10, years: 5 }
+
+modifiers:
+  council_war_levy: { icon: "📯", modifiers: { levy_mult: 0.3 }, good: true }
+  iron_hand: { icon: "⛓", modifiers: { monthly_prestige: 0.5 }, good: true }
+
+interactions:
+  # ---------------------------------------------------------- условия службы
+  grant_privileges:
+    requires_feature: politics
+    icon: "🕊"
+    category: realm
+    is_shown:
+      scope:recipient:
+        is_vassal_of: scope:actor
+        NOT: { vassal_obligation: privileged }
+    auto_accept: yes
+    on_accept:
+      - scope:recipient:
+          if:
+            limit: { vassal_obligation: heavy }
+            add_opinion: { target: scope:actor, modifier: duties_lightened }
+          set_vassal_obligation: privileged
+      - custom_tooltip: ui.privileges_tip
+    ai_targets: [vassal]
+    ai_frequency_months: 12
+    # думать о привилегиях стоит, когда двор неспокоен
+    ai_potential:
+      OR:
+        - any_faction_against: yes
+        - has_snubbed_powerful_vassal: yes
+    ai_will_do:
+      value: 0
+      if:
+        # верность сильных стоит дороже их налогов — особенно когда растёт мятеж
+        - limit:
+            scope:recipient:
+              is_powerful_vassal: yes
+              opinion: { target: scope:actor, value: "< -10" }
+          add: 20
+        - limit: { scope:recipient: { is_in_faction: yes } }
+          add: 15
+        - limit: { has_trait: [greedy, arbitrary] }
+          multiply: 0.3
+
+  impose_heavy_duties:
+    requires_feature: politics
+    icon: "⛓"
+    category: realm
+    is_shown:
+      scope:recipient:
+        is_vassal_of: scope:actor
+        NOT: { vassal_obligation: heavy }
+    is_valid:
+      custom_tooltip:
+        text: ui.heavy_duties_needs_right
+        trigger:
+          OR:
+            - crown_authority_level: ">= 2"
+            - has_strong_hook_on: scope:recipient
+            - has_imprisonment_reason: scope:recipient
+    auto_accept: yes
+    cooldown: { years: 2 }
+    on_accept:
+      - if:
+          limit:
+            NOR:
+              - crown_authority_level: ">= 2"
+              - has_imprisonment_reason: scope:recipient
+          remove_hook: scope:recipient
+      - scope:recipient:
+          if:
+            limit: { vassal_obligation: privileged }
+            add_opinion: { target: scope:actor, modifier: privileges_revoked }
+          set_vassal_obligation: heavy
+      - add_dread: 5
+      - custom_tooltip: ui.heavy_duties_tip
+    ai_targets: [vassal]
+    ai_frequency_months: 24
+    ai_potential:
+      NOT: { has_trait: [compassionate, just, content] }
+      OR:
+        - gold: "< 100"
+        - has_trait: [greedy, arbitrary, ambitious]
+    ai_will_do:
+      value: 0
+      if:
+        - limit:
+            gold: "< 100"
+            scope:recipient: { is_powerful_vassal: no }
+          add: 8
+        - limit: { has_trait: [greedy, arbitrary, ambitious] }
+          add: 8
+        - limit: { scope:recipient: { opinion: { target: scope:actor, value: "< -20" } } }
+          multiply: 0
+        - limit: { has_trait: [compassionate, just, content] }
+          multiply: 0
+
+  restore_obligations:
+    requires_feature: politics
+    icon: "⚖"
+    category: realm
+    is_shown:
+      scope:recipient:
+        is_vassal_of: scope:actor
+        NOT: { vassal_obligation: standard }
+    auto_accept: yes
+    on_accept:
+      - scope:recipient:
+          if:
+            limit: { vassal_obligation: privileged }
+            add_opinion: { target: scope:actor, modifier: privileges_revoked }
+            else:
+              add_opinion: { target: scope:actor, modifier: duties_lightened }
+          set_vassal_obligation: standard
+
+  # ---------------------------------------------------------- разделяй и властвуй
+  sow_discord:
+    requires_feature: politics
+    icon: "🐍"
+    category: intrigue
+    is_shown:
+      scope:recipient: { is_vassal_of: scope:actor }
+      scope:actor: { num_vassals: ">= 2" }
+    is_valid:
+      custom_tooltip:
+        text: ui.discord_needs_intrigue
+        trigger:
+          OR:
+            - intrigue: ">= 8"
+            # или тайный советник за делом
+            - has_council_task: [disrupt_schemes, find_secrets, fabricate_claims]
+    auto_accept: yes
+    hookable: no
+    cooldown: { years: 2 }
+    on_accept:
+      - sow_discord: scope:recipient
+      - custom_tooltip: ui.discord_tip
+    ai_targets: [vassal]
+    ai_frequency_months: 24
+    ai_potential:
+      - NOT: { has_trait: [honest, just] }
+      - OR: [ { any_faction_against: yes }, { has_trait: [deceitful, schemer, paranoid] } ]
+      - OR: [ { intrigue: ">= 8" }, { has_council_task: [disrupt_schemes, find_secrets, fabricate_claims] } ]
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { scope:recipient: { is_faction_leader: yes } }
+          add: 25
+        - limit: { has_trait: [deceitful, schemer, paranoid] }
+          add: 10
+        - limit: { has_trait: [honest, just] }
+          multiply: 0
+
+decisions:
+  convene_great_council:
+    requires_feature: politics
+    icon: "🏛"
+    is_shown:
+      is_ruler: yes
+      tier: ">= duchy"
+      num_vassals: ">= 3"
+    is_valid:
+      gold: 60
+      is_imprisoned: no
+    cost: { gold: 60 }
+    cooldown: { years: 5 }
+    effect:
+      - trigger_event: politics.0010
+      - custom_tooltip: ui.great_council_tip
+    ai_will_do:
+      value: 6
+      if:
+        - limit: { any_vassal: { is_in_faction: yes } }
+          add: 20
+        - limit: { is_at_war: yes }
+          add: 10
+    ai_check_months: 12
+
+# ---------------------------------------------------------- партия вольностей
+factions:
+  liberty_faction:
+    requires_feature: politics
+    icon: "📜"
+    cb: liberty_revolt
+    can_join:
+      # чаще всего отказ здесь — проверяем первым (условия идут по порядку)
+      OR:
+        - vassal_obligation: heavy
+        - scope:liege: { crown_authority_level: ">= 2" }
+      is_vassal: yes
+      is_imprisoned: no
+      NOT: { scope:liege: { has_strong_hook_on: root } }
+    ai_join:
+      value: -15
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:liege)", multiply: -0.6 } }
+        - { desc: ai.crown_authority, value: { value: scope:liege.crown_authority_level, multiply: 12 } }
+        - { desc: ai.heavy_duties, limit: { vassal_obligation: heavy }, value: 30 }
+        - { desc: ai.privileges, limit: { vassal_obligation: privileged }, value: -30 }
+        - { desc: ai.snubbed, limit: { is_powerful_vassal: yes, is_councillor: no }, value: 15 }
+        - { desc: ai.ambitious, limit: { has_trait: [ambitious, arrogant] }, value: 10 }
+        - { desc: ai.content, limit: { has_trait: content }, value: -15 }
+        - { desc: ai.councillor, limit: { is_councillor: yes }, value: -15 }
+        - { desc: ai.dread, value: { value: fear_of_liege, multiply: -0.6 } }
+        - { desc: ai.rival_leader, limit: { exists: scope:faction_leader, has_opinion_modifier: { target: scope:faction_leader, modifier: rival } }, value: -60 }
+    ai_accept_demands:
+      value: -40
+      add: { value: scope:faction.faction_power, multiply: 0.4 }
+    on_demands_accepted:
+      - scope:liege:
+          shift_realm_law: { group: crown_authority, by: -1 }
+          add_prestige: -100
+      - scope:faction:
+          every_faction_member:
+            if:
+              limit: { vassal_obligation: heavy }
+              set_vassal_obligation: standard
+            add_prestige: 30
+
+casus_belli:
+  liberty_revolt:
+    requires_feature: politics
+    icon: "📜"
+    targets: faction
+    manual: yes
+    on_victory:
+      - scope:defender:
+          shift_realm_law: { group: crown_authority, by: -2 }
+          add_prestige: -200
+      - scope:war:
+          every_war_attacker:
+            limit: { is_vassal_of: scope:defender }
+            set_vassal_obligation: privileged
+            add_prestige: 100
+    on_defeat:
+      - scope:war:
+          every_war_attacker:
+            add_prestige: -100
+            scope:defender: { add_opinion: { target: prev, modifier: rebel } }
+      - scope:defender:
+          add_prestige: 150
+          add_dread: 15
+          imprison: { target: scope:attacker, reason: rebellion }
+    truce_years: 5
+    war_name: cb.liberty_revolt.war_name
+
+on_actions:
+  on_vassal_petition:
+    random_events:
+      events:
+        politics.0001: 10
+        politics.0002: 8
+        politics.0003: 7
+        politics.0004: 6
+        politics.0005: 6
+        politics.0006: 5
+        politics.0007: 6

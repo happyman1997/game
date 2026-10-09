@@ -36,6 +36,24 @@ static func register_builtin(engine: GameEngine) -> void:
 		if empty.is_empty():
 			return null
 		return {"icon": "council", "kind": "info", "text": g.loc.t("alert.council_vacant", {"list": ", ".join(empty)}), "action": {"tab": "realm"}})
+	reg.call("powerful_snubbed", 22, func(g: Game):
+		var p: Dictionary = g.player
+		if not g.engine.has_feature("politics") or p.titles.is_empty():
+			return null
+		var list := Politics.snubbed(g, p)
+		if list.is_empty():
+			return null
+		return {"icon": "crown", "kind": "bad", "text": g.loc.t("alert.powerful_snubbed", {"list": ", ".join(list.map(func(v): return g.scope_name({"type": "character", "id": v.id})))}), "action": {"tab": "realm"}})
+	# Страх правителя — в верхней панели, пока он есть.
+	if not engine.ui.top_bar.has("dread"):
+		engine.ui.top_bar.register("dread", {"id": "dread", "order": 5, "render": func(g: Game) -> Variant:
+			var p: Variant = g.player
+			if p == null or not g.engine.has_feature("politics"):
+				return null
+			var d := Politics.dread(p)
+			if d < 1.0:
+				return null
+			return {"icon": "chain", "text": str(roundi(d)), "tooltip": BB.title(g.loc.t("ui.dread")) + "\n" + BB.esc(g.loc.t("ui.dread_tip"))}}, "core")
 	reg.call("title_creatable", 30, func(g: Game):
 		var p: Dictionary = g.player
 		var cands := {}

@@ -19,7 +19,7 @@
 | `has_any_claim` | character | Есть претензии | core |
 | `has_building` | province | Есть постройка | core |
 | `has_claim_on` | character | Есть претензия на титул | core |
-| `has_council_task` | character | Сюзерен: на какой-то должности выбрана задача | core/council |
+| `has_council_task` | character | Сюзерен: на какой-то должности выбрана задача (или одна из списка) | core/council |
 | `has_flag` | character | Есть флаг | core |
 | `has_focus` | character | Выбран фокус образа жизни | core/lifestyles |
 | `has_global_flag` | любой | Есть глобальный флаг | core |
@@ -37,6 +37,7 @@
 | `has_regiment` | character | Есть отряд этого типа (или любой: yes) | core/regiments |
 | `has_scheme` | character | Ведёт интригу: has_scheme: murder или { type, target } | core |
 | `has_secret` | character | Есть секрет (yes или тип) | core/secrets |
+| `has_snubbed_powerful_vassal` | character | Кто-то из влиятельных вассалов не получил места в совете | core/politics |
 | `has_strong_hook_on` | character | Есть сильный крюк на персонажа | core |
 | `has_succession_law` | character | Закон наследования | core |
 | `has_trait` | character | Есть черта | core |
@@ -78,6 +79,7 @@
 | `is_occupied` | province | Оккупирована | core |
 | `is_parent_of` | character | Родитель персонажа | core |
 | `is_player` | character | Персонаж игрока | core |
+| `is_powerful_vassal` | character | Один из влиятельных вассалов своего сюзерена | core/politics |
 | `is_pregnant` | character | Беременна | core |
 | `is_primary_heir` | character | Основной наследник своего сюзерена/отца | core |
 | `is_ruler` | character | Владеет землями | core |
@@ -102,6 +104,7 @@
 | `terrain` | province | Местность | core |
 | `tier_is` | title | Ранг титула: county/duchy/kingdom/empire | core |
 | `var` | любой | Сравнение переменной: var: { name: x, value: ">= 2" } | core |
+| `vassal_obligation` | character | Условия службы вассала: vassal_obligation: heavy | core/politics |
 
 ## Эффекты
 
@@ -116,6 +119,7 @@
 | `add_claim` | Претензия на титул | core |
 | `add_courtier` | Принять ко двору | core |
 | `add_development` | Изменить развитие | core |
+| `add_dread` | Изменить страх, который внушает правитель | core/politics |
 | `add_dynasty_prestige` | Престиж династии | core |
 | `add_faction_discontent` | Изменить недовольство фракции | core/factions |
 | `add_gold` | Изменить gold | core |
@@ -143,6 +147,7 @@
 | `blackmail` | Шантажировать персонажа его самым тяжёлым известным секретом (получить крюк) | core/secrets |
 | `bless_domain` | Светлый чародей благословляет земли домена | arcana |
 | `break_alliance` | Разорвать союз | core |
+| `calm_factions` | Снизить недовольство всех фракций против правителя: calm_factions: 40 | core/politics |
 | `cast_curse_on` | Проклясть персонажа (со стоимостью и риском разоблачения) | arcana |
 | `change_culture` | Сменить культуру | core |
 | `change_faith` | Сменить веру | core |
@@ -163,6 +168,7 @@
 | `firestorm` | Огненная буря на крупнейшее вражеское войско у границ | arcana |
 | `gain_title` | Получить титул | core |
 | `give_title` | Пожаловать титул: { title, to } — получатель становится вассалом | core |
+| `grant_minor_county` | Пожаловать персонажу самое бедное графство своего домена (не столицу) | core/politics |
 | `hunt_dragon` | Выйти на бой с ближайшим драконом | arcana |
 | `hunt_monsters` | Выследить чудовище в державе: найденная тайна раскрывается | arcana |
 | `imprison` | Заключить персонажа в свою темницу: imprison: scope:x или { target, reason } | core/prison |
@@ -182,6 +188,7 @@
 | `remove_building` | Убрать постройку | core |
 | `remove_claim` | Убрать претензию | core |
 | `remove_flag` | Убрать флаг | core |
+| `remove_from_council` | Советник лишается места в совете сюзерена | core/politics |
 | `remove_global_flag` | Убрать глобальный флаг | core |
 | `remove_hook` | Убрать крюк | core |
 | `remove_modifier` | Убрать модификатор | core |
@@ -192,6 +199,7 @@
 | `remove_var` | Удалить переменную | core |
 | `reveal_trait` | Разоблачить скрытую черту (concealed): теперь её видят все | core |
 | `reverse_add_opinion` | Мнение target об этом персонаже: { target, modifier, value? } | core |
+| `seat_in_council` | Дать персонажу место в своём совете (на должность по его лучшему навыку) | core/politics |
 | `seize_primary_title` | Забрать основной титул персонажа (претендент): прежний владелец становится вассалом | core/factions |
 | `send_message` | Сообщение игроку (если этот персонаж — игрок) | core |
 | `set_flag` | Установить флаг: name или { name, days/months/years } | core |
@@ -203,6 +211,9 @@
 | `set_realm_law` | Установить закон державы (без цены и перерыва) | core/laws |
 | `set_succession_law` | Закон наследования | core |
 | `set_var` | Переменная: { name, value } | core |
+| `set_vassal_obligation` | Установить вассалу условия службы: set_vassal_obligation: privileged | core/politics |
+| `shift_realm_law` | Сдвинуть закон группы на ступени: shift_realm_law: { group: crown_authority, by: -1 } (без цены) | core/laws |
+| `sow_discord` | Посеять раздор между вассалом и его ближайшим союзником: sow_discord: scope:recipient | core/politics |
 | `start_disease` | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
 | `start_scheme` | Начать интригу: { type, target } | core |
 | `take_title` | Отобрать титул себе: { title, from? } | core |
@@ -236,9 +247,11 @@
 | `development` | province | Развитие провинции | core |
 | `diplomacy` | character | Навык: diplomacy | core |
 | `domain_limit` | character | Лимит домена | core |
+| `dread` | character | Страх, который внушает правитель (0–100) | core/politics |
 | `dynasty_prestige` | character | Престиж династии | core |
 | `faction_discontent` | faction | Недовольство фракции (0–100) | core/factions |
 | `faction_power` | faction | Сила фракции в % от силы сюзерена | core/factions |
+| `fear_of_liege` | character | Страх перед сюзереном (0 у храбрых и гневливых) | core/politics |
 | `fertility` | character | Плодовитость | core |
 | `fort_level` | province | Уровень укреплений | core |
 | `general_opinion` | character | Характеристика: general_opinion | core |
@@ -270,6 +283,7 @@
 | `num_knights` | character | Число рыцарей | core/knights |
 | `num_known_secrets` | character | Сколько чужих секретов знает персонаж | core/secrets |
 | `num_perks` | character | Число открытых перков | core/lifestyles |
+| `num_powerful_vassals` | character | Число влиятельных вассалов | core/politics |
 | `num_prisoners` | character | Число пленников | core/prison |
 | `num_regiments` | character | Число отрядов | core/regiments |
 | `num_secrets` | character | Число секретов персонажа | core/secrets |
@@ -368,6 +382,7 @@
 | `neighboring_county` | character | Чужие графства, граничащие с державой | core/council |
 | `neighboring_ruler` | character | Независимые правители по соседству | core |
 | `parent` | character | Родители | core |
+| `powerful_vassal` | character | Влиятельные вассалы | core/politics |
 | `prisoner` | character | Пленники персонажа | core/prison |
 | `province` | любой | Все провинции | core |
 | `realm_province` | character | Провинции державы | core |
@@ -375,6 +390,7 @@
 | `ruler` | любой | Все правители (глобально) | core |
 | `self` | любой | Сам этот объект (удобно для списков кандидатов) | core |
 | `sibling` | character | Братья и сёстры | core |
+| `snubbed_powerful_vassal` | character | Влиятельные вассалы без места в совете | core/politics |
 | `son` | character | Сыновья | core |
 | `spouse` | character | Супруги | core |
 | `vassal` | character | Прямые вассалы | core |
@@ -404,6 +420,7 @@
 | `secrets` | Секреты: раскрытие, шантаж (крюки) и разоблачение | да |
 | `laws` | Законы державы: власть короны и другие группы законов | да |
 | `knights` | Рыцари: доблестные придворные и вассалы усиливают армию правителя | да |
+| `politics` | Политика двора: условия службы вассалов, влиятельные вассалы и совет, страх, прошения | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -413,9 +430,9 @@
 - **cb_targets**: `claim`, `de_jure`, `independence`, `adjacent_county`, `holy_war`, `faction`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
 - **interaction_deciders**: `payer`
-- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `plague_fear`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `plague_fear`
 - **province_modifier_providers**: 
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `arcana_faith`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `laws`
-- **systems**: `upkeep` (0), `economy` (10), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `arcana_faith`
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `laws`, `politics`
+- **systems**: `upkeep` (0), `economy` (10), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

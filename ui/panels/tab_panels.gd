@@ -136,6 +136,9 @@ static func realm(app: App) -> Control:
 	var council: Variant = FeatureSections.council(app, p)
 	if council != null:
 		root.add_child(council)
+	var politics: Variant = FeatureSections.politics(app, p)
+	if politics != null:
+		root.add_child(politics)
 	for f in FeatureSections.factions(app, p):
 		root.add_child(f)
 
@@ -173,7 +176,8 @@ static func realm(app: App) -> Control:
 	var vl := []
 	for v in vassals:
 		var op := Opinion.opinion(g, v, p)
-		vl.append(W.char_row(app, v, [], [K.rich(BB.signed(op), false)], 40))
+		var chip: Variant = FeatureSections.obligation_chip(app, v)
+		vl.append(W.char_row(app, v, [chip] if chip != null else [], [K.rich(BB.signed(op), false)], 40))
 	root.add_child(K.section("%s (%d)" % [app.t("ui.vassals"), vassals.size()], vl, "shield"))
 	var court := g.courtiers_of(p.id)
 	var cf := K.flow([], 6)
