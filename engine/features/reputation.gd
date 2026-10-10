@@ -4,7 +4,8 @@ extends EngineFeature
 ## отдельно от настоящего навыка: победы и поражения, раскрытые интриги
 ## сдвигают её, а со временем она тянется к правде.
 ##   skills.<id>.reputation: { drift: 0.2, max_gap: 10 }
-## ИИ судит по молве: славного полководца боятся (сила армии в глазах врага),
+## ИИ судит по молве: полководца, чья слава обгоняет правду, боятся больше
+## (сила армии в глазах врага),
 ## вассалы реже идут против него (в данных фракций), к известному интригану
 ## относятся настороженно (мнение).
 ##   defines.reputation: { war_weight, infamy_from, infamy_per_point }
@@ -38,9 +39,13 @@ static func add(game: Game, c: Dictionary, skill: String, v: float) -> void:
 	game.stat_cache.erase(c.id)
 
 
-## Множитель силы армии в глазах врага: молва о полководце.
+## Множитель силы армии в глазах врага: насколько слава полководца
+## расходится с правдой (раздутая пугает, подмоченная ободряет).
 static func war_fear(game: Game, c: Dictionary) -> float:
-	return 1.0 + value(game, c, "martial") * game.def_num("reputation.war_weight", 0.02)
+	var v: Variant = c.vars.get("rep:martial")
+	if v == null:
+		return 1.0
+	return maxf(0.5, 1.0 + (float(v) - float(Stats.skill(game, c, "martial"))) * game.def_num("reputation.war_weight", 0.03))
 
 
 static func yearly(game: Game) -> void:

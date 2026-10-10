@@ -83,10 +83,8 @@ static func _consider_war(game: Game, c: Dictionary) -> void:
 	if targets.is_empty():
 		return
 	var my_str := Economy.military_strength(game, c)
-	# молва: врага оценивают с поправкой на славу его полководца, себя — по правде
+	# молва: врага, чья слава обгоняет правду, боятся больше, чем следует
 	var has_rep := game.engine.has_feature("reputation")
-	if has_rep:
-		my_str *= 1.0 + Stats.skill(game, c, "martial") * game.def_num("reputation.war_weight", 0.02)
 	var need = game.def_num("ai.war_strength_ratio", 1.3) - Data.num(p.get("boldness")) * 0.02 - Data.num(p.get("aggression")) * 0.02
 	var best: Variant = null
 	var best_score := 0.0

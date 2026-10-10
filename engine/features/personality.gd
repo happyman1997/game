@@ -162,8 +162,15 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 	if list.is_empty() or c.death != null:
 		return
 	var ctx: ScriptContext = null
+	var st: Variant = null
 	for item in list:
-		if not Personality.has_source(game, c, item[0]):
+		var src: String = item[0]
+		if src.begins_with("mastery:"):
+			if st == null:
+				st = Stats.char_stats(game, c)
+			if float(st.get(src, 0.0)) <= 0.0:
+				continue
+		elif not c.traits.has(src):
 			continue
 		if ctx == null:
 			ctx = ScriptContext.make(game, {"type": "character", "id": c.id})
