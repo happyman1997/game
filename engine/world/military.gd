@@ -165,11 +165,15 @@ static func _enemy_armies_in_war(game: Game, w: Dictionary, side: String, loc: S
 
 # ------------------------------------------------------------ ежедневный цикл
 
-## Скорость войска в день: military.speed с march_speed полководца.
+## Скорость войска в день: military.speed с march_speed полководца
+## (пересчитывается раз в месяц: a.march = [множитель, до какого дня]).
 static func army_speed(game: Game, a: Dictionary) -> float:
-	var speed := game.def_num("military.speed", 12)
-	var c: Variant = commander_of(game, a)
-	return speed * clampf(1.0 + Stats.stat(game, c, "march_speed"), 0.5, 2.0) if c != null else speed
+	var m: Variant = a.get("march")
+	if not (m is Array) or game.date >= int(m[1]):
+		var c: Variant = commander_of(game, a)
+		m = [clampf(1.0 + Stats.stat(game, c, "march_speed"), 0.5, 2.0) if c != null else 1.0, game.date + 30]
+		a["march"] = m
+	return game.def_num("military.speed", 12) * float(m[0])
 
 
 static func daily_military(game: Game) -> void:
@@ -237,6 +241,14 @@ static func _side_power(game: Game, armies: Array, defending: bool, loc: String,
 	adv += Stats.stat(game, best, "personal_example") * 100.0 if best != null else 0.0
 	var pd: Variant = game.content.get_def("provinces", loc)
 	var terrain: Variant = game.content.get_def("terrain", pd.get("terrain")) if pd != null else null
+	# home_advantage (мастер засад): бой на земле своей державы
+	if best != null and not armies.is_empty():
+		var ha := Stats.stat(game, best, "home_advantage")
+		if ha != 0.0:
+			var owner: Variant = game.ch(armies[0].owner)
+			var holder: Variant = Titles.province_controller(game, loc)
+			if owner != null and holder != null and (holder.id == owner.id or Titles.top_liege(game, holder).id == Titles.top_liege(game, owner).id):
+				adv += ha
 	var power = eff * (1.0 + martial * game.def_num("military.martial_bonus", 0.04) + adv / 100.0) * game.rng.range_float(game.def_num("military.battle_luck_min", 0.85), game.def_num("military.battle_luck_max", 1.15))
 	if defending:
 		power *= 1.0 + (Data.num(terrain.get("defense")) if terrain != null else 0.0)
@@ -386,6 +398,11 @@ static func _progress_sieges(game: Game) -> void:
 		var owner: Variant = game.ch(a.owner)
 		if owner != null:
 			daily *= maxf(0.2, 1.0 + Stats.stat(game, owner, "siege_speed"))
+		# capital_defense владельца (кастелян): его столица держится дольше
+		var holder_id: Variant = game.state.titles[a.location].holder if game.state.titles.has(a.location) else null
+		var hc: Variant = game.ch(holder_id) if holder_id != null else null
+		if hc != null and hc.capital == a.location:
+			daily /= maxf(0.2, 1.0 + Stats.stat(game, hc, "capital_defense"))
 		p.siege.progress = float(p.siege.progress) + minf(game.def_num("military.siege_max_daily", 12), daily)
 		if p.siege.progress >= 100.0:
 			p.siege = null
@@ -420,6 +437,11 @@ static func province_fort(game: Game, prov_id: String) -> float:
 			var bd: Variant = game.content.get_def("buildings", b)
 			if bd != null and bd.get("modifiers") is Dictionary:
 				fort += Data.num(bd.modifiers.get("fort"))
+	# domain_fort владельца (военный зодчий): крепости его домена крепче
+	var t: Variant = game.state.titles.get(prov_id)
+	var h: Variant = game.ch(t.holder) if t != null and t.holder != null else null
+	if h != null:
+		fort += Stats.stat(game, h, "domain_fort")
 	return fort
 
 

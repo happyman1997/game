@@ -1,5 +1,10 @@
 # Механики «Характер», «Слава и благочестие», «Вера и культура земель».
 msg:
+  trial_started: "Вы встали на путь «{name}». У вас {years} лет, чтобы доказать, что достойны его."
+  trial_completed: "{who} прошёл(а) испытание и стал(а) — «{name}»."
+  trial_failed: "Испытание пути «{name}» провалено: срок вышел."
+  scapegoat: "Интрига раскрыта, но подозрение пало на {who}."
+  nickname_gained: "Люди прозвали {who} — {nick}."
   wounded_in_front: "{who} вёл войско в первых рядах — и получил рану."
   escaped_by_passage: "Столица {place} пала, но вы ушли тайным ходом и не попали в плен."
   faction_negotiated: "Переговоры удались: фракция «{faction}» расходится, не получив от {liege} уступок."
@@ -14,6 +19,15 @@ msg:
   converted_faith: "{place} принимает веру: {value}."
   converted_culture: "{place} перенимает культуру: {value}."
 ui:
+  trial_have: Этот путь уже пройден
+  trial_max: "Путей не больше {n}"
+  trial_busy: Уже идёт другое испытание
+  trial_skills: Навыки не дотягивают до порога
+  trial_chip: "Путь: {name} ({done}/{total})"
+  trial_title: "Испытание: {name}"
+  trial_left: "Осталось месяцев: {months}"
+  trial_fail_note: "Не успеете — стресс +{stress} и перерыв на этот путь."
+  hook_income: Плата за молчание (крюки)
   spouse_must_like: Супруг должен относиться к вам хотя бы ровно
   stress_recent: "Недавно:"
   stress_state_0: "Спокоен"
@@ -72,6 +86,7 @@ ai:
   wounded: Ранен
   faction_leader: Глава фракции
 tr:
+  can_begin_trial: "Может встать на путь «{name}»"
   has_archetype: "Архетип: {value}"
   has_mastery: "Тень мастерства: {value}"
   has_holder_faith: Графство одной веры с владельцем
@@ -79,12 +94,24 @@ tr:
   has_holder_culture: Графство одной культуры с владельцем
   not_holder_culture: Графство чужой культуры
 fx:
+  begin_trial: "Испытание пути «{name}» на {years} лет. Цели:"
+  trial_fail: "Не успеете — стресс +{stress} и {years} лет перерыва на этот путь"
+  grant_archetype: "Путь «{name}» пройден"
+  make_white_peace: "{who} заключает белый мир во всех своих войнах"
   duel: "Поединок: {a} — {b}, шанс победы {chance}%"
   faction_negotiate: "Фракция «{faction}» расходится без уступок"
   learn_secret: "Узнать тайну {who}: {secret}"
   convert_to_holder_faith: "{place} принимает веру владельца"
   convert_to_holder_culture: "{place} перенимает культуру владельца"
 stat:
+  scapegoat: Чужими руками
+  home_advantage: Сила войска на своей земле
+  domain_fort: Крепости домена
+  capital_defense: Стойкость столицы в осаде
+  income_per_hook: Серебро с каждого крюка
+  duel_prestige_mult: Слава поединков
+  knight_effectiveness: Сила рыцарей
+  knight_cap: Мест для рыцарей
   ally_persuasion: Союзники вступают в войну
   peace_persuasion: Враг охотнее мирится
   march_speed: Скорость марша
@@ -120,6 +147,7 @@ mastery_desc:
   learning: "Тень мастерства учёного: витает в книгах, забывая о мирском. Управление и военное дело страдают."
   prowess: "Тень мастерства силача: ищет повода помериться силой. Женщины и мужчины засматриваются, двор побаивается; без войны скучает."
 stress_src:
+  trial: Проваленное испытание
   other: Прочее
   event: "Событие «{name}»"
   decision: "Решение «{name}»"
@@ -129,3 +157,5 @@ stress_src:
   momentum: "Удачи и неудачи: {name}"
   prison: Темница
   dragon: Схватка с драконом
+decision:
+  begin_trial: "Встать на путь: {name}"

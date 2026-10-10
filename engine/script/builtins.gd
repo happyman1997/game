@@ -997,6 +997,11 @@ static func _register_effects(engine: GameEngine) -> void:
 			var outcome: Variant = arg.get("outcome") if arg is Dictionary else arg
 			Wars.end_war(ctx.game, w, str(outcome) if outcome != null else "white_peace")
 	)
+	ce.call("make_white_peace", "Белый мир во всех войнах, где персонаж — вождь стороны", func(g, c, _arg, _ctx, _s):
+		for w in Wars.wars_of(g, c.id).duplicate():
+			if g.state.wars.has(w.id) and (w.attacker == c.id or w.defender == c.id):
+				Wars.end_war(g, w, "white_peace"),
+		func(ctx, s, _arg): return _t(ctx.game, "fx.make_white_peace", {"who": ctx.game.scope_name(s)}))
 	eff.call("change_culture", ["character", "province"], "Сменить культуру", func(ctx, s, arg):
 		var src: Variant = ctx.game.ch(s.id) if s.type == "character" else ctx.game.state.provinces.get(s.id)
 		if src != null:

@@ -119,7 +119,7 @@ static func breakdown(parts: Array, digits: int = 0) -> String:
 
 ## Доли (множители, шансы) показываются процентами.
 const PCT_STATS := ["fertility", "battle_survival", "siege_speed", "development_growth", "march_speed", "pursuit",
-	"orderly_retreat", "regiment_power", "secret_passages", "personal_example"]
+	"orderly_retreat", "regiment_power", "secret_passages", "personal_example", "knight_effectiveness", "capital_defense"]
 ## Шансы, которые уже записаны в процентах.
 const PCT_POINT_STATS := ["audit_chance", "turn_plotter_chance", "discord_chance", "monster_sight"]
 

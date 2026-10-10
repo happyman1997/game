@@ -484,6 +484,12 @@ static func end_war(game: Game, w: Dictionary, outcome: String) -> void:
 	end_scopes.erase("war")
 	if game.is_alive(w.attacker):
 		game.on_action("on_war_ended", {"type": "character", "id": w.attacker}, end_scopes)
+	# победитель (root) и побеждённый (scope:enemy)
+	if outcome == "victory" or outcome == "defeat":
+		var winner: String = w.attacker if outcome == "victory" else w.defender
+		var loser: String = w.defender if outcome == "victory" else w.attacker
+		if game.is_alive(winner) and game.is_alive(loser):
+			game.on_action("on_war_won", {"type": "character", "id": winner}, {"enemy": {"type": "character", "id": loser}})
 	game.emit("war.ended", {"war": w, "outcome": outcome})
 
 

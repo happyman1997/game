@@ -154,9 +154,21 @@ static func _derived(game: Game, c: Dictionary, totals: Dictionary, labels: bool
 				out.append({"label": game.loc.t("modsrc.mastery", {"name": game.loc.t("mastery." + s)}), "mods": m})
 			else:
 				add_into(into, m)
-	# Связки навыков: два-три высоких навыка дают архетип. Не больше
-	# defines.character.max_archetypes — тройки, затем пары с навыками повыше.
-	if high >= 2:
+	# Связки навыков. С механикой trials — только заслуженные испытанием
+	# (c.vars.archetypes, навсегда); без неё — два-три высоких навыка, не больше
+	# defines.character.max_archetypes (тройки, затем пары с навыками повыше).
+	if plan.earned:
+		for aid in Data.as_array(c.vars.get("archetypes")):
+			var a: Variant = plan.arch_by_id.get(aid)
+			if a == null:
+				continue
+			var m := {a[5]: 1.0}
+			add_into(m, a[3])
+			if labels:
+				out.append({"label": game.loc.t("modsrc.archetype", {"name": game.name_of("skill_archetypes", a[0])}), "mods": m})
+			else:
+				add_into(into, m)
+	elif high >= 2:
 		var fit := []
 		for a in plan.archetypes:
 			var total := 0.0
@@ -231,6 +243,15 @@ static func _derived_fast(game: Game, c: Dictionary, out: Dictionary) -> void:
 		if ms != null and v >= float(ms[0]):
 			out["mastery:" + item[0]] = 1.0
 			add_into(out, ms[1])
+	if plan.earned:
+		var have: Variant = c.vars.get("archetypes")
+		if have is Array:
+			for aid in have:
+				var a: Variant = plan.arch_by_id.get(aid)
+				if a != null:
+					out[a[5]] = 1.0
+					add_into(out, a[3])
+		return
 	if high < 2:
 		return
 	# связки: индексы навыков заранее посчитаны в плане
@@ -298,7 +319,11 @@ static func _derived_plan(game: Game) -> Dictionary:
 		amin = minf(amin, mn)
 		archetypes.append([str(a.id), a.skills, mn, a.get("modifiers"), idx, "archetype:" + str(a.id)])
 	var share: Variant = game.def_val("character.spouse_skill_share", null)
+	var by_id := {}
+	for a in archetypes:
+		by_id[a[0]] = a
 	hit = {"skills": Chars.skill_ids(game), "per_skill": per_skill, "archetypes": archetypes, "archetype_min": amin,
+		"earned": game.engine.has_feature("trials"), "arch_by_id": by_id,
 		"adult_days": int(game.def_num("character.adult_age", 16) * GameDate.DAYS_PER_YEAR),
 		"max_archetypes": int(game.def_num("character.max_archetypes", 2)), "share": share if share is Dictionary else {}}
 	game.engine.cache["stats:derived"] = hit

@@ -1,5 +1,10 @@
 # Personality, Renown and Faith & Culture of the Land mechanics.
 msg:
+  trial_started: "You have set out on the path of the {name}. You have {years} years to prove yourself worthy."
+  trial_completed: "{who} has passed the trial and become a {name}."
+  trial_failed: "The trial of the {name} has failed: time ran out."
+  scapegoat: "The scheme was discovered, but suspicion fell on {who}."
+  nickname_gained: "People have started calling {who} {nick}."
   wounded_in_front: "{who} led from the front — and took a wound."
   escaped_by_passage: "{place} has fallen, but you slipped out through a secret passage and avoided capture."
   faction_negotiated: "Negotiations succeeded: the {faction} disbands without concessions from {liege}."
@@ -14,6 +19,15 @@ msg:
   converted_faith: "{place} adopts a new faith: {value}."
   converted_culture: "{place} adopts a new culture: {value}."
 ui:
+  trial_have: You already walk this path
+  trial_max: "No more than {n} paths"
+  trial_busy: Another trial is under way
+  trial_skills: Your skills fall short
+  trial_chip: "Path: {name} ({done}/{total})"
+  trial_title: "Trial: {name}"
+  trial_left: "Months left: {months}"
+  trial_fail_note: "Fail to finish in time — stress +{stress} and a pause on this path."
+  hook_income: Hush money (hooks)
   spouse_must_like: Your spouse must not dislike you
   stress_recent: "Recently:"
   stress_state_0: "Calm"
@@ -72,6 +86,7 @@ ai:
   wounded: Wounded
   faction_leader: Faction leader
 tr:
+  can_begin_trial: "Can set out on the path of the {name}"
   has_archetype: "Archetype: {value}"
   has_mastery: "Shadow of mastery: {value}"
   has_holder_faith: County shares its holder's faith
@@ -79,12 +94,24 @@ tr:
   has_holder_culture: County shares its holder's culture
   not_holder_culture: County of a foreign culture
 fx:
+  begin_trial: "Trial of the {name}, {years} years. Goals:"
+  trial_fail: "Fail — stress +{stress} and {years} years before you may try this path again"
+  grant_archetype: "The path of the {name} is yours"
+  make_white_peace: "{who} makes white peace in all of their wars"
   duel: "Duel: {a} vs {b}, {chance}% to win"
   faction_negotiate: "The {faction} disbands without concessions"
   learn_secret: "Learn {who}'s secret: {secret}"
   convert_to_holder_faith: "{place} adopts its holder's faith"
   convert_to_holder_culture: "{place} adopts its holder's culture"
 stat:
+  scapegoat: By other hands
+  home_advantage: Army strength on own land
+  domain_fort: Domain fortifications
+  capital_defense: Capital siege resistance
+  income_per_hook: Silver per hook
+  duel_prestige_mult: Glory from duels
+  knight_effectiveness: Knight effectiveness
+  knight_cap: Knight slots
   ally_persuasion: Allies join wars
   peace_persuasion: Enemies accept peace sooner
   march_speed: March speed
@@ -120,6 +147,7 @@ mastery_desc:
   learning: "The shadow of a master scholar: lost in books, forgetting worldly matters. Stewardship and martial suffer."
   prowess: "The shadow of a mighty warrior: always looking for a fight. Admired by some, feared by the court; peace bores them."
 stress_src:
+  trial: Failed trial
   other: Other
   event: "Event «{name}»"
   decision: "Decision «{name}»"
@@ -129,3 +157,5 @@ stress_src:
   momentum: "Successes and failures: {name}"
   prison: Prison
   dragon: Fight with a dragon
+decision:
+  begin_trial: "Set out on the path: {name}"

@@ -1,6 +1,6 @@
 skill_archetype:
   gray_eminence: Gray Eminence
-  warlord: Warlord
+  warlord: Unifier
   merchant_prince: Merchant Prince
   arbiter: Arbiter
   courtly_knight: Courtly Knight
@@ -18,35 +18,98 @@ skill_archetype:
   scourge: Scourge of God
   hero_of_songs: Hero of Songs
 skill_archetype_desc:
-  gray_eminence: "Diplomacy and intrigue. Smiles at everyone and sets them against each other. Sows discord even without a spymaster, and better."
-  warlord: "Diplomacy and martial. Men follow such a leader: vassals send more troops and love them."
-  merchant_prince: "Diplomacy and stewardship. Trade is war, only more profitable. Can conclude trade pacts with neighbours."
-  arbiter: "Diplomacy and learning. Their word settles disputes: respect, prestige and piety. Has their own option in vassal disputes."
-  courtly_knight: "Diplomacy and prowess. Troubadours, tournaments and fair ladies: knights serve them gladly."
-  quartermaster: "Martial and stewardship. A well-fed army is a fierce army: cheaper armies, larger levies."
-  ambush_master: "Martial and intrigue. The enemy learns of their army when it is too late."
-  siege_engineer: "Martial and learning. Knows where a wall is weak and how to build their own stronger."
+  gray_eminence: "Diplomacy and intrigue. By other hands: when their scheme is discovered, a courtier takes the blame. Sows discord even without a spymaster, and better."
+  warlord: "Diplomacy and martial. Those they defeat bear no grudge and bend the knee more readily; their own vassals send more troops."
+  merchant_prince: "Diplomacy and stewardship. Concludes trade pacts with neighbours, and their gifts work twice as well."
+  arbiter: "Diplomacy and learning. Mediates other rulers' wars (and gains glory for it); their word settles disputes."
+  courtly_knight: "Diplomacy and prowess. Two more knights in service, and duel victories bring twice the glory."
+  quartermaster: "Martial and stewardship. Double the loot, mercenaries at half price, cheaper armies."
+  ambush_master: "Martial and intrigue. Their army is stronger on home ground, and a routed enemy loses twice as many men."
+  siege_engineer: "Martial and learning. Fortresses in their domain are a level stronger, enemy walls fall faster."
   warrior_king: "Martial and prowess. Fights in the ranks of their own knights, and takes the same risks."
-  shadow_treasurer: "Stewardship and intrigue. Knows where the vassals hide their silver."
-  reformer: "Stewardship and learning. Realm laws change at half the cost; the land develops faster."
-  castellan: "Stewardship and prowess. Builds strong and cheap, keeps the men in line."
-  archivist: "Intrigue and learning. Old charters always hold a right to a neighbouring land."
-  night_blade: "Intrigue and prowess. Their own assassin and their own bodyguard."
-  holy_warrior: "Learning and prowess. Prayer and sword: piety grows, knights are steadier, and they rarely fall."
-  philosopher_king: "Legend: diplomacy, stewardship and learning. A wise ruler of the kind chroniclers write about."
-  scourge: "Legend: martial, intrigue and prowess. Their victories inspire terror, and people hate them."
-  hero_of_songs: "Legend: diplomacy, martial and prowess. Every court sings of them."
+  shadow_treasurer: "Stewardship and intrigue. Everyone they hold a hook on pays silver for their silence."
+  reformer: "Stewardship and learning. Realm laws change at half the cost, and disgruntled vassals cannot stop reforms."
+  castellan: "Stewardship and prowess. Their capital holds out twice as long under siege; builds strong and cheap."
+  archivist: "Intrigue and learning. Old charters always hold a right to a neighbouring land, and each year — someone's secret."
+  night_blade: "Intrigue and prowess. Their assassins work twice as fast, and no assassin can kill them."
+  holy_warrior: "Learning and prowess. Victories over infidels please God; holy wars cost half as much."
+  philosopher_king: "Legend: diplomacy, stewardship and learning. Once in a lifetime may proclaim a Golden Age."
+  scourge: "Legend: martial, intrigue and prowess. Their victories inspire terror, enemies surrender sooner — and people hate them."
+  hero_of_songs: "Legend: diplomacy, martial and prowess. Every court sings of them, and their heir inherits the Hero's Legacy."
 modifier:
   trade_pact: Trade Pact
+  golden_age: Golden Age
+  hero_legacy: Hero's Legacy
 opinion_modifier:
   trade_partner: Trade partner
+  respects_unifier: Respects the victor
+  merchant_gift: Lavish merchant gift
+  mediated_peace: Brought peace
 interaction:
   trade_pact: Propose a Trade Pact
+  mediate_peace: Offer Mediation
 interaction_desc:
+  mediate_peace: "The arbiter offers a ruler peace: if they agree, all of their wars end in white peace, and the arbiter gains glory."
   trade_pact: "Merchants of both realms travel freely: for five years both rulers collect more taxes."
 decision:
   search_archives: Search the Archives
+  golden_age: Proclaim a Golden Age
 decision_desc:
+  golden_age: "Once in a lifetime, a philosopher king may proclaim a Golden Age: for ten years the land develops faster, the court is calm, the vassals content."
   search_archives: "The archivist digs through old charters and finds a right to one of the neighbouring counties."
 msg:
+  hero_legacy: "You inherit not only titles but the glory of a hero of songs."
   archives_claim: "An old charter turned up in the archives: you now have a claim on [scope:claim_target]!"
+deed:
+  battles_won: Battles won
+  battles_lost: Battles lost
+  sieges_won: Fortresses taken
+  wars_won: Wars won
+  duels_won: Duels won
+  buildings: Buildings
+  conversions: Counties converted
+  schemes: Successful schemes
+  whispers: Discord and rumors sown
+  secrets_exposed: Secrets exposed
+  blackmails: Blackmails
+  executions: Executions
+  captives: Thrown in the dungeon
+  gifts: Gifts and pacts
+  pacts: Alliances and oaths of fealty
+  feasts: Feasts and councils
+  charity: Alms given
+  devotions: Pilgrimages and vows
+  hunts: Hunts
+  judgments: Disputes judged
+  revolts: Revolts raised
+  laws: Reforms
+deed_goal:
+  battles_won: "Win battles"
+  battles_lost: "Lose battles"
+  sieges_won: "Take fortresses"
+  wars_won: "Win a war"
+  duels_won: "Win a duel"
+  buildings: "Complete buildings"
+  conversions: "Convert counties"
+  schemes: "Bring schemes to success"
+  whispers: "Sow discord or spread a rumor"
+  secrets_exposed: "Expose secrets"
+  blackmails: "Blackmail"
+  executions: "Execute a prisoner"
+  captives: "Imprison"
+  gifts: "Send gifts"
+  pacts: "Form an alliance or take a vassal"
+  feasts: "Hold a feast or a Great Council"
+  charity: "Give alms"
+  devotions: "Pilgrimage, confession or mission"
+  hunts: "Go hunting"
+  judgments: "Judge a dispute at court"
+  revolts: "Raise a revolt"
+  laws: "Pass a reform"
+trial_goal:
+  gold_300: "Amass 300 gold"
+  gold_250: "Amass 250 gold"
+  secrets_3: "Know three secrets of others"
+ai:
+  respects_unifier: Respects the victor
+  war_weary: Tired of war

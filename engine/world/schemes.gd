@@ -51,15 +51,27 @@ static func monthly_progress(game: Game, s: Dictionary) -> float:
 ## Интрига раскрыта: её on_discovered, сигнал scheme.discovered и для враждебной
 ## (category: hostile) — on_action on_scheme_discovered у цели (root — цель,
 ## scope:plotter — заговорщик, scope:scheme).
+## scapegoat у заговорщика (архетип «Серый кардинал») — «чужими руками»:
+## подозрение падает на случайного придворного, последствия — на него.
 static func mark_discovered(game: Game, s: Dictionary) -> void:
 	s.discovered = true
 	var def: Variant = game.content.get_def("schemes", s.type)
-	var ctx := scheme_context(game, s)
+	var blamed := s
+	var owner: Variant = game.ch(s.owner)
+	if owner != null and Stats.stat(game, owner, "scapegoat") > 0.0:
+		var pool := game.courtiers_of(owner.id).filter(func(x): return Chars.is_alive(x) and Chars.is_adult(game, x) and x.id != s.target and not owner.spouses.has(x.id) and not owner.children.has(x.id))
+		var goat: Variant = game.rng.pick(pool)
+		if goat != null:
+			blamed = s.duplicate()
+			blamed.owner = goat.id
+			if game.is_player(owner.id):
+				game.message(game.loc.t("msg.scapegoat", {"who": game.scope_name({"type": "character", "id": goat.id})}), "good", {"type": "character", "id": goat.id})
+	var ctx := scheme_context(game, blamed)
 	Interp.run_effect(ctx, ctx.root, def.get("on_discovered") if def != null else null)
-	game.emit("scheme.discovered", {"scheme": s})
-	if def != null and def.get("category") == "hostile" and game.is_alive(s.target) and game.is_alive(s.owner):
+	game.emit("scheme.discovered", {"scheme": s, "blamed": blamed.owner})
+	if def != null and def.get("category") == "hostile" and game.is_alive(s.target) and game.is_alive(blamed.owner):
 		game.on_action("on_scheme_discovered", {"type": "character", "id": s.target},
-			{"plotter": {"type": "character", "id": s.owner}, "scheme": {"type": "scheme", "id": s.id}})
+			{"plotter": {"type": "character", "id": blamed.owner}, "scheme": {"type": "scheme", "id": s.id}})
 
 
 static func end_scheme(game: Game, id: String) -> void:

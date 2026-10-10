@@ -202,6 +202,30 @@ static func stress_source(g: Game, src: String) -> String:
 	return g.loc.t_or("stress_src." + kind, g.loc.t("stress_src.other"))
 
 
+## Плашка испытания пути: название, сколько целей выполнено; в подсказке —
+## цели с прогрессом и срок.
+static func trial_chip(app: App, c: Dictionary, trial: Dictionary) -> Control:
+	var g := app.game
+	var aid := str(trial.id)
+	var ad: Variant = g.content.get_def("skill_archetypes", aid)
+	var gs := Trials.goals(g, c)
+	var done := gs.filter(func(x): return x.done).size()
+	var aname := g.name_of("skill_archetypes", aid)
+	var chip := K.panel(K.hbox([K.icon("⏳", 16), K.label(app.t("ui.trial_chip", {"name": aname, "done": done, "total": gs.size()}), "SmallLabel")], 3))
+	chip.add_theme_stylebox_override("panel", UiArt.flat(Color("#25303a"), Color(UiArt.GOLD, 0.45), 1, 3, 3))
+	var months := maxi(0, ceili((int(trial.until) - g.date) / 30.4))
+	var tb := BB.title(app.t("ui.trial_title", {"name": aname})) + "\n" + BB.muted(app.t("ui.trial_left", {"months": months}))
+	for x in gs:
+		var line := "%s %s (%d/%d)" % ["✓" if x.done else "•", x.text, x.have, x.need] if x.need > 1 or not x.done else "✓ " + str(x.text)
+		tb += "\n" + (BB.good(line) if x.done else BB.esc(line))
+	var adesc := g.desc_of("skill_archetypes", aid) if ad != null else ""
+	if adesc != "":
+		tb += "\n" + BB.i(adesc)
+	tb += "\n" + BB.muted(app.t("ui.trial_fail_note", {"stress": roundi(g.def_num("trials.fail_stress", 30))}))
+	K.tip(chip, tb)
+	return chip
+
+
 ## Черты персонажа: значки-плашки.
 static func traits(app: App, c: Dictionary) -> Control:
 	var g := app.game
@@ -258,13 +282,18 @@ static func traits(app: App, c: Dictionary) -> Control:
 		var raw: Variant = ad.get("modifiers")
 		if raw is Dictionary:
 			for k in raw:
-				if k != "self_knight":
+				# правила-флаги описаны в тексте архетипа
+				if k != "self_knight" and k != "scapegoat":
 					amods[k] = raw[k]
 		var mtxt := BB.modifiers(g, amods)
 		if mtxt != "":
 			tb += "\n" + mtxt
 		K.tip(chip, tb)
 		f.add_child(chip)
+	# испытание пути: цели и срок
+	var trial: Variant = Trials.active(c) if g.engine.has_feature("trials") else null
+	if trial != null:
+		f.add_child(trial_chip(app, c, trial))
 	# тени мастерства: изнанка очень высоких навыков
 	for s in Stats.masteries(g, c):
 		var sd: Variant = g.content.get_def("skills", s)

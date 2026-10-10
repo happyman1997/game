@@ -32,46 +32,38 @@ on_actions:
           add_hook: { target: scope:plotter }
           send_message: { text: msg.plotter_turned, kind: good }
 
-  # «Ревизия» (управление): сюзерен ловит казнокрада в своём совете —
-  # audit_chance % в месяц за каждого (root — советник, scope:liege).
-  on_councillor_pulse:
-    requires_feature: secrets
-    effect:
-      - if:
-          limit:
-            has_secret: secret_embezzler
-            scope:liege: { NOT: { knows_secret_of: root } }
-          random:
-            chance: scope:liege.audit_chance
-            save_scope_as: embezzler
-            scope:liege: { trigger_event: skills.0001 }
+# «Ревизия» (управление): обворованный (жертва секрета) ловит казнокрада —
+# audit_chance % в месяц (механика secrets, поле audit_event).
+secret_types:
+  secret_embezzler:
+    audit_event: skills.0001
 
 events:
-  # Ревизия нашла недостачу (root — сюзерен, scope:embezzler — казнокрад).
+  # Ревизия нашла недостачу (root — сюзерен, scope:culprit — казнокрад).
   skills.0001:
     requires_feature: secrets
     triggered_only: true
     theme: intrigue
     icon: "🧾"
     immediate:
-      - learn_secret: { owner: scope:embezzler, type: secret_embezzler }
+      - learn_secret: { owner: scope:culprit, type: secret_embezzler }
     options:
       # разоблачить: деньги вернуть, вора — из совета
       - effect:
           - add_gold: 40
-          - expose_secret: scope:embezzler
-          - scope:embezzler: { remove_from_council: yes }
+          - expose_secret: scope:culprit
+          - scope:culprit: { remove_from_council: yes }
         ai_chance: { value: 40, if: { limit: { has_trait: [just, honest, zealous] }, add: 40 } }
       # промолчать: вор вернёт часть и будет у вас на крючке
       - effect:
           - add_gold: 20
-          - add_hook: { target: scope:embezzler, strong: yes }
+          - add_hook: { target: scope:culprit, strong: yes }
         ai_chance: { value: 30, if: { limit: { has_trait: [deceitful, arbitrary, greedy] }, add: 40 } }
       # голос управления: пересчитать всё до гроша
       - skill: { skill: stewardship, check: 12 }
         success:
           - add_gold: 80
-          - scope:embezzler: { remove_from_council: yes }
+          - scope:culprit: { remove_from_council: yes }
         failure:
           - add_gold: 10
           - add_stress: 10
@@ -141,7 +133,7 @@ interactions:
       value: 0
       add:
         - { desc: ai.duel_odds, value: { value: "duel_odds(scope:actor)", subtract: 50, multiply: 1.5 } }
-        - { desc: ai.duel_honor, value: 15 }
+        - { desc: ai.duel_honor, value: 25 }
         - { desc: ai.boldness, value: { value: ai_boldness, multiply: 8 } }
         - { desc: ai.brave, limit: { has_trait: brave }, value: 20 }
         - { desc: ai.craven, limit: { has_trait: craven }, value: -40 }
@@ -167,4 +159,4 @@ interactions:
         - limit: { has_trait: [wrathful, arrogant, brave] }
           add: 8
       # только когда уверен в победе
-      multiply: { value: "duel_odds(scope:recipient)", subtract: 55, multiply: 0.05, min: 0, max: 1 }
+      multiply: { value: "duel_odds(scope:recipient)", subtract: 45, multiply: 0.05, min: 0, max: 1 }

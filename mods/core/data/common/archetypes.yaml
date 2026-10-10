@@ -1,33 +1,151 @@
-# Связки навыков (архетипы). Когда все навыки из skills не ниже min, у
-# персонажа появляется архетип: modifiers действуют, а условие
-# has_archetype: <id> открывает особые действия. Архетипов у персонажа не
-# больше defines.character.max_archetypes — берутся тройки, затем пары
-# с самыми высокими навыками.
+# Связки навыков (архетипы). Когда все навыки из skills не ниже min,
+# открывается решение «Встать на путь» (механика trials): испытание — цели
+# trial.goals за trial.years лет. Выполнил — архетип навсегда: modifiers
+# действуют, а has_archetype: <id> открывает особые правила и действия
+# (здесь и в skill_paths.yaml). Архетипов — не больше
+# defines.character.max_archetypes. Цель — { deed, count } (деяния из
+# deeds.yaml, считаются с начала испытания) или { trigger, desc }.
 defines:
   character:
     max_archetypes: 2
+  trials:
+    years: 5                  # срок испытания по умолчанию
+    fail_stress: 30           # не успел — стресс
+    cooldown_years: 5         # и перерыв на этот путь
+    ai_check_months: 12       # ИИ раз в столько месяцев думает о пути
+    ai_goal_will: 40          # ИИ на испытании охотнее делает то, что нужно для целей,
+    ai_goal_frequency: 3      # и втрое чаще об этом думает
+    ai_war_chance: 0.25       # военные цели — охотнее воюет
 
 skill_archetypes:
   # ---------------------------------------------------------------- пары
-  gray_eminence:    { skills: [diplomacy, intrigue], min: 14, icon: "🎭", modifiers: { scheme_power: 10, discord_chance: 20 } }
-  warlord:          { skills: [diplomacy, martial], min: 14, icon: "🚩", modifiers: { vassal_levy_mult: 0.15, vassal_opinion: 5 } }
-  merchant_prince:  { skills: [diplomacy, stewardship], min: 14, icon: "⚖", modifiers: { vassal_tax_mult: 0.1, monthly_income: 1 } }
-  arbiter:          { skills: [diplomacy, learning], min: 14, icon: "📜", modifiers: { general_opinion: 5, monthly_prestige: 0.5, monthly_piety: 0.3 } }
-  courtly_knight:   { skills: [diplomacy, prowess], min: 14, icon: "🌹", modifiers: { attraction_opinion: 10, general_opinion: 3, knight_effectiveness: 0.15 } }
-  quartermaster:    { skills: [martial, stewardship], min: 14, icon: "⛺", modifiers: { army_upkeep_mult: -0.2, levy_mult: 0.05 } }
-  ambush_master:    { skills: [martial, intrigue], min: 14, icon: "🌲", modifiers: { commander_advantage: 8 } }
-  siege_engineer:   { skills: [martial, learning], min: 14, icon: "🏰", modifiers: { siege_speed: 0.3, build_cost_mult: -0.1 } }
-  warrior_king:     { skills: [martial, prowess], min: 14, icon: "⚔", modifiers: { self_knight: 1, knight_effectiveness: 0.2, monthly_prestige: 0.5 } }
-  shadow_treasurer: { skills: [stewardship, intrigue], min: 14, icon: "🗝", modifiers: { vassal_tax_mult: 0.15, scheme_defense: 5 } }
-  reformer:         { skills: [stewardship, learning], min: 14, icon: "📖", modifiers: { law_cost_mult: -0.5, development_growth: 0.05 } }
-  castellan:        { skills: [stewardship, prowess], min: 14, icon: "🏯", modifiers: { build_cost_mult: -0.15, levy_mult: 0.05 } }
-  archivist:        { skills: [intrigue, learning], min: 14, icon: "📚", modifiers: { scheme_power: 5 } }
-  night_blade:      { skills: [intrigue, prowess], min: 14, icon: "🗡", modifiers: { scheme_power: 10, scheme_defense: 10 } }
-  holy_warrior:     { skills: [learning, prowess], min: 14, icon: "✝", modifiers: { monthly_piety: 0.5, knight_effectiveness: 0.1, battle_survival: 0.15 } }
+  # «Чужими руками»: раскрытую интригу валят на придворного; раздор — без тайного советника
+  gray_eminence:
+    skills: [diplomacy, intrigue]
+    min: 14
+    icon: "🎭"
+    modifiers: { scheme_power: 10, discord_chance: 20, scapegoat: 1 }
+    trial: { goals: [ { deed: whispers, count: 2 }, { deed: blackmails, count: 1 } ] }
+  # «Объединитель»: побеждённые не держат зла и охотнее идут в вассалы
+  warlord:
+    skills: [diplomacy, martial]
+    min: 14
+    icon: "🚩"
+    modifiers: { vassal_levy_mult: 0.15, vassal_opinion: 5 }
+    trial: { goals: [ { deed: wars_won, count: 1 }, { deed: pacts, count: 1 } ] }
+  # торговые договоры с соседями; подарки вдвое действеннее
+  merchant_prince:
+    skills: [diplomacy, stewardship]
+    min: 14
+    icon: "⚖"
+    modifiers: { vassal_tax_mult: 0.1, monthly_income: 1 }
+    trial: { goals: [ { deed: gifts, count: 2 }, { trigger: { gold: ">= 300" }, desc: trial_goal.gold_300 } ] }
+  # посредник: мирит чужие войны (взаимодействие mediate_peace)
+  arbiter:
+    skills: [diplomacy, learning]
+    min: 14
+    icon: "📜"
+    modifiers: { general_opinion: 5, monthly_prestige: 0.5, monthly_piety: 0.3 }
+    trial: { goals: [ { deed: judgments, count: 1 }, { deed: devotions, count: 1 } ] }
+  # +2 рыцаря; победы в поединках — вдвое славнее
+  courtly_knight:
+    skills: [diplomacy, prowess]
+    min: 14
+    icon: "🌹"
+    modifiers: { attraction_opinion: 10, general_opinion: 3, knight_effectiveness: 0.15, knight_cap: 2, duel_prestige_mult: 1 }
+    trial: { goals: [ { deed: duels_won, count: 1 }, { deed: feasts, count: 1 } ] }
+  # двойная добыча; наёмники вдвое дешевле
+  quartermaster:
+    skills: [martial, stewardship]
+    min: 14
+    icon: "⛺"
+    modifiers: { army_upkeep_mult: -0.2, loot_mult: 1 }
+    trial: { goals: [ { deed: sieges_won, count: 3 }, { deed: buildings, count: 1 } ] }
+  # на своей земле войско сильнее; разбитый враг теряет вдвое больше
+  ambush_master:
+    skills: [martial, intrigue]
+    min: 14
+    icon: "🌲"
+    modifiers: { commander_advantage: 5, home_advantage: 15, pursuit: 0.5 }
+    trial: { goals: [ { deed: battles_won, count: 3 }, { deed: whispers, count: 1 } ] }
+  # крепости его домена на уровень крепче; осады быстрее
+  siege_engineer:
+    skills: [martial, learning]
+    min: 14
+    icon: "🏰"
+    modifiers: { siege_speed: 0.3, build_cost_mult: -0.1, domain_fort: 1 }
+    trial: { goals: [ { deed: sieges_won, count: 3 }, { deed: buildings, count: 1 } ] }
+  # сам бьётся в рядах своих рыцарей — и рискует, как они
+  warrior_king:
+    skills: [martial, prowess]
+    min: 14
+    icon: "⚔"
+    modifiers: { self_knight: 1, knight_effectiveness: 0.2, monthly_prestige: 0.5 }
+    trial: { goals: [ { deed: battles_won, count: 3 }, { deed: duels_won, count: 1 } ] }
+  # каждый крюк приносит серебро
+  shadow_treasurer:
+    skills: [stewardship, intrigue]
+    min: 14
+    icon: "🗝"
+    modifiers: { vassal_tax_mult: 0.1, scheme_defense: 5, income_per_hook: 0.5 }
+    trial: { goals: [ { deed: blackmails, count: 2 }, { trigger: { gold: ">= 250" }, desc: trial_goal.gold_250 } ] }
+  # законы вдвое дешевле, а недовольство вассалов реформам не мешает
+  reformer:
+    skills: [stewardship, learning]
+    min: 14
+    icon: "📖"
+    modifiers: { law_cost_mult: -0.5, development_growth: 0.05 }
+    trial: { goals: [ { deed: buildings, count: 3 }, { deed: charity, count: 1 } ] }
+  # столица держит осаду вдвое дольше
+  castellan:
+    skills: [stewardship, prowess]
+    min: 14
+    icon: "🏯"
+    modifiers: { build_cost_mult: -0.15, capital_defense: 1 }
+    trial: { goals: [ { deed: buildings, count: 2 }, { deed: battles_won, count: 1 } ] }
+  # права из архивов; каждый год — чужая тайна
+  archivist:
+    skills: [intrigue, learning]
+    min: 14
+    icon: "📚"
+    modifiers: { scheme_power: 5 }
+    trial: { goals: [ { trigger: { num_known_secrets: ">= 3" }, desc: trial_goal.secrets_3 }, { deed: devotions, count: 1 } ] }
+  # убийства вдвое быстрее; убийцы против него бессильны
+  night_blade:
+    skills: [intrigue, prowess]
+    min: 14
+    icon: "🗡"
+    modifiers: { scheme_power: 10, scheme_defense: 10 }
+    trial: { goals: [ { deed: schemes, count: 2 }, { deed: hunts, count: 1 } ] }
+  # победы над иноверцами дают благочестие; священная война вдвое дешевле
+  holy_warrior:
+    skills: [learning, prowess]
+    min: 14
+    icon: "✝"
+    modifiers: { monthly_piety: 0.5, knight_effectiveness: 0.1, battle_survival: 0.15 }
+    trial: { goals: [ { deed: battles_won, count: 2 }, { deed: devotions, count: 1 } ] }
   # ---------------------------------------------------------------- легенды (три навыка)
-  philosopher_king: { skills: [diplomacy, stewardship, learning], min: 17, icon: "👑", modifiers: { vassal_opinion: 10, development_growth: 0.1, monthly_prestige: 1 } }
-  scourge:          { skills: [martial, intrigue, prowess], min: 17, icon: "💀", modifiers: { commander_advantage: 10, general_opinion: -10, monthly_prestige: 1 } }
-  hero_of_songs:    { skills: [diplomacy, martial, prowess], min: 17, icon: "🎶", modifiers: { monthly_prestige: 2, attraction_opinion: 15, knight_effectiveness: 0.25 } }
+  # раз в жизни — «Золотой век»
+  philosopher_king:
+    skills: [diplomacy, stewardship, learning]
+    min: 17
+    icon: "👑"
+    modifiers: { vassal_opinion: 10, development_growth: 0.1, monthly_prestige: 1 }
+    trial: { years: 7, goals: [ { deed: buildings, count: 4 }, { deed: judgments, count: 1 }, { deed: charity, count: 1 } ] }
+  # победы внушают ужас; враг сдаётся раньше
+  scourge:
+    skills: [martial, intrigue, prowess]
+    min: 17
+    icon: "💀"
+    modifiers: { commander_advantage: 10, general_opinion: -10, monthly_prestige: 1, peace_persuasion: 25 }
+    trial: { years: 7, goals: [ { deed: battles_won, count: 5 }, { deed: executions, count: 1 } ] }
+  # наследнику — «Наследие героя»
+  hero_of_songs:
+    skills: [diplomacy, martial, prowess]
+    min: 17
+    icon: "🎶"
+    modifiers: { monthly_prestige: 2, attraction_opinion: 15, knight_effectiveness: 0.25 }
+    trial: { years: 7, goals: [ { deed: wars_won, count: 1 }, { deed: battles_won, count: 4 }, { deed: duels_won, count: 1 } ] }
 
 modifiers:
   trade_pact: { icon: "⚖", modifiers: { tax_mult: 0.1, monthly_income: 0.5 }, good: true }

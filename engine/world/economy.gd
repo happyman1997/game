@@ -94,6 +94,10 @@ static func income_breakdown(game: Game, c: Dictionary) -> Array:
 	var army := army_maintenance(game, c)
 	if army != 0.0:
 		parts.append({"label": game.loc.t("ui.army_upkeep"), "value": -army})
+	# income_per_hook (тайный казначей): должники платят за молчание
+	var per_hook := Stats.stat(game, c, "income_per_hook")
+	if per_hook != 0.0 and not c.hooks.is_empty():
+		parts.append({"label": game.loc.t("ui.hook_income"), "value": per_hook * c.hooks.size()})
 	for extra in game.engine.hooks.collect("economy.income", {"game": game, "character": c}):
 		parts.append(extra)
 	return parts

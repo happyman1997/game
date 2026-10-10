@@ -262,6 +262,7 @@ events:
 | `on_war_started` / `on_war_ended` | нападающий | `scope:attacker`, `scope:defender`, `scope:target` |
 | `on_battle_won` / `on_battle_lost` | владелец армии | `scope:enemy` |
 | `on_siege_won` | тот, чья армия взяла крепость | `scope:province`, `scope:war`, `scope:defender` |
+| `on_war_won` | победитель войны | `scope:enemy` — побеждённый |
 | `on_scheme_discovered` | цель раскрытой враждебной интриги | `scope:plotter`, `scope:scheme` |
 | `on_councillor_pulse` | советник (раз в месяц) | `scope:liege` |
 | `on_stress_level` | персонаж, чей стресс перешёл новую сотню | |
@@ -477,7 +478,9 @@ map_links:                                    # морские переправ�
 | Тексты событий | `ev.<id>.t`, `ev.<id>.desc`, `ev.<id>.a`… |
 
 Вместо ключа почти везде можно написать текст прямо в данных:
-`name: { ru: "Сокольничий", en: "Falconer" }`.
+`name: { ru: "Сокольничий", en: "Falconer" }`, или ключ с параметрами:
+`name: { key: decision.begin_trial, params: { name: skill_archetype.warlord } }`
+(строковые параметры тоже переводятся).
 
 Строки интерфейса движка лежат в `locale/`; мод может переопределить любую
 из них, просто указав тот же ключ в своих файлах.
@@ -645,7 +648,7 @@ func init(api: ModApi) -> void:
 
   (доступны `lifestyles`, `council`, `prison`, `factions`, `regiments`,
   `secrets`, `laws`, `knights`, `politics`, `personality`, `renown`, `lands`,
-  `momentum`, `duels`;
+  `momentum`, `duels`, `deeds`, `trials`;
   интерфейс скрывает вкладки и разделы выключенных механик). Словарь скриптов
   механики (её триггеры, эффекты, значения) остаётся зарегистрированным, так что
   чужие данные, которые его упоминают, не ломаются — на пустом состоянии
@@ -804,6 +807,9 @@ secret_types:
     on_expose:                       # root — владелец, scope:exposer, scope:secret_target
       - add_prestige: -200
       - liege: { add_opinion: { target: root, modifier: exposed_murderer } }
+  secret_embezzler:
+    audit_event: skills.0001         # ревизия: жертва (target) с audit_chance % в месяц ловит
+                                     # виновного — событие у неё, scope:culprit — владелец
 ```
 
 Секреты появляются из данных: интрига убийства даёт `secret_murder`, удачное
@@ -812,7 +818,8 @@ secret_types:
 «Поиск секретов» (`discover_secret`) и случайные свидетели. Взаимодействия
 «Шантажировать» и «Разоблачить секрет» используют эффекты `blackmail` и
 `expose_secret`. Скрипт: `has_secret`, `knows_secret_of`, `num_secrets`,
-`num_known_secrets`, список `known_secret_owner`.
+`num_known_secrets`, список `known_secret_owner`, эффект
+`learn_secret: { owner: scope:x, type }` (тип — необязателен).
 
 **Скрытые черты.** Черта с `concealed: <тип секрета>` видна только тем, кто знает
 этот секрет её владельца (и самому владельцу): остальные не видят её плашку,
@@ -914,7 +921,12 @@ skills:
       stress_monthly: { trigger: { ... }, value: 2, desc: stress_when.peace }
 
 skill_archetypes:                                              # связки навыков
-  gray_eminence: { skills: [diplomacy, intrigue], min: 14, icon: "🎭", modifiers: { scheme_power: 10 } }
+  gray_eminence:
+    skills: [diplomacy, intrigue]
+    min: 14
+    icon: "🎭"
+    modifiers: { scheme_power: 10, scapegoat: 1 }
+    trial: { years: 5, goals: [ { deed: whispers, count: 2 }, { trigger: { gold: ">= 300" }, desc: my.goal } ] }
 ```
 
 - **Супруг правителя** даёт долю своих собственных навыков
@@ -923,11 +935,14 @@ skill_archetypes:                                              # связки н
   отклики на поступки и месячный стресс работают как у черт характера.
   Условие `has_mastery: intrigue`; название — `mastery.<навык>`, описание —
   `mastery_desc.<навык>`.
-- **Связки (архетипы)**: когда все навыки из `skills` не ниже `min`,
-  персонаж получает архетип — не больше `defines.character.max_archetypes`
-  (сначала тройки-«легенды», потом пары с самыми высокими навыками). Условие
-  `has_archetype: <id>` открывает особые действия (в ядре: торговый договор
-  купца-князя, архивы архивариуса, раздор серого кардинала). Характеристики
+- **Связки (архетипы)** нужно заслужить (механика `trials`, ниже): когда
+  все навыки из `skills` не ниже `min`, открывается испытание; пройденное —
+  архетип навсегда, даже если навыки потом упадут. Без механики `trials`
+  архетип приходит сам, пока навыки держатся (сначала тройки-«легенды», потом
+  пары с самыми высокими навыками). Архетипов — не больше
+  `defines.character.max_archetypes`. Условие `has_archetype: <id>`
+  открывает особые правила и действия — в ядре у каждого пути своё
+  (`archetypes.yaml`, `skill_paths.yaml`). Характеристики
   `self_knight` (правитель бьётся среди своих рыцарей), `law_cost_mult`,
   `discord_chance`, `battle_survival`, `siege_speed`, `build_time_mult`,
   `faction_discontent_mult`, `dread_decay_mult` можно давать и чертами, и
@@ -949,7 +964,7 @@ skill_archetypes:                                              # связки н
 | | `siege_speed` | скорость осад |
 | управление | `army_upkeep_mult`, `build_cost_mult`, `build_time_mult` | содержание войск и стройки |
 | | `loot_mult` | добыча со взятых крепостей (`on_siege_won`) |
-| | `audit_chance` | «Ревизия»: % в месяц поймать казнокрада в своём совете (событие `skills.0001`) |
+| | `audit_chance` | «Ревизия»: % в месяц поймать того, кто обворовывает (секрет с `audit_event`; в ядре — казнокрад, событие `skills.0001`) |
 | интриги | `scheme_defense` | защита от интриг |
 | | `secret_passages` | «Тайные ходы»: шанс уйти из павшей столицы и бежать из темницы (× `prison.escape_per_passage`) |
 | | `turn_plotter_chance` | «Перевербовка»: % получить крюк на раскрытого заговорщика (`on_scheme_discovered`) |
@@ -964,6 +979,52 @@ skill_archetypes:                                              # связки н
 Образ жизни может учиться и вторым навыком: `lifestyles.<id>.secondary_skill`
 (доля опыта — `secondary_share`, по умолчанию половина; в `arcana` колдовство
 учится и учёностью).
+
+### Испытания путей
+
+Механика `trials`. Для каждой связки движок сам создаёт решение
+`trial_<id>` («Встать на путь: …»; своё решение с таким id в данных его
+заменяет). Оно видно, когда навыки дотянули до порога, путь не пройден, нет
+другого испытания и не исчерпан предел архетипов. Испытание — цели
+`trial.goals` за `trial.years` лет (по умолчанию `defines.trials.years`):
+
+- `{ deed: <деяние>, count: N }` — столько деяний (механика `deeds`) с начала
+  испытания; текст — `deed_goal.<деяние>` (или своё `desc`), рядом — прогресс;
+- `{ trigger: { ... }, desc: <ключ> }` — условие, проверяется раз в месяц.
+
+Все цели выполнены — архетип навсегда (`c.vars.archetypes`, хук
+`trial.completed`, деяние-сигнал `trial_completed`). Срок вышел — стресс
+`fail_stress` и перерыв `cooldown_years` на этот путь (`trial.failed`). Без
+`trial` решение даёт архетип сразу. ИИ берёт путь по `trial.ai_will_do`, а на
+испытании охотнее и чаще принимает решения и взаимодействия, которые ведут к
+его целям (`ai_goal_will`, `ai_goal_frequency`; для деяний-сигналов — по
+`ai_hint` деяния), и чаще воюет, если цели военные (`ai_war_chance`).
+Скрипт: `can_begin_trial: <id>`, `has_active_trial`, `num_archetypes`,
+эффекты `begin_trial`, `grant_archetype`. Характеристики-правила путей,
+которые читает движок: `scapegoat` (раскрытую интригу валят на придворного),
+`home_advantage` (сила войска на своей земле, %), `domain_fort` (крепости
+домена), `capital_defense` (столица держит осаду дольше), `income_per_hook`,
+`duel_prestige_mult`, `knight_cap`, `loot_mult`, `peace_persuasion`.
+
+### Деяния
+
+Механика `deeds`: летопись поступков, `c.vars.deeds = {деяние: число}`.
+
+```yaml
+deeds:
+  battles_won: { icon: "⚔", signal: battle_won }          # встроенный источник
+  feasts:      { icon: "🍗", decisions: [hold_feast] }     # принятые решения
+  executions:  { icon: "🪓", interactions: [execute_prisoner] }   # принятые взаимодействия (у действующего лица)
+  judgments:   { icon: "⚖", events: [court.0004] }          # события, через которые прошёл персонаж
+  murders:     { icon: "🩸", schemes: [murder] }            # удачные интриги
+  duels_won:   { icon: "🤺", signal: duel_won, ai_hint: { interactions: [challenge_to_duel] } }  # что помогает ИИ
+```
+
+Сигналы: `battle_won`, `battle_lost`, `siege_won`, `war_won`, `war_lost`,
+`duel_won`, `duel_lost`, `building`, `conversion`, `scheme_success`,
+`discord`, `secret_exposed`, `revolt_led`, `law_changed`, `trial_completed`.
+Скрипт: эффект `add_deed: <id>` (или `{ id, value }`), значения
+`deeds_<id>`. Хук `deed` — `{character, deed, count}`. Название — `deed.<id>`.
 
 ### Голоса навыков в событиях
 
@@ -1089,6 +1150,8 @@ traits:
   а пущенный слух охлаждает вассалов соперника — его фракциям легче;
 - **поединки ↔ страх ↔ кураж**: победа в поединке внушает страх, полоса побед
   даёт кураж доблести;
+- **деяния ↔ испытания ↔ ИИ**: путь (архетип) заслуживают делами — битвами,
+  постройками, пирами, шантажом; ИИ на испытании сам ищет нужные дела;
 - **учёность ↔ магия** (мод `arcana`): учёность помогает постигать колдовство,
   защищает от порчи и выдаёт чудовищ при дворе.
 

@@ -111,6 +111,9 @@ static func _consider_war(game: Game, c: Dictionary) -> void:
 	if game.engine.has_feature("personality"):
 		# робким и довольным война в тягость (стресс → меньше шанс)
 		chance += Personality.ai_will_shift(game, c, "declare_war") * 0.01
+	# испытание пути требует побед
+	if c.vars.has("trial") and Trials.ai_wants_war(game, c):
+		chance += game.def_num("trials.ai_war_chance", 0.25)
 	if game.rng.chance(chance):
 		Wars.declare_war(game, c, best)
 
@@ -305,8 +308,13 @@ static func _ai_interaction_defs(game: Game) -> Array:
 static func _consider_interactions(game: Game, c: Dictionary) -> void:
 	var list_cache := {}
 	var has_personality := game.engine.has_feature("personality")
+	var on_trial: bool = c.vars.has("trial")
 	for def in _ai_interaction_defs(game):
 		var freq := Data.num(def.get("ai_frequency_months"), 6)
+		# на испытании пути о полезном для целей думают чаще
+		var trial_shift := Trials.ai_will_shift(game, c, "interaction:" + str(def.id)) if on_trial else 0.0
+		if trial_shift > 0.0:
+			freq /= game.def_num("trials.ai_goal_frequency", 3)
 		if not game.rng.chance(1.0 / freq):
 			continue
 		# условия самого действующего лица — один раз, а не на каждую цель
@@ -320,6 +328,7 @@ static func _consider_interactions(game: Game, c: Dictionary) -> void:
 				continue
 		# характер: претящее делается реже, то, что по душе, — охотнее
 		var shift := Personality.ai_will_shift(game, c, str(def.get("scheme", def.id))) if has_personality else 0.0
+		shift += trial_shift
 		var best: Variant = null
 		for r in _ai_targets(game, c, def, list_cache):
 			if not Interactions.is_shown(game, def, c, r):
@@ -429,10 +438,15 @@ static func _consider_decisions(game: Game, c: Dictionary) -> void:
 	# один контекст на все проверки; сохранённые условиями скоупы сбрасываются
 	var ctx := Decisions.context(game, c)
 	var base_scopes := ctx.scopes.duplicate()
+	var on_trial: bool = c.vars.has("trial")
 	for def in game.content.all("decisions"):
 		if def.get("ai_will_do") == null:
 			continue
-		if not game.rng.chance(1.0 / Data.num(def.get("ai_check_months"), 6)):
+		var months := Data.num(def.get("ai_check_months"), 6)
+		var trial_shift := Trials.ai_will_shift(game, c, "decision:" + str(def.id)) if on_trial else 0.0
+		if trial_shift > 0.0:
+			months /= game.def_num("trials.ai_goal_frequency", 3)
+		if not game.rng.chance(1.0 / months):
 			continue
 		if ctx.scopes.size() != base_scopes.size() or not ctx.values.is_empty():
 			ctx = Decisions.context(game, c)
@@ -441,6 +455,7 @@ static func _consider_decisions(game: Game, c: Dictionary) -> void:
 		var will := Interp.eval_value(ctx, ctx.root, def.ai_will_do)
 		if has_personality:
 			will += Personality.ai_will_shift(game, c, str(def.id))
+		will += trial_shift
 		if game.rng.next() * 100.0 < will:
 			Decisions.take(game, def, c)
 

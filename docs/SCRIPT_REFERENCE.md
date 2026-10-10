@@ -7,6 +7,7 @@
 
 | Имя | Скоупы | Описание | Источник |
 |---|---|---|---|
+| `can_begin_trial` | character | Может встать на путь связки навыков (испытание): can_begin_trial: <архетип> | core/trials |
 | `can_marry` | character | Может вступить в брак с персонажем | core |
 | `can_use_hook_on` | character | Крюк на персонажа можно использовать сейчас | core |
 | `capital_has_disease` | character | В столице персонажа (или его сюзерена) эпидемия. | plague |
@@ -16,6 +17,7 @@
 | `faction_type` | faction | Тип фракции | core/factions |
 | `faith` | character, province | Вера равна | core |
 | `global_var` | любой | Сравнение глобальной переменной | core |
+| `has_active_trial` | character | Проходит испытание (yes/no или id архетипа) | core/trials |
 | `has_any_claim` | character | Есть претензии | core |
 | `has_archetype` | character | Есть архетип — связка высоких навыков (skill_archetypes): has_archetype: <id> или yes | core |
 | `has_building` | province | Есть постройка | core |
@@ -34,6 +36,7 @@
 | `has_lifestyle` | character | Текущий фокус принадлежит образу жизни | core/lifestyles |
 | `has_mastery` | character | Легла тень мастерства навыка: has_mastery: intrigue | core |
 | `has_modifier` | character | Есть модификатор | core |
+| `has_nickname` | character | Есть прозвище (yes/no или id прозвища из nicknames) | core/deeds |
 | `has_opinion_modifier` | character | Есть модификатор мнения: { target, modifier } | core |
 | `has_perk` | character | Открыт перк | core/lifestyles |
 | `has_province_flag` | province | Есть флаг провинции | core |
@@ -123,6 +126,7 @@
 | `add_building` | Добавить постройку | core |
 | `add_claim` | Претензия на титул | core |
 | `add_courtier` | Принять ко двору | core |
+| `add_deed` | Записать деяние: add_deed: <id> или { id, value } | core/deeds |
 | `add_development` | Изменить развитие | core |
 | `add_dread` | Изменить страх, который внушает правитель | core/politics |
 | `add_dynasty_prestige` | Престиж династии | core |
@@ -149,6 +153,7 @@
 | `awaken_dead` | Мёртвые восстают в провинции: awaken_dead: 30 (сила) | arcana |
 | `become_independent` | Стать независимым | core |
 | `become_vassal_of` | Стать вассалом | core |
+| `begin_trial` | Начать испытание пути: begin_trial: <архетип> | core/trials |
 | `blackmail` | Шантажировать персонажа его самым тяжёлым известным секретом (получить крюк) | core/secrets |
 | `bless_domain` | Светлый чародей благословляет земли домена | arcana |
 | `break_alliance` | Разорвать союз | core |
@@ -177,6 +182,7 @@
 | `firestorm` | Огненная буря на крупнейшее вражеское войско у границ | arcana |
 | `gain_title` | Получить титул | core |
 | `give_title` | Пожаловать титул: { title, to } — получатель становится вассалом | core |
+| `grant_archetype` | Дать архетип без испытания: grant_archetype: <архетип> | core/trials |
 | `grant_minor_county` | Пожаловать персонажу самое бедное графство своего домена (не столицу) | core/politics |
 | `hunt_dragon` | Выйти на бой с ближайшим драконом | arcana |
 | `hunt_monsters` | Выследить чудовище в державе: найденная тайна раскрывается | arcana |
@@ -187,6 +193,7 @@
 | `lose_all_titles` | Потерять все титулы | core |
 | `lose_title` | Потерять титул (переходит к сюзерену) | core |
 | `make_pregnant` | Беременность: { father } | core |
+| `make_white_peace` | Белый мир во всех войнах, где персонаж — вождь стороны | core |
 | `mark_criminal` | Даёт target законный повод заключить этого персонажа: { target, years } | core/prison |
 | `marry` | Заключить брак | core |
 | `move_to_court` | Переехать ко двору персонажа | core |
@@ -254,6 +261,28 @@
 | `crown_authority_level` | character | Уровень закона группы crown_authority (−1, если не действует) | core/laws |
 | `current_year` | любой | Текущий год | core |
 | `days_since_start` | любой | Дней с начала партии | core |
+| `deeds_battles_lost` | character | Деяния: battles_lost | core/deeds |
+| `deeds_battles_won` | character | Деяния: battles_won | core/deeds |
+| `deeds_blackmails` | character | Деяния: blackmails | core/deeds |
+| `deeds_buildings` | character | Деяния: buildings | core/deeds |
+| `deeds_captives` | character | Деяния: captives | core/deeds |
+| `deeds_charity` | character | Деяния: charity | core/deeds |
+| `deeds_conversions` | character | Деяния: conversions | core/deeds |
+| `deeds_devotions` | character | Деяния: devotions | core/deeds |
+| `deeds_duels_won` | character | Деяния: duels_won | core/deeds |
+| `deeds_executions` | character | Деяния: executions | core/deeds |
+| `deeds_feasts` | character | Деяния: feasts | core/deeds |
+| `deeds_gifts` | character | Деяния: gifts | core/deeds |
+| `deeds_hunts` | character | Деяния: hunts | core/deeds |
+| `deeds_judgments` | character | Деяния: judgments | core/deeds |
+| `deeds_laws` | character | Деяния: laws | core/deeds |
+| `deeds_pacts` | character | Деяния: pacts | core/deeds |
+| `deeds_revolts` | character | Деяния: revolts | core/deeds |
+| `deeds_schemes` | character | Деяния: schemes | core/deeds |
+| `deeds_secrets_exposed` | character | Деяния: secrets_exposed | core/deeds |
+| `deeds_sieges_won` | character | Деяния: sieges_won | core/deeds |
+| `deeds_wars_won` | character | Деяния: wars_won | core/deeds |
+| `deeds_whispers` | character | Деяния: whispers | core/deeds |
 | `development` | province | Развитие провинции | core |
 | `diplomacy` | character | Навык: diplomacy | core |
 | `domain_limit` | character | Лимит домена | core |
@@ -283,6 +312,7 @@
 | `monsters_slain` | character | Сколько чудовищ уничтожил персонаж (слава охотника) | arcana |
 | `monthly_piety` | character | Характеристика: monthly_piety | core |
 | `monthly_prestige` | character | Характеристика: monthly_prestige | core |
+| `num_archetypes` | character | Сколько архетипов заслужено | core/trials |
 | `num_buildings` | province | Число построек | core |
 | `num_children` | character | Число живых детей | core |
 | `num_claims` | character | Число претензий | core |
@@ -445,6 +475,8 @@
 | `lands` | Вера и культура земель: чужие графства дают меньше, их можно обратить | да |
 | `momentum` | Кураж и хандра: полосы удач и неудач в одной сфере меняют навык и стресс | да |
 | `duels` | Поединки: вызов на бой один на один, поборники из рыцарей | да |
+| `deeds` | Деяния: летопись поступков персонажа и прозвища, которые из неё растут | да |
+| `trials` | Испытания архетипов: связку навыков нужно заслужить делами | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -457,6 +489,6 @@
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `momentum`, `plague_fear`
 - **province_modifier_providers**: `lands`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `arcana_faith`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `laws`, `politics`, `personality`
-- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `momentum` (13), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `deeds`, `trials`
+- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `momentum` (13), `trials` (14), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

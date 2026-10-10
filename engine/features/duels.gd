@@ -52,8 +52,8 @@ static func duel(game: Game, a: Dictionary, b: Dictionary) -> Dictionary:
 	var fw: Dictionary = fa if a_wins else fb
 	var fl: Dictionary = fb if a_wins else fa
 	var share := game.def_num("duels.champion_share", 0.5)
-	# слава — тому, за кого бились; поборнику — его доля
-	win.prestige += game.def_num("duels.win_prestige", 60) * (share if fw.id != win.id else 1.0)
+	# слава — тому, за кого бились; поборнику — его доля (duel_prestige_mult — куртуазный рыцарь)
+	win.prestige += game.def_num("duels.win_prestige", 60) * (share if fw.id != win.id else 1.0) * maxf(0.0, 1.0 + Stats.stat(game, win, "duel_prestige_mult"))
 	if fw.id != win.id:
 		fw.prestige += game.def_num("duels.win_prestige", 60) * share
 	lose.prestige -= game.def_num("duels.lose_prestige", 40) * (share if fl.id != lose.id else 1.0)

@@ -87,10 +87,19 @@ func t_or(key: String, fallback: String, params: Dictionary = {}) -> String:
 ## Разрешает «текстовое значение» из данных мода:
 ##  - словарь {ru: "...", en: "..."} — выбирается текущий язык;
 ##  - строка, совпадающая с ключом локализации — переводится;
-##  - иначе строка используется как есть (можно писать текст прямо в данных).
+##  - иначе строка используется как есть (можно писать текст прямо в данных);
+##  - {key, params} — ключ с параметрами (значения-строки тоже переводятся).
 func resolve(v: Variant, params: Dictionary = {}) -> String:
 	if v == null:
 		return ""
+	# { key, params } — ключ с параметрами; строки-параметры тоже переводятся
+	if v is Dictionary and v.has("key"):
+		var ps := params.duplicate()
+		var vp: Variant = v.get("params")
+		if vp is Dictionary:
+			for k in vp:
+				ps[k] = resolve(vp[k])
+		return resolve(v.key, ps)
 	if v is Dictionary:
 		var s: Variant = v.get(lang)
 		if s == null:

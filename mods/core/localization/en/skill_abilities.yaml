@@ -3,7 +3,7 @@ ev:
     c: "Sit down with the rebels and negotiate"
   skills.0001:
     t: Audit
-    desc: "Going over the treasury accounts, you find a shortfall — and the trail leads to [scope:embezzler]. The coins went missing a little at a time, but for years."
+    desc: "Going over the treasury accounts, you find a shortfall — and the trail leads to [scope:culprit]. The coins went missing a little at a time, but for years."
     a: "Expose the thief and recover the money"
     b: "Keep quiet — let them return a share and know that I know"
     c: "Count every last penny"

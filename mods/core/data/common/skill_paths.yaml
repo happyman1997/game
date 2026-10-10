@@ -1,0 +1,148 @@
+# Уникальные правила путей (архетипов, archetypes.yaml), которые живут в
+# данных: дописываются к чужим записям слиянием (файл грузится после них) или
+# добавляют свои. Правила, которые читает движок, — характеристики в modifiers
+# архетипа: scapegoat, home_advantage, domain_fort, capital_defense,
+# income_per_hook, duel_prestige_mult, loot_mult, peace_persuasion, knight_cap.
+
+modifiers:
+  golden_age: { icon: "☀", good: true, modifiers: { development_growth: 0.3, stress_gain_mult: -0.3, vassal_opinion: 10, monthly_prestige: 1 } }
+  hero_legacy: { icon: "🎶", good: true, modifiers: { monthly_prestige: 1.5, vassal_opinion: 10, knight_effectiveness: 0.1 } }
+
+opinion_modifiers:
+  respects_unifier: { value: 25, years: 10 }
+  merchant_gift: { value: 20, decay: 1 }
+  mediated_peace: { value: 20, years: 10 }
+
+on_actions:
+  # Победитель войны (root) и побеждённый (scope:enemy).
+  # Объединитель: побеждённые не держат зла — и охотнее идут к нему в вассалы.
+  on_war_won:
+    effect:
+      - if:
+          limit: { has_archetype: warlord }
+          scope:enemy: { add_opinion: { target: root, modifier: respects_unifier } }
+
+  on_battle_won:
+    effect:
+      $append:
+        # Воин веры: победа над иноверцем угодна Богу
+        - if:
+            limit:
+              has_archetype: holy_warrior
+              NOT: { same_faith_as: scope:enemy }
+            add_piety: 30
+
+  on_yearly_pulse:
+    effect:
+      # Архивариус: каждый год в архивах всплывает чужая тайна
+      - if:
+          limit: { has_archetype: archivist }
+          random_neighboring_ruler:
+            limit: { num_secrets: ">= 1" }
+            save_scope_as: archive_target
+          if:
+            limit: { exists: scope:archive_target }
+            learn_secret: { owner: scope:archive_target }
+
+  # Наследник (root) героя песен (scope:predecessor) получает его славу.
+  on_inheritance:
+    effect:
+      - if:
+          limit: { scope:predecessor: { has_archetype: hero_of_songs } }
+          add_modifier: { id: hero_legacy, years: 20 }
+          send_message: { text: msg.hero_legacy, kind: good }
+
+interactions:
+  # Объединитель: побеждённый им охотнее склоняется
+  offer_vassalization:
+    ai_accept:
+      add:
+        $append:
+          - { desc: ai.respects_unifier, limit: { has_opinion_modifier: { target: scope:actor, modifier: respects_unifier } }, value: 30 }
+
+  # Купец-князь: его подарки вдвое действеннее
+  send_gift:
+    on_accept:
+      $append:
+        - if:
+            limit: { scope:actor: { has_archetype: merchant_prince } }
+            scope:recipient: { add_opinion: { target: scope:actor, modifier: merchant_gift } }
+
+  # Третейский судья: мирит чужую войну — обоим сторонам мир, ему — слава
+  mediate_peace:
+    icon: "🕊"
+    category: diplomacy
+    is_shown:
+      scope:actor: { has_archetype: arbiter }
+      scope:recipient: { is_ruler: yes, is_at_war: yes }
+    is_valid:
+      scope:actor: { NOT: { is_at_war_with: scope:recipient } }
+    ai_accept:
+      value: 0
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.6 } }
+        - { desc: ai.war_weary, value: 15 }
+        - { desc: ai.ambitious, limit: { has_trait: [ambitious, wrathful] }, value: -20 }
+    on_accept:
+      - scope:recipient:
+          make_white_peace: yes
+          add_opinion: { target: scope:actor, modifier: mediated_peace }
+      - add_prestige: 100
+    cooldown: { years: 3 }
+    ai_targets: [neighboring_ruler, vassal]
+    ai_frequency_months: 12
+    ai_will_do: 30
+
+decisions:
+  # Хозяин войска: наёмники вдвое дешевле
+  hire_mercenaries:
+    cost:
+      gold: { value: 80, add: { value: tier, multiply: 30 }, if: { limit: { has_archetype: quartermaster }, multiply: 0.5 } }
+
+  # Государь-философ: раз в жизни — «Золотой век»
+  golden_age:
+    icon: "☀"
+    is_shown: { is_ruler: yes, has_archetype: philosopher_king }
+    is_valid:
+      NOT: { has_flag: golden_age_done }
+    cost: { gold: 200, prestige: 500 }
+    effect:
+      - set_flag: golden_age_done
+      - add_modifier: { id: golden_age, years: 10 }
+      - every_vassal: { add_opinion: { target: root, modifier: grateful } }
+    ai_check_months: 12
+    ai_will_do: 60
+
+casus_belli:
+  # Воин веры: священная война вдвое дешевле
+  holy_war:
+    cost:
+      piety: { value: 150, if: { limit: { has_archetype: holy_warrior }, multiply: 0.5 } }
+
+realm_laws:
+  # Реформатор: вассалы не мешают реформам
+  crown_authority_2:
+    can_change:
+      custom_tooltip:
+        trigger:
+          $replace: true
+          OR:
+            - has_archetype: reformer
+            - NOT: { any_vassal: { count: ">= 2", opinion: { target: root, value: "< -20" } } }
+  crown_authority_3:
+    can_change:
+      custom_tooltip:
+        trigger:
+          $replace: true
+          OR:
+            - has_archetype: reformer
+            - NOT: { any_vassal: { count: ">= 2", opinion: { target: root, value: "< 0" } } }
+
+schemes:
+  # Клинок в ночи: его убийцы вдвое быстрее, а убить его невозможно
+  murder:
+    progress:
+      multiply: { value: 1, if: { limit: { scope:owner: { has_archetype: night_blade } }, add: 1 } }
+    success_chance:
+      # после min/max: против клинка в ночи — ноль
+      multiply: { value: 1, if: { limit: { scope:target: { has_archetype: night_blade } }, multiply: 0 } }

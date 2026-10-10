@@ -10,6 +10,9 @@ extends EngineFeature
 ##     discovered_by — список (spouse, close_family, liege…), чьи члены могут
 ##     случайно узнать секрет; discovery_chance — шанс в месяц (в %).
 ##     on_expose: root — владелец, scope:exposer, scope:secret_target.
+##     audit_event — ревизия: жертва секрета (target) каждый месяц с шансом
+##     audit_chance (%, от управления) ловит виновного — событие у жертвы,
+##     scope:culprit — владелец секрета (в ядре — казнокрад и skills.0001).
 ##   defines.secrets: { max_known_per_secret }
 ## Состояние: c.secrets = [{id, type, target, known: [id], since}].
 
@@ -186,7 +189,15 @@ static func monthly(game: Game) -> void:
 			# секреты об умерших сообщниках не исчезают, а знающие умирают
 			s.known = s.known.filter(func(id): return game.is_alive(id))
 			var def: Variant = _def(game, s)
-			if def == null or def.get("discovered_by") == null:
+			if def == null:
+				continue
+			# audit_event: жертва (target) с audit_chance (ревизия) ловит виновного —
+			# событие у жертвы, scope:culprit — владелец секрета
+			if def.get("audit_event") != null and s.get("target") != null and not s.known.has(s.target):
+				var victim: Variant = game.ch(s.target)
+				if victim != null and Chars.is_alive(victim) and game.rng.next() * 100.0 < Stats.stat(game, victim, "audit_chance"):
+					game.events.trigger(str(def.audit_event), {"type": "character", "id": victim.id}, {"culprit": {"type": "character", "id": owner.id}})
+			if def.get("discovered_by") == null:
 				continue
 			var scopes := {"secret_target": {"type": "character", "id": s.target}} if s.get("target") != null else {}
 			var ctx := ScriptContext.make(game, {"type": "character", "id": owner.id}, scopes)
@@ -206,6 +217,10 @@ static func monthly(game: Game) -> void:
 
 func install(engine: GameEngine) -> void:
 	engine.systems.register("secrets", {"id": "secrets", "order": 42, "on_month": Secrets.monthly}, OWNER)
+	engine.content_validators.register("secret_audit", func(_e: GameEngine, v: ScriptValidator):
+		for d in _e.content.all("secret_types"):
+			v.ref("events", d.get("audit_event"), "secret_types/" + d.id)
+	)
 
 
 func register_script(engine: GameEngine) -> void:

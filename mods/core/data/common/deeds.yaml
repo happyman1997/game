@@ -1,0 +1,29 @@
+# Деяния (механика deeds): летопись того, что персонаж совершил за жизнь.
+# Из неё растут прозвища и цели испытаний архетипов (archetypes.yaml).
+# Источник — signal (встроенный), decisions, interactions (принятые, у
+# действующего лица), schemes (удачные интриги), events (события персонажа);
+# ai_hint — что помогает ИИ добиться деяния-сигнала. Название — deed.<id>,
+# цель испытания — deed_goal.<id> (прогресс «2/3» дописывается сам).
+deeds:
+  battles_won:     { icon: "⚔", order: 1, signal: battle_won }
+  battles_lost:    { icon: "🏳", order: 2, signal: battle_lost }
+  sieges_won:      { icon: "🏰", order: 3, signal: siege_won }
+  wars_won:        { icon: "👑", order: 4, signal: war_won }
+  duels_won:       { icon: "🤺", order: 5, signal: duel_won, ai_hint: { interactions: [challenge_to_duel] } }
+  buildings:       { icon: "🏗", order: 6, signal: building }
+  conversions:     { icon: "✝", order: 7, signal: conversion }
+  schemes:         { icon: "🗡", order: 8, signal: scheme_success }
+  whispers:        { icon: "🐍", order: 9, interactions: [sow_discord, spread_rumor] }
+  secrets_exposed: { icon: "🔍", order: 10, signal: secret_exposed }
+  blackmails:      { icon: "🤐", order: 11, interactions: [blackmail] }
+  executions:      { icon: "🪓", order: 12, interactions: [execute_prisoner] }
+  captives:        { icon: "⛓", order: 13, interactions: [imprison] }
+  gifts:           { icon: "🎁", order: 14, interactions: [send_gift, trade_pact] }
+  pacts:           { icon: "🤝", order: 15, interactions: [propose_alliance, offer_vassalization] }
+  feasts:          { icon: "🍗", order: 16, decisions: [hold_feast, convene_great_council] }
+  charity:         { icon: "🪙", order: 17, decisions: [give_alms] }
+  devotions:       { icon: "🙏", order: 18, decisions: [go_on_pilgrimage, confession, send_missionaries] }
+  hunts:           { icon: "🏹", order: 19, decisions: [go_hunting] }
+  judgments:       { icon: "⚖", order: 20, events: [court.0004, politics.0002, politics.0004, family.0002, feast.0002] }
+  revolts:         { icon: "📯", order: 21, signal: revolt_led }
+  laws:            { icon: "📜", order: 22, signal: law_changed }
