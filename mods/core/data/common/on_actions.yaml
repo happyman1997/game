@@ -88,4 +88,6 @@ on_actions:
     effect:
       - add_gold: { value: scope:province.tax, multiply: 8, min: 5 }
       - scope:province:
-          add_development: -1
+          if:
+            limit: { development: ">= 3" }
+            add_development: -1
