@@ -61,28 +61,28 @@ msg:
   hero_legacy: "Вы наследуете не только титулы, но и славу героя песен."
   archives_claim: "В архивах нашлась грамота: у вас претензия на [scope:claim_target]!"
 deed:
-  battles_won: Выиграно битв
-  battles_lost: Проиграно битв
-  sieges_won: Взято крепостей
-  wars_won: Выиграно войн
-  duels_won: Побед в поединках
-  buildings: Построек
-  conversions: Обращено графств
-  schemes: Удачных интриг
-  whispers: Посеянных раздоров и слухов
-  secrets_exposed: Разоблачено тайн
-  blackmails: Шантажей
-  executions: Казней
-  captives: Брошено в темницу
-  gifts: Подарков и договоров
-  pacts: Союзов и вассальных клятв
-  feasts: Пиров и советов
-  charity: Милостыни
-  devotions: Паломничеств и обетов
-  hunts: Охот
-  judgments: Рассуженных споров
-  revolts: Поднятых мятежей
-  laws: Реформ
+  battles_won: Победы в битвах
+  battles_lost: Поражения в битвах
+  sieges_won: Взятые крепости
+  wars_won: Выигранные войны
+  duels_won: Победы в поединках
+  buildings: Постройки
+  conversions: Обращённые графства
+  schemes: Удачные интриги
+  whispers: Раздоры и слухи
+  secrets_exposed: Разоблачённые тайны
+  blackmails: Шантаж
+  executions: Казни
+  captives: Узники
+  gifts: Подарки и договоры
+  pacts: Союзы и клятвы
+  feasts: Пиры и советы
+  charity: Милостыня
+  devotions: Паломничества и обеты
+  hunts: Охоты
+  judgments: Рассуженные споры
+  revolts: Мятежи
+  laws: Реформы
 deed_goal:
   battles_won: "Выиграть битвы"
   battles_lost: "Проиграть битвы"

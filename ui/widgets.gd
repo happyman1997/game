@@ -226,6 +226,41 @@ static func trial_chip(app: App, c: Dictionary, trial: Dictionary) -> Control:
 	return chip
 
 
+## Летопись деяний: значки со счётчиками и ближайшие прозвища (null — пусто).
+static func deeds(app: App, c: Dictionary) -> Variant:
+	var g := app.game
+	if not g.engine.has_feature("deeds"):
+		return null
+	var defs: Array = g.content.all("deeds").duplicate()
+	Data.sort_by(defs, func(d): return Data.num(d.get("order"), 99))
+	var f := K.flow([], 4)
+	for d in defs:
+		var n := Deeds.count(c, d.id)
+		if n <= 0:
+			continue
+		var chip := K.panel(K.hbox([K.icon(d.get("icon", "star"), 15), K.label(str(n), "SmallLabel")], 3))
+		chip.add_theme_stylebox_override("panel", UiArt.flat(Color("#2c2a24"), Color(UiArt.BRONZE, 0.5), 1, 3, 3))
+		K.tip(chip, BB.title(g.name_of("deeds", d.id)) + "\n" + BB.esc(str(n)))
+		f.add_child(chip)
+	var lines := []
+	var nid: Variant = c.vars.get("nick_id")
+	if nid != null and g.content.has("nicknames", str(nid)):
+		lines.append(app.t("ui.nickname_from", {"deed": g.name_of("deeds", str(g.content.get_def("nicknames", str(nid)).get("deed")))}))
+	for x in Deeds.next_nicknames(g, c).slice(0, 2):
+		var key := "nick." + str(x.nickname)
+		if c.female and g.loc.raw(key + "_f") != null:
+			key += "_f"
+		lines.append(app.t("ui.next_nickname", {"nick": g.loc.resolve(key), "deed": g.name_of("deeds", x.deed), "have": x.have, "need": x.need}))
+	if f.get_child_count() == 0 and lines.is_empty():
+		return null
+	var box := K.vbox([f], 3)
+	for l in lines:
+		box.add_child(K.label(l, "MutedLabel"))
+	var sec := K.section(app.t("ui.deeds"), [box], "scroll")
+	K.tip(sec.get_child(0), BB.title(app.t("ui.deeds")) + "\n" + BB.esc(app.t("ui.deeds_tip")))
+	return sec
+
+
 ## Черты персонажа: значки-плашки.
 static func traits(app: App, c: Dictionary) -> Control:
 	var g := app.game

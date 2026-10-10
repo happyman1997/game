@@ -79,8 +79,9 @@ static func build(app: App, id: String) -> Control:
 	root.add_child(K.panel(skill_box, "InsetPanel"))
 
 	# ---------------------------------------------------- черты и модификаторы
-	if not c.traits.is_empty():
-		root.add_child(W.traits(app, c))
+	var tf := W.traits(app, c)
+	if tf.get_child_count() > 0:
+		root.add_child(tf)
 	var shown_mods: Array = c.modifiers.filter(func(m): return Chars.modifier_visible(g, c, m.id, g.state.player))
 	if not shown_mods.is_empty():
 		var mods := K.flow([], 4)
@@ -108,6 +109,9 @@ static func build(app: App, id: String) -> Control:
 	var secrets: Variant = FeatureSections.secrets_character(app, c)
 	if secrets != null:
 		root.add_child(secrets)
+	var chron: Variant = W.deeds(app, c)
+	if chron != null:
+		root.add_child(chron)
 
 	# ---------------------------------------------------- действия
 	if p != null and alive and not app.pick_mode and g.state.game_over == null:

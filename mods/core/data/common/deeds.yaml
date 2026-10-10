@@ -27,3 +27,33 @@ deeds:
   judgments:       { icon: "⚖", order: 20, events: [court.0004, politics.0002, politics.0004, family.0002, feast.0002] }
   revolts:         { icon: "📯", order: 21, signal: revolt_led }
   laws:            { icon: "📜", order: 22, signal: law_changed }
+
+# Прозвища (только имя, без эффектов): nick.<id>, женское — nick.<id>_f.
+# Новое прозвище заменяет прежнее, только если priority выше; прозвища из
+# истории не заменяются.
+nicknames:
+  victorious:   { deed: battles_won, count: 5, priority: 3 }
+  invincible:   { deed: battles_won, count: 12, priority: 6 }
+  unlucky:      { deed: battles_lost, count: 8, priority: 1 }
+  wallbreaker:  { deed: sieges_won, count: 6, priority: 3 }
+  conqueror:    { deed: wars_won, count: 3, priority: 5 }
+  fearless:     { deed: duels_won, count: 3, priority: 4 }
+  builder:      { deed: buildings, count: 6, priority: 2 }
+  great_builder: { deed: buildings, count: 14, priority: 4 }
+  enlightener:  { deed: conversions, count: 4, priority: 3 }
+  cunning:      { deed: schemes, count: 4, priority: 2 }
+  two_tongued:  { deed: whispers, count: 4, priority: 2 }
+  all_seeing:   { deed: secrets_exposed, count: 3, priority: 3 }
+  spider:       { deed: blackmails, count: 4, priority: 3 }
+  cruel:        { deed: executions, count: 3, priority: 4 }
+  bloody:       { deed: executions, count: 7, priority: 6 }
+  jailer:       { deed: captives, count: 6, priority: 2 }
+  generous:     { deed: gifts, count: 6, priority: 2 }
+  gatherer:     { deed: pacts, count: 4, priority: 3 }
+  hospitable:   { deed: feasts, count: 5, priority: 2 }
+  merciful:     { deed: charity, count: 4, priority: 2 }
+  pious:        { deed: devotions, count: 4, priority: 3 }
+  huntsman:     { deed: hunts, count: 6, priority: 1 }
+  wise_judge:   { deed: judgments, count: 5, priority: 3 }
+  rebel:        { deed: revolts, count: 1, priority: 2 }
+  lawgiver:     { deed: laws, count: 2, priority: 3 }

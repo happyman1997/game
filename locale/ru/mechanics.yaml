@@ -4,7 +4,6 @@ msg:
   trial_completed: "{who} прошёл(а) испытание и стал(а) — «{name}»."
   trial_failed: "Испытание пути «{name}» провалено: срок вышел."
   scapegoat: "Интрига раскрыта, но подозрение пало на {who}."
-  nickname_gained: "Люди прозвали {who} — {nick}."
   wounded_in_front: "{who} вёл войско в первых рядах — и получил рану."
   escaped_by_passage: "Столица {place} пала, но вы ушли тайным ходом и не попали в плен."
   faction_negotiated: "Переговоры удались: фракция «{faction}» расходится, не получив от {liege} уступок."

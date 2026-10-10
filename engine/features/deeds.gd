@@ -16,9 +16,10 @@ extends EngineFeature
 ##     ai_hint: { decisions, interactions } — что помогает добиться деяния
 ##       (ИИ на испытании охотнее это делает), если сам источник — сигнал.
 ##   nicknames: { <id>: { deed, count, priority } } — прозвище (ключ
-##     локализации nickname.<id>) приходит, когда счётчик деяния дорос до
-##     count; новое заменяет старое, только если priority выше. Прозвища из
-##     истории (поле nickname персонажа) не заменяются.
+##     локализации nick.<id>, женское — nick.<id>_f, если есть) приходит,
+##     когда счётчик деяния дорос до count; новое заменяет старое, только если
+##     priority выше. Прозвища из истории (поле nickname персонажа) не
+##     заменяются. Прозвище — только имя: никаких эффектов.
 ## Состояние: c.vars.deeds = {деяние: число}, c.vars.nick_priority.
 ## Скрипт: эффект add_deed, значения deeds_<id>, условие has_nickname.
 ## Хуки: deed — {character, deed, count}; nickname.gained — {character, nickname}.
@@ -112,11 +113,14 @@ static func give_nickname(game: Game, c: Dictionary, nick: String) -> void:
 	var n: Variant = game.content.get_def("nicknames", nick)
 	if n == null:
 		return
-	c.nickname = "nickname." + nick
+	var key := "nick." + nick
+	if c.female and game.loc.raw("nick." + nick + "_f") != null:
+		key += "_f"
+	c.nickname = key
 	c.vars["nick_priority"] = Data.num(n.get("priority"), 0)
 	c.vars["nick_id"] = nick
 	if game.is_player(c.id) or game.is_player(str(c.get("liege"))):
-		game.message(game.loc.t("msg.nickname_gained", {"who": game.scope_name({"type": "character", "id": c.id}, "first_name"), "nick": game.loc.t("nickname." + nick)}), "good" if game.is_player(c.id) else "info", {"type": "character", "id": c.id})
+		game.message(game.loc.t("msg.nickname_gained", {"who": game.scope_name({"type": "character", "id": c.id}, "first_name"), "nick": game.loc.resolve(key)}), "good" if game.is_player(c.id) else "info", {"type": "character", "id": c.id})
 	game.emit("nickname.gained", {"character": c, "nickname": nick})
 	game.notify("character")
 

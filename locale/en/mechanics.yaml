@@ -4,7 +4,6 @@ msg:
   trial_completed: "{who} has passed the trial and become a {name}."
   trial_failed: "The trial of the {name} has failed: time ran out."
   scapegoat: "The scheme was discovered, but suspicion fell on {who}."
-  nickname_gained: "People have started calling {who} {nick}."
   wounded_in_front: "{who} led from the front — and took a wound."
   escaped_by_passage: "{place} has fallen, but you slipped out through a secret passage and avoided capture."
   faction_negotiated: "Negotiations succeeded: the {faction} disbands without concessions from {liege}."
