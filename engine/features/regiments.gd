@@ -149,9 +149,12 @@ static func army_bonus(game: Game, a: Dictionary, enemies: Array = [], location:
 		mine[r.type] = float(mine.get(r.type, 0.0)) + float(r.size)
 	var pd: Variant = game.content.get_def("provinces", location if location != null else a.location)
 	var terrain: Variant = pd.get("terrain") if pd != null else null
+	# regiment_power владельца — муштра (военное дело правителя)
+	var owner: Variant = game.ch(a.owner)
+	var drill := maxf(0.0, 1.0 + Stats.stat(game, owner, "regiment_power")) if owner != null else 1.0
 	var bonus := 0.0
 	for r in regs:
-		bonus += effective(game, r, enemy_men, mine.get(r.type, float(r.size)), terrain) - float(r.size)
+		bonus += effective(game, r, enemy_men, mine.get(r.type, float(r.size)), terrain) * drill - float(r.size)
 	return bonus
 
 
@@ -164,7 +167,7 @@ static func idle_power(game: Game, c: Dictionary) -> float:
 			continue
 		var def: Variant = game.content.get_def("regiment_types", r.type)
 		total += float(r.size) * (Data.num(def.get("power"), 1.0) if def != null else 1.0)
-	return total
+	return total * maxf(0.0, 1.0 + Stats.stat(game, c, "regiment_power"))
 
 
 ## То же, что recruit_blockers(...).is_empty(), но без текстов причин (для ИИ).

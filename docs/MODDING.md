@@ -262,6 +262,8 @@ events:
 | `on_war_started` / `on_war_ended` | нападающий | `scope:attacker`, `scope:defender`, `scope:target` |
 | `on_battle_won` / `on_battle_lost` | владелец армии | `scope:enemy` |
 | `on_siege_won` | тот, чья армия взяла крепость | `scope:province`, `scope:war`, `scope:defender` |
+| `on_scheme_discovered` | цель раскрытой враждебной интриги | `scope:plotter`, `scope:scheme` |
+| `on_councillor_pulse` | советник (раз в месяц) | `scope:liege` |
 | `on_stress_level` | персонаж, чей стресс перешёл новую сотню | |
 
 Мод может завести и **свой** on_action: опишите его в `on_actions` и вызывайте
@@ -402,6 +404,7 @@ interactions:
     ai_frequency_months: 12
     ai_potential: { piety: 100 }       # только для ИИ: условия на него самого (root), проверяются до перебора целей
     ai_will_do: 30
+    # ai_send_if_declined: yes         # ИИ предлагает, даже если ждёт отказа (отказ сам чего-то стоит)
     cooldown: { years: 1 }
     # scheme: murder                   # вместо on_accept — запустить интригу
 ```
@@ -642,7 +645,7 @@ func init(api: ModApi) -> void:
 
   (доступны `lifestyles`, `council`, `prison`, `factions`, `regiments`,
   `secrets`, `laws`, `knights`, `politics`, `personality`, `renown`, `lands`,
-  `reputation`, `momentum`;
+  `momentum`, `duels`;
   интерфейс скрывает вкладки и разделы выключенных механик). Словарь скриптов
   механики (её триггеры, эффекты, значения) остаётся зарегистрированным, так что
   чужие данные, которые его упоминают, не ломаются — на пустом состоянии
@@ -717,6 +720,9 @@ council_tasks:
 Правителей берут в плен при взятии их столицы, полководцев — после
 проигранных сражений; плен вражеского лидера даёт `leader_captured_warscore`
 очков войны. Пленник не правит, не командует и не ведёт интриги.
+Тайные ходы (`secret_passages`, от интриги) — шанс уйти из павшей столицы
+(хук `prison.passage_escape`) и ежемесячный шанс бежать
+(`escape_chance + secret_passages × escape_per_passage`).
 Скрипт: `is_imprisoned`, `is_imprisoned_by`, `has_imprisonment_reason`
 (законный повод: раскрытая интрига, модификатор мнения из
 `crime_opinion_modifiers`, флаг от `mark_criminal`), `prison_months`,
@@ -744,10 +750,14 @@ factions:
 игроку приходит событие `faction.0001` (его можно заменить). Отказ —
 война с поводом `cb`, где все члены фракции — нападающие; в эффектах повода
 доступны `scope:war` (списки `war_attacker`, `war_defender`) и `scope:claimant`.
+ИИ-сюзерен, отвергший требования, пробует договориться: проверка дипломатии
+против `factions.negotiation_check` (как проверка навыка в событии); удача —
+фракция расходится без уступок (`negotiated_opinion` её членам, хук
+`faction.ultimatum` с `negotiated: true`), неудача — мятеж.
 Скоуп фракции: значения `faction_power`, `faction_discontent`,
 `num_faction_members`; ссылки `faction_leader`, `faction_target`,
 `faction_claimant`; список `faction_member`; эффекты `faction_enforce_demands`,
-`faction_start_war`, `add_faction_discontent`. Для персонажа: `is_in_faction`,
+`faction_start_war`, `faction_negotiate`, `add_faction_discontent`. Для персонажа: `is_in_faction`,
 `is_faction_leader`, `joined_faction`, `join_faction`, `leave_faction`,
 `seize_primary_title`.
 
@@ -896,7 +906,7 @@ vassal_obligations:                 # условия службы, ровно о
 skills:
   diplomacy:
     per_point: { general_opinion: 0.25 }                       # всем, за каждое очко
-    ruler_per_point: { vassal_opinion: 0.5, faction_discontent_mult: -0.012 }   # только правителям
+    ruler_per_point: { vassal_opinion: 0.4, ally_persuasion: 1.25 }   # только правителям
     mastery:                                                   # тень мастерства
       at: 20
       modifiers: { dread_decay_mult: 1.0 }
@@ -925,6 +935,36 @@ skill_archetypes:                                              # связки н
 - Навыки по-прежнему читает и движок: управление — налог и лимит домена,
   военное дело полководца — сила армии, учёность — благочестие.
 
+Способности навыков в ядре — характеристики, которые движок и данные читают
+напрямую (их можно давать и чертами, перками, модификаторами):
+
+| Навык | Характеристика | Что делает |
+|---|---|---|
+| дипломатия | `ally_persuasion` | союзник вступает в войну при мнении о зовущем не ниже `war.ally_min_opinion` минус это |
+| | `peace_persuasion` | враг соглашается на капитуляцию и белый мир на столько очков счёта раньше |
+| | — | переговоры с мятежниками: вариант ультиматума `faction.0001`, у ИИ — проверка против `factions.negotiation_check` |
+| военное дело | `march_speed` | скорость войска под командованием |
+| | `pursuit`, `orderly_retreat` | потери проигравших × (1 + преследование победителя − порядок отхода проигравшего), в `military.chase_min…chase_max` |
+| | `regiment_power` | «Муштра»: сила профессиональных отрядов правителя |
+| | `siege_speed` | скорость осад |
+| управление | `army_upkeep_mult`, `build_cost_mult`, `build_time_mult` | содержание войск и стройки |
+| | `loot_mult` | добыча со взятых крепостей (`on_siege_won`) |
+| | `audit_chance` | «Ревизия»: % в месяц поймать казнокрада в своём совете (событие `skills.0001`) |
+| интриги | `scheme_defense` | защита от интриг |
+| | `secret_passages` | «Тайные ходы»: шанс уйти из павшей столицы и бежать из темницы (× `prison.escape_per_passage`) |
+| | `turn_plotter_chance` | «Перевербовка»: % получить крюк на раскрытого заговорщика (`on_scheme_discovered`) |
+| | — | взаимодействие `spread_rumor`: цель теряет престиж, её вассалы охладевают |
+| учёность | `lifestyle_xp_mult`, `health`, `development_growth` | учение, здоровье, рост земель |
+| | (мод `arcana`) `curse_resistance`, `monster_sight` | защита от порчи; % в год распознать вампира или оборотня при дворе |
+| доблесть | `battle_survival` | реже гибнет в бою и в поединке |
+| | `personal_example` | «Личный пример»: + сила войска полководца, сверх `military.personal_example_safe` — риск раны |
+| | `dread_gain_mult` | «Устрашение»: страх копится быстрее; дерзкие вассалы уважают доблестного сюзерена (`politics.respect_*`) |
+| | — | поединки (механика `duels`, взаимодействие `challenge_to_duel`) |
+
+Образ жизни может учиться и вторым навыком: `lifestyles.<id>.secondary_skill`
+(доля опыта — `secondary_share`, по умолчанию половина; в `arcana` колдовство
+учится и учёностью).
+
 ### Голоса навыков в событиях
 
 Вариант события может говорить голосом навыка (поле `skill`):
@@ -947,16 +987,19 @@ check_per_point`, в пределах `check_min…check_max`, минус `check
 success}`. Ядро дописывает такие варианты к своим событиям в
 `core/data/events/skill_voices.yaml` через `$append` — так же могут и моды.
 
-### Молва
+### Поединки
 
-Механика `reputation`. У навыка с полем `reputation: { drift, max_gap }`
-(в ядре — военное дело и интриги) есть молва: что о персонаже думают. Победы
-и поражения (`on_battle_won`/`on_battle_lost`, взятие крепостей), раскрытые
-интриги и разоблачённые секреты сдвигают её, а за год она тянется к правде на
-`drift`. ИИ оценивает силу врага с поправкой на то, насколько слава его
-полководца расходится с правдой (`defines.reputation.war_weight`), фракции не любят бунтовать против славного
-полководца, а к интригану с дурной славой (`infamy_from`) хуже относятся.
-Скрипт: значения `<навык>_reputation`, эффект `add_reputation: { skill, value }`.
+Механика `duels`. Эффект `duel: scope:x` — бой один на один. За правителя
+бьётся поборник — лучший из его рыцарей, если тот доблестнее хозяина хотя бы
+на `champion_margin`. Шанс — `50 + (доблесть бойца − доблесть противника) ×
+per_point` в пределах `min_chance…max_chance`. Победитель получает
+`win_prestige` (поборнику — доля `champion_share`) и страх `win_dread`,
+проигравшая сторона теряет `lose_prestige`, проигравший боец гибнет с шансом
+`death_chance × (1 − battle_survival)` или ранен (`wound_chance`). Числа —
+`defines.duels`. Скрипт: значение `duel_odds(scope:x)` (шанс победы, %),
+условие `has_champion`. Хук `duel` — `{winner, loser, winner_fighter,
+loser_fighter, death}`; поединок — сфера доблести для куража и хандры.
+В ядре — взаимодействие `challenge_to_duel` (отказ стоит престижа).
 
 ### Кураж, хандра и стресс
 
@@ -1035,7 +1078,19 @@ traits:
 - **темница ↔ титулы ↔ страх**: ИИ отбирает земли у вассалов, которых держит в
   темнице за преступление или мятеж, — отзыв титула добавляет страх;
 - **война ↔ экономика**: взятие крепости приносит добычу и разоряет графство
-  (`on_actions.on_siege_won`).
+  (`on_actions.on_siege_won`), а управитель берёт больше (`loot_mult`);
+- **навыки ↔ войны**: дипломат собирает союзников и раньше вынуждает к миру,
+  полководец быстрее идёт и жёстче преследует, доблестный ведёт войско в
+  первых рядах — и рискует раной;
+- **секреты ↔ совет ↔ казна**: казнокрад в совете (секрет) попадается на
+  ревизии управителя — деньги возвращаются, а вор лишается места или
+  остаётся на крючке;
+- **интриги ↔ фракции**: раскрытого заговорщика можно перевербовать (крюк),
+  а пущенный слух охлаждает вассалов соперника — его фракциям легче;
+- **поединки ↔ страх ↔ кураж**: победа в поединке внушает страх, полоса побед
+  даёт кураж доблести;
+- **учёность ↔ магия** (мод `arcana`): учёность помогает постигать колдовство,
+  защищает от порчи и выдаёт чудовищ при дворе.
 
 ### Оповещения
 

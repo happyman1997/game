@@ -11,7 +11,11 @@ extends EngineFeature
 ##               on_demands_accepted, ultimatum_event }
 ##   defines.factions: { power_threshold, discontent_gain, discontent_decay,
 ##                       ai_join_chance, ai_create_threshold, ai_create_chance,
-##                       ai_leave_below, cooldown_years }
+##                       ai_leave_below, cooldown_years, negotiation_check,
+##                       negotiated_opinion }
+## Переговоры с мятежниками: ИИ-сюзерен, отвергший требования, ещё пробует
+## уговорить фракцию разойтись — проверка дипломатии против negotiation_check
+## (игроку — вариант события ультиматума, эффект faction_negotiate).
 ## Скоупы: root — вассал (для can_join/ai_join) или лидер фракции (для
 ## on_demands_accepted), scope:liege, scope:faction, scope:faction_leader,
 ## scope:claimant.
@@ -202,6 +206,30 @@ static func enforce_demands(game: Game, f: Dictionary) -> void:
 	game.mark_dirty()
 
 
+## Переговоры с мятежниками удались: фракция расходится без войны и без
+## уступок (члены надолго остывают — faction_cooldown), им приятно, что их выслушали.
+static func negotiate(game: Game, f: Dictionary) -> void:
+	var liege: Variant = game.ch(f.target)
+	if liege == null:
+		return
+	game.emit("faction.ultimatum", {"faction": f, "accepted": false, "negotiated": true})
+	var om := str(game.def_val("factions.negotiated_opinion", "heard_out"))
+	for id in f.members:
+		var m: Variant = game.ch(id)
+		if m != null and game.content.has("opinion_modifiers", om):
+			Opinion.add_opinion(game, m, liege, om)
+	game.message(game.loc.t("msg.faction_negotiated", {"faction": game.name_of("factions", f.type), "liege": game.scope_name({"type": "character", "id": liege.id})}), "good" if game.is_player(liege.id) else "info", null, [liege.id] + f.members)
+	dissolve(game, f)
+	game.mark_dirty()
+
+
+## Шанс ИИ-сюзерена уговорить мятежников (проверка дипломатии против
+## factions.negotiation_check, как проверка навыка в событии).
+static func negotiation_chance(game: Game, liege: Dictionary) -> float:
+	var v := game.def_num("events.check_base", 50) + (Stats.skill(game, liege, "diplomacy") - game.def_num("factions.negotiation_check", 16)) * game.def_num("events.check_per_point", 5)
+	return clampf(v, game.def_num("events.check_min", 5), game.def_num("events.check_max", 95))
+
+
 ## Ультиматум отвергнут — мятеж.
 static func revolt(game: Game, f: Dictionary) -> bool:
 	var def: Variant = game.content.get_def("factions", f.type)
@@ -251,6 +279,8 @@ static func _issue_ultimatum(game: Game, f: Dictionary) -> void:
 	var accept := Interp.eval_value(ctx, ctx.root, def.ai_accept_demands) if def.get("ai_accept_demands") != null else -1.0
 	if accept > 0:
 		enforce_demands(game, f)
+	elif game.rng.next() * 100.0 < negotiation_chance(game, liege):
+		negotiate(game, f)
 	else:
 		revolt(game, f)
 
@@ -499,6 +529,15 @@ func register_script(engine: GameEngine) -> void:
 		"describe": func(ctx, s, _arg):
 			var f: Variant = fac.call(ctx, s)
 			return ctx.game.loc.t("fx.faction_enforce_demands", {"faction": ctx.game.name_of("factions", f.type)}) if f != null else null,
+	}, OWNER)
+	r.effects.register("faction_negotiate", {"scopes": FA, "doc": "Сюзерен уговорил фракцию разойтись без уступок",
+		"apply": func(ctx, s, _arg):
+			var f: Variant = fac.call(ctx, s)
+			if f != null:
+				Factions.negotiate(ctx.game, f),
+		"describe": func(ctx, s, _arg):
+			var f: Variant = fac.call(ctx, s)
+			return ctx.game.loc.t("fx.faction_negotiate", {"faction": ctx.game.name_of("factions", f.type)}) if f != null else null,
 	}, OWNER)
 	r.effects.register("faction_start_war", {"scopes": FA, "doc": "Фракция поднимает мятеж",
 		"apply": func(ctx, s, _arg):

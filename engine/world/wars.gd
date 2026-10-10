@@ -275,7 +275,8 @@ static func can_afford_war(game: Game, attacker: Dictionary, t: Dictionary) -> b
 	return Economy.cost_blockers(game, attacker, war_cost(game, attacker, t)).is_empty()
 
 
-## ИИ-союзник решает, вступать ли в войну.
+## ИИ-союзник решает, вступать ли в войну: мнение о зовущем не ниже
+## war.ally_min_opinion минус его ally_persuasion (дипломатия).
 static func ally_will_join(game: Game, ally: Dictionary, leader: Dictionary, enemy: String) -> bool:
 	if not Chars.is_alive(ally) or ally.titles.is_empty():
 		return false
@@ -285,7 +286,7 @@ static func ally_will_join(game: Game, ally: Dictionary, leader: Dictionary, ene
 		return true
 	if is_allied(game, ally.id, enemy):
 		return false
-	return Opinion.opinion(game, ally, leader) >= game.def_num("war.ally_min_opinion", -10)
+	return Opinion.opinion(game, ally, leader) >= game.def_num("war.ally_min_opinion", 0) - Stats.stat(game, leader, "ally_persuasion")
 
 
 static func new_war_record() -> Dictionary:
@@ -513,6 +514,13 @@ static func validate_wars(game: Game) -> void:
 
 
 ## Насколько сторона готова сдаться (для ИИ).
+## Дар убеждения того, кто предлагает мир стороне side (вождь другой стороны):
+## на столько очков счёта войны раньше она соглашается.
+static func peace_persuasion(game: Game, w: Dictionary, side: String) -> float:
+	var other: Variant = game.ch(w.attacker if side == "def" else w.defender)
+	return Stats.stat(game, other, "peace_persuasion") if other != null else 0.0
+
+
 static func ai_will_accept_surrender(game: Game, w: Dictionary, loser_side: String) -> bool:
 	var ws: float = warscore(game, w).total
 	var score = ws if loser_side == "def" else -ws
@@ -521,14 +529,15 @@ static func ai_will_accept_surrender(game: Game, w: Dictionary, loser_side: Stri
 	# «Военная усталость»: чем дольше война, тем охотнее проигрывающий сдаётся.
 	var years = (game.date - int(w.start)) / float(GameDate.DAYS_PER_YEAR)
 	var fatigue = maxf(0.0, years - game.def_num("war.fatigue_after_years", 2)) * game.def_num("war.fatigue_per_year", 6)
-	return score >= maxf(game.def_num("war.min_surrender_threshold", 40), game.def_num("war.ai_surrender_threshold", 75) - fatigue)
+	var need := maxf(game.def_num("war.min_surrender_threshold", 50), game.def_num("war.ai_surrender_threshold", 85) - fatigue)
+	return score >= need - peace_persuasion(game, w, loser_side)
 
 
 static func ai_will_accept_white_peace(game: Game, w: Dictionary, side: String) -> bool:
 	var ws: float = warscore(game, w).total
 	var mine = ws if side == "att" else -ws
 	var years = (game.date - int(w.start)) / float(GameDate.DAYS_PER_YEAR)
-	if mine <= -game.def_num("war.white_peace_losing", 25):
+	if mine <= -game.def_num("war.white_peace_losing", 35) + peace_persuasion(game, w, side):
 		return true
 	return years >= game.def_num("war.white_peace_years", 3) and absf(ws) <= game.def_num("war.white_peace_max_score", 30)
 

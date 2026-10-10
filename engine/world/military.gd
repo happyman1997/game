@@ -68,6 +68,13 @@ static func _death_mult(game: Game, c: Dictionary) -> float:
 	return clampf(1.0 - Stats.stat(game, c, "battle_survival"), 0.1, 5.0)
 
 
+## Рана (черта military.wound_trait), если её ещё нет.
+static func _wound(game: Game, c: Dictionary) -> void:
+	var t := str(game.def_val("military.wound_trait", "wounded"))
+	if game.content.has("traits", t) and not c.traits.has(t) and Chars.add_trait(game, c, t) and game.is_player(c.id):
+		game.message(game.loc.t("msg.wounded_in_front", {"who": game.scope_name({"type": "character", "id": c.id})}), "bad", {"type": "character", "id": c.id})
+
+
 static func commander_of(game: Game, a: Dictionary) -> Variant:
 	var c: Variant = game.ch(a.commander)
 	if c == null:
@@ -117,7 +124,7 @@ static func move_army(game: Game, id: String, dest: String) -> bool:
 static func days_to_next(game: Game, a: Dictionary) -> int:
 	if a.path.is_empty():
 		return 0
-	return ceili((1.0 - float(a.progress)) * edge_cost(game, a.location, a.path[0]) / game.def_num("military.speed", 12))
+	return ceili((1.0 - float(a.progress)) * edge_cost(game, a.location, a.path[0]) / army_speed(game, a))
 
 
 # ------------------------------------------------------------ враждебность
@@ -158,8 +165,14 @@ static func _enemy_armies_in_war(game: Game, w: Dictionary, side: String, loc: S
 
 # ------------------------------------------------------------ ежедневный цикл
 
+## Скорость войска в день: military.speed с march_speed полководца.
+static func army_speed(game: Game, a: Dictionary) -> float:
+	var speed := game.def_num("military.speed", 12)
+	var c: Variant = commander_of(game, a)
+	return speed * clampf(1.0 + Stats.stat(game, c, "march_speed"), 0.5, 2.0) if c != null else speed
+
+
 static func daily_military(game: Game) -> void:
-	var speed = game.def_num("military.speed", 12)
 	for a in game.state.armies.values():
 		if not game.is_alive(a.owner):
 			game.state.armies.erase(a.id)
@@ -167,7 +180,7 @@ static func daily_military(game: Game) -> void:
 		if a.path.is_empty():
 			continue
 		var cost = maxf(1.0, edge_cost(game, a.location, a.path[0]))
-		a.progress = float(a.progress) + speed / cost
+		a.progress = float(a.progress) + army_speed(game, a) / cost
 		if a.progress >= 1.0:
 			a.location = a.path.pop_front()
 			a.progress = 0.0
@@ -220,6 +233,8 @@ static func _side_power(game: Game, armies: Array, defending: bool, loc: String,
 			best = c
 	var martial = Stats.skill(game, best, "martial") if best != null else 0
 	var adv = Stats.stat(game, best, "commander_advantage") if best != null else 0.0
+	# личный пример: доблестный полководец ведёт войско в первых рядах
+	adv += Stats.stat(game, best, "personal_example") * 100.0 if best != null else 0.0
 	var pd: Variant = game.content.get_def("provinces", loc)
 	var terrain: Variant = game.content.get_def("terrain", pd.get("terrain")) if pd != null else null
 	var power = eff * (1.0 + martial * game.def_num("military.martial_bonus", 0.04) + adv / 100.0) * game.rng.range_float(game.def_num("military.battle_luck_min", 0.85), game.def_num("military.battle_luck_max", 1.15))
@@ -239,7 +254,14 @@ static func _battle(game: Game, w: Dictionary, loc: String, att: Array, def: Arr
 	var win_armies: Array = att if att_wins else def
 	var lose_armies: Array = def if att_wins else att
 	var ratio = minf(1.0, lose.power / maxf(1.0, win.power))
-	var lose_loss = roundi(lose.men * (game.def_num("military.loser_loss_base", 0.25) + game.def_num("military.loser_loss_scale", 0.4) * (1.0 - ratio)))
+	# преследование победителя против порядка при отходе у проигравшего
+	var chase := 1.0
+	if win.commander != null:
+		chase += Stats.stat(game, win.commander, "pursuit")
+	if lose.commander != null:
+		chase -= Stats.stat(game, lose.commander, "orderly_retreat")
+	chase = clampf(chase, game.def_num("military.chase_min", 0.5), game.def_num("military.chase_max", 1.8))
+	var lose_loss = roundi(minf(lose.men * 0.95, lose.men * (game.def_num("military.loser_loss_base", 0.25) + game.def_num("military.loser_loss_scale", 0.4) * (1.0 - ratio)) * chase))
 	var win_loss = roundi(win.men * (game.def_num("military.winner_loss_base", 0.05) + game.def_num("military.winner_loss_scale", 0.2) * ratio))
 	_distribute(win_armies, win_loss, win.men)
 	_distribute(lose_armies, lose_loss, lose.men)
@@ -269,6 +291,10 @@ static func _battle(game: Game, w: Dictionary, loc: String, att: Array, def: Arr
 	# Гибель полководцев
 	var lc: Variant = lose.commander
 	var wc: Variant = win.commander
+	# личный пример даром не даётся: в первых рядах легко получить рану
+	for cm in [lc, wc]:
+		if cm != null and game.rng.chance(maxf(0.0, Stats.stat(game, cm, "personal_example") - game.def_num("military.personal_example_safe", 0.03)) * game.def_num("military.personal_example_wound", 2)):
+			Military._wound(game, cm)
 	# battle_survival — доблестным реже достаётся смертельный удар
 	if lc != null and game.rng.chance(game.def_num("military.loser_commander_death", 0.04) * _death_mult(game, lc)):
 		Succession.kill_character(game, lc, "battle", wc.id if wc != null else null)

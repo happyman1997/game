@@ -106,6 +106,7 @@ arcana:
   msg_wolf_tamed: You have tamed the beast — it serves you, not the other way round.
   msg_wolf_alpha: You lead the pack. The beast answers your call on any night.
   msg_fey_sight: "Glamour cannot hide the truth from a changeling: {who} is not what they seem."
+  msg_scholar_sight: "The old bestiaries do not lie: the signs all match — {who} is not what they seem."
   msg_monster_hunter: Your first monster is slain. People call you a monster hunter.
   msg_monster_bane: Your fame runs ahead of you — you are the Bane of Monsters. The Order of the Silver Flame stands ready to serve.
   hunter_title: Monsters slain

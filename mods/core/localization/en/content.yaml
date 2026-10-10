@@ -6,12 +6,12 @@ skill:
   learning: Learning
   prowess: Prowess
 skill_desc:
-  diplomacy: "People. For a ruler: loyal vassals, respectful neighbours, quieter factions. For a chancellor: their tasks. For friendship schemes: success."
-  martial: "Armies. For a ruler: larger levies, cheaper armies, faster sieges. For a commander: army strength; for a marshal: their tasks."
-  stewardship: "Treasury. For a ruler: taxes, domain limit, development, cheaper and faster construction. For a steward: their tasks."
-  intrigue: "Secrets. Protection from schemes and power of your own, sowing discord, escaping prison. For a spymaster: their tasks."
+  diplomacy: "People. For a ruler: loyal vassals, quieter factions, allies who answer the call, enemies who make peace sooner, and rebels who can be talked down. For a chancellor: their tasks."
+  martial: "War. For a commander: army strength, fast marches, ruthless pursuit and orderly retreats. For a ruler: faster sieges and drilled regiments. For a marshal: their tasks."
+  stewardship: "Treasury. For a ruler: taxes, domain limit, development, cheaper construction and armies, siege loot, and audits that catch embezzlers on the council. For a steward: their tasks."
+  intrigue: "Secrets. Protection from schemes and power of your own, secret passages (escaping prison and a fallen capital), turning exposed plotters, rumors about rivals. For a spymaster: their tasks."
   learning: "Faith and knowledge. Piety, development, lifestyle learning, a little health. For a chaplain: their tasks, fabricating claims."
-  prowess: "Personal might. Knights in the army, surviving battles and assassins, bearing."
+  prowess: "Personal might. Duels, knights in the army, leading from the front (at the risk of wounds), surviving battles, dread — the defiant respect strength."
 
 trait:
   brave: Brave

@@ -138,6 +138,7 @@ ui:
     stress: от разрыва сердца
     plague: от чумы
     execution: казнён(а)
+    duel: в поединке
   courtier_of: "Придворный: {who}"
   wanderer: Странник
   lowborn: Безродный

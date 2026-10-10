@@ -1,0 +1,27 @@
+ev:
+  faction.0001:
+    c: "Sit down with the rebels and negotiate"
+  skills.0001:
+    t: Audit
+    desc: "Going over the treasury accounts, you find a shortfall — and the trail leads to [scope:embezzler]. The coins went missing a little at a time, but for years."
+    a: "Expose the thief and recover the money"
+    b: "Keep quiet — let them return a share and know that I know"
+    c: "Count every last penny"
+opinion_modifier:
+  bested_in_duel: Bested me in a duel
+  rumors_about_liege: Ugly rumors about the liege
+  slandered_me: Spread rumors about me
+  heard_out: Heard us out
+interaction:
+  spread_rumor: Spread a Rumor
+  challenge_to_duel: Challenge to a Duel
+interaction_desc:
+  spread_rumor: "Spread a nasty rumor about a ruler. Success — they lose prestige and their vassals cool toward them (good for factions). Failure — you are caught red-handed. Chance depends on your intrigue against theirs."
+  challenge_to_duel: "Challenge to single combat. Odds depend on the fighters' prowess; rulers may send a champion — the best of their knights. The winner gains prestige and dread, the loser risks wounds or death. Refusing costs prestige."
+msg:
+  plotter_turned: "Turned: [scope:plotter] is now on your hook — the exposed plotter will serve you."
+  rumor_spread: "The rumor is out: every court is whispering about [scope:recipient]."
+  rumor_about_you: "Ugly rumors about you are spreading — your vassals look at you askance."
+  rumor_caught: "You were caught spreading rumors about [scope:recipient]."
+  rumor_caught_you: "[scope:actor] was spreading rumors about you — but the truth came out."
+  duel_refused: "[scope:recipient] refuses the duel — and loses face."

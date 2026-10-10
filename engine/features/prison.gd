@@ -9,10 +9,12 @@ extends EngineFeature
 ## стоят. Все действия с пленниками — обычные взаимодействия в данных
 ## (imprison, release_prisoner, execute_prisoner, demand_ransom).
 ##
-##   defines.prison: { escape_chance, escape_per_intrigue, siege_capture_chance,
+##   defines.prison: { escape_chance, escape_per_passage, siege_capture_chance,
 ##                     battle_capture_chance, leader_captured_warscore,
 ##                     ransom_base, ransom_per_tier, ransom_income_months,
 ##                     crime_opinion_modifiers, monthly_stress, dungeon_health }
+## Тайные ходы (secret_passages — от интриги): шанс бежать из темницы
+## (× escape_per_passage в месяц) и уйти из павшей столицы, не попав в плен.
 ## Состояние: c.prison = {by, since, home, war}.
 
 const OWNER := "core/prison"
@@ -132,7 +134,8 @@ static func monthly(game: Game) -> void:
 			release(game, c, "jailer_died")
 			continue
 		Chars.change_stress(game, c, game.def_num("prison.monthly_stress", 2), "prison")
-		var escape := game.def_num("prison.escape_chance", 0.004) + Data.num(c.skills.get("intrigue")) * game.def_num("prison.escape_per_intrigue", 0.0005)
+		# тайные ходы (интрига): знает, где в стене плохо держится камень
+		var escape := game.def_num("prison.escape_chance", 0.004) + Stats.stat(game, c, "secret_passages") * game.def_num("prison.escape_per_passage", 0.02)
 		if game.rng.chance(escape):
 			release(game, c, "escaped")
 
@@ -155,7 +158,13 @@ static func _on_siege_won(game: Game, war: Dictionary, army: Dictionary, provinc
 		if game.state.armies.values().any(func(a): return a.owner == r.id):
 			continue
 		if game.rng.chance(game.def_num("prison.siege_capture_chance", 0.5)):
-			imprison(game, captor, r, "siege", war.id)
+			# тайные ходы: правитель уходит из павшей столицы подземным ходом
+			if game.rng.chance(clampf(Stats.stat(game, r, "secret_passages"), 0.0, 0.9)):
+				if game.is_player(r.id):
+					game.message(game.loc.t("msg.escaped_by_passage", {"place": game.name_of("provinces", province)}), "good", {"type": "province", "id": province})
+				game.emit("prison.passage_escape", {"character": r, "province": province})
+			else:
+				imprison(game, captor, r, "siege", war.id)
 		for id in r.spouses + r.children:
 			var f: Variant = game.ch(id)
 			if f != null and Chars.is_alive(f) and f.get("prison") == null and f.titles.is_empty() and f.liege == r.id and Chars.is_adult(game, f) and game.rng.chance(game.def_num("prison.family_capture_chance", 0.3)):

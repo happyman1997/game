@@ -19,6 +19,7 @@
 | `has_any_claim` | character | Есть претензии | core |
 | `has_archetype` | character | Есть архетип — связка высоких навыков (skill_archetypes): has_archetype: <id> или yes | core |
 | `has_building` | province | Есть постройка | core |
+| `has_champion` | character | За персонажа в поединке бьётся поборник | core/duels |
 | `has_claim_on` | character | Есть претензия на титул | core |
 | `has_council_task` | character | Сюзерен: на какой-то должности выбрана задача (или одна из списка) | core/council |
 | `has_flag` | character | Есть флаг | core |
@@ -138,7 +139,6 @@
 | `add_prestige` | Изменить prestige | core |
 | `add_province_modifier` | Модификатор провинции | core |
 | `add_regiment` | Получить отряд бесплатно (сверх предела) | core/regiments |
-| `add_reputation` | Сдвинуть молву о навыке: add_reputation: { skill: martial, value: 2 } | core/reputation |
 | `add_secret` | Персонаж получает секрет: add_secret: тип или { type, target, known_by } | core/secrets |
 | `add_skill` | Навсегда изменить навык: { skill, value } | core |
 | `add_stress` | Изменить стресс | core |
@@ -167,9 +167,11 @@
 | `discover_scheme_against` | Раскрыть случайную враждебную интригу против персонажа или его семьи | core/council |
 | `discover_secret` | Узнать случайный секрет кого-то из своей державы | core/secrets |
 | `divorce` | Развод | core |
+| `duel` | Поединок с персонажем: duel: scope:x (за правителей могут биться поборники) | core/duels |
 | `end_war` | Завершить войну: victory/white_peace/defeat | core |
 | `expose_secret` | Разоблачить самый тяжёлый известный секрет персонажа | core/secrets |
 | `faction_enforce_demands` | Сюзерен выполняет требования фракции | core/factions |
+| `faction_negotiate` | Сюзерен уговорил фракцию разойтись без уступок | core/factions |
 | `faction_start_war` | Фракция поднимает мятеж | core/factions |
 | `feed_on_blood` | Вампир утоляет жажду (жертва — пленник или придворный) | arcana |
 | `firestorm` | Огненная буря на крупнейшее вражеское войско у границ | arcana |
@@ -180,7 +182,7 @@
 | `hunt_monsters` | Выследить чудовище в державе: найденная тайна раскрывается | arcana |
 | `imprison` | Заключить персонажа в свою темницу: imprison: scope:x или { target, reason } | core/prison |
 | `join_faction` | Вступить во фракцию против сюзерена (или создать): join_faction: <тип> | core/factions |
-| `learn_secret` | Узнать тайну персонажа: { owner, type } | arcana |
+| `learn_secret` | Узнать тайну персонажа (тип — необязателен): learn_secret: { owner: scope:x, type: secret_embezzler } | core/secrets |
 | `leave_faction` | Выйти из фракции | core/factions |
 | `lose_all_titles` | Потерять все титулы | core |
 | `lose_title` | Потерять титул (переходит к сюзерену) | core |
@@ -243,6 +245,7 @@
 | `ai_zeal` | character | Личность ИИ: zeal | core |
 | `arcane_power` | character | Колдовская сила персонажа | arcana |
 | `attraction` | character | Привлекательность | core |
+| `audit_chance` | character | Характеристика: audit_chance | core |
 | `beast_control` | character | Власть оборотня над зверем: −100 (одичал) … 100 (вожак стаи) | arcana |
 | `blood_potency` | character | Сила крови вампира (растёт с годами и кормлением) | arcana |
 | `blood_thirst` | character | Жажда крови вампира (0–100) | arcana |
@@ -253,9 +256,9 @@
 | `days_since_start` | любой | Дней с начала партии | core |
 | `development` | province | Развитие провинции | core |
 | `diplomacy` | character | Навык: diplomacy | core |
-| `diplomacy_reputation` | character | Молва о навыке «diplomacy» (без молвы — сам навык) | core/reputation |
 | `domain_limit` | character | Лимит домена | core |
 | `dread` | character | Страх, который внушает правитель (0–100) | core/politics |
+| `duel_odds` | character | Шанс победить персонажа в поединке, %: duel_odds(scope:x) | core/duels |
 | `dynasty_prestige` | character | Престиж династии | core |
 | `faction_discontent` | faction | Недовольство фракции (0–100) | core/factions |
 | `faction_power` | faction | Сила фракции в % от силы сюзерена | core/factions |
@@ -268,17 +271,15 @@
 | `income` | character | Ежемесячный доход | core |
 | `infected_provinces` | любой | Число заражённых провинций в мире. | plague |
 | `intrigue` | character | Навык: intrigue | core |
-| `intrigue_reputation` | character | Молва о навыке «intrigue» (без молвы — сам навык) | core/reputation |
 | `knights_power` | character | Сила рыцарей (в ополченцах) | core/knights |
 | `learning` | character | Навык: learning | core |
-| `learning_reputation` | character | Молва о навыке «learning» (без молвы — сам навык) | core/reputation |
 | `levies` | character | Ополчение державы | core |
 | `levy` | province | Ополчение провинции | core |
 | `levy_flat` | character | Характеристика: levy_flat | core |
 | `levy_ratio` | character | Доля восстановленных ополчений | core |
 | `lifestyle_xp` | character | Опыт текущего образа жизни | core/lifestyles |
+| `loot_mult` | character | Характеристика: loot_mult | core |
 | `martial` | character | Навык: martial | core |
-| `martial_reputation` | character | Молва о навыке «martial» (без молвы — сам навык) | core/reputation |
 | `monsters_slain` | character | Сколько чудовищ уничтожил персонаж (слава охотника) | arcana |
 | `monthly_piety` | character | Характеристика: monthly_piety | core |
 | `monthly_prestige` | character | Характеристика: monthly_prestige | core |
@@ -305,13 +306,13 @@
 | `num_vassals` | character | Число прямых вассалов | core |
 | `num_wars` | character | Число войн | core |
 | `opinion` | character | Мнение о персонаже: opinion(scope:x) | core |
+| `personal_example` | character | Характеристика: personal_example | core |
 | `piety` | character | Благочестие | core |
 | `piety_level` | character | Уровень благочестия (0 — нечестие) | core/renown |
 | `prestige` | character | Престиж | core |
 | `prestige_level` | character | Уровень славы (0 — позор) | core/renown |
 | `prison_months` | character | Сколько месяцев персонаж в темнице | core/prison |
 | `prowess` | character | Навык: prowess | core |
-| `prowess_reputation` | character | Молва о навыке «prowess» (без молвы — сам навык) | core/reputation |
 | `ransom_cost` | character | Размер выкупа за пленника | core/prison |
 | `realm_size` | character | Графств в державе | core |
 | `regiment_cap` | character | Предел отрядов | core/regiments |
@@ -320,14 +321,15 @@
 | `scheme_defense` | character | Характеристика: scheme_defense | core |
 | `scheme_power` | character | Характеристика: scheme_power | core |
 | `scheme_progress` | scheme | Прогресс интриги | core |
+| `secret_passages` | character | Характеристика: secret_passages | core |
 | `sorcery` | character | Навык: sorcery | core |
 | `stewardship` | character | Навык: stewardship | core |
-| `stewardship_reputation` | character | Молва о навыке «stewardship» (без молвы — сам навык) | core/reputation |
 | `stress` | character | Стресс | core |
 | `stress_level` | character | Уровень стресса (стресс / 100) | core |
 | `tax` | province | Налог провинции | core |
 | `tier` | character | Ранг основного титула (0 — нет земель, 1 — граф ... 4 — император) | core |
 | `title_tier` | title | Ранг титула | core |
+| `turn_plotter_chance` | character | Характеристика: turn_plotter_chance | core |
 | `vampire_tier` | character | Уровень вампира: 1 птенец, 2 вампир, 3 старейшина, 4 древний (0 — не вампир) | arcana |
 | `vassal_opinion` | character | Характеристика: vassal_opinion | core |
 | `war_duration_days` | war | Длительность войны | core |
@@ -441,8 +443,8 @@
 | `personality` | Характер: черты отзываются стрессом на поступки, ИИ поступает по характеру | да |
 | `renown` | Слава и благочестие: уровни престижа и благочестия меняют мнение подданных | да |
 | `lands` | Вера и культура земель: чужие графства дают меньше, их можно обратить | да |
-| `reputation` | Молва: слава полководца и дурная слава интригана живут своей жизнью | да |
 | `momentum` | Кураж и хандра: полосы удач и неудач в одной сфере меняют навык и стресс | да |
+| `duels` | Поединки: вызов на бой один на один, поборники из рыцарей | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -454,7 +456,7 @@
 - **interaction_deciders**: `payer`
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `momentum`, `plague_fear`
 - **province_modifier_providers**: `lands`
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `reputation`, `arcana_faith`
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `arcana_faith`
 - **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `laws`, `politics`, `personality`
-- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `momentum` (13), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85), `reputation` (85)
+- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `momentum` (13), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

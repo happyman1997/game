@@ -118,13 +118,16 @@ static func breakdown(parts: Array, digits: int = 0) -> String:
 
 
 ## Доли (множители, шансы) показываются процентами.
-const PCT_STATS := ["fertility", "battle_survival", "siege_speed", "development_growth"]
+const PCT_STATS := ["fertility", "battle_survival", "siege_speed", "development_growth", "march_speed", "pursuit",
+	"orderly_retreat", "regiment_power", "secret_passages", "personal_example"]
+## Шансы, которые уже записаны в процентах.
+const PCT_POINT_STATS := ["audit_chance", "turn_plotter_chance", "discord_chance", "monster_sight"]
 
 
 ## Значение характеристики со знаком: доли — процентами, мелкие — с десятыми.
 static func stat_value(k: String, v: float) -> String:
-	if "mult" in k or PCT_STATS.has(k):
-		var p := v * 100.0
+	if "mult" in k or PCT_STATS.has(k) or PCT_POINT_STATS.has(k):
+		var p := v if PCT_POINT_STATS.has(k) else v * 100.0
 		return "%s%s%%" % ["+" if v > 0 else "", K.fmt(p, 0 if absf(p) >= 10 or is_equal_approx(p, roundf(p)) else 1)]
 	var digits := 0
 	if absf(v) < 1.0:

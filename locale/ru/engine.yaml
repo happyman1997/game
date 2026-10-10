@@ -126,6 +126,7 @@ death:
   stress: "{who} умирает от разрыва сердца"
   plague: "{who} умирает от чумы"
   execution: "{who} казнён(а)"
+  duel: "{who} пал(а) в поединке"
 
 opinion:
   traits: Черты характера

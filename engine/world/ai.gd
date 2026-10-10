@@ -84,14 +84,13 @@ static func _consider_war(game: Game, c: Dictionary) -> void:
 		return
 	var my_str := Economy.military_strength(game, c)
 	# молва: врага, чья слава обгоняет правду, боятся больше, чем следует
-	var has_rep := game.engine.has_feature("reputation")
 	var need = game.def_num("ai.war_strength_ratio", 1.3) - Data.num(p.get("boldness")) * 0.02 - Data.num(p.get("aggression")) * 0.02
 	var best: Variant = null
 	var best_score := 0.0
 	for t in targets:
 		var def: Dictionary = game.ch(t.defender)
 		# Сначала дешёвое (соотношение сил), потом цена войны и желание.
-		var ratio := my_str / maxf(1.0, Economy.military_strength(game, def) * (Reputation.war_fear(game, def) if has_rep else 1.0))
+		var ratio := my_str / maxf(1.0, Economy.military_strength(game, def))
 		if ratio < need or not Wars.can_afford_war(game, c, t):
 			continue
 		if game.is_player(def.id) and game.rng.chance(game.def_num("ai.spare_player_chance", 0)):
@@ -348,9 +347,10 @@ static func _consider_interactions(game: Game, c: Dictionary) -> void:
 					if not Interactions.blockers(game, def, c, r, args).is_empty():
 						continue
 					# Не предлагаем то, на что заведомо откажут (кроме игрока — тот решает сам),
-					# если только нет крюка, которым можно заставить согласиться.
+					# если только нет крюка, которым можно заставить согласиться. Исключение —
+					# ai_send_if_declined: сам отказ чего-то стоит (вызов на поединок).
 					var decider := Interactions.decider_of(game, def, r)
-					if not game.is_player(decider.id):
+					if not game.is_player(decider.id) and not ScriptContext.is_yes(def.get("ai_send_if_declined", false)):
 						var acc := Interactions.acceptance(game, def, c, r, args)
 						if not acc.auto and acc.total <= 0.0:
 							if not Interactions.hook_available(game, def, c, r) or will < game.def_num("ai.use_hook_min_will", 30):

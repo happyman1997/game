@@ -1,5 +1,10 @@
 # Personality, Renown and Faith & Culture of the Land mechanics.
 msg:
+  wounded_in_front: "{who} led from the front — and took a wound."
+  escaped_by_passage: "{place} has fallen, but you slipped out through a secret passage and avoided capture."
+  faction_negotiated: "Negotiations succeeded: the {faction} disbands without concessions from {liege}."
+  duel_result: "Duel: {winner} defeats {loser}."
+  duel_died: "Duel: {winner} slays {loser}."
   momentum_up: "A winning streak: momentum in {skill} (level {n})."
   momentum_down: "A losing streak: despondency in {skill} (level {n})."
   check_success: "The {skill} check succeeded (the chance was {chance}%)."
@@ -16,9 +21,6 @@ ui:
   stress_state_2: "Strained: skills reduced, a breakdown is possible"
   stress_state_3: "On the edge: skills sharply reduced"
   stress_state_4: "Near collapse: this may end badly"
-  reputation: "Reputation"
-  reputation_tip: "What people believe. Reputation drifts toward the truth, but victories, defeats and exposed schemes move it. The AI judges by reputation: a famous general is feared, a known schemer distrusted."
-  reputation_item: "{skill} {value} (actually {real})"
   check_success: "If it succeeds:"
   check_failure: "If it fails:"
   voice_needs_skill: "Requires {skill} {min}+"
@@ -59,11 +61,15 @@ renown:
   piety_4: Righteous
   piety_5: Saintly
 opinion:
-  infamy: Infamous schemer
   renown_prestige: "Renown: {name}"
   renown_piety: "Piety: {name}"
 ai:
-  liege_fame: Liege's fame as a general
+  duel_odds: Odds of winning
+  duel_honor: Refusal is shameful
+  boldness: Boldness
+  brave: Brave
+  craven: Craven
+  wounded: Wounded
   faction_leader: Faction leader
 tr:
   has_archetype: "Archetype: {value}"
@@ -73,10 +79,24 @@ tr:
   has_holder_culture: County shares its holder's culture
   not_holder_culture: County of a foreign culture
 fx:
-  add_reputation: "Reputation ({skill}): {value}"
+  duel: "Duel: {a} vs {b}, {chance}% to win"
+  faction_negotiate: "The {faction} disbands without concessions"
+  learn_secret: "Learn {who}'s secret: {secret}"
   convert_to_holder_faith: "{place} adopts its holder's faith"
   convert_to_holder_culture: "{place} adopts its holder's culture"
 stat:
+  ally_persuasion: Allies join wars
+  peace_persuasion: Enemies accept peace sooner
+  march_speed: March speed
+  pursuit: Pursuit of the routed
+  orderly_retreat: Orderly retreat
+  regiment_power: Regiment drill
+  loot_mult: Siege loot
+  audit_chance: Audit (chance per month)
+  secret_passages: Secret passages
+  turn_plotter_chance: Turning plotters
+  personal_example: Leading from the front
+  dread_gain_mult: Dread gain
   discord_chance: Chance to sow discord
   self_knight: Fights among the knights
   law_cost_mult: Law change cost

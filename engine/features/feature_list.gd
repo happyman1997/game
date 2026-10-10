@@ -4,4 +4,4 @@ extends RefCounted
 
 
 static func builtin() -> Array:
-	return [Lifestyles.new(), Council.new(), Prison.new(), Factions.new(), Regiments.new(), Secrets.new(), Laws.new(), Knights.new(), Politics.new(), Personality.new(), Renown.new(), Lands.new(), Reputation.new(), Momentum.new()]
+	return [Lifestyles.new(), Council.new(), Prison.new(), Factions.new(), Regiments.new(), Secrets.new(), Laws.new(), Knights.new(), Politics.new(), Personality.new(), Renown.new(), Lands.new(), Momentum.new(), Duels.new()]

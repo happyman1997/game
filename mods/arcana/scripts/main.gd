@@ -252,16 +252,6 @@ func _register_script(api: ModApi) -> void:
 			if c != null and arg is Dictionary:
 				witness(ctx.game, c, str(arg.get("secret")), Data.num(arg.get("chance"), 20)),
 		"describe": func(ctx, _s, arg): return t(ctx.game, "fx_witness", {"n": int(Data.num(arg.get("chance"), 20)) if arg is Dictionary else 20})})
-	api.effect("learn_secret", {"scopes": CH, "doc": "Узнать тайну персонажа: { owner, type }",
-		"apply": func(ctx, s, arg):
-			var c: Variant = ch.call(ctx, s)
-			var o: Variant = Interp.resolve_scope(ctx, s, arg.get("owner")) if arg is Dictionary else null
-			var oc: Variant = ctx.game.ch(o.id) if (o != null and o.type == "character") else null
-			if c != null and oc != null:
-				for sec in Secrets.secrets_of(oc):
-					if sec.type == arg.get("type"):
-						Secrets.learn(ctx.game, c, oc, sec),
-		"describe": func(_ctx, _s, _a): return null})
 	api.effect("cast_curse_on", {"scopes": CH, "doc": "Проклясть персонажа (со стоимостью и риском разоблачения)",
 		"apply": func(ctx, s, arg):
 			var c: Variant = ch.call(ctx, s)
@@ -510,14 +500,17 @@ static func _char_month(game: Game, c: Dictionary) -> void:
 	elif c.vars.has("beast_control"):
 		_drop_path(game, c, WOLF_MODS, ["beast_control"])
 	if c.traits.has("changeling"):
-		_fey_sight(game, c)
+		_monster_sight(game, c, game.def_num("arcana.fey_sight_chance", 0.03), "msg_fey_sight")
 	if c.titles.is_empty():
 		return
 	if c.get("regiments") != null and not c.regiments.is_empty():
 		_risen_upkeep(game, c)
 	# Тайные события двора: игрок — каждый месяц, остальные правители — раз в
 	# год, в «свой» месяц (шансы в on_arcane_pulse рассчитаны на это).
-	if game.is_player(c.id) or (Rng.hash_string(c.id) & 0x7FFFFFFF) % 12 == GameDate.parts(game.date).m - 1:
+	var own_month: bool = (Rng.hash_string(c.id) & 0x7FFFFFFF) % 12 == GameDate.parts(game.date).m - 1
+	if own_month:
+		_monster_sight(game, c, Stats.stat(game, c, "monster_sight") / 100.0, "msg_scholar_sight")
+	if game.is_player(c.id) or own_month:
 		game.on_action("on_arcane_pulse", {"type": "character", "id": c.id})
 
 
@@ -633,9 +626,10 @@ static func _beast_wins(game: Game, c: Dictionary) -> void:
 
 # ------------------------------------------------------------ подменыши, мертвецы на службе
 
-## Подменыш видит сквозь чары: порой узнаёт тайну чудовища при своём дворе.
-static func _fey_sight(game: Game, c: Dictionary) -> void:
-	if not game.rng.chance(game.def_num("arcana.fey_sight_chance", 0.03)):
+## Подменыш видит сквозь чары (в месяц), учёный правитель — по книгам
+## (monster_sight от учёности, раз в год): порой узнаёт тайну чудовища при своём дворе.
+static func _monster_sight(game: Game, c: Dictionary, chance: float, msg: String) -> void:
+	if not game.rng.chance(chance):
 		return
 	var court_of: String = c.id if not c.titles.is_empty() else str(c.liege)
 	var pool: Array = game.courtiers_of(court_of)
@@ -649,7 +643,7 @@ static func _fey_sight(game: Game, c: Dictionary) -> void:
 			if MONSTER_SECRETS.has(s.type) and not s.known.has(c.id):
 				Secrets.learn(game, c, x, s)
 				if game.is_player(c.id):
-					game.message(t(game, "msg_fey_sight", {"who": cname(game, x.id)}), "event", {"type": "character", "id": x.id})
+					game.message(t(game, msg, {"who": cname(game, x.id)}), "event", {"type": "character", "id": x.id})
 				return
 
 

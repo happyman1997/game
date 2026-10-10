@@ -71,12 +71,6 @@ on_actions:
       - if:
           limit: { has_archetype: scourge }
           add_dread: 3
-      # молва: слава полководца растёт с победами
-      - add_reputation: { skill: martial, value: 1.5 }
-
-  on_battle_lost:
-    effect:
-      - add_reputation: { skill: martial, value: -1.5 }
 
   on_player_succession:
     events: [succession.0001]
@@ -93,11 +87,10 @@ on_actions:
 
   # Крепость взята (root — тот, чья армия её взяла; scope:province, scope:war,
   # scope:defender — прежний владелец). Добыча и разорение: война бьёт по казне
-  # и развитию, а не только по счёту войны.
+  # и развитию, а не только по счёту войны. loot_mult (управление) — больше добычи.
   on_siege_won:
     effect:
-      - add_gold: { value: scope:province.tax, multiply: 8, min: 5 }
-      - add_reputation: { skill: martial, value: 0.5 }
+      - add_gold: { value: loot_mult, add: 1, multiply: { value: scope:province.tax, multiply: 8, min: 5 } }
       - scope:province:
           if:
             limit: { development: ">= 3" }

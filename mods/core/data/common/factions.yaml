@@ -23,8 +23,6 @@ factions:
         - { desc: ai.rank, value: { value: tier, multiply: 6 } }
         - { desc: ai.councillor, limit: { is_councillor: yes }, value: -15 }
         # политика двора (условия службы уже сказались на мнении): страх, вражда с лидером
-        # молва: против славного полководца бунтовать боязно
-        - { desc: ai.liege_fame, value: { value: scope:liege.martial_reputation, subtract: 12, multiply: -0.7 } }
         - { desc: ai.dread, value: { value: fear_of_liege, multiply: -0.6 } }
         - { desc: ai.rival_leader, limit: { exists: scope:faction_leader, has_opinion_modifier: { target: scope:faction_leader, modifier: rival } }, value: -60 }
     ai_accept_demands:
@@ -129,6 +127,14 @@ events:
         ai_chance: 10
       - effect: { scope:faction: { faction_start_war: yes } }
         ai_chance: 90
+      # голос дипломатии: переговоры с мятежниками (сложность — factions.negotiation_check)
+      - skill: { skill: diplomacy, check: 16 }
+        success:
+          scope:faction: { faction_negotiate: yes }
+        failure:
+          add_prestige: -30
+          scope:faction: { faction_start_war: yes }
+        ai_chance: { value: 5, add: { value: diplomacy, multiply: 2 } }
 
 # Крюк против заговора: сюзерен требует от вассала выйти из фракции.
 # Без крюка согласится лишь тот, кто любит или боится сюзерена.
@@ -168,3 +174,4 @@ interactions:
 
 opinion_modifiers:
   forced_out_of_faction: { value: -15, years: 5 }
+  heard_out: { value: 10, years: 5 }           # переговоры с мятежниками: их выслушали

@@ -5,6 +5,7 @@ stat:
   arcane_regen: Arcane power recovery
   arcane_capacity: Arcane power capacity
   curse_resistance: Curse resistance
+  monster_sight: Spotting monsters at court (% per year)
 
 trait:
   gifted: Gifted

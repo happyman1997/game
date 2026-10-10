@@ -137,6 +137,7 @@ ui:
     stress: of a broken heart
     plague: of the plague
     execution: executed
+    duel: in a duel
   courtier_of: "Courtier of {who}"
   wanderer: Wanderer
   lowborn: Lowborn

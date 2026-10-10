@@ -85,6 +85,11 @@ defines:
     battle_prestige: 20
     loser_commander_death: 0.04
     winner_commander_death: 0.01
+    chase_min: 0.5                  # потери проигравших: 1 + pursuit победителя − orderly_retreat проигравшего
+    chase_max: 1.8
+    personal_example_safe: 0.03     # личный пример сверх этого — риск раны: (x − safe) × wound
+    personal_example_wound: 2
+    wound_trait: wounded
     siege_per_fort: 800
     siege_base: 400
     siege_speed: 3
@@ -99,14 +104,14 @@ defines:
     ticking_loss: 1
     defender_ticking_after_months: 12
     truce_years: 5
-    ally_min_opinion: -10
-    ai_surrender_threshold: 75
-    min_surrender_threshold: 40
+    ally_min_opinion: 0             # минус ally_persuasion зовущего (дипломатия)
+    ai_surrender_threshold: 85      # минус peace_persuasion победителя (дипломатия)
+    min_surrender_threshold: 50
     fatigue_after_years: 2
     fatigue_per_year: 6
     white_peace_years: 3
     white_peace_max_score: 30
-    white_peace_losing: 25
+    white_peace_losing: 35          # минус peace_persuasion того, кто предлагает мир
 
   ai:
     war_check_chance: 0.35
@@ -173,13 +178,6 @@ defines:
     uplift_level: 2           # кураж с этой ступени — «душевный подъём»
     uplift_stress_gain: -0.2  # стресс копится на 20% медленнее
 
-  reputation:
-    war_weight: 0.03          # сила армии в глазах врага: ±3% за очко, на которое слава расходится с правдой
-    discovered_scheme: 2      # раскрытая интрига — к дурной славе
-    exposed_secret: 3
-    infamy_from: 12           # с какой дурной славы к интригану относятся хуже
-    infamy_per_point: -1
-
   events:
     # проверки навыка в событиях: шанс = check_base + (навык − сложность) × check_per_point
     check_base: 50
@@ -196,7 +194,7 @@ defines:
 
   prison:
     escape_chance: 0.004            # в месяц
-    escape_per_intrigue: 0.0005
+    escape_per_passage: 0.02         # × secret_passages (интрига 10 → +0,6% в месяц)
     siege_capture_chance: 0.5       # правитель в столице при её взятии
     family_capture_chance: 0.3
     battle_capture_chance: 0.08     # выживший полководец проигравших
@@ -220,6 +218,8 @@ defines:
     cooldown_years: 5               # после распада фракции её члены не вступают в новые
     sibling_claim_chance: 0.5       # дети, не унаследовавшие титул, получают на него претензию
     ultimatum_event: faction.0001
+    negotiation_check: 16           # переговоры с мятежниками: проверка дипломатии ИИ-сюзерена такой сложности
+    negotiated_opinion: heard_out
 
   regiments:
     cap_by_tier: [0, 2, 3, 4, 6]    # сколько отрядов можно держать (по рангу)
@@ -249,8 +249,8 @@ defines:
     plotter_weight: 4               # во столько раз чаще тайный советник находит секреты заговорщиков
 
   # Механики движка, которые нужно отключить (lifestyles, council, prison, factions, regiments, secrets, laws,
-  # knights, politics, personality, renown, lands, reputation, momentum).
+  # knights, politics, personality, renown, lands, momentum, duels).
   disabled_features: []
 
   # Характеристики, доступные в скриптах как значения (gold, age и навыки — встроены).
-  script_stat_values: [general_opinion, vassal_opinion, monthly_prestige, monthly_piety, commander_advantage, levy_flat, scheme_power, scheme_defense]
+  script_stat_values: [general_opinion, vassal_opinion, monthly_prestige, monthly_piety, commander_advantage, levy_flat, scheme_power, scheme_defense, loot_mult, audit_chance, turn_plotter_chance, secret_passages, personal_example]

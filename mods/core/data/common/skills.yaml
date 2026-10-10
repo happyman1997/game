@@ -5,54 +5,65 @@
 # после самих навыков); ruler_per_point — то же, но только правителям.
 # mastery — тень мастерства: при навыке от `at` у мастера появляется изнанка
 # (modifiers; stress_reactions и stress_monthly — как у черт характера).
-# reputation — у навыка есть молва (механика reputation): drift — насколько
-# за год она тянется к правде, max_gap — насколько может от неё отойти. Кроме этого движок читает навыки напрямую:
+# Кроме этого движок читает навыки напрямую:
 #   управление — налог домена (economy.tax_per_skill) и лимит домена,
 #   военное дело — сила армии под командованием (military.martial_bonus),
 #   учёность — благочестие (economy.piety_per_learning),
 #   управление — рост развития (development.growth_per_stewardship),
 #   у советников — их задачи (council.yaml), у интриганов — интриги (schemes.yaml).
+#
+# Характеристики, которые дают навыки (что они делают — в MODDING.md):
+#   ally_persuasion   — союзники вступают в войну даже при мнении на столько хуже;
+#   peace_persuasion  — враг соглашается на мир на столько очков счёта войны раньше;
+#   march_speed, pursuit, orderly_retreat — скорость войска, потери бегущего
+#                       врага и свои потери при отступлении (у полководца);
+#   regiment_power    — сила профессиональных отрядов правителя («Муштра»);
+#   loot_mult         — добыча со взятых крепостей;
+#   audit_chance      — % в месяц поймать казнокрада в своём совете («Ревизия»);
+#   secret_passages   — уйти из павшей столицы и бежать из темницы («Тайные ходы»);
+#   turn_plotter_chance — % получить крюк на раскрытого заговорщика («Перевербовка»);
+#   personal_example  — полководец в первых рядах: сила войска и риск ранения;
+#   dread_gain_mult   — страх копится быстрее («Устрашение»).
 skills:
-  # люди: вассалы, иноземные дворы, фракции
+  # люди: вассалы, иноземные дворы, фракции, союзы и мир
   diplomacy:
     icon: "🗣"
     color: "#5b8bd6"
     order: 1
     per_point: { general_opinion: 0.25 }
-    ruler_per_point: { vassal_opinion: 0.4, faction_discontent_mult: -0.008 }
+    ruler_per_point: { vassal_opinion: 0.4, faction_discontent_mult: -0.008, ally_persuasion: 1.25, peace_persuasion: 1.25 }
     mastery:    # «Мягкотелость»: со всеми ладит — и никого не пугает
       at: 20
       modifiers: { dread_decay_mult: 1.0 }
       stress_reactions: { execute_prisoner: 20, imprison: 10, impose_heavy_duties: 10, revoke_title: 10 }
-  # войско: ополчение, содержание армий, осады
+  # война: полководец (сила войска — в движке), марш, преследование, осады, муштра
   martial:
     icon: "⚔"
     color: "#c0504d"
     order: 2
-    ruler_per_point: { levy_mult: 0.01, army_upkeep_mult: -0.01, siege_speed: 0.02 }
-    reputation: { drift: 0.2, max_gap: 10 }     # слава полководца
+    per_point: { march_speed: 0.015, pursuit: 0.02, orderly_retreat: 0.02 }
+    ruler_per_point: { siege_speed: 0.02, regiment_power: 0.01 }
     mastery:    # «Безрассудство»: рвётся в бой и в первые ряды
       at: 20
       modifiers: { commander_advantage: 5, battle_survival: -0.6 }
       stress_reactions: { declare_war: -10 }
       stress_monthly: { trigger: { is_ruler: yes, is_at_war: no }, value: 2, desc: stress_when.peace }
-  # казна: налоги и лимит домена (в движке), стройки
+  # казна: налоги и лимит домена (в движке), стройки, содержание войск, добыча, ревизия
   stewardship:
     icon: "💰"
     color: "#d4a63a"
     order: 3
-    ruler_per_point: { build_cost_mult: -0.01, build_time_mult: -0.015 }
+    ruler_per_point: { build_cost_mult: -0.01, build_time_mult: -0.015, army_upkeep_mult: -0.01, loot_mult: 0.04, audit_chance: 0.25 }
     mastery:    # «Скупость»: считает каждую монету — двор это чувствует
       at: 20
       modifiers: { general_opinion: -5 }
       stress_reactions: { send_gift: 15, give_alms: 15, hold_feast: 15, grant_privileges: 15 }
-  # тайны: своя защита от интриг (сила своих — в формулах интриг)
+  # тайны: защита от интриг, тайные ходы, перевербовка (сила своих — в формулах интриг)
   intrigue:
     icon: "🗡"
     color: "#8a5bb0"
     order: 4
-    per_point: { scheme_defense: 1 }
-    reputation: { drift: 0.15, max_gap: 12 }    # дурная слава интригана
+    per_point: { scheme_defense: 1, secret_passages: 0.03, turn_plotter_chance: 2.5 }
     mastery:    # «Подозрительность»: видит заговор в каждом шёпоте
       at: 20
       modifiers: { scheme_defense: 10, general_opinion: -3 }
@@ -69,14 +80,15 @@ skills:
       at: 20
       modifiers: { stewardship: -2, martial: -2 }
       stress_reactions: { declare_war: 10, emergency_taxes: 10 }
-  # личная сила: рыцари, выживание в бою, стать
+  # личная сила: поединки, личный пример в бою, выживание, устрашение
   prowess:
     icon: "💪"
     color: "#a5704a"
     order: 6
-    per_point: { battle_survival: 0.03, attraction_opinion: 0.3 }
+    per_point: { battle_survival: 0.03, attraction_opinion: 0.3, personal_example: 0.005 }
+    ruler_per_point: { dread_gain_mult: 0.025 }
     mastery:    # «Задиристость»: ищет повода помериться силой
       at: 20
       modifiers: { general_opinion: -3, attraction_opinion: 5 }
-      stress_reactions: { release_prisoner: 10, seek_solitude: 15 }
+      stress_reactions: { release_prisoner: 10, seek_solitude: 15, challenge_to_duel: -10 }
       stress_monthly: { trigger: { is_ruler: yes, is_at_war: no }, value: 1, desc: stress_when.peace }

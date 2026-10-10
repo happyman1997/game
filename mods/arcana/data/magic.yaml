@@ -21,6 +21,11 @@ skills:
     spread: 3
     inherit_spread: 2
     hide_if_zero: true
+  # учёность и тайное: книжник крепче против проклятий, а учёный правитель
+  # порой распознаёт вампира или оборотня при своём дворе (monster_sight — % в год)
+  learning:
+    per_point: { curse_resistance: 1.5 }
+    ruler_per_point: { monster_sight: 1.5 }
 
 traits:
   gifted:
@@ -75,6 +80,7 @@ traits:
 lifestyles:
   sorcery_lifestyle:
     skill: sorcery
+    secondary_skill: learning    # книжная учёность помогает постигать тайное (половина её опыта)
     icon: "🔮"
     color: "#6a5ac0"
     order: 6

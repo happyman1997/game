@@ -14,6 +14,9 @@ defines:
     intimidated_per_dread: 0.3      # робкие подданные: + мнение за очко страха
     defiant_per_dread: -0.15        # храбрые и гневливые: − мнение
     defiant_traits: [brave, wrathful]
+    respect_from: 12                # дерзкие уважают сюзерена с доблестью выше этой:
+    respect_per_point: 1.5          #   + мнение за каждое очко сверх
+    respect_max: 15
     petition_chance_ai: 30          # % в год, что к правителю ИИ придут с прошением
     petition_chance_player: 5       # % в месяц для игрока
     discord_base_chance: 35

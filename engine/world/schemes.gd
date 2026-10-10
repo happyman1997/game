@@ -48,6 +48,20 @@ static func monthly_progress(game: Game, s: Dictionary) -> float:
 	return maxf(1.0, Interp.eval_value(ctx, ctx.root, def.get("progress")))
 
 
+## Интрига раскрыта: её on_discovered, сигнал scheme.discovered и для враждебной
+## (category: hostile) — on_action on_scheme_discovered у цели (root — цель,
+## scope:plotter — заговорщик, scope:scheme).
+static func mark_discovered(game: Game, s: Dictionary) -> void:
+	s.discovered = true
+	var def: Variant = game.content.get_def("schemes", s.type)
+	var ctx := scheme_context(game, s)
+	Interp.run_effect(ctx, ctx.root, def.get("on_discovered") if def != null else null)
+	game.emit("scheme.discovered", {"scheme": s})
+	if def != null and def.get("category") == "hostile" and game.is_alive(s.target) and game.is_alive(s.owner):
+		game.on_action("on_scheme_discovered", {"type": "character", "id": s.target},
+			{"plotter": {"type": "character", "id": s.owner}, "scheme": {"type": "scheme", "id": s.id}})
+
+
 static func end_scheme(game: Game, id: String) -> void:
 	game.state.schemes.erase(id)
 
@@ -70,9 +84,7 @@ static func monthly_schemes(game: Game) -> void:
 			continue # в темнице интриги стоят
 		s.progress = float(s.progress) + monthly_progress(game, s)
 		if not s.discovered and def.get("discovery_chance") != null and game.rng.next() * 100.0 < Interp.eval_value(ctx, ctx.root, def.discovery_chance):
-			s.discovered = true
-			Interp.run_effect(ctx, ctx.root, def.get("on_discovered"))
-			game.emit("scheme.discovered", {"scheme": s})
+			mark_discovered(game, s)
 		if s.progress >= 100.0:
 			var chance := success_chance(game, s)
 			var success := game.rng.next() * 100.0 < chance

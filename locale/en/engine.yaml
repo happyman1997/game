@@ -125,6 +125,7 @@ death:
   stress: "{who} dies of a broken heart"
   plague: "{who} dies of the plague"
   execution: "{who} is executed"
+  duel: "{who} falls in a duel"
 
 opinion:
   traits: Personality traits

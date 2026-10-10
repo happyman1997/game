@@ -10,8 +10,10 @@ extends EngineFeature
 ##   defines.politics: { powerful_vassals_by_tier, powerful_seat_opinion,
 ##     powerful_snub_opinion, council_seat_bonus, dread_max, dread_decay,
 ##     dread_decay_compassionate, intimidated_per_dread, defiant_per_dread,
-##     defiant_traits, petition_chance_ai, petition_chance_player,
-##     discord_base_chance }
+##     defiant_traits, respect_from, respect_per_point, respect_max, petition_chance_ai,
+##     petition_chance_player, discord_base_chance }
+##   Дерзкие вассалы (defiant_traits) страха не знают, но уважают доблестного
+##   сюзерена; dread_gain_mult правителя (доблесть) ускоряет рост страха.
 ##   on_actions.on_vassal_petition — события-прошения (root — сюзерен)
 ## Состояние: вассал — c.obligation = {liege, id} (с другим сюзереном
 ## действуют обычные условия); правитель — c.vars.dread.
@@ -138,6 +140,9 @@ static func dread(c: Dictionary) -> float:
 
 
 static func add_dread(game: Game, c: Dictionary, v: float) -> void:
+	# dread_gain_mult — устрашение (доблесть): страх перед силачом копится быстрее
+	if v > 0.0:
+		v *= maxf(0.0, 1.0 + Stats.stat(game, c, "dread_gain_mult"))
 	var before := dread(c)
 	c.vars["dread"] = clampf(before + v, 0.0, game.def_num("politics.dread_max", 100))
 	if dread(c) <= 0.0:
@@ -280,6 +285,11 @@ func install(engine: GameEngine) -> void:
 				else:
 					out.append({"label": game.loc.t("opinion.powerful_snubbed"), "value": game.def_num("politics.powerful_snub_opinion", -15)})
 		var d := Politics.dread(b)
+		# дерзкие (храбрые, гневливые) не боятся, но уважают силу: доблестного сюзерена
+		if Politics.is_defiant(game, a):
+			var resp := minf(game.def_num("politics.respect_max", 15), (Stats.skill(game, b, "prowess") - game.def_num("politics.respect_from", 12)) * game.def_num("politics.respect_per_point", 1.5))
+			if resp >= 1.0:
+				out.append({"label": game.loc.t("opinion.respects_strength"), "value": roundf(resp)})
 		if d >= 1.0:
 			if Politics.is_defiant(game, a):
 				out.append({"label": game.loc.t("opinion.defiant"), "value": roundf(d * game.def_num("politics.defiant_per_dread", -0.15))})

@@ -5,7 +5,7 @@ extends EngineFeature
 ## перки — узлы деревьев. Последний перк дерева обычно даёт черту.
 ##
 ## Данные:
-##   lifestyles:   { skill, icon, color, order, is_shown }
+##   lifestyles:   { skill, secondary_skill, secondary_share, xp_mult, icon, color, order, is_shown }
 ##   focuses:      { lifestyle, icon, modifiers, is_shown, ai_will_do }
 ##   perks:        { lifestyle, tree, requires, icon, modifiers, trait, effect, ai_will_do }
 ##   defines.lifestyle: { base_xp, xp_per_skill, perk_cost, perk_cost_growth, focus_change_cooldown_months }
@@ -203,6 +203,9 @@ static func monthly_xp(game: Game, c: Dictionary) -> float:
 	if l == null:
 		return 0.0
 	var base := game.def_num("lifestyle.base_xp", 20) + Stats.skill(game, c, str(l.get("skill"))) * game.def_num("lifestyle.xp_per_skill", 2)
+	# secondary_skill — второй навык пути (учёность для колдовства) даёт долю опыта
+	if l.get("secondary_skill") != null:
+		base += Stats.skill(game, c, str(l.secondary_skill)) * game.def_num("lifestyle.xp_per_skill", 2) * Data.num(l.get("secondary_share"), 0.5)
 	# xp_mult образа жизни: трудные пути (колдовство) постигаются дольше
 	return maxf(0.0, base * (1.0 + Stats.stat(game, c, "lifestyle_xp_mult")) * Data.num(l.get("xp_mult"), 1.0))
 

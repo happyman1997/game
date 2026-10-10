@@ -5,6 +5,7 @@ stat:
   arcane_regen: Восполнение колдовской силы
   arcane_capacity: Предел колдовской силы
   curse_resistance: Защита от порчи
+  monster_sight: Распознать чудовище при дворе (% в год)
 
 trait:
   gifted: Одарённый

@@ -301,11 +301,7 @@ static func discover_scheme_against(game: Game, c: Dictionary) -> bool:
 	var s: Variant = game.rng.pick(hidden)
 	if s == null:
 		return false
-	s.discovered = true
-	var def: Variant = game.content.get_def("schemes", s.type)
-	var ctx := Schemes.scheme_context(game, s)
-	Interp.run_effect(ctx, ctx.root, def.get("on_discovered") if def != null else null)
-	game.emit("scheme.discovered", {"scheme": s})
+	Schemes.mark_discovered(game, s)
 	return true
 
 

@@ -278,6 +278,23 @@ func register_script(engine: GameEngine) -> void:
 			var strong: bool = d != null and d.get("hook") == "strong"
 			return ctx.game.loc.t("fx.add_strong_hook" if strong else "fx.add_hook", {"value": ctx.game.scope_name({"type": "character", "id": o.id})}),
 	}, OWNER)
+	r.effects.register("learn_secret", {"scopes": CH, "doc": "Узнать тайну персонажа (тип — необязателен): learn_secret: { owner: scope:x, type: secret_embezzler }",
+		"apply": func(ctx, s, arg):
+			var c: Variant = ch.call(ctx, s)
+			var o: Variant = target.call(ctx, s, arg.get("owner") if arg is Dictionary else arg)
+			if c == null or o == null:
+				return
+			var type: Variant = arg.get("type") if arg is Dictionary else null
+			for sec in Secrets.secrets_of(o):
+				if type == null or sec.type == str(type):
+					Secrets.learn(ctx.game, c, o, sec),
+		"describe": func(ctx, s, arg):
+			var o: Variant = target.call(ctx, s, arg.get("owner") if arg is Dictionary else arg)
+			if o == null:
+				return null
+			var type: Variant = arg.get("type") if arg is Dictionary else null
+			return ctx.game.loc.t("fx.learn_secret", {"who": ctx.game.scope_name({"type": "character", "id": o.id}), "secret": ctx.game.name_of("secret_types", str(type)) if type != null else "?"}),
+	}, OWNER)
 	r.effects.register("expose_secret", {"scopes": CH, "doc": "Разоблачить самый тяжёлый известный секрет персонажа",
 		"apply": func(ctx, s, arg):
 			var c: Variant = ch.call(ctx, s)

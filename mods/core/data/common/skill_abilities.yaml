@@ -1,0 +1,170 @@
+# Способности навыков, которые живут в данных: ревизия (управление),
+# перевербовка и слухи (интриги), поединки (доблесть). Остальное — в
+# характеристиках навыков (skills.yaml) и в движке.
+
+defines:
+  duels:
+    per_point: 4              # шанс = 50 + (доблесть бойца − доблесть противника) × per_point
+    min_chance: 10
+    max_chance: 90
+    champion_margin: 2        # рыцарь бьётся за правителя, если доблестнее его хотя бы на столько
+    win_prestige: 60
+    lose_prestige: 40
+    champion_share: 0.5       # доля славы (и позора), когда бился поборник
+    win_dread: 5
+    death_chance: 0.1         # проигравший боец гибнет (× 1 − battle_survival)
+    wound_chance: 0.5         # иначе — ранен с таким шансом
+    loser_opinion: bested_in_duel
+
+opinion_modifiers:
+  bested_in_duel: { value: -15, years: 5 }
+  rumors_about_liege: { value: -10, years: 3 }
+  slandered_me: { value: -30, years: 10 }
+
+on_actions:
+  # Враждебную интригу раскрыли (root — её цель, scope:plotter — заговорщик).
+  # «Перевербовка» (интрига): шанс turn_plotter_chance получить на заговорщика
+  # крюк — теперь он будет работать на вас.
+  on_scheme_discovered:
+    effect:
+      - random:
+          chance: turn_plotter_chance
+          add_hook: { target: scope:plotter }
+          send_message: { text: msg.plotter_turned, kind: good }
+
+  # «Ревизия» (управление): сюзерен ловит казнокрада в своём совете —
+  # audit_chance % в месяц за каждого (root — советник, scope:liege).
+  on_councillor_pulse:
+    requires_feature: secrets
+    effect:
+      - if:
+          limit:
+            has_secret: secret_embezzler
+            scope:liege: { NOT: { knows_secret_of: root } }
+          random:
+            chance: scope:liege.audit_chance
+            save_scope_as: embezzler
+            scope:liege: { trigger_event: skills.0001 }
+
+events:
+  # Ревизия нашла недостачу (root — сюзерен, scope:embezzler — казнокрад).
+  skills.0001:
+    requires_feature: secrets
+    triggered_only: true
+    theme: intrigue
+    icon: "🧾"
+    immediate:
+      - learn_secret: { owner: scope:embezzler, type: secret_embezzler }
+    options:
+      # разоблачить: деньги вернуть, вора — из совета
+      - effect:
+          - add_gold: 40
+          - expose_secret: scope:embezzler
+          - scope:embezzler: { remove_from_council: yes }
+        ai_chance: { value: 40, if: { limit: { has_trait: [just, honest, zealous] }, add: 40 } }
+      # промолчать: вор вернёт часть и будет у вас на крючке
+      - effect:
+          - add_gold: 20
+          - add_hook: { target: scope:embezzler, strong: yes }
+        ai_chance: { value: 30, if: { limit: { has_trait: [deceitful, arbitrary, greedy] }, add: 40 } }
+      # голос управления: пересчитать всё до гроша
+      - skill: { skill: stewardship, check: 12 }
+        success:
+          - add_gold: 80
+          - scope:embezzler: { remove_from_council: yes }
+        failure:
+          - add_gold: 10
+          - add_stress: 10
+        ai_chance: { value: 10, add: { value: stewardship, multiply: 1.5 } }
+
+interactions:
+  # «Пустить слух» (интрига): удача — цель теряет престиж, её вассалы
+  # охладевают к ней (подспорье фракциям); провал — вас поймали за руку.
+  spread_rumor:
+    icon: "👄"
+    category: intrigue
+    is_shown:
+      scope:actor: { is_ruler: yes }
+      scope:recipient: { is_ruler: yes }
+    is_valid:
+      scope:actor: { is_imprisoned: no }
+    auto_accept: yes
+    hookable: no
+    cooldown: { years: 3 }
+    on_accept:
+      - random_list:
+          - weight: { value: 50, add: { value: intrigue, multiply: 3 }, subtract: { value: scope:recipient.intrigue, multiply: 3 }, min: 5 }
+            scope:recipient:
+              add_prestige: -60
+              every_vassal:
+                add_opinion: { target: scope:recipient, modifier: rumors_about_liege }
+              send_message: { text: msg.rumor_about_you, kind: bad }
+            send_message: { text: msg.rumor_spread, kind: good }
+          - weight: { value: 50, add: { value: scope:recipient.intrigue, multiply: 3 }, subtract: { value: intrigue, multiply: 3 }, min: 5 }
+            add_prestige: -30
+            scope:recipient:
+              add_opinion: { target: scope:actor, modifier: slandered_me }
+              send_message: { text: msg.rumor_caught_you, kind: info }
+            send_message: { text: msg.rumor_caught, kind: bad }
+    ai_targets: [neighboring_ruler, liege]
+    ai_frequency_months: 24
+    ai_potential:
+      - NOT: { has_trait: [honest, just] }
+      - OR: [ { has_trait: [deceitful, ambitious, arbitrary, vengeful] }, { intrigue: ">= 12" } ]
+    ai_will_do:
+      value: 0
+      add: { value: "opinion(scope:recipient)", multiply: -0.4 }
+      if:
+        - limit: { has_opinion_modifier: { target: scope:recipient, modifier: rival } }
+          add: 25
+        - limit: { scope:recipient: { intrigue: ">= 14" } }
+          multiply: 0.3
+
+  # «Вызвать на поединок» (доблесть): за правителей могут биться поборники —
+  # лучшие из их рыцарей. Отказ стоит престижа.
+  challenge_to_duel:
+    requires_feature: duels
+    icon: "🤺"
+    category: hostile
+    is_shown:
+      scope:actor: { is_adult: yes }
+      scope:recipient: { is_adult: yes }
+    is_valid:
+      scope:actor:
+        is_imprisoned: no
+        NOT: { has_trait: wounded }
+      scope:recipient:
+        NOT: { is_close_family_of: scope:actor }
+    hookable: no
+    cooldown: { years: 2 }
+    ai_accept:
+      value: 0
+      add:
+        - { desc: ai.duel_odds, value: { value: "duel_odds(scope:actor)", subtract: 50, multiply: 1.5 } }
+        - { desc: ai.duel_honor, value: 15 }
+        - { desc: ai.boldness, value: { value: ai_boldness, multiply: 8 } }
+        - { desc: ai.brave, limit: { has_trait: brave }, value: 20 }
+        - { desc: ai.craven, limit: { has_trait: craven }, value: -40 }
+        - { desc: ai.wounded, limit: { has_trait: wounded }, value: -40 }
+    on_accept:
+      - duel: scope:recipient
+    on_decline:
+      - add_prestige: 15
+      - scope:recipient: { add_prestige: -40 }
+    decline_text: msg.duel_refused
+    ai_targets: [vassal, neighboring_ruler]
+    ai_frequency_months: 24
+    ai_send_if_declined: yes          # отказ — тоже победа: трус теряет лицо
+    ai_potential:
+      - prowess: ">= 12"
+      - NOT: { has_trait: [craven, wounded] }
+    ai_will_do:
+      value: 3
+      add: { value: "opinion(scope:recipient)", multiply: -0.3 }
+      if:
+        - limit: { has_opinion_modifier: { target: scope:recipient, modifier: rival } }
+          add: 25
+        - limit: { has_trait: [wrathful, arrogant, brave] }
+          add: 8
+      # только когда уверен в победе
+      multiply: { value: "duel_odds(scope:recipient)", subtract: 55, multiply: 0.05, min: 0, max: 1 }
