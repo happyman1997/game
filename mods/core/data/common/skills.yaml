@@ -21,7 +21,7 @@ skills:
     per_point: { general_opinion: 0.25 }
     ruler_per_point: { vassal_opinion: 0.4, faction_discontent_mult: -0.008 }
     mastery:    # «Мягкотелость»: со всеми ладит — и никого не пугает
-      at: 18
+      at: 20
       modifiers: { dread_decay_mult: 1.0 }
       stress_reactions: { execute_prisoner: 20, imprison: 10, impose_heavy_duties: 10, revoke_title: 10 }
   # войско: ополчение, содержание армий, осады
@@ -32,7 +32,7 @@ skills:
     ruler_per_point: { levy_mult: 0.01, army_upkeep_mult: -0.01, siege_speed: 0.02 }
     reputation: { drift: 0.2, max_gap: 10 }     # слава полководца
     mastery:    # «Безрассудство»: рвётся в бой и в первые ряды
-      at: 18
+      at: 20
       modifiers: { commander_advantage: 5, battle_survival: -0.6 }
       stress_reactions: { declare_war: -10 }
       stress_monthly: { trigger: { is_ruler: yes, is_at_war: no }, value: 2, desc: stress_when.peace }
@@ -43,7 +43,7 @@ skills:
     order: 3
     ruler_per_point: { build_cost_mult: -0.01, build_time_mult: -0.015 }
     mastery:    # «Скупость»: считает каждую монету — двор это чувствует
-      at: 18
+      at: 20
       modifiers: { general_opinion: -5 }
       stress_reactions: { send_gift: 15, give_alms: 15, hold_feast: 15, grant_privileges: 15 }
   # тайны: своя защита от интриг (сила своих — в формулах интриг)
@@ -54,7 +54,7 @@ skills:
     per_point: { scheme_defense: 1 }
     reputation: { drift: 0.15, max_gap: 12 }    # дурная слава интригана
     mastery:    # «Подозрительность»: видит заговор в каждом шёпоте
-      at: 18
+      at: 20
       modifiers: { scheme_defense: 10, general_opinion: -3 }
       stress_reactions: { invite_to_court: 10, release_prisoner: 10 }
       stress_monthly: { trigger: { any_faction_against: yes }, value: 4, desc: stress_when.factions }
@@ -66,7 +66,7 @@ skills:
     per_point: { lifestyle_xp_mult: 0.01, health: 0.02 }
     ruler_per_point: { development_growth: 0.005 }
     mastery:    # «Рассеянность»: витает в книгах, забывая о мирском
-      at: 18
+      at: 20
       modifiers: { stewardship: -2, martial: -2 }
       stress_reactions: { declare_war: 10, emergency_taxes: 10 }
   # личная сила: рыцари, выживание в бою, стать
@@ -76,7 +76,7 @@ skills:
     order: 6
     per_point: { battle_survival: 0.03, attraction_opinion: 0.3 }
     mastery:    # «Задиристость»: ищет повода помериться силой
-      at: 18
+      at: 20
       modifiers: { general_opinion: -3, attraction_opinion: 5 }
       stress_reactions: { release_prisoner: 10, seek_solitude: 15 }
       stress_monthly: { trigger: { is_ruler: yes, is_at_war: no }, value: 1, desc: stress_when.peace }

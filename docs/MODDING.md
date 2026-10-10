@@ -898,7 +898,7 @@ skills:
     per_point: { general_opinion: 0.25 }                       # всем, за каждое очко
     ruler_per_point: { vassal_opinion: 0.5, faction_discontent_mult: -0.012 }   # только правителям
     mastery:                                                   # тень мастерства
-      at: 18
+      at: 20
       modifiers: { dread_decay_mult: 1.0 }
       stress_reactions: { execute_prisoner: 20 }               # как у черт (механика personality)
       stress_monthly: { trigger: { ... }, value: 2, desc: stress_when.peace }
@@ -965,7 +965,7 @@ success}`. Ядро дописывает такие варианты к свои
 копится медленнее); провалы — хандра (−навык, провал добавляет стресс). Ступень
 уходит к нулю за `decay_days` без новых удач и неудач. Успехи и провалы:
 проверки навыков в событиях, интриги (по полю `skill` интриги), битвы, не
-автоматические дипломатические и интриганские взаимодействия, постройки.
+автоматические дипломатические и интриганские взаимодействия игрока.
 Хук `momentum.changed`.
 
 Стресс меняется через `Chars.change_stress(game, c, value, source)`: рост

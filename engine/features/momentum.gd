@@ -7,7 +7,7 @@ extends EngineFeature
 ## «душевный подъём»: стресс копится медленнее.
 ## Успехи и провалы: проверки навыков в событиях, интриги (по навыку
 ## интриги), битвы (военное дело), дипломатические и интриганские
-## взаимодействия игрока, которые решает другая сторона, завершённые постройки.
+## взаимодействия игрока, которые решает другая сторона.
 ##   defines.momentum: { max_level, skill_per_level, decay_days, success_stress,
 ##                       failure_stress, uplift_level, uplift_stress_gain }
 ## Состояние — c.vars.momentum: {навык: [ступень, дата последнего изменения]}.
@@ -132,9 +132,4 @@ func install(engine: GameEngine) -> void:
 		var cat := str(d.get("category", ""))
 		if cat == "diplomacy" or cat == "intrigue":
 			Momentum.record(g, g.ch(p.actor), cat, p.accepted)
-	, 0, OWNER)
-	engine.hooks.on("building.completed", func(p):
-		var g: Game = p.game
-		if p.get("by") != null:
-			Momentum.record(g, g.ch(p.by), "stewardship", true)
 	, 0, OWNER)
