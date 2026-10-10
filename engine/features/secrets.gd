@@ -161,6 +161,17 @@ static func discover(game: Game, c: Dictionary) -> bool:
 			for s in o.secrets:
 				if not s.known.has(c.id):
 					cands.append([o, s])
+	# тайный советник прежде всего роет под заговорщиков из фракций против правителя
+	var plotters := {}
+	for f in game.state.factions.values():
+		if f.get("target") == c.id:
+			for id in f.members:
+				plotters[id] = true
+	if not plotters.is_empty():
+		for item in cands.duplicate():
+			if plotters.has(item[0].id):
+				for i in int(game.def_num("secrets.plotter_weight", 4)) - 1:
+					cands.append(item)
 	var pick: Variant = game.rng.pick(cands)
 	if pick == null:
 		return false

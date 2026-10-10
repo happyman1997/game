@@ -1,0 +1,79 @@
+# Характер: как черты отзываются на поступки (механика personality).
+# Поля сливаются с чертами из traits.yaml: здесь — только отклики.
+#   stress_reactions: { <поступок>: стресс } — поступок — id взаимодействия,
+#     решения или интриги, а также declare_war. Минус — поступок по душе.
+#   stress_monthly: { trigger, value, desc } — стресс каждый месяц, пока верно
+#     условие (desc — ключ локализации «когда», для подсказки черты).
+# ИИ избегает того, что ему претит (defines.personality.ai_weight).
+
+defines:
+  personality:
+    ai_weight: 0.5            # воли ИИ за очко стресса (претит — меньше, по душе — больше)
+
+traits:
+  craven:
+    stress_reactions: { declare_war: 20, go_hunting: 10 }
+    stress_monthly: { trigger: { is_at_war: yes }, value: 4, desc: stress_when.at_war }
+  wrathful:
+    stress_reactions: { execute_prisoner: -10, release_prisoner: 10 }
+  chaste:
+    stress_reactions: { hold_feast: 10 }
+  lustful:
+    stress_reactions: { seduce: -15 }
+  content:
+    stress_reactions: { declare_war: 15, fabricate_claim: 10 }
+    stress_monthly: { trigger: { is_at_war: yes }, value: 3, desc: stress_when.at_war }
+  ambitious:
+    stress_reactions: { release_vassal: 25, grant_privileges: 10 }
+    # честолюбцу тесно при чужом дворе
+    stress_monthly: { trigger: { is_ruler: no, is_adult: yes }, value: 3, desc: stress_when.landless }
+  lazy:
+    stress_reactions: { convene_great_council: 15 }
+  forgiving:
+    stress_reactions: { execute_prisoner: 30, imprison: 10, release_prisoner: -10 }
+  vengeful:
+    stress_reactions: { release_prisoner: 15, execute_prisoner: -10 }
+  generous:
+    stress_reactions: { send_gift: -10, give_alms: -10, emergency_taxes: 15, impose_heavy_duties: 10, demand_ransom: 10 }
+  greedy:
+    stress_reactions: { send_gift: 15, give_alms: 20, grant_privileges: 15, hold_feast: 10, emergency_taxes: -10 }
+    stress_monthly: { trigger: { gold: "< 0" }, value: 5, desc: stress_when.in_debt }
+  gregarious:
+    stress_reactions: { hold_feast: -20, convene_great_council: -10, seek_solitude: 10 }
+    stress_monthly: { trigger: { is_imprisoned: yes }, value: 4, desc: stress_when.imprisoned }
+  shy:
+    stress_reactions: { hold_feast: 15, convene_great_council: 20, seek_solitude: -10 }
+  honest:
+    stress_reactions: { blackmail: 25, sow_discord: 25, fabricate_claim: 15, fabricate_hook: 20, murder: 15 }
+  humble:
+    stress_reactions: { commission_chronicle: 20, coronation: 15 }
+  arrogant:
+    stress_reactions: { grant_privileges: 10, coronation: -20 }
+  just:
+    stress_reactions: { revoke_title: 20, fabricate_claim: 20, sow_discord: 15, imprison: 10, emergency_taxes: 10, murder: 20 }
+  temperate:
+    stress_reactions: { hold_feast: 15 }
+  gluttonous:
+    stress_reactions: { hold_feast: -15 }
+  trusting:
+    stress_reactions: { sow_discord: 15, blackmail: 10 }
+  paranoid:
+    stress_reactions: { invite_to_court: 10 }
+    stress_monthly: { trigger: { any_faction_against: yes }, value: 4, desc: stress_when.factions }
+  zealous:
+    stress_reactions: { go_on_pilgrimage: -20, give_alms: -10, confession: -10, send_missionaries: -15 }
+  cynical:
+    stress_reactions: { go_on_pilgrimage: 15, confession: 10 }
+  compassionate:
+    stress_reactions:
+      execute_prisoner: 40
+      imprison: 15
+      impose_heavy_duties: 20
+      murder: 30
+      revoke_title: 15
+      blackmail: 15
+      emergency_taxes: 15
+      give_alms: -15
+      release_prisoner: -10
+  callous:
+    stress_reactions: { give_alms: 15, release_prisoner: 10 }

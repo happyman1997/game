@@ -1,0 +1,63 @@
+# Слава и благочестие (механика renown). Уровни престижа и благочестия
+# правителя меняют мнение подданных: слава — всех, благочестие — единоверцев.
+# Пороги — сколько нужно для уровней 1, 2, 3…; ниже первого — уровень 0.
+defines:
+  renown:
+    prestige_levels: [0, 300, 1000, 2500, 5000]
+    prestige_opinion: [-15, 0, 5, 10, 15, 20]
+    piety_levels: [0, 200, 600, 1500, 3000]
+    piety_opinion: [-15, 0, 4, 8, 12, 16]
+
+modifiers:
+  crowned: { icon: "👑", modifiers: { vassal_opinion: 5, monthly_prestige: 0.5 }, good: true }
+
+opinion_modifiers:
+  witnessed_coronation: { value: 10, years: 5 }
+
+decisions:
+  # благочестие — плата за то, чтобы церковь освятила власть
+  coronation:
+    requires_feature: renown
+    icon: "👑"
+    major: true
+    is_shown:
+      tier: ">= kingdom"
+      NOT: { has_modifier: crowned }
+    is_valid:
+      is_adult: yes
+      is_at_war: no
+      is_imprisoned: no
+    cost:
+      piety: { value: 150, add: { value: tier, multiply: 50 } }
+      gold: 100
+    effect:
+      - add_modifier: { id: crowned }
+      - add_prestige: 200
+      - every_vassal:
+          add_opinion: { target: root, modifier: witnessed_coronation }
+    ai_check_months: 12
+    ai_will_do: 60
+
+  # благочестие снимает стресс
+  confession:
+    requires_feature: renown
+    icon: "✝"
+    is_shown:
+      is_adult: yes
+      religion: christianity
+    is_valid:
+      custom_tooltip:
+        text: ui.need_stress
+        trigger: { stress: 30 }
+    cost: { piety: 75 }
+    cooldown: { years: 2 }
+    effect:
+      - add_stress: -40
+    ai_check_months: 6
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { stress: 40 }
+          add: 30
+        - limit: { stress: 80 }
+          add: 30

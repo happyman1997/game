@@ -178,6 +178,16 @@ interactions:
                 limit: { NOT: { is_same_as: scope:recipient } }
                 add_opinion: { target: scope:actor, modifier: tyranny }
       - add_dread: 10
+    # ИИ отбирает земли у вассалов, которых держит в темнице за преступление или мятеж
+    ai_targets: [prisoner]
+    ai_frequency_months: 12
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { has_imprisonment_reason: scope:recipient }
+          add: 30
+        - limit: { has_trait: [ambitious, greedy, arbitrary, vengeful] }
+          add: 15
 
   release_vassal:
     icon: "🕊"

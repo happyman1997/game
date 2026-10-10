@@ -70,8 +70,8 @@ static func build(app: App, id: String) -> Control:
 	var stats := Stats.char_stats(g, c)
 	var res := K.hbox([
 		W.stat("gold", K.fmt(c.gold), BB.title(app.t("ui.gold"))),
-		W.stat("prestige", K.fmt(c.prestige), BB.title(app.t("ui.prestige"))),
-		W.stat("piety", K.fmt(c.piety), BB.title(app.t("ui.piety"))),
+		W.stat("prestige", K.fmt(c.prestige), func(): return BB.title(app.t("ui.prestige")) + ("\n" + BB.esc(Renown.describe(g, c, "prestige")) if g.engine.has_feature("renown") else "")),
+		W.stat("piety", K.fmt(c.piety), func(): return BB.title(app.t("ui.piety")) + ("\n" + BB.esc(Renown.describe(g, c, "piety")) if g.engine.has_feature("renown") else "")),
 		W.stat("heart", K.fmt(float(stats.get("health", 0.0)), 1), func(): return BB.title(app.t("ui.health")) + "\n" + BB.breakdown(Stats.stat_breakdown(g, c, "health"), 1)),
 		W.stat("stress", K.fmt(c.stress), BB.esc(app.t("ui.stress_tip")), UiArt.C_BAD if float(c.stress) >= 100 else UiArt.C_TEXT),
 	], 14)

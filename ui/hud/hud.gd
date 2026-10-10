@@ -209,6 +209,14 @@ func live_window() -> void:
 	_refresh_window(false)
 
 
+## Подсказка престижа или благочестия: уровень славы (механика renown).
+func _renown_tip(p: Variant, kind: String) -> String:
+	var bb := BB.title(t("ui." + kind))
+	if p != null and app.game.engine.has_feature("renown"):
+		bb += "\n" + BB.esc(Renown.describe(app.game, p, kind))
+	return bb
+
+
 func _refresh_resources(p: Variant) -> void:
 	var g := app.game
 	var items: Array = []
@@ -218,9 +226,9 @@ func _refresh_resources(p: Variant) -> void:
 			var pl: Variant = app.game.player
 			return BB.title(t("ui.gold")) + ("\n" + BB.breakdown(Economy.income_breakdown(app.game, pl), 1) if pl != null else "")])
 		var mp := Economy.monthly_prestige(g, p)
-		items.append(["prestige", K.fmt(p.prestige), K.signed(mp, 1), mp >= 0, BB.title(t("ui.prestige"))])
+		items.append(["prestige", K.fmt(p.prestige), K.signed(mp, 1), mp >= 0, func(): return _renown_tip(app.game.player, "prestige")])
 		var pi := Economy.monthly_piety(g, p)
-		items.append(["piety", K.fmt(p.piety), K.signed(pi, 1), pi >= 0, BB.title(t("ui.piety"))])
+		items.append(["piety", K.fmt(p.piety), K.signed(pi, 1), pi >= 0, func(): return _renown_tip(app.game.player, "piety")])
 		items.append(["levies", K.fmt(Economy.realm_levy(g, p)), "", true, BB.title(t("ui.levies"))])
 		if float(p.stress) > 0:
 			items.append(["stress", K.fmt(p.stress), "", float(p.stress) < 100, BB.title(t("ui.stress"))])

@@ -107,6 +107,9 @@ static func _consider_war(game: Game, c: Dictionary) -> void:
 	if best == null:
 		return
 	var chance = minf(0.9, game.def_num("ai.base_war_chance", 0.25) + (Data.num(p.get("aggression")) + Data.num(p.get("greed"))) * 0.03)
+	if game.engine.has_feature("personality"):
+		# робким и довольным война в тягость (стресс → меньше шанс)
+		chance += Personality.ai_will_shift(game, c, "declare_war") * 0.01
 	if game.rng.chance(chance):
 		Wars.declare_war(game, c, best)
 
@@ -300,6 +303,7 @@ static func _ai_interaction_defs(game: Game) -> Array:
 
 static func _consider_interactions(game: Game, c: Dictionary) -> void:
 	var list_cache := {}
+	var has_personality := game.engine.has_feature("personality")
 	for def in _ai_interaction_defs(game):
 		var freq := Data.num(def.get("ai_frequency_months"), 6)
 		if not game.rng.chance(1.0 / freq):
@@ -313,6 +317,8 @@ static func _consider_interactions(game: Game, c: Dictionary) -> void:
 			var pctx := Interactions.context(game, def, c, c)
 			if not Interp.eval_trigger(pctx, pctx.root, pot):
 				continue
+		# характер: претящее делается реже, то, что по душе, — охотнее
+		var shift := Personality.ai_will_shift(game, c, str(def.get("scheme", def.id))) if has_personality else 0.0
 		var best: Variant = null
 		for r in _ai_targets(game, c, def, list_cache):
 			if not Interactions.is_shown(game, def, c, r):
@@ -334,6 +340,7 @@ static func _consider_interactions(game: Game, c: Dictionary) -> void:
 					var will = cached_will if cached_will != null else Interp.eval_value(ctx, ctx.root, def.ai_will_do)
 					if per_recipient:
 						cached_will = will
+					will += shift
 					if will <= 0.0 or (best != null and will <= best.score):
 						continue
 					if not Interactions.blockers(game, def, c, r, args).is_empty():
@@ -416,6 +423,7 @@ static func _arrange_marriages(game: Game, c: Dictionary) -> void:
 
 
 static func _consider_decisions(game: Game, c: Dictionary) -> void:
+	var has_personality := game.engine.has_feature("personality")
 	# один контекст на все проверки; сохранённые условиями скоупы сбрасываются
 	var ctx := Decisions.context(game, c)
 	var base_scopes := ctx.scopes.duplicate()
@@ -428,7 +436,10 @@ static func _consider_decisions(game: Game, c: Dictionary) -> void:
 			ctx = Decisions.context(game, c)
 		if not Decisions.is_shown(game, def, c, ctx) or not Decisions.can_take(game, def, c, ctx):
 			continue
-		if game.rng.next() * 100.0 < Interp.eval_value(ctx, ctx.root, def.ai_will_do):
+		var will := Interp.eval_value(ctx, ctx.root, def.ai_will_do)
+		if has_personality:
+			will += Personality.ai_will_shift(game, c, str(def.id))
+		if game.rng.next() * 100.0 < will:
 			Decisions.take(game, def, c)
 
 

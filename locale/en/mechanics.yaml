@@ -1,0 +1,51 @@
+# Personality, Renown and Faith & Culture of the Land mechanics.
+msg:
+  stress_reaction_bad: "«{action}» weighed on you ({traits}): stress {value}."
+  stress_reaction_good: "«{action}» suited your nature ({traits}): stress {value}."
+  converted_faith: "{place} adopts a new faith: {value}."
+  converted_culture: "{place} adopts a new culture: {value}."
+ui:
+  declare_war_action: Declaring war
+  renown_level: "Level: {name}"
+  renown_prestige_effect: "Opinion of your subjects: {value}"
+  renown_piety_effect: "Opinion of subjects of your faith: {value}"
+  renown_next: "{value} more to reach «{name}»"
+  foreign_faith: Foreign faith
+  foreign_culture: Foreign culture
+  foreign_faith_tip: "The county does not share its holder's faith and pays and serves grudgingly. Your court chaplain (the «Conversion» task) or missionaries can convert it."
+  foreign_culture_tip: "The county's culture differs from its holder's: it pays less and provides fewer troops. Your chancellor (the «Cultural Integration» task) can change that."
+  stress_dislikes: "Dislikes (stress): {list}"
+  stress_likes: "Enjoys (relieves stress): {list}"
+  stress_monthly: "{when}: stress {value} per month"
+stress_when:
+  at_war: While at war
+  landless: Without lands of their own
+  in_debt: In debt
+  imprisoned: In prison
+  factions: While factions oppose them
+renown:
+  prestige_0: Disgraced
+  prestige_1: Unknown
+  prestige_2: Noted
+  prestige_3: Renowned
+  prestige_4: Great
+  prestige_5: Legendary
+  piety_0: Impious
+  piety_1: Layman
+  piety_2: Pious
+  piety_3: Devout
+  piety_4: Righteous
+  piety_5: Saintly
+opinion:
+  renown_prestige: "Renown: {name}"
+  renown_piety: "Piety: {name}"
+ai:
+  faction_leader: Faction leader
+tr:
+  has_holder_faith: County shares its holder's faith
+  not_holder_faith: County of a foreign faith
+  has_holder_culture: County shares its holder's culture
+  not_holder_culture: County of a foreign culture
+fx:
+  convert_to_holder_faith: "{place} adopts its holder's faith"
+  convert_to_holder_culture: "{place} adopts its holder's culture"

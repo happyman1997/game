@@ -84,8 +84,10 @@ decisions:
     ai_will_do:
       value: 0
       if:
+        - limit: { stress: 60 }
+          add: 30
         - limit: { stress: 120 }
-          add: 60
+          add: 30
 
   commission_chronicle:
     icon: "📚"

@@ -23,6 +23,8 @@
 | `has_flag` | character | Есть флаг | core |
 | `has_focus` | character | Выбран фокус образа жизни | core/lifestyles |
 | `has_global_flag` | любой | Есть глобальный флаг | core |
+| `has_holder_culture` | province | Графство одной культуры с владельцем | core/lands |
+| `has_holder_faith` | province | Графство одной веры с владельцем | core/lands |
 | `has_holding` | province | Есть владение типа | core |
 | `has_hook_on` | character | Есть крюк на персонажа | core |
 | `has_imprisonment_reason` | character | Есть законный повод заключить персонажа (преступление против этого персонажа) | core/prison |
@@ -154,6 +156,8 @@
 | `change_var` | Изменить переменную: { name, add } | core |
 | `command_restless_dead` | Некромант подчиняет восставших мёртвых своей державы | arcana |
 | `consecrate_against_dead` | Освятить земли державы против нежити | arcana |
+| `convert_to_holder_culture` | Привить графству культуру владельца | core/lands |
+| `convert_to_holder_faith` | Обратить графство в веру владельца | core/lands |
 | `create_character` | Создать персонажа: { culture, faith, female, age, traits, dynasty: new\|none\|path, court, save_scope_as } | core |
 | `cure_ailments` | Снять болезни, раны и порчу | arcana |
 | `death` | Смерть: yes, причина или { reason, killer } | core |
@@ -278,6 +282,8 @@
 | `num_courtiers` | character | Число придворных | core |
 | `num_de_jure_counties` | title | Де-юре графств в титуле | core |
 | `num_faction_members` | faction | Число членов фракции | core/factions |
+| `num_foreign_culture_counties` | character | Графств домена чужой культуры | core/lands |
+| `num_foreign_faith_counties` | character | Графств домена чужой веры | core/lands |
 | `num_holdings` | province | Число владений | core |
 | `num_hooks` | character | Число крюков персонажа на других | core |
 | `num_knights` | character | Число рыцарей | core/knights |
@@ -293,7 +299,9 @@
 | `num_wars` | character | Число войн | core |
 | `opinion` | character | Мнение о персонаже: opinion(scope:x) | core |
 | `piety` | character | Благочестие | core |
+| `piety_level` | character | Уровень благочестия (0 — нечестие) | core/renown |
 | `prestige` | character | Престиж | core |
+| `prestige_level` | character | Уровень славы (0 — позор) | core/renown |
 | `prison_months` | character | Сколько месяцев персонаж в темнице | core/prison |
 | `prowess` | character | Навык: prowess | core |
 | `ransom_cost` | character | Размер выкупа за пленника | core/prison |
@@ -421,6 +429,9 @@
 | `laws` | Законы державы: власть короны и другие группы законов | да |
 | `knights` | Рыцари: доблестные придворные и вассалы усиливают армию правителя | да |
 | `politics` | Политика двора: условия службы вассалов, влиятельные вассалы и совет, страх, прошения | да |
+| `personality` | Характер: черты отзываются стрессом на поступки, ИИ поступает по характеру | да |
+| `renown` | Слава и благочестие: уровни престижа и благочестия меняют мнение подданных | да |
+| `lands` | Вера и культура земель: чужие графства дают меньше, их можно обратить | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -431,8 +442,8 @@
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
 - **interaction_deciders**: `payer`
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `plague_fear`
-- **province_modifier_providers**: 
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `arcana_faith`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `laws`, `politics`
-- **systems**: `upkeep` (0), `economy` (10), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
+- **province_modifier_providers**: `lands`
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `arcana_faith`
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `laws`, `politics`, `personality`
+- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

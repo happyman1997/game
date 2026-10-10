@@ -113,6 +113,16 @@ static func build(app: App, id: String) -> Control:
 	root.add_child(holds)
 	if st.get("siege") != null:
 		root.add_child(K.vbox([W.stat("tower", "%s: %d%%" % [app.t("ui.siege"), int(st.siege.progress)]), K.bar(st.siege.progress, 100, Color("#c9a040"))], 2))
+	# чужая вера или культура графства (механика lands)
+	if g.engine.has_feature("lands"):
+		var strange := K.flow([], 4)
+		for part in Lands.strangeness(g, id):
+			var chip := K.panel(K.hbox([K.icon("piety" if part.kind == "faith" else "speech", 16), K.label(app.t("ui.foreign_" + part.kind), "SmallLabel")], 3))
+			chip.add_theme_stylebox_override("panel", UiArt.flat(Color("#4a2a2a"), Color(UiArt.BRONZE, 0.6), 1, 3, 3))
+			K.tip(chip, BB.title(app.t("ui.foreign_" + part.kind)) + "\n" + BB.esc(app.t("ui.foreign_%s_tip" % part.kind)) + "\n" + BB.modifiers(g, part.modifiers))
+			strange.add_child(chip)
+		if strange.get_child_count() > 0:
+			root.add_child(strange)
 	if not st.modifiers.is_empty():
 		var mods := K.flow([], 4)
 		for m in st.modifiers:

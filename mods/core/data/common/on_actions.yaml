@@ -80,3 +80,12 @@ on_actions:
           if:
             limit: { is_player: yes }
             trigger_event: war.0001
+
+  # Крепость взята (root — тот, чья армия её взяла; scope:province, scope:war,
+  # scope:defender — прежний владелец). Добыча и разорение: война бьёт по казне
+  # и развитию, а не только по счёту войны.
+  on_siege_won:
+    effect:
+      - add_gold: { value: scope:province.tax, multiply: 8, min: 5 }
+      - scope:province:
+          add_development: -1

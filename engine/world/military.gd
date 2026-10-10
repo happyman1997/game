@@ -360,6 +360,11 @@ static func _progress_sieges(game: Game) -> void:
 			else:
 				p.occupant = a.owner
 				p.occupant_war = war.id
+				# добыча и разорение — в данных (on_actions.on_siege_won)
+				var scopes := {"province": {"type": "province", "id": a.location}, "war": {"type": "war", "id": war.id}}
+				if holder != null:
+					scopes["defender"] = {"type": "character", "id": holder}
+				game.on_action("on_siege_won", {"type": "character", "id": a.owner}, scopes)
 			game.message(game.loc.t("msg.siege_won", {"place": game.name_of("provinces", a.location), "who": game.scope_name({"type": "character", "id": a.owner})}), "war", {"type": "province", "id": a.location}, war.attackers + war.defenders)
 			game.emit("siege.won", {"war": war, "army": a, "province": a.location})
 			game.notify("map")

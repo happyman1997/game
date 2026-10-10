@@ -1,0 +1,51 @@
+# Механики «Характер», «Слава и благочестие», «Вера и культура земель».
+msg:
+  stress_reaction_bad: "«{action}» далось вам тяжело ({traits}): стресс {value}."
+  stress_reaction_good: "«{action}» пришлось вам по душе ({traits}): стресс {value}."
+  converted_faith: "{place} принимает веру: {value}."
+  converted_culture: "{place} перенимает культуру: {value}."
+ui:
+  declare_war_action: Объявление войны
+  renown_level: "Уровень: {name}"
+  renown_prestige_effect: "Мнение подданных: {value}"
+  renown_piety_effect: "Мнение подданных вашей веры: {value}"
+  renown_next: "До уровня «{name}» — ещё {value}"
+  foreign_faith: Чужая вера
+  foreign_culture: Чужая культура
+  foreign_faith_tip: "Графство не разделяет веру владельца — платит и служит неохотно. Обратить его могут духовник (задача «Обращение») или миссионеры."
+  foreign_culture_tip: "Графство чужой владельцу культуры — платит меньше и даёт меньше войск. Привить культуру может канцлер (задача «Слияние культур»)."
+  stress_dislikes: "Претит (стресс): {list}"
+  stress_likes: "По душе (снимает стресс): {list}"
+  stress_monthly: "{when}: стресс {value} в месяц"
+stress_when:
+  at_war: Во время войны
+  landless: Без собственных земель
+  in_debt: В долгах
+  imprisoned: В темнице
+  factions: Пока есть фракции против
+renown:
+  prestige_0: Опозоренный
+  prestige_1: Безвестный
+  prestige_2: Знатный
+  prestige_3: Прославленный
+  prestige_4: Великий
+  prestige_5: Легендарный
+  piety_0: Нечестивый
+  piety_1: Мирянин
+  piety_2: Благочестивый
+  piety_3: Набожный
+  piety_4: Праведный
+  piety_5: Святой
+opinion:
+  renown_prestige: "Слава: {name}"
+  renown_piety: "Благочестие: {name}"
+ai:
+  faction_leader: Глава фракции
+tr:
+  has_holder_faith: Графство одной веры с владельцем
+  not_holder_faith: Графство чужой веры
+  has_holder_culture: Графство одной культуры с владельцем
+  not_holder_culture: Графство чужой культуры
+fx:
+  convert_to_holder_faith: "{place} принимает веру владельца"
+  convert_to_holder_culture: "{place} перенимает культуру владельца"

@@ -201,6 +201,10 @@ static func _ai_pick_task(game: Game, liege: Dictionary, pos_id: String) -> Vari
 	var ctx := ScriptContext.make(game, {"type": "character", "id": liege.id}, {"liege": {"type": "character", "id": liege.id}})
 	for t in tasks_of(game, pos_id):
 		var v: float = Interp.eval_value(ctx, ctx.root, t.ai_will_do) if t.get("ai_will_do") != null else (10.0 if t.get("default", false) else 5.0)
+		if v <= 0.0:
+			continue
+		# немного случайности: равные по пользе задачи выбирают по-разному
+		v += game.rng.next() * game.def_num("council.ai_task_jitter", 4)
 		if best == null or v > bv:
 			best = t.id
 			bv = v

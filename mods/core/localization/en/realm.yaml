@@ -1,0 +1,23 @@
+decision:
+  coronation: Coronation
+  confession: Confession
+  send_missionaries: Send Missionaries
+decision_desc:
+  coronation: "Have the Church anoint you: rule sanctified by God, for life. Subjects respect a crowned sovereign, and your vassals will remember the ceremony."
+  confession: Unburden your soul in confession. Piety pays for peace of mind.
+  send_missionaries: Monks and priests travel to a county of your domain that does not share your faith and convert it.
+council_task:
+  convert_faith: Conversion
+  integrate_culture: Cultural Integration
+council_task_desc:
+  convert_faith: The chaplain preaches in domain counties of other faiths; in time they adopt the ruler's faith.
+  integrate_culture: The chancellor brings the ruler's customs and language to domain counties; in time they adopt the ruler's culture.
+modifier:
+  crowned: Anointed
+opinion_modifier:
+  witnessed_coronation: Witnessed the coronation
+  forced_out_of_faction: Forced me out of my faction
+interaction:
+  demand_leave_faction: Demand to Leave Faction
+interaction_desc:
+  demand_leave_faction: "Demand that a vassal break with the conspirators. Those who love or fear you will comply, as will anyone you hold a hook over."

@@ -170,6 +170,15 @@ static func traits(app: App, c: Dictionary) -> Control:
 		var mods := BB.modifiers(g, d.get("modifiers"))
 		if mods != "":
 			tipbb += "\n" + mods
+		if g.engine.has_feature("personality"):
+			# характер: что претит и что по душе (стресс)
+			var ps := Personality.trait_summary(g, d)
+			if ps.bad != "":
+				tipbb += "\n" + BB.bad(app.t("ui.stress_dislikes", {"list": ps.bad}))
+			if ps.good != "":
+				tipbb += "\n" + BB.good(app.t("ui.stress_likes", {"list": ps.good}))
+			if ps.monthly != "":
+				tipbb += "\n" + BB.bad(ps.monthly)
 		if Chars.trait_concealed(g, c, t):
 			# тайная черта: видна только носителю и посвящённым
 			tipbb += "\n" + BB.muted(app.t("ui.concealed_trait"))

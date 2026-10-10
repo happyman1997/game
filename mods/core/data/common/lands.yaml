@@ -1,0 +1,60 @@
+# Вера и культура земель (механика lands). Графство чужой веры или культуры
+# (по сравнению с владельцем) платит меньше и даёт меньше войск. Обращают
+# духовник (вера), канцлер (культура) и миссионеры (за благочестие).
+defines:
+  lands:
+    foreign_faith: { tax_mult: -0.3, levy_mult: -0.2, development_growth: -0.05 }
+    foreign_culture: { tax_mult: -0.1, levy_mult: -0.2 }
+
+council_tasks:
+  convert_faith:
+    requires_feature: lands
+    position: court_chaplain
+    icon: "✝"
+    monthly_chance: { value: learning, multiply: 0.25 }
+    monthly_effect:
+      scope:liege:
+        random_domain_province:
+          limit: { has_holder_faith: no, is_occupied: no }
+          convert_to_holder_faith: yes
+    ai_will_do:
+      value: 0
+      if:
+        # 6 за каждое чужое графство + 15 (до 45)
+        - limit: { num_foreign_faith_counties: ">= 1" }
+          add: { value: num_foreign_faith_counties, add: 2.5, multiply: 6, max: 45 }
+  integrate_culture:
+    requires_feature: lands
+    position: chancellor
+    icon: "🤝"
+    monthly_chance: { value: diplomacy, multiply: 0.15 }
+    monthly_effect:
+      scope:liege:
+        random_domain_province:
+          limit: { has_holder_culture: no, is_occupied: no }
+          convert_to_holder_culture: yes
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { num_foreign_culture_counties: ">= 1" }
+          add: { value: num_foreign_culture_counties, add: 2.5, multiply: 6, max: 45 }
+
+decisions:
+  send_missionaries:
+    requires_feature: lands
+    icon: "📿"
+    is_shown:
+      is_ruler: yes
+      num_foreign_faith_counties: ">= 1"
+    is_valid:
+      is_at_war: no
+    cost: { piety: 120, gold: 30 }
+    cooldown: { years: 3 }
+    effect:
+      - random_domain_province:
+          limit: { has_holder_faith: no }
+          convert_to_holder_faith: yes
+    ai_check_months: 12
+    ai_will_do:
+      value: 20
+      add: { value: num_foreign_faith_counties, multiply: 5 }

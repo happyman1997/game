@@ -127,3 +127,42 @@ events:
         ai_chance: 10
       - effect: { scope:faction: { faction_start_war: yes } }
         ai_chance: 90
+
+# Крюк против заговора: сюзерен требует от вассала выйти из фракции.
+# Без крюка согласится лишь тот, кто любит или боится сюзерена.
+interactions:
+  demand_leave_faction:
+    requires_feature: factions
+    icon: "✋"
+    category: realm
+    is_shown:
+      scope:recipient:
+        is_vassal_of: scope:actor
+        is_in_faction: yes
+    ai_accept:
+      value: -40
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.6 } }
+        - { desc: ai.dread, value: { value: fear_of_liege, multiply: 0.5 } }
+        - { desc: ai.faction_leader, limit: { is_faction_leader: yes }, value: -30 }
+    on_accept:
+      - scope:recipient:
+          leave_faction: yes
+          set_flag: { name: faction_cooldown, years: 3 }
+          add_opinion: { target: scope:actor, modifier: forced_out_of_faction }
+    on_decline:
+      - scope:actor:
+          add_prestige: -20
+    ai_targets: [vassal]
+    ai_frequency_months: 6
+    ai_potential: { any_faction_against: yes }
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { scope:recipient: { is_in_faction: yes } }
+          add: 35
+        - limit: { scope:recipient: { is_faction_leader: yes } }
+          add: 15
+
+opinion_modifiers:
+  forced_out_of_faction: { value: -15, years: 5 }
