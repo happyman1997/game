@@ -57,6 +57,17 @@ static func validate(engine: GameEngine) -> Array:
 			if opts[i] is Dictionary:
 				v.trigger(opts[i].get("trigger"), "%s option %d" % [w, i + 1])
 				v.effect(opts[i].get("effect"), "%s option %d" % [w, i + 1])
+				var sp: Variant = opts[i].get("skill")
+				if sp is Dictionary:
+					if sp.get("skill") != null and not c.has("skills", str(sp.skill)):
+						v.issue("%s option %d: нет навыка \"%s\"" % [w, i + 1, sp.skill])
+					if sp.get("archetype") != null and not c.has("skill_archetypes", str(sp.archetype)):
+						v.issue("%s option %d: нет архетипа \"%s\"" % [w, i + 1, sp.archetype])
+					if sp.get("check") != null:
+						v.effect(opts[i].get("success"), "%s option %d success" % [w, i + 1])
+						v.effect(opts[i].get("failure"), "%s option %d failure" % [w, i + 1])
+				elif sp != null:
+					v.issue("%s option %d: skill — словарь { skill, min | check } или { archetype }" % [w, i + 1])
 	for a in c.all("skill_archetypes"):
 		if not (a.get("skills") is Array) or a.skills.size() < 2:
 			v.issue("skill_archetypes/%s: skills — список из двух и более навыков" % a.id)

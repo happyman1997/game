@@ -73,9 +73,25 @@ static func build(app: App, id: String) -> Control:
 		W.stat("prestige", K.fmt(c.prestige), func(): return BB.title(app.t("ui.prestige")) + ("\n" + BB.esc(Renown.describe(g, c, "prestige")) if g.engine.has_feature("renown") else "")),
 		W.stat("piety", K.fmt(c.piety), func(): return BB.title(app.t("ui.piety")) + ("\n" + BB.esc(Renown.describe(g, c, "piety")) if g.engine.has_feature("renown") else "")),
 		W.stat("heart", K.fmt(float(stats.get("health", 0.0)), 1), func(): return BB.title(app.t("ui.health")) + "\n" + BB.breakdown(Stats.stat_breakdown(g, c, "health"), 1)),
-		W.stat("stress", K.fmt(c.stress), BB.esc(app.t("ui.stress_tip")), UiArt.C_BAD if float(c.stress) >= 100 else UiArt.C_TEXT),
+		W.stat("stress", K.fmt(c.stress), func(): return W.stress_tip(app, c), UiArt.C_BAD if float(c.stress) >= 100 else UiArt.C_TEXT),
 	], 14)
-	root.add_child(K.panel(K.vbox([W.skills(app, c), res], 6), "InsetPanel"))
+	var skill_box := K.vbox([W.skills(app, c), res], 6)
+	# молва: где она расходится с правдой хотя бы на очко
+	if g.engine.has_feature("reputation"):
+		var reps := []
+		for s in Chars.skill_ids(g):
+			if c.vars.has("rep:" + s):
+				var rv := roundi(Reputation.value(g, c, s))
+				var real := Stats.skill(g, c, s)
+				if rv != real:
+					reps.append(app.t("ui.reputation_item", {"skill": g.name_of("skills", s), "value": rv, "real": real}))
+		if not reps.is_empty():
+			var rl := K.label("%s: %s" % [app.t("ui.reputation"), ", ".join(reps)], "SmallLabel")
+			rl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			K.tip(rl, BB.title(app.t("ui.reputation")) + "\n" + BB.esc(app.t("ui.reputation_tip")))
+			rl.mouse_filter = Control.MOUSE_FILTER_PASS
+			skill_box.add_child(rl)
+	root.add_child(K.panel(skill_box, "InsetPanel"))
 
 	# ---------------------------------------------------- черты и модификаторы
 	if not c.traits.is_empty():

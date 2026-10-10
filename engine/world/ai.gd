@@ -83,13 +83,17 @@ static func _consider_war(game: Game, c: Dictionary) -> void:
 	if targets.is_empty():
 		return
 	var my_str := Economy.military_strength(game, c)
+	# молва: врага оценивают с поправкой на славу его полководца, себя — по правде
+	var has_rep := game.engine.has_feature("reputation")
+	if has_rep:
+		my_str *= 1.0 + Stats.skill(game, c, "martial") * game.def_num("reputation.war_weight", 0.02)
 	var need = game.def_num("ai.war_strength_ratio", 1.3) - Data.num(p.get("boldness")) * 0.02 - Data.num(p.get("aggression")) * 0.02
 	var best: Variant = null
 	var best_score := 0.0
 	for t in targets:
 		var def: Dictionary = game.ch(t.defender)
 		# Сначала дешёвое (соотношение сил), потом цена войны и желание.
-		var ratio := my_str / maxf(1.0, Economy.military_strength(game, def))
+		var ratio := my_str / maxf(1.0, Economy.military_strength(game, def) * (Reputation.war_fear(game, def) if has_rep else 1.0))
 		if ratio < need or not Wars.can_afford_war(game, c, t):
 			continue
 		if game.is_player(def.id) and game.rng.chance(game.def_num("ai.spare_player_chance", 0)):

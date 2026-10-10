@@ -131,7 +131,7 @@ static func monthly(game: Game) -> void:
 		if not Chars.is_alive(jailer):
 			release(game, c, "jailer_died")
 			continue
-		c.stress = float(c.stress) + game.def_num("prison.monthly_stress", 2)
+		Chars.change_stress(game, c, game.def_num("prison.monthly_stress", 2), "prison")
 		var escape := game.def_num("prison.escape_chance", 0.004) + Data.num(c.skills.get("intrigue")) * game.def_num("prison.escape_per_intrigue", 0.0005)
 		if game.rng.chance(escape):
 			release(game, c, "escaped")

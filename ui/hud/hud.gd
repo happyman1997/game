@@ -231,7 +231,7 @@ func _refresh_resources(p: Variant) -> void:
 		items.append(["piety", K.fmt(p.piety), K.signed(pi, 1), pi >= 0, func(): return _renown_tip(app.game.player, "piety")])
 		items.append(["levies", K.fmt(Economy.realm_levy(g, p)), "", true, BB.title(t("ui.levies"))])
 		if float(p.stress) > 0:
-			items.append(["stress", K.fmt(p.stress), "", float(p.stress) < 100, BB.title(t("ui.stress"))])
+			items.append(["stress", K.fmt(p.stress), "", float(p.stress) < 100, func(): return W.stress_tip(app, app.game.player) if app.game.player != null else ""])
 		var widgets: Array = g.engine.ui.top_bar.values()
 		Data.sort_by(widgets, func(w): return Data.num(w.get("order")))
 		for w in widgets:

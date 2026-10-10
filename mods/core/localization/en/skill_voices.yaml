@@ -1,0 +1,50 @@
+# Skill voices — option texts for data/events/skill_voices.yaml.
+ev:
+  court.0001:
+    c: "Go through their accounts: the money is there, their steward is stealing it"
+    d: "Find out where their silver really went"
+  court.0002:
+    d: "Hold a learned disputation before the whole court"
+  court.0004:
+    d: "Reconcile them over a cup of wine"
+    e: "Judge by custom, as the old laws command"
+  court.0005:
+    d: "Lower the dues for a year and hear the grievances yourself"
+    e: "Disperse the rebels with your retinue"
+  court.0007:
+    c: "Send for learned men: crop rotation and new seed"
+  court.0008:
+    c: "Invite foreign merchants and take your share"
+  court.0009:
+    c: "Persuade the bishop to bless us without a donation"
+  court.0011:
+    d: "Remind them of a certain episode from their past"
+    e: "Challenge the upstart to a duel"
+  family.0001:
+    e: "Teach them yourself: languages, letters and philosophy"
+  family.0002:
+    c: "Have a heart-to-heart talk"
+  health.0001:
+    d: "Treat yourself, following Galen's treatises"
+  health.0005:
+    c: "Show the youngsters how real warriors fight"
+  feast.0002:
+    c: "Laugh it all off"
+  hunt.0002:
+    c: "Finish the beast yourself — with bare hands!"
+    d: "Post the beaters and take the boar on spears"
+  pilgrimage.0001:
+    c: "Keep a travel journal for posterity"
+  intrigue.0001:
+    c: "Plant your own man among the plotters"
+  politics.0001:
+    d: "Convince them their voice will be heard even without a seat"
+  politics.0002:
+    e: "Judge by custom and old charters"
+    f: "Produce the boundary charters and show them both"
+  politics.0004:
+    d: "Quietly verify the accusation yourself"
+  politics.0007:
+    d: "Turn them: let them serve only us"
+  politics.0010:
+    e: "Give a speech they will remember"

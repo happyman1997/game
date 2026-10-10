@@ -9,25 +9,25 @@ defines:
 
 skill_archetypes:
   # ---------------------------------------------------------------- пары
-  gray_eminence:    { skills: [diplomacy, intrigue], min: 12, icon: "🎭", modifiers: { scheme_power: 10, discord_chance: 20 } }
-  warlord:          { skills: [diplomacy, martial], min: 12, icon: "🚩", modifiers: { vassal_levy_mult: 0.15, vassal_opinion: 5 } }
-  merchant_prince:  { skills: [diplomacy, stewardship], min: 12, icon: "⚖", modifiers: { vassal_tax_mult: 0.1, monthly_income: 1 } }
-  arbiter:          { skills: [diplomacy, learning], min: 12, icon: "📜", modifiers: { general_opinion: 5, monthly_prestige: 0.5, monthly_piety: 0.3 } }
-  courtly_knight:   { skills: [diplomacy, prowess], min: 12, icon: "🌹", modifiers: { attraction_opinion: 10, general_opinion: 3, knight_effectiveness: 0.15 } }
-  quartermaster:    { skills: [martial, stewardship], min: 12, icon: "⛺", modifiers: { army_upkeep_mult: -0.2, levy_mult: 0.05 } }
-  ambush_master:    { skills: [martial, intrigue], min: 12, icon: "🌲", modifiers: { commander_advantage: 8 } }
-  siege_engineer:   { skills: [martial, learning], min: 12, icon: "🏰", modifiers: { siege_speed: 0.3, build_cost_mult: -0.1 } }
-  warrior_king:     { skills: [martial, prowess], min: 12, icon: "⚔", modifiers: { self_knight: 1, knight_effectiveness: 0.2, monthly_prestige: 0.5 } }
-  shadow_treasurer: { skills: [stewardship, intrigue], min: 12, icon: "🗝", modifiers: { vassal_tax_mult: 0.15, scheme_defense: 5 } }
-  reformer:         { skills: [stewardship, learning], min: 12, icon: "📖", modifiers: { law_cost_mult: -0.5, development_growth: 0.05 } }
-  castellan:        { skills: [stewardship, prowess], min: 12, icon: "🏯", modifiers: { build_cost_mult: -0.15, levy_mult: 0.05 } }
-  archivist:        { skills: [intrigue, learning], min: 12, icon: "📚", modifiers: { scheme_power: 5 } }
-  night_blade:      { skills: [intrigue, prowess], min: 12, icon: "🗡", modifiers: { scheme_power: 10, scheme_defense: 10 } }
-  holy_warrior:     { skills: [learning, prowess], min: 12, icon: "✝", modifiers: { monthly_piety: 0.5, knight_effectiveness: 0.1, battle_survival: 0.15 } }
+  gray_eminence:    { skills: [diplomacy, intrigue], min: 14, icon: "🎭", modifiers: { scheme_power: 10, discord_chance: 20 } }
+  warlord:          { skills: [diplomacy, martial], min: 14, icon: "🚩", modifiers: { vassal_levy_mult: 0.15, vassal_opinion: 5 } }
+  merchant_prince:  { skills: [diplomacy, stewardship], min: 14, icon: "⚖", modifiers: { vassal_tax_mult: 0.1, monthly_income: 1 } }
+  arbiter:          { skills: [diplomacy, learning], min: 14, icon: "📜", modifiers: { general_opinion: 5, monthly_prestige: 0.5, monthly_piety: 0.3 } }
+  courtly_knight:   { skills: [diplomacy, prowess], min: 14, icon: "🌹", modifiers: { attraction_opinion: 10, general_opinion: 3, knight_effectiveness: 0.15 } }
+  quartermaster:    { skills: [martial, stewardship], min: 14, icon: "⛺", modifiers: { army_upkeep_mult: -0.2, levy_mult: 0.05 } }
+  ambush_master:    { skills: [martial, intrigue], min: 14, icon: "🌲", modifiers: { commander_advantage: 8 } }
+  siege_engineer:   { skills: [martial, learning], min: 14, icon: "🏰", modifiers: { siege_speed: 0.3, build_cost_mult: -0.1 } }
+  warrior_king:     { skills: [martial, prowess], min: 14, icon: "⚔", modifiers: { self_knight: 1, knight_effectiveness: 0.2, monthly_prestige: 0.5 } }
+  shadow_treasurer: { skills: [stewardship, intrigue], min: 14, icon: "🗝", modifiers: { vassal_tax_mult: 0.15, scheme_defense: 5 } }
+  reformer:         { skills: [stewardship, learning], min: 14, icon: "📖", modifiers: { law_cost_mult: -0.5, development_growth: 0.05 } }
+  castellan:        { skills: [stewardship, prowess], min: 14, icon: "🏯", modifiers: { build_cost_mult: -0.15, levy_mult: 0.05 } }
+  archivist:        { skills: [intrigue, learning], min: 14, icon: "📚", modifiers: { scheme_power: 5 } }
+  night_blade:      { skills: [intrigue, prowess], min: 14, icon: "🗡", modifiers: { scheme_power: 10, scheme_defense: 10 } }
+  holy_warrior:     { skills: [learning, prowess], min: 14, icon: "✝", modifiers: { monthly_piety: 0.5, knight_effectiveness: 0.1, battle_survival: 0.15 } }
   # ---------------------------------------------------------------- легенды (три навыка)
-  philosopher_king: { skills: [diplomacy, stewardship, learning], min: 15, icon: "👑", modifiers: { vassal_opinion: 10, development_growth: 0.1, monthly_prestige: 1 } }
-  scourge:          { skills: [martial, intrigue, prowess], min: 15, icon: "💀", modifiers: { commander_advantage: 10, general_opinion: -10, monthly_prestige: 1 } }
-  hero_of_songs:    { skills: [diplomacy, martial, prowess], min: 15, icon: "🎶", modifiers: { monthly_prestige: 2, attraction_opinion: 15, knight_effectiveness: 0.25 } }
+  philosopher_king: { skills: [diplomacy, stewardship, learning], min: 17, icon: "👑", modifiers: { vassal_opinion: 10, development_growth: 0.1, monthly_prestige: 1 } }
+  scourge:          { skills: [martial, intrigue, prowess], min: 17, icon: "💀", modifiers: { commander_advantage: 10, general_opinion: -10, monthly_prestige: 1 } }
+  hero_of_songs:    { skills: [diplomacy, martial, prowess], min: 17, icon: "🎶", modifiers: { monthly_prestige: 2, attraction_opinion: 15, knight_effectiveness: 0.25 } }
 
 modifiers:
   trade_pact: { icon: "⚖", modifiers: { tax_mult: 0.1, monthly_income: 0.5 }, good: true }

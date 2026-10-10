@@ -1,0 +1,6 @@
+decision:
+  confide_in_spouse: Довериться супругу
+decision_desc:
+  confide_in_spouse: "Выговориться тому, кто рядом: супруг выслушает, и станет легче — если он вас любит."
+opinion_modifier:
+  confided_in: Доверился мне

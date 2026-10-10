@@ -86,6 +86,30 @@ static func random_skill(game: Game, s: String, bonus: float = 0.0, def_mean: fl
 	return game.rng.gauss(mean + bonus, spread)
 
 
+## Изменить стресс: рост умножается на stress_gain_mult; изменение попадает в
+## журнал источников c.vars.stress_log (последние defines.character.stress_log_size):
+## [[дата, изменение, источник]]. Источник — "event:<id>", "decision:<id>",
+## "interaction:<id>", "action:<поступок>", "trait:<черта>", "momentum:<навык>",
+## "prison", "" (прочее).
+static func change_stress(game: Game, c: Dictionary, v: float, src: String = "") -> float:
+	if v > 0.0:
+		v *= maxf(0.0, 1.0 + Stats.stat(game, c, "stress_gain_mult"))
+	var before := float(c.stress)
+	c.stress = maxf(0.0, before + v)
+	var d := float(c.stress) - before
+	if absf(d) >= 0.5:
+		var log: Array = c.vars.get("stress_log", [])
+		if not log.is_empty() and log[-1][0] == game.date and log[-1][2] == src:
+			log[-1][1] = float(log[-1][1]) + d
+		else:
+			log.append([game.date, d, src])
+		var n := int(game.def_num("character.stress_log_size", 8))
+		if log.size() > n:
+			log = log.slice(log.size() - n)
+		c.vars["stress_log"] = log
+	return d
+
+
 static func add_trait(game: Game, c: Dictionary, t: String) -> bool:
 	var def: Variant = trait_def(game, t)
 	if def == null:

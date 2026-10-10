@@ -89,6 +89,28 @@ decisions:
         - limit: { stress: 120 }
           add: 30
 
+  # супруг — опора: выговориться
+  confide_in_spouse:
+    icon: "💬"
+    is_shown: { is_adult: yes, is_married: yes }
+    is_valid:
+      - custom_tooltip:
+          text: ui.need_stress
+          trigger: { stress: 30 }
+      - custom_tooltip:
+          text: ui.spouse_must_like
+          trigger:
+            spouse: { opinion: { target: root, value: ">= 0" } }
+    cooldown: { years: 1 }
+    effect:
+      - add_stress: -25
+      - spouse: { add_opinion: { target: root, modifier: confided_in } }
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { stress: 50 }
+          add: 35
+
   commission_chronicle:
     icon: "📚"
     is_shown: { is_ruler: yes, tier: ">= duchy" }
@@ -179,3 +201,6 @@ script_values:
   feast_cost:
     value: 30
     add: { value: tier, multiply: 20 }
+
+opinion_modifiers:
+  confided_in: { value: 10, years: 3 }

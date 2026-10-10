@@ -23,6 +23,8 @@ factions:
         - { desc: ai.rank, value: { value: tier, multiply: 6 } }
         - { desc: ai.councillor, limit: { is_councillor: yes }, value: -15 }
         # политика двора (условия службы уже сказались на мнении): страх, вражда с лидером
+        # молва: против славного полководца бунтовать боязно
+        - { desc: ai.liege_fame, value: { value: scope:liege.martial_reputation, subtract: 12, multiply: -0.7 } }
         - { desc: ai.dread, value: { value: fear_of_liege, multiply: -0.6 } }
         - { desc: ai.rival_leader, limit: { exists: scope:faction_leader, has_opinion_modifier: { target: scope:faction_leader, modifier: rival } }, value: -60 }
     ai_accept_demands:

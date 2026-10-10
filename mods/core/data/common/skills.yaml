@@ -4,7 +4,9 @@
 # per_point — что даёт персонажу каждое очко навыка (модификаторы, считаются
 # после самих навыков); ruler_per_point — то же, но только правителям.
 # mastery — тень мастерства: при навыке от `at` у мастера появляется изнанка
-# (modifiers; stress_reactions и stress_monthly — как у черт характера). Кроме этого движок читает навыки напрямую:
+# (modifiers; stress_reactions и stress_monthly — как у черт характера).
+# reputation — у навыка есть молва (механика reputation): drift — насколько
+# за год она тянется к правде, max_gap — насколько может от неё отойти. Кроме этого движок читает навыки напрямую:
 #   управление — налог домена (economy.tax_per_skill) и лимит домена,
 #   военное дело — сила армии под командованием (military.martial_bonus),
 #   учёность — благочестие (economy.piety_per_learning),
@@ -17,7 +19,7 @@ skills:
     color: "#5b8bd6"
     order: 1
     per_point: { general_opinion: 0.25 }
-    ruler_per_point: { vassal_opinion: 0.5, faction_discontent_mult: -0.012 }
+    ruler_per_point: { vassal_opinion: 0.4, faction_discontent_mult: -0.008 }
     mastery:    # «Мягкотелость»: со всеми ладит — и никого не пугает
       at: 18
       modifiers: { dread_decay_mult: 1.0 }
@@ -28,6 +30,7 @@ skills:
     color: "#c0504d"
     order: 2
     ruler_per_point: { levy_mult: 0.01, army_upkeep_mult: -0.01, siege_speed: 0.02 }
+    reputation: { drift: 0.2, max_gap: 10 }     # слава полководца
     mastery:    # «Безрассудство»: рвётся в бой и в первые ряды
       at: 18
       modifiers: { commander_advantage: 5, battle_survival: -0.6 }
@@ -49,6 +52,7 @@ skills:
     color: "#8a5bb0"
     order: 4
     per_point: { scheme_defense: 1 }
+    reputation: { drift: 0.15, max_gap: 12 }    # дурная слава интригана
     mastery:    # «Подозрительность»: видит заговор в каждом шёпоте
       at: 18
       modifiers: { scheme_defense: 10, general_opinion: -3 }

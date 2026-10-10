@@ -130,10 +130,8 @@ static func trait_summary(game: Game, tdef: Dictionary) -> Dictionary:
 
 
 ## Изменить стресс (рост умножается на stress_gain_mult, как у эффекта add_stress).
-static func add_stress(game: Game, c: Dictionary, v: float) -> void:
-	if v > 0.0:
-		v *= maxf(0.0, 1.0 + Stats.stat(game, c, "stress_gain_mult"))
-	c.stress = maxf(0.0, float(c.stress) + v)
+static func add_stress(game: Game, c: Dictionary, v: float, src: String = "") -> void:
+	Chars.change_stress(game, c, v, src)
 
 
 ## Отклик характера на поступок: стресс и, для игрока, запись в журнал.
@@ -149,13 +147,14 @@ static func react(game: Game, c: Variant, action: String, action_name: String = 
 	if total == 0.0:
 		return
 	var before := float(c.stress)
-	add_stress(game, c, total)
-	game.emit("personality.reacted", {"character": c, "action": action, "stress": float(c.stress) - before})
-	if game.is_player(c.id):
+	add_stress(game, c, total, "action:" + action)
+	var delta := float(c.stress) - before
+	game.emit("personality.reacted", {"character": c, "action": action, "stress": delta})
+	if game.is_player(c.id) and absf(delta) >= 1.0:
 		var names := ", ".join(parts.map(func(pair): return Personality.source_name(game, pair[0])))
 		game.message(game.loc.t("msg.stress_reaction_bad" if total > 0 else "msg.stress_reaction_good", {
 			"action": action_name if action_name != "" else action, "traits": names,
-			"value": "%+d" % roundi(float(c.stress) - before)}), "bad" if total > 0 else "good", {"type": "character", "id": c.id})
+			"value": "%+d" % roundi(delta)}), "bad" if total > 0 else "good", {"type": "character", "id": c.id})
 
 
 static func monthly_char(game: Game, c: Dictionary) -> void:
@@ -169,7 +168,7 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 		if ctx == null:
 			ctx = ScriptContext.make(game, {"type": "character", "id": c.id})
 		if Interp.eval_trigger(ctx, ctx.root, item[1]):
-			add_stress(game, c, item[2])
+			add_stress(game, c, item[2], "trait:" + str(item[0]))
 
 
 func install(engine: GameEngine) -> void:

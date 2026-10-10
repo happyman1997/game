@@ -1,0 +1,283 @@
+# Голоса навыков: варианты, которые дописываются к событиям ядра ($append —
+# сами события остаются в своих файлах). Вариант с полем skill:
+#   { skill: X, min: N }   — доступен при навыке не ниже N (игрок видит его серым);
+#   { archetype: id }      — доступен связке навыков;
+#   { skill: X, check: N } — проверка: шанс виден заранее, затем success/failure.
+# Тексты — ev.<id>.<буква>, буквы продолжают варианты события.
+events:
+  # ---------------------------------------------------------------- двор
+  court.0001:            # обедневший вассал просит денег
+    options:
+      $append:
+        - skill: { skill: stewardship, min: 12 }
+          effect:
+            add_prestige: 10
+            scope:vassal: { add_opinion: { target: root, modifier: grateful } }
+          ai_chance: 50
+        - skill: { skill: intrigue, check: 12 }
+          success:
+            add_hook: { target: scope:vassal }
+          failure:
+            scope:vassal: { add_opinion: { target: root, modifier: insulted, value: -15 } }
+          ai_chance: { value: 10, add: { value: intrigue, multiply: 1.5 } }
+
+  court.0002:            # странствующий учёный
+    options:
+      $append:
+        - skill: { skill: learning, check: 12 }
+          success:
+            add_prestige: 30
+            add_skill: { skill: learning, value: 1 }
+          failure:
+            add_prestige: -20
+            add_stress: 10
+          ai_chance: { value: 10, add: { value: learning, multiply: 1.5 } }
+
+  court.0004:            # ссора придворных
+    options:
+      $append:
+        - skill: { skill: diplomacy, min: 12 }
+          trigger: { exists: scope:second }
+          effect:
+            add_stress: -5
+            scope:first: { add_opinion: { target: root, modifier: grateful } }
+            scope:second: { add_opinion: { target: root, modifier: grateful } }
+          ai_chance: 60
+        - skill: { archetype: arbiter }
+          trigger: { exists: scope:second }
+          effect:
+            add_prestige: 15
+            scope:first: { add_opinion: { target: root, modifier: fair_judgment } }
+            scope:second: { add_opinion: { target: root, modifier: fair_judgment } }
+          ai_chance: 70
+
+  court.0005:            # крестьянские волнения
+    options:
+      $append:
+        - skill: { skill: stewardship, check: 10 }
+          success:
+            add_prestige: 10
+            scope:province: { add_development: 1 }
+          failure:
+            add_gold: -20
+            scope:province: { add_province_modifier: { id: peasant_unrest, years: 1 } }
+          ai_chance: { value: 10, add: { value: stewardship, multiply: 1.5 } }
+        - skill: { skill: martial, min: 14 }
+          effect:
+            add_prestige: 15
+            add_dread: 5
+            scope:province: { add_development: -1 }
+          ai_chance: { value: 10, add: { value: ai_compassion, multiply: -5 } }
+
+  court.0007:            # неурожай
+    options:
+      $append:
+        - skill: { skill: learning, min: 12 }
+          effect:
+            scope:province:
+              add_development: 1
+              add_province_modifier: { id: poor_harvest, years: 1 }
+          ai_chance: 60
+
+  court.0008:            # ярмарка
+    options:
+      $append:
+        - skill: { archetype: merchant_prince }
+          effect:
+            add_gold: 30
+            scope:province: { add_province_modifier: { id: trade_fair, years: 3 } }
+          ai_chance: 80
+
+  court.0009:            # епископ просит пожертвования
+    options:
+      $append:
+        - skill: { skill: diplomacy, check: 12 }
+          success:
+            add_piety: 40
+          failure:
+            add_piety: -30
+            add_prestige: -10
+          ai_chance: { value: 10, add: { value: diplomacy, multiply: 1.5 } }
+
+  court.0011:            # дерзкий вассал
+    options:
+      $append:
+        - skill: { skill: intrigue, min: 14 }
+          effect:
+            add_hook: { target: scope:vassal }
+            scope:vassal: { add_opinion: { target: root, modifier: insulted, value: -10 } }
+          ai_chance: { value: 30, if: { limit: { has_trait: [deceitful, schemer] }, add: 20 } }
+        - skill: { skill: prowess, check: 12 }
+          success:
+            add_prestige: 50
+            scope:vassal: { add_opinion: { target: root, modifier: humiliated } }
+          failure:
+            add_prestige: -20
+            add_trait: wounded
+          ai_chance: { value: 5, add: { value: ai_boldness, multiply: 10 } }
+
+  # ---------------------------------------------------------------- семья и здоровье
+  family.0001:           # способный ребёнок
+    options:
+      $append:
+        - skill: { skill: learning, min: 15 }
+          effect:
+            scope:child:
+              - add_skill: { skill: learning, value: 1 }
+              - add_skill: { skill: diplomacy, value: 1 }
+              - add_opinion: { target: root, modifier: grateful }
+          ai_chance: 60
+
+  family.0002:           # семейная ссора
+    options:
+      $append:
+        - skill: { skill: diplomacy, check: 10 }
+          success:
+            add_stress: -10
+            scope:spouse: { add_opinion: { target: root, modifier: grateful } }
+          failure:
+            add_stress: 5
+            scope:spouse: { add_opinion: { target: root, modifier: insulted } }
+          ai_chance: { value: 10, add: { value: diplomacy, multiply: 1.5 } }
+
+  health.0001:           # недомогание
+    options:
+      $append:
+        - skill: { skill: learning, min: 14 }
+          effect:
+            random: { chance: 60, remove_trait: ill }
+          ai_chance: 60
+
+  health.0005:           # учебный поединок
+    options:
+      $append:
+        - skill: { skill: prowess, check: 14 }
+          success:
+            add_prestige: 30
+            add_modifier: { id: inspired, years: 1 }
+          failure:
+            add_trait: wounded
+          ai_chance: { value: 5, add: { value: prowess, multiply: 1.5 } }
+
+  # ---------------------------------------------------------------- пир, охота, паломничество
+  feast.0002:            # пьяная драка
+    options:
+      $append:
+        - skill: { skill: diplomacy, check: 8 }
+          success:
+            add_prestige: 10
+            add_stress: -10
+            scope:brawler: { add_opinion: { target: root, modifier: grateful } }
+          failure:
+            add_prestige: -10
+          ai_chance: { value: 10, add: { value: diplomacy, multiply: 1.5 } }
+
+  hunt.0002:             # раненый вепрь
+    options:
+      $append:
+        # голос доблести: безрассудный совет — добить зверя самому
+        - skill: { skill: prowess, min: 16 }
+          effect:
+            random_list:
+              - weight: 50
+                add_trait: hunter
+                add_prestige: 100
+              - weight: 38
+                add_trait: wounded
+              - weight: 12
+                death: { reason: hunting }
+          ai_chance: { value: 5, add: { value: ai_boldness, multiply: 10 } }
+        - skill: { skill: martial, check: 10 }
+          success:
+            add_trait: hunter
+            add_prestige: 30
+          failure:
+            add_prestige: -10
+          ai_chance: { value: 15, add: { value: martial, multiply: 1.5 } }
+
+  pilgrimage.0001:       # в путь
+    options:
+      $append:
+        - skill: { skill: learning, min: 12 }
+          effect:
+            add_piety: 30
+            add_prestige: 20
+            trigger_event: { id: pilgrimage.0002, days: 120 }
+          ai_chance: 60
+
+  intrigue.0001:         # заговор раскрыт
+    options:
+      $append:
+        - skill: { skill: intrigue, check: 12 }
+          success:
+            add_hook: { target: scope:owner, strong: yes }
+          failure:
+            add_opinion: { target: scope:owner, modifier: rival }
+          ai_chance: { value: 10, add: { value: intrigue, multiply: 1.5 } }
+
+  # ---------------------------------------------------------------- политика двора
+  politics.0001:         # место в совете
+    options:
+      $append:
+        - skill: { skill: diplomacy, check: 14 }
+          success:
+            scope:vassal: { add_opinion: { target: root, modifier: compensated } }
+          failure:
+            scope:vassal: { add_opinion: { target: root, modifier: refused_council_seat } }
+          ai_chance: { value: 5, add: { value: diplomacy, multiply: 1.5 } }
+
+  politics.0002:         # тяжба о меже
+    options:
+      $append:
+        - skill: { archetype: arbiter }
+          trigger: { exists: scope:second }
+          effect:
+            add_prestige: 20
+            scope:first: { add_opinion: { target: root, modifier: fair_judgment } }
+            scope:second: { add_opinion: { target: root, modifier: fair_judgment } }
+          ai_chance: 80
+        - skill: { skill: learning, min: 14 }
+          trigger: { exists: scope:second }
+          effect:
+            add_prestige: 5
+            scope:first: { add_opinion: { target: root, modifier: fair_judgment } }
+            scope:second: { add_opinion: { target: root, modifier: fair_judgment } }
+          ai_chance: 60
+
+  politics.0004:         # жалоба на советника
+    options:
+      $append:
+        - skill: { skill: intrigue, min: 14 }
+          trigger: { exists: scope:accuser }
+          effect:
+            random_list:
+              - weight: 80
+                scope:accused: { remove_from_council: yes }
+                scope:accuser: { add_opinion: { target: root, modifier: trusted_me } }
+                send_message: { text: msg.complaint_true, kind: good }
+              - weight: 20
+                scope:accuser: { add_opinion: { target: root, modifier: ignored_dispute } }
+                send_message: { text: msg.complaint_false, kind: info }
+          ai_chance: 60
+
+  politics.0007:         # осведомитель
+    options:
+      $append:
+        - skill: { skill: intrigue, check: 14 }
+          success:
+            add_hook: { target: scope:informant, strong: yes }
+            calm_factions: 30
+          failure:
+            scope:informant: { add_opinion: { target: root, modifier: insulted, value: -20 } }
+          ai_chance: { value: 5, add: { value: intrigue, multiply: 1.5 } }
+
+  politics.0010:         # Великий совет
+    options:
+      $append:
+        - skill: { skill: diplomacy, min: 16 }
+          effect:
+            add_prestige: 60
+            calm_factions: 30
+            every_vassal:
+              add_opinion: { target: root, modifier: swore_fealty }
+          ai_chance: 70

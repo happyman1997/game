@@ -1,0 +1,6 @@
+decision:
+  confide_in_spouse: Confide in Your Spouse
+decision_desc:
+  confide_in_spouse: "Pour your heart out to the one beside you: your spouse will listen, and it will help — if they love you."
+opinion_modifier:
+  confided_in: Confided in me

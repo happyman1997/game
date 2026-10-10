@@ -71,6 +71,12 @@ on_actions:
       - if:
           limit: { has_archetype: scourge }
           add_dread: 3
+      # молва: слава полководца растёт с победами
+      - add_reputation: { skill: martial, value: 1.5 }
+
+  on_battle_lost:
+    effect:
+      - add_reputation: { skill: martial, value: -1.5 }
 
   on_player_succession:
     events: [succession.0001]
@@ -91,6 +97,7 @@ on_actions:
   on_siege_won:
     effect:
       - add_gold: { value: scope:province.tax, multiply: 8, min: 5 }
+      - add_reputation: { skill: martial, value: 0.5 }
       - scope:province:
           if:
             limit: { development: ">= 3" }

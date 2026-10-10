@@ -42,7 +42,7 @@ traits:
     stress_reactions: { hold_feast: -20, convene_great_council: -10, seek_solitude: 10 }
     stress_monthly: { trigger: { is_imprisoned: yes }, value: 4, desc: stress_when.imprisoned }
   shy:
-    stress_reactions: { hold_feast: 15, convene_great_council: 20, seek_solitude: -10 }
+    stress_reactions: { hold_feast: 15, convene_great_council: 20, seek_solitude: -10, confide_in_spouse: -10 }
   honest:
     stress_reactions: { blackmail: 25, sow_discord: 25, fabricate_claim: 15, fabricate_hook: 20, murder: 15 }
   humble:

@@ -67,6 +67,7 @@ static func take(game: Game, def: Dictionary, c: Dictionary) -> bool:
 	if def.get("cooldown") != null:
 		c.flags["dec:" + str(def.id)] = game.date + GameDate.duration_days(def.cooldown)
 	var ctx := context(game, c)
+	ctx.values["__src"] = "decision:" + str(def.id)
 	Interp.run_effect(ctx, ctx.root, def.get("effect"))
 	game.emit("decision.taken", {"decision": def.id, "character": c.id})
 	return true
@@ -146,12 +147,13 @@ static func daily_construction(game: Game) -> void:
 		if p.construction == null or p.construction.done > game.date:
 			continue
 		var b: String = p.construction.building
+		var by: Variant = p.construction.get("by")
 		p.buildings.append(b)
 		p.construction = null
 		game.stat_cache.clear()
 		var t: Variant = game.state.titles.get(p.id)
 		game.message(game.loc.t("msg.building_done", {"building": game.name_of("buildings", b), "place": game.name_of("provinces", p.id)}), "good", {"type": "province", "id": p.id}, [t.holder if t != null else null])
-		game.emit("building.completed", {"province": p.id, "building": b})
+		game.emit("building.completed", {"province": p.id, "building": b, "by": by})
 
 
 ## [{province, def}]

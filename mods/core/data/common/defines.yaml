@@ -12,6 +12,7 @@ defines:
     base_stats: { fertility: 0.5 }
     # супруг правителя помогает советом: доля его собственных навыков
     spouse_skill_share: { diplomacy: 0.25, stewardship: 0.25, learning: 0.25 }
+    stress_log_size: 8        # сколько последних источников стресса помнить (подсказка)
     old_age_start: 50
     old_age_health_per_year: 0.08
     old_age_prowess_per_year: 0.25
@@ -163,6 +164,30 @@ defines:
     perk_cost_growth: 100
     focus_change_cooldown_months: 12
 
+  momentum:
+    max_level: 3              # ступеней куража и хандры
+    skill_per_level: 1        # навык за ступень
+    decay_days: 365           # без новых удач и неудач ступень уходит к нулю
+    success_stress: -4        # успех снимает стресс (на полосе — больше)
+    failure_stress: 4
+    uplift_level: 2           # кураж с этой ступени — «душевный подъём»
+    uplift_stress_gain: -0.2  # стресс копится на 20% медленнее
+
+  reputation:
+    war_weight: 0.02          # сила армии в глазах врага: +2% за очко славы полководца
+    discovered_scheme: 2      # раскрытая интрига — к дурной славе
+    exposed_secret: 3
+    infamy_from: 12           # с какой дурной славы к интригану относятся хуже
+    infamy_per_point: -1
+
+  events:
+    # проверки навыка в событиях: шанс = check_base + (навык − сложность) × check_per_point
+    check_base: 50
+    check_per_point: 5
+    check_min: 5
+    check_max: 95
+    check_stress_penalty: 10  # минус к шансу за каждую сотню стресса
+
   council:
     councillor_opinion: 10          # мнение советника о сюзерене
     ai_replace_skill_gap: 4         # ИИ меняет советника, если кандидат лучше на столько
@@ -224,7 +249,7 @@ defines:
     plotter_weight: 4               # во столько раз чаще тайный советник находит секреты заговорщиков
 
   # Механики движка, которые нужно отключить (lifestyles, council, prison, factions, regiments, secrets, laws,
-  # knights, politics, personality, renown, lands).
+  # knights, politics, personality, renown, lands, reputation, momentum).
   disabled_features: []
 
   # Характеристики, доступные в скриптах как значения (gold, age и навыки — встроены).

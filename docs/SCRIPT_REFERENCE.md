@@ -138,6 +138,7 @@
 | `add_prestige` | Изменить prestige | core |
 | `add_province_modifier` | Модификатор провинции | core |
 | `add_regiment` | Получить отряд бесплатно (сверх предела) | core/regiments |
+| `add_reputation` | Сдвинуть молву о навыке: add_reputation: { skill: martial, value: 2 } | core/reputation |
 | `add_secret` | Персонаж получает секрет: add_secret: тип или { type, target, known_by } | core/secrets |
 | `add_skill` | Навсегда изменить навык: { skill, value } | core |
 | `add_stress` | Изменить стресс | core |
@@ -252,6 +253,7 @@
 | `days_since_start` | любой | Дней с начала партии | core |
 | `development` | province | Развитие провинции | core |
 | `diplomacy` | character | Навык: diplomacy | core |
+| `diplomacy_reputation` | character | Молва о навыке «diplomacy» (без молвы — сам навык) | core/reputation |
 | `domain_limit` | character | Лимит домена | core |
 | `dread` | character | Страх, который внушает правитель (0–100) | core/politics |
 | `dynasty_prestige` | character | Престиж династии | core |
@@ -266,14 +268,17 @@
 | `income` | character | Ежемесячный доход | core |
 | `infected_provinces` | любой | Число заражённых провинций в мире. | plague |
 | `intrigue` | character | Навык: intrigue | core |
+| `intrigue_reputation` | character | Молва о навыке «intrigue» (без молвы — сам навык) | core/reputation |
 | `knights_power` | character | Сила рыцарей (в ополченцах) | core/knights |
 | `learning` | character | Навык: learning | core |
+| `learning_reputation` | character | Молва о навыке «learning» (без молвы — сам навык) | core/reputation |
 | `levies` | character | Ополчение державы | core |
 | `levy` | province | Ополчение провинции | core |
 | `levy_flat` | character | Характеристика: levy_flat | core |
 | `levy_ratio` | character | Доля восстановленных ополчений | core |
 | `lifestyle_xp` | character | Опыт текущего образа жизни | core/lifestyles |
 | `martial` | character | Навык: martial | core |
+| `martial_reputation` | character | Молва о навыке «martial» (без молвы — сам навык) | core/reputation |
 | `monsters_slain` | character | Сколько чудовищ уничтожил персонаж (слава охотника) | arcana |
 | `monthly_piety` | character | Характеристика: monthly_piety | core |
 | `monthly_prestige` | character | Характеристика: monthly_prestige | core |
@@ -306,6 +311,7 @@
 | `prestige_level` | character | Уровень славы (0 — позор) | core/renown |
 | `prison_months` | character | Сколько месяцев персонаж в темнице | core/prison |
 | `prowess` | character | Навык: prowess | core |
+| `prowess_reputation` | character | Молва о навыке «prowess» (без молвы — сам навык) | core/reputation |
 | `ransom_cost` | character | Размер выкупа за пленника | core/prison |
 | `realm_size` | character | Графств в державе | core |
 | `regiment_cap` | character | Предел отрядов | core/regiments |
@@ -316,6 +322,7 @@
 | `scheme_progress` | scheme | Прогресс интриги | core |
 | `sorcery` | character | Навык: sorcery | core |
 | `stewardship` | character | Навык: stewardship | core |
+| `stewardship_reputation` | character | Молва о навыке «stewardship» (без молвы — сам навык) | core/reputation |
 | `stress` | character | Стресс | core |
 | `stress_level` | character | Уровень стресса (стресс / 100) | core |
 | `tax` | province | Налог провинции | core |
@@ -434,6 +441,8 @@
 | `personality` | Характер: черты отзываются стрессом на поступки, ИИ поступает по характеру | да |
 | `renown` | Слава и благочестие: уровни престижа и благочестия меняют мнение подданных | да |
 | `lands` | Вера и культура земель: чужие графства дают меньше, их можно обратить | да |
+| `reputation` | Молва: слава полководца и дурная слава интригана живут своей жизнью | да |
+| `momentum` | Кураж и хандра: полосы удач и неудач в одной сфере меняют навык и стресс | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -443,9 +452,9 @@
 - **cb_targets**: `claim`, `de_jure`, `independence`, `adjacent_county`, `holy_war`, `faction`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
 - **interaction_deciders**: `payer`
-- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `plague_fear`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `momentum`, `plague_fear`
 - **province_modifier_providers**: `lands`
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `arcana_faith`
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `reputation`, `arcana_faith`
 - **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `laws`, `politics`, `personality`
-- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
+- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `momentum` (13), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85), `reputation` (85)
 - **ui.map_modes**: `arcana`, `plague`

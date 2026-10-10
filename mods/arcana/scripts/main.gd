@@ -540,7 +540,7 @@ static func _vampire_month(game: Game, c: Dictionary) -> void:
 	c.vars["blood_thirst"] = th
 	var has_mod: bool = c.modifiers.any(func(m): return m.id == "bloodthirst")
 	if th >= game.def_num("arcana.thirst_stress_from", 60):
-		c.stress = float(c.stress) + 6.0
+		Chars.change_stress(game, c, 6.0)
 		if not has_mod:
 			c.modifiers.append({"id": "bloodthirst"})
 			game.stat_cache.erase(c.id)
@@ -555,7 +555,7 @@ static func _vampire_month(game: Game, c: Dictionary) -> void:
 	elif th >= 100.0:
 		if tier >= 4:
 			# древний не теряет себя — лишь мучается
-			c.stress = float(c.stress) + 10.0
+			Chars.change_stress(game, c, 10.0)
 		else:
 			frenzy(game, c)
 
@@ -628,7 +628,7 @@ static func _beast_wins(game: Game, c: Dictionary) -> void:
 		Succession.kill_character(game, c, "beast_within")
 	else:
 		c.vars["beast_control"] = -60.0
-		c.stress = float(c.stress) + 40.0
+		Chars.change_stress(game, c, 40.0)
 
 
 # ------------------------------------------------------------ подменыши, мертвецы на службе
@@ -1025,7 +1025,7 @@ static func hunt_dragon(game: Game, c: Dictionary) -> void:
 		else:
 			if game.content.has("traits", "wounded"):
 				Chars.add_trait(game, c, "wounded")
-			c.stress = float(c.stress) + 30.0
+			Chars.change_stress(game, c, 30.0, "dragon")
 			d.hoard = float(d.hoard) + 50.0
 			if game.is_player(c.id):
 				game.message(t(game, "msg_dragon_escape", {"place": pname(game, lair)}), "bad", {"type": "province", "id": lair})
@@ -1151,7 +1151,7 @@ static func witch_hunt(game: Game, c: Dictionary) -> void:
 		if game.rng.chance(0.4):
 			Opinion.add_opinion(game, v, c, "witch_hunt_terror")
 	if c.traits.has("compassionate"):
-		c.stress = float(c.stress) + 25.0
+		Chars.change_stress(game, c, 25.0, "action:witch_hunt")
 	if game.is_player(c.id):
 		game.events.trigger("arcana.0071", {"type": "character", "id": c.id})
 		game.message(t(game, "msg_witch_hunt", {"found": found, "seized": burned}), "info")

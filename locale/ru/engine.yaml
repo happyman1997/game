@@ -175,6 +175,9 @@ modsrc:
   spouse: "Супруг(а): {name}"
   mastery: "Тень мастерства: {name}"
   archetype: "Архетип: {name}"
+  momentum_up: "Кураж ({skill}, ступень {n})"
+  momentum_down: "Хандра ({skill}, ступень {n})"
+  uplift: "Душевный подъём"
 
 list:
   vassal: вассалы

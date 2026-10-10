@@ -160,6 +160,48 @@ static func skill_tip(g: Game, c: Dictionary, sid: String) -> String:
 	return bb
 
 
+## Подсказка стресса: состояние, что оно значит, откуда стресс в последнее время.
+static func stress_tip(app: App, c: Dictionary) -> String:
+	var g := app.game
+	var st := float(c.stress)
+	var lvl := floori(st / 100.0)
+	var state := 0 if st < 50.0 else (1 if lvl == 0 else mini(4, lvl + 1))
+	var state_txt := app.t("ui.stress_state_%d" % state)
+	var bb := BB.title(app.t("ui.stress")) + "\n" + (BB.bad(state_txt) if state >= 2 else BB.muted(state_txt))
+	bb += "\n" + BB.esc(app.t("ui.stress_tip"))
+	var log: Array = c.vars.get("stress_log", [])
+	if not log.is_empty():
+		var rows := []
+		for i in range(log.size() - 1, -1, -1):
+			var e: Array = log[i]
+			rows.append([BB.esc(stress_source(g, str(e[2]))), BB.bad(K.signed(float(e[1]))) if float(e[1]) > 0 else BB.good(K.signed(float(e[1])))])
+		bb += "\n" + BB.muted(app.t("ui.stress_recent")) + "\n" + BB.rows(rows)
+	return bb
+
+
+## Подпись источника стресса из журнала (Chars.change_stress).
+static func stress_source(g: Game, src: String) -> String:
+	if src == "":
+		return g.loc.t("stress_src.other")
+	var i := src.find(":")
+	var kind := src.substr(0, i) if i >= 0 else src
+	var id := src.substr(i + 1) if i >= 0 else ""
+	match kind:
+		"event":
+			return g.loc.t("stress_src.event", {"name": g.loc.t_or("ev.%s.t" % id, id)})
+		"decision":
+			return g.loc.t("stress_src.decision", {"name": g.name_of("decisions", id)})
+		"interaction":
+			return g.loc.t("stress_src.interaction", {"name": g.name_of("interactions", id)})
+		"action":
+			return g.loc.t("stress_src.action", {"name": Personality.action_name(g, id)})
+		"trait":
+			return g.loc.t("stress_src.trait", {"name": Personality.source_name(g, id)})
+		"momentum":
+			return g.loc.t("stress_src.momentum", {"name": g.name_of("skills", id)})
+	return g.loc.t_or("stress_src." + kind, g.loc.t("stress_src.other"))
+
+
 ## Черты персонажа: значки-плашки.
 static func traits(app: App, c: Dictionary) -> Control:
 	var g := app.game

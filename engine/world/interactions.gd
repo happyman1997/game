@@ -205,6 +205,7 @@ static func execute(game: Game, def: Dictionary, actor: Dictionary, recipient: D
 	if not game.engine.hooks.veto("interaction.before", {"game": game, "interaction": def.id, "actor": actor, "recipient": recipient, "args": args}):
 		return "invalid"
 	var ctx := context(game, def, actor, recipient, args)
+	ctx.values["__src"] = "interaction:" + str(def.id)
 	var cst := cost(game, def, ctx)
 	actor.gold -= cst.gold
 	actor.prestige -= cst.prestige

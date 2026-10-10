@@ -1,10 +1,28 @@
 # Механики «Характер», «Слава и благочестие», «Вера и культура земель».
 msg:
+  momentum_up: "Полоса удач: кураж в навыке «{skill}» (ступень {n})."
+  momentum_down: "Полоса неудач: хандра в навыке «{skill}» (ступень {n})."
+  check_success: "Проверка навыка «{skill}» удалась (шанс был {chance}%)."
+  check_failure: "Проверка навыка «{skill}» не удалась (шанс был {chance}%)."
   stress_reaction_bad: "«{action}» далось вам тяжело ({traits}): стресс {value}."
   stress_reaction_good: "«{action}» пришлось вам по душе ({traits}): стресс {value}."
   converted_faith: "{place} принимает веру: {value}."
   converted_culture: "{place} перенимает культуру: {value}."
 ui:
+  spouse_must_like: Супруг должен относиться к вам хотя бы ровно
+  stress_recent: "Недавно:"
+  stress_state_0: "Спокоен"
+  stress_state_1: "Напряжён — ещё немного, и начнутся срывы"
+  stress_state_2: "Надломлен: навыки снижены, возможен срыв"
+  stress_state_3: "На грани: навыки сильно снижены"
+  stress_state_4: "Срыв близко: может кончиться бедой"
+  reputation: "Молва"
+  reputation_tip: "Что о нём думают. Молва тянется к правде, но победы, поражения и раскрытые интриги сдвигают её. ИИ судит по молве: славного полководца боятся, известному интригану не доверяют."
+  reputation_item: "{skill} {value} (на деле {real})"
+  check_success: "Если удастся:"
+  check_failure: "Если не удастся:"
+  voice_needs_skill: "Нужно: {skill} не ниже {min}"
+  voice_needs_archetype: "Нужен архетип «{name}»"
   per_skill_point_ruler: "Правителю — за каждое очко:"
   archetype_needs: "{skills} — от {min}"
   per_skill_point: "За каждое очко навыка:"
@@ -41,9 +59,11 @@ renown:
   piety_4: Праведный
   piety_5: Святой
 opinion:
+  infamy: Дурная слава интригана
   renown_prestige: "Слава: {name}"
   renown_piety: "Благочестие: {name}"
 ai:
+  liege_fame: Слава сюзерена-полководца
   faction_leader: Глава фракции
 tr:
   has_archetype: "Архетип: {value}"
@@ -53,6 +73,7 @@ tr:
   has_holder_culture: Графство одной культуры с владельцем
   not_holder_culture: Графство чужой культуры
 fx:
+  add_reputation: "Молва ({skill}): {value}"
   convert_to_holder_faith: "{place} принимает веру владельца"
   convert_to_holder_culture: "{place} перенимает культуру владельца"
 stat:
@@ -78,3 +99,13 @@ mastery_desc:
   intrigue: "Тень мастерства интригана: видит заговор в каждом шёпоте. Защищён лучше всех, но фракции не дают ему спать."
   learning: "Тень мастерства учёного: витает в книгах, забывая о мирском. Управление и военное дело страдают."
   prowess: "Тень мастерства силача: ищет повода помериться силой. Женщины и мужчины засматриваются, двор побаивается; без войны скучает."
+stress_src:
+  other: Прочее
+  event: "Событие «{name}»"
+  decision: "Решение «{name}»"
+  interaction: "«{name}»"
+  action: "Поступок против натуры: {name}"
+  trait: "{name}"
+  momentum: "Удачи и неудачи: {name}"
+  prison: Темница
+  dragon: Схватка с драконом

@@ -76,24 +76,68 @@ static func build(app: App, pe: Dictionary, on_close: Callable) -> Control:
 	var theme_color := Color(theme.get("color", "#8a6d3b")) if theme != null else Color("#8a6d3b")
 	var scene := _scene(app, theme_color, def.get("icon", theme.get("icon") if theme != null else "scroll"), people)
 	var options := []
-	var visible: Array = g.events.visible_options(def, ctx, pe.target)
+	var visible: Array = g.events.visible_options(def, ctx, pe.target, true)
 	for item in visible:
 		var opt: Dictionary = item.opt
 		var index: int = item.index
 		var label := g.text(opt.get("name", "ev.%s.%s" % [def.id, LETTERS[index]]), ctx)
-		options.append(_option(label, func():
+		var voice := _voice_label(app, opt, pe.target, item.locked)
+		if voice != "":
+			label = voice + " " + label
+		var b := _option(label, func():
 			g.events.choose(pe.uid, index)
 			on_close.call()
 			app.mark_dirty(true), func():
 			var c2 := ScriptContext.make(g, pe.target, pe.scopes)
 			var lines: Array = Interp.describe_effect(c2, pe.target, opt.get("effect"))
 			var extra := BB.i(g.text(opt.tooltip, c2)) + "\n" if opt.get("tooltip") != null else ""
-			return extra + BB.desc_lines(lines) if not lines.is_empty() or extra != "" else ""))
-	if visible.is_empty():
+			var bb := extra + BB.desc_lines(lines) if not lines.is_empty() or extra != "" else ""
+			if item.locked:
+				bb = BB.bad(_voice_need(app, opt)) + ("\n" + bb if bb != "" else "")
+			# проверка навыка: что будет при успехе и при неудаче
+			if g.events.check_chance(opt, pe.target) >= 0:
+				var ls := Interp.describe_effect(c2, pe.target, opt.get("success"))
+				var lf := Interp.describe_effect(c2, pe.target, opt.get("failure"))
+				if not ls.is_empty():
+					bb += ("\n" if bb != "" else "") + BB.good(app.t("ui.check_success")) + "\n" + BB.desc_lines(ls)
+				if not lf.is_empty():
+					bb += ("\n" if bb != "" else "") + BB.bad(app.t("ui.check_failure")) + "\n" + BB.desc_lines(lf)
+			return bb)
+		if item.locked:
+			b.disabled = true
+		options.append(b)
+	if visible.filter(func(x): return not x.locked).is_empty():
 		options.append(_option("OK", func():
 			g.events.choose(pe.uid, -1)
 			on_close.call(), null))
 	return _frame(title, scene, BB.esc(desc), options)
+
+
+## Метка «голоса навыка»: [Учёность], [Интриги: 65%], [Третейский судья].
+static func _voice_label(app: App, opt: Dictionary, target: Dictionary, locked: bool = false) -> String:
+	var g := app.game
+	var sp: Variant = GameEvents.skill_spec(opt)
+	if sp == null:
+		return ""
+	if sp.get("archetype") != null:
+		return "[%s]" % g.name_of("skill_archetypes", sp.archetype)
+	var sname := g.name_of("skills", str(sp.get("skill")))
+	var ch := g.events.check_chance(opt, target)
+	if ch >= 0:
+		return "[%s: %d%%]" % [sname, ch]
+	if locked and sp.get("min") != null:
+		return "[%s %d]" % [sname, int(Data.num(sp.min))]
+	return "[%s]" % sname
+
+
+static func _voice_need(app: App, opt: Dictionary) -> String:
+	var g := app.game
+	var sp: Variant = GameEvents.skill_spec(opt)
+	if sp == null:
+		return ""
+	if sp.get("archetype") != null:
+		return app.t("ui.voice_needs_archetype", {"name": g.name_of("skill_archetypes", sp.archetype)})
+	return app.t("ui.voice_needs_skill", {"skill": g.name_of("skills", str(sp.get("skill"))), "min": int(Data.num(sp.get("min")))})
 
 
 static func _option(label: String, cb: Callable, tip_content: Variant) -> Button:

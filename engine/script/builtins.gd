@@ -651,10 +651,7 @@ static func _register_effects(engine: GameEngine) -> void:
 					d.prestige = float(d.prestige) + v * g.def_num(share_key, 0.1)
 		, func(ctx, s, arg): return _t(ctx.game, "fx." + ename, {"value": signed(_num(ctx, s, arg))}))
 	ce.call("add_stress", "Изменить стресс", func(g, c, arg, ctx, s):
-		var v := _num(ctx, s, arg)
-		if v > 0:
-			v *= maxf(0.0, 1.0 + Stats.stat(g, c, "stress_gain_mult"))
-		c.stress = maxf(0.0, float(c.stress) + v)
+		Chars.change_stress(g, c, _num(ctx, s, arg), str(ctx.values.get("__src", "")))
 	, func(ctx, s, arg): return _t(ctx.game, "fx.add_stress", {"value": signed(_num(ctx, s, arg))}))
 	ce.call("add_health", "Изменить базовое здоровье", func(g, c, arg, ctx, s):
 		c.health = float(c.health) + _num(ctx, s, arg)
