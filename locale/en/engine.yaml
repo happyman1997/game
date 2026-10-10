@@ -170,6 +170,10 @@ ai:
 modsrc:
   buildings: Buildings
   stress: Stress
+  skill: "Skill «{name}»"
+  spouse: "Spouse: {name}"
+  mastery: "Shadow of mastery: {name}"
+  archetype: "Archetype: {name}"
 
 list:
   vassal: vassals

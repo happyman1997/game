@@ -37,7 +37,12 @@ static func knights_of(game: Game, c: Dictionary) -> Array:
 	return game.cached_monthly("knights:" + c.id, func():
 		var pool := (game.courtiers_of(c.id) + game.vassals_of(c.id)).filter(func(x): return Knights.is_candidate(game, c, x))
 		Data.sort_by(pool, func(x): return Stats.skill(game, x, "prowess"), true)
-		return pool.slice(0, Knights.cap(game, c)))
+		pool = pool.slice(0, Knights.cap(game, c))
+		# self_knight (архетип «Король-воин»): правитель сам бьётся в рядах рыцарей —
+		# и рискует, как они
+		if Stats.stat(game, c, "self_knight") > 0.0 and Chars.is_adult(game, c) and c.get("prison") == null:
+			pool.push_front(c)
+		return pool)
 
 
 static func power(game: Game, c: Dictionary) -> float:
@@ -67,7 +72,7 @@ static func _battle_casualties(game: Game, owner_id: String, won: bool) -> void:
 	for k in knights_of(game, owner):
 		if k.death != null:
 			continue
-		if game.rng.chance(death):
+		if game.rng.chance(death * Military._death_mult(game, k)):
 			Succession.kill_character(game, k, "battle")
 			continue
 		if game.rng.chance(wound):

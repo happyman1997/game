@@ -117,6 +117,21 @@ static func breakdown(parts: Array, digits: int = 0) -> String:
 	return rows(pairs)
 
 
+## Доли (множители, шансы) показываются процентами.
+const PCT_STATS := ["fertility", "battle_survival", "siege_speed", "development_growth"]
+
+
+## Значение характеристики со знаком: доли — процентами, мелкие — с десятыми.
+static func stat_value(k: String, v: float) -> String:
+	if "mult" in k or PCT_STATS.has(k):
+		var p := v * 100.0
+		return "%s%s%%" % ["+" if v > 0 else "", K.fmt(p, 0 if absf(p) >= 10 or is_equal_approx(p, roundf(p)) else 1)]
+	var digits := 0
+	if absf(v) < 1.0:
+		digits = 1 if is_equal_approx(v * 10.0, roundf(v * 10.0)) else 2
+	return K.signed(v, digits)
+
+
 ## Модификаторы {stat: value} → таблица.
 static func modifiers(game: Game, mods: Variant) -> String:
 	if not (mods is Dictionary) or mods.is_empty():
@@ -124,9 +139,8 @@ static func modifiers(game: Game, mods: Variant) -> String:
 	var pairs := []
 	for k in mods:
 		var v := float(mods[k])
-		var is_bad := v > 0 if k == "stress_gain_mult" else v < 0
-		var pct: bool = "mult" in k or k == "fertility"
-		var val := ("%s%d%%" % ["+" if v > 0 else "", roundi(v * 100)]) if pct else K.signed(v, 1 if absf(v) < 1 else 0)
+		var is_bad := v > 0 if (k == "stress_gain_mult" or k == "build_time_mult" or k == "faction_discontent_mult") else v < 0
+		var val := stat_value(k, v)
 		pairs.append([esc(game.loc.t_or("stat." + k, k)), bad(val) if is_bad else good(val)])
 	return rows(pairs)
 

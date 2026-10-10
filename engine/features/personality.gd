@@ -19,34 +19,63 @@ func _init() -> void:
 	doc = "Характер: черты отзываются стрессом на поступки, ИИ поступает по характеру"
 
 
-## {действие: [[черта, стресс], ...]} — на движок.
+## Источники характера: черты и тени мастерства навыков (skills.<id>.mastery,
+## источник "mastery:<навык>"). [[источник, определение с stress_*], ...]
+static func _sources(game: Game) -> Array:
+	var hit: Variant = game.engine.cache.get("personality:src")
+	if hit == null:
+		hit = []
+		for t in game.content.all("traits"):
+			if t.get("stress_reactions") is Dictionary or t.get("stress_monthly") is Dictionary:
+				hit.append([str(t.id), t])
+		for sk in game.content.all("skills"):
+			if sk.get("mastery") is Dictionary:
+				hit.append(["mastery:" + str(sk.id), sk.mastery])
+		game.engine.cache["personality:src"] = hit
+	return hit
+
+
+## {действие: [[источник, стресс], ...]} — на движок.
 static func _index(game: Game) -> Dictionary:
 	var hit: Variant = game.engine.cache.get("personality:idx")
 	if hit == null:
 		hit = {}
-		for t in game.content.all("traits"):
-			var r: Variant = t.get("stress_reactions")
+		for item in _sources(game):
+			var r: Variant = item[1].get("stress_reactions")
 			if not (r is Dictionary):
 				continue
 			for action in r:
 				if not hit.has(action):
 					hit[action] = []
-				hit[action].append([str(t.id), Data.num(r[action])])
+				hit[action].append([item[0], Data.num(r[action])])
 		game.engine.cache["personality:idx"] = hit
 	return hit
 
 
-## Черты со stress_monthly: [[черта, условие, стресс], ...].
+## Источники со stress_monthly: [[источник, условие, стресс], ...].
 static func _monthly(game: Game) -> Array:
 	var hit: Variant = game.engine.cache.get("personality:monthly")
 	if hit == null:
 		hit = []
-		for t in game.content.all("traits"):
-			var m: Variant = t.get("stress_monthly")
+		for item in _sources(game):
+			var m: Variant = item[1].get("stress_monthly")
 			if m is Dictionary:
-				hit.append([str(t.id), m.get("trigger"), Data.num(m.get("value"))])
+				hit.append([item[0], m.get("trigger"), Data.num(m.get("value"))])
 		game.engine.cache["personality:monthly"] = hit
 	return hit
+
+
+## Есть ли у персонажа источник: черта или тень мастерства.
+static func has_source(game: Game, c: Dictionary, src: String) -> bool:
+	if src.begins_with("mastery:"):
+		return Stats.stat(game, c, src) > 0.0
+	return c.traits.has(src)
+
+
+static func source_name(game: Game, src: String) -> String:
+	if src.begins_with("mastery:"):
+		return game.loc.t("mastery." + src.substr(8))
+	return game.name_of("traits", src)
 
 
 ## Сколько стресса принесёт персонажу поступок (сумма по его чертам).
@@ -56,14 +85,14 @@ static func stress_for(game: Game, c: Dictionary, action: String) -> float:
 		return 0.0
 	var total := 0.0
 	for pair in list:
-		if c.traits.has(pair[0]):
+		if has_source(game, c, pair[0]):
 			total += pair[1]
 	return total
 
 
-## Черты, которые отзываются на поступок: [[черта, стресс], ...].
+## Черты, которые отзываются на поступок: [[источник, стресс], ...].
 static func reacting_traits(game: Game, c: Dictionary, action: String) -> Array:
-	return Data.as_array(_index(game).get(action)).filter(func(pair): return c.traits.has(pair[0]))
+	return Data.as_array(_index(game).get(action)).filter(func(pair): return Personality.has_source(game, c, pair[0]))
 
 
 ## Поправка к желанию ИИ: претит — меньше, по душе — больше.
@@ -123,7 +152,7 @@ static func react(game: Game, c: Variant, action: String, action_name: String = 
 	add_stress(game, c, total)
 	game.emit("personality.reacted", {"character": c, "action": action, "stress": float(c.stress) - before})
 	if game.is_player(c.id):
-		var names := ", ".join(parts.map(func(pair): return game.name_of("traits", pair[0])))
+		var names := ", ".join(parts.map(func(pair): return Personality.source_name(game, pair[0])))
 		game.message(game.loc.t("msg.stress_reaction_bad" if total > 0 else "msg.stress_reaction_good", {
 			"action": action_name if action_name != "" else action, "traits": names,
 			"value": "%+d" % roundi(float(c.stress) - before)}), "bad" if total > 0 else "good", {"type": "character", "id": c.id})
@@ -135,7 +164,7 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 		return
 	var ctx: ScriptContext = null
 	for item in list:
-		if not c.traits.has(item[0]):
+		if not Personality.has_source(game, c, item[0]):
 			continue
 		if ctx == null:
 			ctx = ScriptContext.make(game, {"type": "character", "id": c.id})
@@ -173,15 +202,26 @@ func register_script(engine: GameEngine) -> void:
 		for kind in ["interactions", "decisions", "schemes"]:
 			for d in e.content.all(kind):
 				known[str(d.id)] = true
+		var defs := []
 		for t in e.content.all("traits"):
+			defs.append(["traits/" + str(t.id), t])
+		for sk in e.content.all("skills"):
+			if sk.get("mastery") != null:
+				defs.append(["skills/%s mastery" % sk.id, sk.mastery])
+		for item in defs:
+			var where: String = item[0]
+			var t: Variant = item[1]
+			if not (t is Dictionary):
+				v.issue("%s: ожидается словарь" % where)
+				continue
 			var r: Variant = t.get("stress_reactions")
 			if r != null and not (r is Dictionary):
-				v.issue("traits/%s: stress_reactions должен быть словарём" % t.id)
+				v.issue("%s: stress_reactions должен быть словарём" % where)
 				continue
 			for action in (r if r is Dictionary else {}):
 				if not known.has(str(action)):
-					v.issue("traits/%s: stress_reactions — неизвестный поступок \"%s\"" % [t.id, action])
+					v.issue("%s: stress_reactions — неизвестный поступок \"%s\"" % [where, action])
 			var m: Variant = t.get("stress_monthly")
 			if m is Dictionary:
-				v.trigger(m.get("trigger"), "traits/%s stress_monthly" % t.id)
+				v.trigger(m.get("trigger"), "%s stress_monthly" % where)
 	, OWNER)

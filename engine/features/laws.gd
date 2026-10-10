@@ -53,10 +53,12 @@ static func current(game: Game, c: Dictionary, group: String) -> Variant:
 static func change_cost(game: Game, c: Dictionary, law: Dictionary) -> Dictionary:
 	var ctx := ScriptContext.make(game, {"type": "character", "id": c.id}, {"law_owner": {"type": "character", "id": c.id}})
 	var cd: Dictionary = law.get("change_cost") if law.get("change_cost") is Dictionary else {}
+	# law_cost_mult — например, у архетипа «Реформатор»
+	var k := maxf(0.1, 1.0 + Stats.stat(game, c, "law_cost_mult"))
 	return {
-		"gold": roundf(Interp.eval_value(ctx, ctx.root, cd.get("gold", 0))),
-		"prestige": roundf(Interp.eval_value(ctx, ctx.root, cd.get("prestige", 0))),
-		"piety": roundf(Interp.eval_value(ctx, ctx.root, cd.get("piety", 0))),
+		"gold": roundf(Interp.eval_value(ctx, ctx.root, cd.get("gold", 0)) * k),
+		"prestige": roundf(Interp.eval_value(ctx, ctx.root, cd.get("prestige", 0)) * k),
+		"piety": roundf(Interp.eval_value(ctx, ctx.root, cd.get("piety", 0)) * k),
 	}
 
 

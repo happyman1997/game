@@ -5,6 +5,9 @@ msg:
   converted_faith: "{place} принимает веру: {value}."
   converted_culture: "{place} перенимает культуру: {value}."
 ui:
+  per_skill_point_ruler: "Правителю — за каждое очко:"
+  archetype_needs: "{skills} — от {min}"
+  per_skill_point: "За каждое очко навыка:"
   declare_war_action: Объявление войны
   renown_level: "Уровень: {name}"
   renown_prestige_effect: "Мнение подданных: {value}"
@@ -18,6 +21,7 @@ ui:
   stress_likes: "По душе (снимает стресс): {list}"
   stress_monthly: "{when}: стресс {value} в месяц"
 stress_when:
+  peace: В мирное время
   at_war: Во время войны
   landless: Без собственных земель
   in_debt: В долгах
@@ -42,6 +46,8 @@ opinion:
 ai:
   faction_leader: Глава фракции
 tr:
+  has_archetype: "Архетип: {value}"
+  has_mastery: "Тень мастерства: {value}"
   has_holder_faith: Графство одной веры с владельцем
   not_holder_faith: Графство чужой веры
   has_holder_culture: Графство одной культуры с владельцем
@@ -49,3 +55,26 @@ tr:
 fx:
   convert_to_holder_faith: "{place} принимает веру владельца"
   convert_to_holder_culture: "{place} перенимает культуру владельца"
+stat:
+  discord_chance: Шанс посеять раздор
+  self_knight: Сам в рядах рыцарей
+  law_cost_mult: Цена смены законов
+  dread_decay_mult: Таяние страха
+  faction_discontent_mult: Рост недовольства фракций
+  siege_speed: Скорость осад
+  build_time_mult: Срок строительства
+  battle_survival: Выживание в бою
+mastery:
+  diplomacy: Мягкотелость
+  martial: Безрассудство
+  stewardship: Скупость
+  intrigue: Подозрительность
+  learning: Рассеянность
+  prowess: Задиристость
+mastery_desc:
+  diplomacy: "Тень мастерства дипломата: со всеми ладит — и никого не пугает. Страх перед ним тает вдвое быстрее, жестокость ему тяжела."
+  martial: "Тень мастерства полководца: рвётся в бой и в первые ряды. Армия злее, но сам он чаще гибнет; без войны ему тоскливо."
+  stewardship: "Тень мастерства управителя: считает каждую монету. Двор относится к нему хуже, а щедрость даётся с трудом."
+  intrigue: "Тень мастерства интригана: видит заговор в каждом шёпоте. Защищён лучше всех, но фракции не дают ему спать."
+  learning: "Тень мастерства учёного: витает в книгах, забывая о мирском. Управление и военное дело страдают."
+  prowess: "Тень мастерства силача: ищет повода помериться силой. Женщины и мужчины засматриваются, двор побаивается; без войны скучает."

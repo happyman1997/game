@@ -1,0 +1,81 @@
+# Связки навыков (архетипы). Когда все навыки из skills не ниже min, у
+# персонажа появляется архетип: modifiers действуют, а условие
+# has_archetype: <id> открывает особые действия. Архетипов у персонажа не
+# больше defines.character.max_archetypes — берутся тройки, затем пары
+# с самыми высокими навыками.
+defines:
+  character:
+    max_archetypes: 2
+
+skill_archetypes:
+  # ---------------------------------------------------------------- пары
+  gray_eminence:    { skills: [diplomacy, intrigue], min: 12, icon: "🎭", modifiers: { scheme_power: 10, discord_chance: 20 } }
+  warlord:          { skills: [diplomacy, martial], min: 12, icon: "🚩", modifiers: { vassal_levy_mult: 0.15, vassal_opinion: 5 } }
+  merchant_prince:  { skills: [diplomacy, stewardship], min: 12, icon: "⚖", modifiers: { vassal_tax_mult: 0.1, monthly_income: 1 } }
+  arbiter:          { skills: [diplomacy, learning], min: 12, icon: "📜", modifiers: { general_opinion: 5, monthly_prestige: 0.5, monthly_piety: 0.3 } }
+  courtly_knight:   { skills: [diplomacy, prowess], min: 12, icon: "🌹", modifiers: { attraction_opinion: 10, general_opinion: 3, knight_effectiveness: 0.15 } }
+  quartermaster:    { skills: [martial, stewardship], min: 12, icon: "⛺", modifiers: { army_upkeep_mult: -0.2, levy_mult: 0.05 } }
+  ambush_master:    { skills: [martial, intrigue], min: 12, icon: "🌲", modifiers: { commander_advantage: 8 } }
+  siege_engineer:   { skills: [martial, learning], min: 12, icon: "🏰", modifiers: { siege_speed: 0.3, build_cost_mult: -0.1 } }
+  warrior_king:     { skills: [martial, prowess], min: 12, icon: "⚔", modifiers: { self_knight: 1, knight_effectiveness: 0.2, monthly_prestige: 0.5 } }
+  shadow_treasurer: { skills: [stewardship, intrigue], min: 12, icon: "🗝", modifiers: { vassal_tax_mult: 0.15, scheme_defense: 5 } }
+  reformer:         { skills: [stewardship, learning], min: 12, icon: "📖", modifiers: { law_cost_mult: -0.5, development_growth: 0.05 } }
+  castellan:        { skills: [stewardship, prowess], min: 12, icon: "🏯", modifiers: { build_cost_mult: -0.15, levy_mult: 0.05 } }
+  archivist:        { skills: [intrigue, learning], min: 12, icon: "📚", modifiers: { scheme_power: 5 } }
+  night_blade:      { skills: [intrigue, prowess], min: 12, icon: "🗡", modifiers: { scheme_power: 10, scheme_defense: 10 } }
+  holy_warrior:     { skills: [learning, prowess], min: 12, icon: "✝", modifiers: { monthly_piety: 0.5, knight_effectiveness: 0.1, battle_survival: 0.15 } }
+  # ---------------------------------------------------------------- легенды (три навыка)
+  philosopher_king: { skills: [diplomacy, stewardship, learning], min: 15, icon: "👑", modifiers: { vassal_opinion: 10, development_growth: 0.1, monthly_prestige: 1 } }
+  scourge:          { skills: [martial, intrigue, prowess], min: 15, icon: "💀", modifiers: { commander_advantage: 10, general_opinion: -10, monthly_prestige: 1 } }
+  hero_of_songs:    { skills: [diplomacy, martial, prowess], min: 15, icon: "🎶", modifiers: { monthly_prestige: 2, attraction_opinion: 15, knight_effectiveness: 0.25 } }
+
+modifiers:
+  trade_pact: { icon: "⚖", modifiers: { tax_mult: 0.1, monthly_income: 0.5 }, good: true }
+
+opinion_modifiers:
+  trade_partner: { value: 15, years: 5 }
+
+interactions:
+  # Купец-князь: торговый договор с соседом — выгода обоим
+  trade_pact:
+    icon: "⚖"
+    category: diplomacy
+    is_shown:
+      scope:actor: { has_archetype: merchant_prince }
+      scope:recipient: { is_ruler: yes }
+    is_valid:
+      scope:actor: { NOT: { has_modifier: trade_pact } }
+      scope:recipient: { NOT: { has_modifier: trade_pact } }
+    ai_accept:
+      value: 10
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.5 } }
+        - { desc: ai.different_faith, limit: { NOT: { same_faith_as: scope:actor } }, value: -20 }
+        - { desc: ai.at_war, limit: { is_at_war_with: scope:actor }, value: -100 }
+    on_accept:
+      - add_modifier: { id: trade_pact, years: 5 }
+      - scope:recipient:
+          add_modifier: { id: trade_pact, years: 5 }
+          add_opinion: { target: scope:actor, modifier: trade_partner }
+    cooldown: { years: 5 }
+    ai_targets: [neighboring_ruler]
+    ai_frequency_months: 12
+    ai_will_do: 40
+
+decisions:
+  # Архивариус: в старых грамотах всегда найдётся право на соседнюю землю
+  search_archives:
+    icon: "📜"
+    is_shown: { is_ruler: yes, has_archetype: archivist }
+    cost: { gold: 50 }
+    cooldown: { years: 4 }
+    effect:
+      - random_neighboring_county:
+          limit: { NOT: { scope:actor: { has_claim_on: prev } } }
+          save_scope_as: claim_target
+      - if:
+          limit: { exists: scope:claim_target }
+          add_claim: scope:claim_target
+          send_message: { text: msg.archives_claim, kind: good }
+    ai_check_months: 12
+    ai_will_do: 40

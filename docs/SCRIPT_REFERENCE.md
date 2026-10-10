@@ -17,6 +17,7 @@
 | `faith` | character, province | Вера равна | core |
 | `global_var` | любой | Сравнение глобальной переменной | core |
 | `has_any_claim` | character | Есть претензии | core |
+| `has_archetype` | character | Есть архетип — связка высоких навыков (skill_archetypes): has_archetype: <id> или yes | core |
 | `has_building` | province | Есть постройка | core |
 | `has_claim_on` | character | Есть претензия на титул | core |
 | `has_council_task` | character | Сюзерен: на какой-то должности выбрана задача (или одна из списка) | core/council |
@@ -30,6 +31,7 @@
 | `has_imprisonment_reason` | character | Есть законный повод заключить персонажа (преступление против этого персонажа) | core/prison |
 | `has_known_trait` | character | Есть черта, известная всем (не скрытая или разоблачённая) | core |
 | `has_lifestyle` | character | Текущий фокус принадлежит образу жизни | core/lifestyles |
+| `has_mastery` | character | Легла тень мастерства навыка: has_mastery: intrigue | core |
 | `has_modifier` | character | Есть модификатор | core |
 | `has_opinion_modifier` | character | Есть модификатор мнения: { target, modifier } | core |
 | `has_perk` | character | Открыт перк | core/lifestyles |

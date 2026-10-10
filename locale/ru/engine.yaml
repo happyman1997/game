@@ -171,6 +171,10 @@ ai:
 modsrc:
   buildings: Постройки
   stress: Стресс
+  skill: "Навык «{name}»"
+  spouse: "Супруг(а): {name}"
+  mastery: "Тень мастерства: {name}"
+  archetype: "Архетип: {name}"
 
 list:
   vassal: вассалы

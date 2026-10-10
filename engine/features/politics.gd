@@ -187,7 +187,7 @@ static func sow_discord(game: Game, actor: Dictionary, target: Dictionary) -> bo
 	var sm: Variant = game.ch(seat.get("holder")) if seat != null else null
 	if sm != null:
 		spy = Stats.skill(game, sm, "intrigue")
-	var chance := game.def_num("politics.discord_base_chance", 35) + (Stats.skill(game, actor, "intrigue") + spy) * 2.0 - Stats.skill(game, target, "intrigue") * 2.0
+	var chance := game.def_num("politics.discord_base_chance", 35) + (Stats.skill(game, actor, "intrigue") + spy) * 2.0 - Stats.skill(game, target, "intrigue") * 2.0 + Stats.stat(game, actor, "discord_chance")
 	chance = clampf(chance, 10.0, 90.0)
 	if game.rng.next() * 100.0 >= chance:
 		if game.content.has("opinion_modifiers", "caught_sowing_discord"):
@@ -233,6 +233,8 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 		var decay := game.def_num("politics.dread_decay", 0.75)
 		if c.traits.has("compassionate"):
 			decay = game.def_num("politics.dread_decay_compassionate", 1.5)
+		# dread_decay_mult — например, тень мастерства дипломата: страх перед ним быстро тает
+		decay *= maxf(0.0, 1.0 + Stats.stat(game, c, "dread_decay_mult"))
 		c.vars["dread"] = d - decay
 		if dread(c) <= 0.0:
 			c.vars.erase("dread")

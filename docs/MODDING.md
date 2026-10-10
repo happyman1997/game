@@ -157,7 +157,8 @@ defines:
 | Тип | Где пример | Кратко |
 |---|---|---|
 | `defines` | `core/data/common/defines.yaml` | Числовые константы экономики, армии, демографии, ИИ. |
-| `skills` | `core/data/common/skills.yaml` | Навыки. Новый навык автоматически становится значением в скриптах. `mean`/`spread` — среднее и разброс при рождении (по умолчанию 6 и 5; историческим персонажам без указанного навыка — на 1 выше), `inherit_spread` — разброс вокруг среднего родителей, `hide_if_zero` — не показывать нулевой навык (редкий дар вроде чародейства). |
+| `skills` | `core/data/common/skills.yaml` | Навыки. Новый навык автоматически становится значением в скриптах. `mean`/`spread` — среднее и разброс при рождении (по умолчанию 6 и 5; историческим персонажам без указанного навыка — на 1 выше), `inherit_spread` — разброс вокруг среднего родителей, `hide_if_zero` — не показывать нулевой навык (редкий дар вроде чародейства). `per_point` / `ruler_per_point` — что даёт каждое очко (всем / только правителям), `mastery` — тень мастерства (см. «Навыки: очки, тени и связки»). |
+| `skill_archetypes` | `core/data/common/archetypes.yaml` | Связки навыков: `{ skills: [..], min, icon, modifiers }`. |
 | `traits` | `core/data/common/traits.yaml` | Черты: `category`, `icon`, `modifiers`, `opposites`, `compatibility`, `genetic`/`birth_chance`/`inherit_chance`, `education`, `ai`, `monthly_death_chance`, `monthly_cure_chance`, `duration_days`, `group`, `color` (цвет плашки), `concealed` (скрытая черта — см. «Крюки и секреты»), `portrait` (как черта меняет портрет — см. ниже). |
 | `cultures` | `core/data/common/cultures.yaml` | `color`, `male_names`, `female_names`, `dynasty_pattern` (`name`/`place`), `succession_law`, `skin`/`hair`, `modifiers`. |
 | `faiths` | там же | `religion`, `color`, `icon`, `doctrines` (`polygamy`), `virtues`, `sins`, `modifiers`. |
@@ -884,6 +885,44 @@ vassal_obligations:                 # условия службы, ровно о
 - Ещё эффекты: `sow_discord: <вассал>` (рассорить с ближайшим союзником),
   `calm_factions: <число>`, `remove_from_council`, `grant_minor_county: <персонаж>`
   и, в механике законов, `shift_realm_law: { group, by }`.
+
+### Навыки: очки, тени и связки
+
+Что даёт навык, описано в данных (`core/data/common/skills.yaml`) и считается
+после самих навыков:
+
+```yaml
+skills:
+  diplomacy:
+    per_point: { general_opinion: 0.25 }                       # всем, за каждое очко
+    ruler_per_point: { vassal_opinion: 0.5, faction_discontent_mult: -0.012 }   # только правителям
+    mastery:                                                   # тень мастерства
+      at: 18
+      modifiers: { dread_decay_mult: 1.0 }
+      stress_reactions: { execute_prisoner: 20 }               # как у черт (механика personality)
+      stress_monthly: { trigger: { ... }, value: 2, desc: stress_when.peace }
+
+skill_archetypes:                                              # связки навыков
+  gray_eminence: { skills: [diplomacy, intrigue], min: 12, icon: "🎭", modifiers: { scheme_power: 10 } }
+```
+
+- **Супруг правителя** даёт долю своих собственных навыков
+  (`defines.character.spouse_skill_share`).
+- **Тень мастерства** ложится при навыке от `at`: её модификаторы действуют, а
+  отклики на поступки и месячный стресс работают как у черт характера.
+  Условие `has_mastery: intrigue`; название — `mastery.<навык>`, описание —
+  `mastery_desc.<навык>`.
+- **Связки (архетипы)**: когда все навыки из `skills` не ниже `min`,
+  персонаж получает архетип — не больше `defines.character.max_archetypes`
+  (сначала тройки-«легенды», потом пары с самыми высокими навыками). Условие
+  `has_archetype: <id>` открывает особые действия (в ядре: торговый договор
+  купца-князя, архивы архивариуса, раздор серого кардинала). Характеристики
+  `self_knight` (правитель бьётся среди своих рыцарей), `law_cost_mult`,
+  `discord_chance`, `battle_survival`, `siege_speed`, `build_time_mult`,
+  `faction_discontent_mult`, `dread_decay_mult` можно давать и чертами, и
+  модификаторами.
+- Навыки по-прежнему читает и движок: управление — налог и лимит домена,
+  военное дело полководца — сила армии, учёность — благочестие.
 
 ### Характер
 

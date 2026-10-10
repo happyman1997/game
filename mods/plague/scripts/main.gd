@@ -79,8 +79,11 @@ func init(api: ModApi) -> void:
 	api.registries.modifier_providers.register("plague_fear", {
 		"label": {"ru": "Страх эпидемии", "en": "Fear of pestilence"},
 		"fn": func(game: Game, c: Dictionary) -> Variant:
+			var infected: Dictionary = state_of(game).infected
+			if infected.is_empty():
+				return null
 			var cap: Variant = home_of(game, c)
-			return {"stress_gain_mult": 0.25, "fertility": -0.2} if (cap != null and state_of(game).infected.has(cap)) else null,
+			return {"stress_gain_mult": 0.25, "fertility": -0.2} if (cap != null and infected.has(cap)) else null,
 	}, api.owner)
 
 	# ------------------------------------------------ интерфейс

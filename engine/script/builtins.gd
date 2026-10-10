@@ -444,6 +444,20 @@ static func register(engine: GameEngine) -> void:
 			return arg.any(func(x): return c.traits.has(x))
 		return c.traits.has(str(arg))
 	, func(ctx, _s, arg): return _t(ctx.game, "tr.has_trait", {"value": " / ".join(Data.as_array(arg).map(func(x): return ctx.game.name_of("traits", x)))}))
+	ct.call("has_archetype", "Есть архетип — связка высоких навыков (skill_archetypes): has_archetype: <id> или yes", func(g, c, arg, _ctx, _s):
+		if arg is bool or (arg is String and (arg == "yes" or arg == "no")):
+			return (not Stats.archetypes(g, c).is_empty()) == _yes(arg)
+		for a in Data.as_array(arg):
+			if Stats.stat(g, c, "archetype:" + str(a)) > 0.0:
+				return true
+		return false
+	, func(ctx, _s, arg): return _t(ctx.game, "tr.has_archetype", {"value": " / ".join(Data.as_array(arg).map(func(x): return ctx.game.name_of("skill_archetypes", x)))}))
+	ct.call("has_mastery", "Легла тень мастерства навыка: has_mastery: intrigue", func(g, c, arg, _ctx, _s):
+		for a in Data.as_array(arg):
+			if Stats.stat(g, c, "mastery:" + str(a)) > 0.0:
+				return true
+		return false
+	, func(ctx, _s, arg): return _t(ctx.game, "tr.has_mastery", {"value": " / ".join(Data.as_array(arg).map(func(x): return ctx.game.loc.t("mastery." + str(x))))}))
 	ct.call("has_known_trait", "Есть черта, известная всем (не скрытая или разоблачённая)", func(g, c, arg, _ctx, _s):
 		for t in Data.as_array(arg):
 			if c.traits.has(t) and Chars.trait_visible(g, c, str(t), null):

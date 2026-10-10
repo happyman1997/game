@@ -63,6 +63,11 @@ static func disband_army(game: Game, id: String) -> void:
 	game.notify("army")
 
 
+## Множитель шанса гибели в бою: 1 − battle_survival (не ниже 0,1; безрассудным — выше).
+static func _death_mult(game: Game, c: Dictionary) -> float:
+	return clampf(1.0 - Stats.stat(game, c, "battle_survival"), 0.1, 5.0)
+
+
 static func commander_of(game: Game, a: Dictionary) -> Variant:
 	var c: Variant = game.ch(a.commander)
 	if c == null:
@@ -264,10 +269,11 @@ static func _battle(game: Game, w: Dictionary, loc: String, att: Array, def: Arr
 	# Гибель полководцев
 	var lc: Variant = lose.commander
 	var wc: Variant = win.commander
-	if lc != null and game.rng.chance(game.def_num("military.loser_commander_death", 0.04)):
+	# battle_survival — доблестным реже достаётся смертельный удар
+	if lc != null and game.rng.chance(game.def_num("military.loser_commander_death", 0.04) * _death_mult(game, lc)):
 		Succession.kill_character(game, lc, "battle", wc.id if wc != null else null)
 	else:
-		if wc != null and game.rng.chance(game.def_num("military.winner_commander_death", 0.01)):
+		if wc != null and game.rng.chance(game.def_num("military.winner_commander_death", 0.01) * _death_mult(game, wc)):
 			Succession.kill_character(game, wc, "battle", lc.id if lc != null else null)
 		if lc != null and lc.death == null:
 			game.emit("battle.commander_survived", {"war": w, "commander": lc.id, "captor": win_owner.id})
@@ -350,6 +356,10 @@ static func _progress_sieges(game: Game) -> void:
 		var fort = maxf(1.0, province_fort(game, a.location))
 		var liberation: bool = p.occupant != null and Wars.participant_side(war, p.occupant) != side
 		var daily = float(a.size) / (fort * game.def_num("military.siege_per_fort", 800) + game.def_num("military.siege_base", 400)) * game.def_num("military.siege_speed", 3) * (2.0 if liberation else 1.0)
+		# siege_speed владельца армии (военное дело ускоряет осады)
+		var owner: Variant = game.ch(a.owner)
+		if owner != null:
+			daily *= maxf(0.2, 1.0 + Stats.stat(game, owner, "siege_speed"))
 		p.siege.progress = float(p.siege.progress) + minf(game.def_num("military.siege_max_daily", 12), daily)
 		if p.siege.progress >= 100.0:
 			p.siege = null

@@ -5,6 +5,9 @@ msg:
   converted_faith: "{place} adopts a new faith: {value}."
   converted_culture: "{place} adopts a new culture: {value}."
 ui:
+  per_skill_point_ruler: "For a ruler, per point:"
+  archetype_needs: "{skills} — {min}+"
+  per_skill_point: "Per skill point:"
   declare_war_action: Declaring war
   renown_level: "Level: {name}"
   renown_prestige_effect: "Opinion of your subjects: {value}"
@@ -18,6 +21,7 @@ ui:
   stress_likes: "Enjoys (relieves stress): {list}"
   stress_monthly: "{when}: stress {value} per month"
 stress_when:
+  peace: In times of peace
   at_war: While at war
   landless: Without lands of their own
   in_debt: In debt
@@ -42,6 +46,8 @@ opinion:
 ai:
   faction_leader: Faction leader
 tr:
+  has_archetype: "Archetype: {value}"
+  has_mastery: "Shadow of mastery: {value}"
   has_holder_faith: County shares its holder's faith
   not_holder_faith: County of a foreign faith
   has_holder_culture: County shares its holder's culture
@@ -49,3 +55,26 @@ tr:
 fx:
   convert_to_holder_faith: "{place} adopts its holder's faith"
   convert_to_holder_culture: "{place} adopts its holder's culture"
+stat:
+  discord_chance: Chance to sow discord
+  self_knight: Fights among the knights
+  law_cost_mult: Law change cost
+  dread_decay_mult: Dread decay
+  faction_discontent_mult: Faction discontent growth
+  siege_speed: Siege speed
+  build_time_mult: Construction time
+  battle_survival: Battle survival
+mastery:
+  diplomacy: Soft Touch
+  martial: Recklessness
+  stewardship: Miserliness
+  intrigue: Suspicion
+  learning: Absent-mindedness
+  prowess: Belligerence
+mastery_desc:
+  diplomacy: "The shadow of a master diplomat: gets along with everyone and frightens no one. Dread fades twice as fast; cruelty weighs on them."
+  martial: "The shadow of a master general: eager for battle and the front rank. The army fights harder, but they fall more often; peace bores them."
+  stewardship: "The shadow of a master steward: counts every coin. The court likes them less, and generosity comes hard."
+  intrigue: "The shadow of a master schemer: sees a plot in every whisper. Better protected than anyone, but factions rob them of sleep."
+  learning: "The shadow of a master scholar: lost in books, forgetting worldly matters. Stewardship and martial suffer."
+  prowess: "The shadow of a mighty warrior: always looking for a fight. Admired by some, feared by the court; peace bores them."

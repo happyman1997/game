@@ -335,7 +335,9 @@ static func monthly(game: Game) -> void:
 			continue
 		var pw := power(game, f)
 		if pw >= game.def_num("factions.power_threshold", 80):
-			f.discontent = minf(100.0, float(f.discontent) + game.def_num("factions.discontent_gain", 6))
+			# faction_discontent_mult сюзерена: дипломат гасит недовольство
+			var gain := game.def_num("factions.discontent_gain", 6) * maxf(0.2, 1.0 + Stats.stat(game, liege, "faction_discontent_mult"))
+			f.discontent = minf(100.0, float(f.discontent) + gain)
 		else:
 			f.discontent = maxf(0.0, float(f.discontent) - game.def_num("factions.discontent_decay", 4))
 		if f.discontent >= 100.0:

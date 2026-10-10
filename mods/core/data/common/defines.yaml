@@ -10,6 +10,8 @@ defines:
     base_health: 5
     personality_traits: 3
     base_stats: { fertility: 0.5 }
+    # супруг правителя помогает советом: доля его собственных навыков
+    spouse_skill_share: { diplomacy: 0.25, stewardship: 0.25, learning: 0.25 }
     old_age_start: 50
     old_age_health_per_year: 0.08
     old_age_prowess_per_year: 0.25
@@ -59,7 +61,7 @@ defines:
 
   development:
     base_growth: 0.12
-    growth_per_stewardship: 0.01
+    growth_per_stewardship: 0.005   # вторую половину даёт учёность (skills.learning.per_point)
     max: 100
 
   buildings:

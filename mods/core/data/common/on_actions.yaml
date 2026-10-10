@@ -67,6 +67,10 @@ on_actions:
             NOT: { has_trait: victorious }
           add_trait: victorious
           send_message: { text: msg.became_victorious, kind: good }
+      # «Бич Божий»: каждая победа внушает ужас
+      - if:
+          limit: { has_archetype: scourge }
+          add_dread: 3
 
   on_player_succession:
     events: [succession.0001]

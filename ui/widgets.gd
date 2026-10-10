@@ -140,8 +140,24 @@ static func skills(app: App, c: Dictionary) -> Control:
 			continue
 		var ic: Variant = d.get("icon", "star") if d != null else "star"
 		var sid: String = s
-		row.add_child(stat(ic, str(v), func(): return BB.title(g.name_of("skills", sid)) + "\n" + BB.breakdown(Stats.stat_breakdown(g, c, sid)), UiArt.C_TEXT, 18))
+		row.add_child(stat(ic, str(v), func(): return skill_tip(g, c, sid), UiArt.C_TEXT, 18))
 	return row
+
+
+## Подсказка навыка: из чего сложился, что даёт (описание и «за каждое очко»).
+static func skill_tip(g: Game, c: Dictionary, sid: String) -> String:
+	var bb := BB.title(g.name_of("skills", sid)) + "\n" + BB.breakdown(Stats.stat_breakdown(g, c, sid))
+	var desc := g.loc.t_or("skill_desc." + sid, "")
+	if desc != "":
+		bb += "\n" + BB.i(desc)
+	var d: Variant = g.content.get_def("skills", sid)
+	var pp: Variant = d.get("per_point") if d != null else null
+	if pp is Dictionary and not pp.is_empty():
+		bb += "\n" + BB.muted(g.loc.t("ui.per_skill_point")) + "\n" + BB.modifiers(g, pp)
+	var rp: Variant = d.get("ruler_per_point") if d != null else null
+	if rp is Dictionary and not rp.is_empty():
+		bb += "\n" + BB.muted(g.loc.t("ui.per_skill_point_ruler")) + "\n" + BB.modifiers(g, rp)
+	return bb
 
 
 ## Черты персонажа: значки-плашки.
@@ -184,6 +200,49 @@ static func traits(app: App, c: Dictionary) -> Control:
 			tipbb += "\n" + BB.muted(app.t("ui.concealed_trait"))
 			chip.modulate = Color(1, 1, 1, 0.8)
 		K.tip(chip, tipbb)
+		f.add_child(chip)
+	# архетипы: связки высоких навыков
+	for aid in Stats.archetypes(g, c):
+		var ad: Variant = g.content.get_def("skill_archetypes", aid)
+		var aname := g.name_of("skill_archetypes", aid)
+		var chip := K.panel(K.hbox([K.icon(ad.get("icon", "star"), 16), K.label(aname, "SmallLabel")], 3))
+		chip.add_theme_stylebox_override("panel", UiArt.flat(Color("#4a3c20"), Color(UiArt.GOLD, 0.8), 1, 3, 3))
+		var need := " + ".join(Data.as_array(ad.get("skills")).map(func(x): return g.name_of("skills", x)))
+		var tb := BB.title(aname) + "\n" + BB.muted(app.t("ui.archetype_needs", {"skills": need, "min": int(Data.num(ad.get("min"), 12))}))
+		var adesc := g.desc_of("skill_archetypes", aid)
+		if adesc != "":
+			tb += "\n" + BB.i(adesc)
+		var amods := {}
+		var raw: Variant = ad.get("modifiers")
+		if raw is Dictionary:
+			for k in raw:
+				if k != "self_knight":
+					amods[k] = raw[k]
+		var mtxt := BB.modifiers(g, amods)
+		if mtxt != "":
+			tb += "\n" + mtxt
+		K.tip(chip, tb)
+		f.add_child(chip)
+	# тени мастерства: изнанка очень высоких навыков
+	for s in Stats.masteries(g, c):
+		var sd: Variant = g.content.get_def("skills", s)
+		var ms: Dictionary = sd.mastery
+		var mname := g.loc.t("mastery." + s)
+		var chip := K.panel(K.hbox([K.icon(sd.get("icon", "star"), 16), K.label(mname, "SmallLabel")], 3))
+		chip.add_theme_stylebox_override("panel", UiArt.flat(Color("#3a2a3e"), Color(UiArt.BRONZE, 0.7), 1, 3, 3))
+		var tb := BB.title(app.t("modsrc.mastery", {"name": mname})) + "\n" + BB.i(g.loc.t_or("mastery_desc." + s, ""))
+		var mods := BB.modifiers(g, ms.get("modifiers"))
+		if mods != "":
+			tb += "\n" + mods
+		if g.engine.has_feature("personality"):
+			var ps := Personality.trait_summary(g, ms)
+			if ps.bad != "":
+				tb += "\n" + BB.bad(app.t("ui.stress_dislikes", {"list": ps.bad}))
+			if ps.good != "":
+				tb += "\n" + BB.good(app.t("ui.stress_likes", {"list": ps.good}))
+			if ps.monthly != "":
+				tb += "\n" + BB.bad(ps.monthly)
+		K.tip(chip, tb)
 		f.add_child(chip)
 	return f
 

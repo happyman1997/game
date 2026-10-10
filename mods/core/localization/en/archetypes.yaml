@@ -1,0 +1,52 @@
+skill_archetype:
+  gray_eminence: Gray Eminence
+  warlord: Warlord
+  merchant_prince: Merchant Prince
+  arbiter: Arbiter
+  courtly_knight: Courtly Knight
+  quartermaster: Quartermaster
+  ambush_master: Master of Ambush
+  siege_engineer: Siege Engineer
+  warrior_king: Warrior King
+  shadow_treasurer: Shadow Treasurer
+  reformer: Reformer
+  castellan: Castellan
+  archivist: Archivist
+  night_blade: Night Blade
+  holy_warrior: Holy Warrior
+  philosopher_king: Philosopher King
+  scourge: Scourge of God
+  hero_of_songs: Hero of Songs
+skill_archetype_desc:
+  gray_eminence: "Diplomacy and intrigue. Smiles at everyone and sets them against each other. Sows discord even without a spymaster, and better."
+  warlord: "Diplomacy and martial. Men follow such a leader: vassals send more troops and love them."
+  merchant_prince: "Diplomacy and stewardship. Trade is war, only more profitable. Can conclude trade pacts with neighbours."
+  arbiter: "Diplomacy and learning. Their word settles disputes: respect, prestige and piety. Has their own option in vassal disputes."
+  courtly_knight: "Diplomacy and prowess. Troubadours, tournaments and fair ladies: knights serve them gladly."
+  quartermaster: "Martial and stewardship. A well-fed army is a fierce army: cheaper armies, larger levies."
+  ambush_master: "Martial and intrigue. The enemy learns of their army when it is too late."
+  siege_engineer: "Martial and learning. Knows where a wall is weak and how to build their own stronger."
+  warrior_king: "Martial and prowess. Fights in the ranks of their own knights, and takes the same risks."
+  shadow_treasurer: "Stewardship and intrigue. Knows where the vassals hide their silver."
+  reformer: "Stewardship and learning. Realm laws change at half the cost; the land develops faster."
+  castellan: "Stewardship and prowess. Builds strong and cheap, keeps the men in line."
+  archivist: "Intrigue and learning. Old charters always hold a right to a neighbouring land."
+  night_blade: "Intrigue and prowess. Their own assassin and their own bodyguard."
+  holy_warrior: "Learning and prowess. Prayer and sword: piety grows, knights are steadier, and they rarely fall."
+  philosopher_king: "Legend: diplomacy, stewardship and learning. A wise ruler of the kind chroniclers write about."
+  scourge: "Legend: martial, intrigue and prowess. Their victories inspire terror, and people hate them."
+  hero_of_songs: "Legend: diplomacy, martial and prowess. Every court sings of them."
+modifier:
+  trade_pact: Trade Pact
+opinion_modifier:
+  trade_partner: Trade partner
+interaction:
+  trade_pact: Propose a Trade Pact
+interaction_desc:
+  trade_pact: "Merchants of both realms travel freely: for five years both rulers collect more taxes."
+decision:
+  search_archives: Search the Archives
+decision_desc:
+  search_archives: "The archivist digs through old charters and finds a right to one of the neighbouring counties."
+msg:
+  archives_claim: "An old charter turned up in the archives: you now have a claim on [scope:claim_target]!"
