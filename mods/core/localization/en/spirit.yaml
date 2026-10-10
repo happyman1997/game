@@ -1,0 +1,116 @@
+spirit_state:
+  broken: Breakdown
+  fury: Fury
+  sleepless: Sleeplessness
+  obsession: Obsession
+  rapture: Rapture
+  longing: Longing
+  revelry: Revelry
+  unease: Unease
+  serenity: Serenity
+spirit_state_desc:
+  broken: "Stress has passed a hundred: skills suffer, and each new hundred threatens a breakdown."
+  fury: "Anger finds no outlet: the hand is heavier, the sword quicker — and talking to people ever harder."
+  sleepless: "The paranoid cannot sleep: no plot will catch them unawares, but their strength wanes."
+  obsession: "The ambitious are obsessed: they work for three and demand the same of their vassals."
+  rapture: "The zealous are enraptured: prayer and books consume them, worldly matters irritate."
+  longing: "Longing drives them from people to books: they learn easily, but the court rarely sees them."
+  revelry: "The pleasure-loving drown their cares in feasts: merry and charming, but the treasury melts."
+  unease: "Unease never lets go: suspicious and watchful, but stiff with people."
+  serenity: "Two years without cares: learning comes easily — but they grow careless, and plotters find it easier."
+trait:
+  hardened: Hardened
+  shattered: Shattered
+trait_desc:
+  hardened: "Lived through a breakdown and came out stronger: stress builds more slowly."
+  shattered: "A second breakdown: the spirit has cracked, and stress hurts more."
+modifier:
+  overworked: Overworked
+  inner_resolve: Inner Resolve
+  ancestor_blessing: Ancestor's Blessing
+  prophetic_insight: Prophetic Insight
+  quiet_vow: Vow of Calm
+decision:
+  work_to_exhaustion: Work to Exhaustion
+decision_desc:
+  work_to_exhaustion: "Turn stress into work: the higher it is, the more you learn (and get done in your capital). Your health pays, and the stress stays."
+msg:
+  spirit_state: "State of mind: {name}."
+  spirit_hardened: "You have lived through a breakdown and come out hardened."
+  spirit_shattered: "Another breakdown: your hardening did not hold — your spirit has cracked."
+tr:
+  spirit_state: "State of mind: {value}"
+ui:
+  spirit: State of mind
+ev:
+  stress.0010:
+    t: A Sleepless Night
+    desc: "Sleep will not come. Thoughts go round in circles, the candle burns down, and dawn is far away."
+    a: Read until dawn
+    b: Walk the castle walls
+    c: Send for wine
+    d: Check the guards — who is whispering out there?
+    e: Count the army in your head, regiment by regiment
+  stress.0011:
+    t: A Flash of Rage
+    desc: "[scope:victim] said something foolish — a trifle, but the blood rushes to your head."
+    a: Strike them
+    b: Hold back
+    c: Turn it into a joke
+    d: Smash the table with your fist
+    e: Take a deep breath
+  stress.0012:
+    t: The Fool Speaks the Truth
+    desc: "At the feast the jester capers and quips: \"Our lord looks like a hard-ridden horse.\" Everyone laughs — except you."
+    a: Laugh along with everyone
+    b: Have the insolent fool flogged
+    c: Understand what he is hinting at
+    d: The fool forgot himself — and everyone saw it
+  stress.0013:
+    t: A Dream of an Ancestor
+    desc: "In a dream [scope:ancestor] comes to you: looks at you in silence and shakes their head. You wake in a cold sweat."
+    a: Visit their tomb
+    b: It was only a dream
+    c: Interpret the dream by the books
+    d: Order a prayer service
+  stress.0014:
+    t: A Friend from Youth
+    desc: "[scope:friend] recalls how the two of you once ran away from lessons together. You have not laughed like this in a long time."
+    a: Spend the evening over wine
+    b: No time for memories
+    c: Make them a trusted friend
+    d: Stay silent all evening — but together
+  stress.0015:
+    t: A Letter to Oneself
+    desc: "At night you write a letter — to yourself, ten years from now. What do you truly want?"
+    a: Peace
+    b: Greatness, whatever the cost
+    c: Burn the letter
+    d: Encrypt it — in case someone reads it
+  stress.0016:
+    t: Revelry
+    desc: "Musicians, wine, laughter until dawn — your cares can wait. Or can they?"
+    a: Revel until morning
+    b: Not tonight
+    c: Invite the vassals to the feast
+    d: Drink a cup of water
+  stress.0017:
+    t: A Vision
+    desc: "In broad daylight a light rises before your eyes, and in it — signs impossible to misread. Or are they?"
+    a: It is a sign from above
+    b: A fever dream
+    c: Write it down and interpret it
+    d: The sleep of reason — nothing more
+  stress.0018:
+    t: A Quiet Morning
+    desc: "Cares are far away, the sun is warm, and it seems it will always be so. That is exactly what people think just before they are caught off guard."
+    a: Stroll in the garden with a book
+    b: Put off business for another day
+    c: Something is wrong with this silence…
+  stress.0019:
+    t: On the Edge
+    desc: "Hands tremble, words get tangled. A little more — and something will break."
+    a: Confess
+    b: Lash out at the servants
+    c: Bury yourself in work
+    d: Talk to your spouse

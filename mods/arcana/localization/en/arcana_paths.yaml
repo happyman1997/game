@@ -5,6 +5,7 @@ trait_desc:
   monster_bane: Six monsters have fallen to this hand. The dead, the bloodsuckers and the wolf-men give these lands a wide berth, and the Order of the Silver Flame stands ready to follow its hero.
 
 modifier:
+  moonlit_calm: Moonlit Calm
   vampire_tier_2: "Blood potency: vampire"
   vampire_tier_3: "Blood potency: elder"
   vampire_tier_4: "Blood potency: ancient"
@@ -220,3 +221,11 @@ ev:
     t: The Fruits of Alchemy
     desc: For a year the alchemists never left their laboratory. Green fire burned in the windows day and night and the smell of sulphur crept through the castle. Today the master asks you to come down — he is ready to show what he has achieved.
     a: Let us see
+  arcana.0200:
+    t: A Night Walk
+    desc: "Sleep will not come, so you go out into the night. Beyond the hill lights flicker, quiet and beckoning; in the village people speak of such lights in whispers."
+    a: Follow the lights
+    b: Go back to the castle
+    c: These are fey lights — I know their tongue
+    d: Recall what the bestiary says of them
+    e: The night calls — and I answer

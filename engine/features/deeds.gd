@@ -125,7 +125,8 @@ static func give_nickname(game: Game, c: Dictionary, nick: String) -> void:
 	game.notify("character")
 
 
-## Ближайшее прозвище для подсказки: [{nickname, deed, have, need}], по одному на деяние.
+## Ближайшие прозвища для подсказки (по начатым деяниям): [{nickname, deed, have, need}],
+## по одному на деяние.
 static func next_nicknames(game: Game, c: Dictionary) -> Array:
 	var out := []
 	var cur := Data.num(c.vars.get("nick_priority"), -1.0)
@@ -136,10 +137,11 @@ static func next_nicknames(game: Game, c: Dictionary) -> Array:
 	for n in game.content.all("nicknames"):
 		var deed := str(n.get("deed"))
 		var need := int(Data.num(n.get("count"), 1))
-		if Data.num(n.get("priority"), 0) <= cur or count(c, deed) >= need:
+		var have := count(c, deed)
+		if Data.num(n.get("priority"), 0) <= cur or have >= need or have <= 0:
 			continue
 		if not by_deed.has(deed) or need < by_deed[deed].need:
-			by_deed[deed] = {"nickname": n.id, "deed": deed, "have": count(c, deed), "need": need}
+			by_deed[deed] = {"nickname": n.id, "deed": deed, "have": have, "need": need}
 	for k in by_deed:
 		out.append(by_deed[k])
 	out.sort_custom(func(a, b): return float(a.have) / a.need > float(b.have) / b.need)

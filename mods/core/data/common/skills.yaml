@@ -16,7 +16,7 @@
 #   ally_persuasion   — союзники вступают в войну даже при мнении на столько хуже;
 #   peace_persuasion  — враг соглашается на мир на столько очков счёта войны раньше;
 #   march_speed, pursuit, orderly_retreat — скорость войска, потери бегущего
-#                       врага и свои потери при отступлении (у полководца);
+#                       врага и свои потери при отступлении (у полководца — им всегда бывает сам правитель);
 #   regiment_power    — сила профессиональных отрядов правителя («Муштра»);
 #   loot_mult         — добыча со взятых крепостей;
 #   audit_chance      — % в месяц поймать казнокрада в своём совете («Ревизия»);
@@ -41,8 +41,8 @@ skills:
     icon: "⚔"
     color: "#c0504d"
     order: 2
-    per_point: { march_speed: 0.015, pursuit: 0.02, orderly_retreat: 0.02 }
-    ruler_per_point: { siege_speed: 0.02, regiment_power: 0.01 }
+    # полководцы — сами правители (армию ведёт её владелец)
+    ruler_per_point: { march_speed: 0.015, pursuit: 0.02, orderly_retreat: 0.02, siege_speed: 0.02, regiment_power: 0.01 }
     mastery:    # «Безрассудство»: рвётся в бой и в первые ряды
       at: 20
       modifiers: { commander_advantage: 5, battle_survival: -0.6 }
@@ -63,7 +63,8 @@ skills:
     icon: "🗡"
     color: "#8a5bb0"
     order: 4
-    per_point: { scheme_defense: 1, secret_passages: 0.03, turn_plotter_chance: 2.5 }
+    per_point: { scheme_defense: 1, secret_passages: 0.03 }
+    ruler_per_point: { turn_plotter_chance: 2.5 }
     mastery:    # «Подозрительность»: видит заговор в каждом шёпоте
       at: 20
       modifiers: { scheme_defense: 10, general_opinion: -3 }
@@ -85,8 +86,8 @@ skills:
     icon: "💪"
     color: "#a5704a"
     order: 6
-    per_point: { battle_survival: 0.03, attraction_opinion: 0.3, personal_example: 0.005 }
-    ruler_per_point: { dread_gain_mult: 0.025 }
+    per_point: { battle_survival: 0.03, attraction_opinion: 0.3 }
+    ruler_per_point: { personal_example: 0.005, dread_gain_mult: 0.025 }
     mastery:    # «Задиристость»: ищет повода помериться силой
       at: 20
       modifiers: { general_opinion: -3, attraction_opinion: 5 }

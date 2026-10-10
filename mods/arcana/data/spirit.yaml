@@ -1,0 +1,49 @@
+# Ночная прогулка: событие духа (механика spirit) для мира тайных искусств.
+# Неспокойная душа выходит в ночь — а ночь здесь не пуста.
+on_actions:
+  on_spirit_pulse:
+    random_events:
+      events:
+        arcana.0200: 6
+
+modifiers:
+  moonlit_calm: { icon: "🌕", good: true, modifiers: { stress_gain_mult: -0.25, sorcery: 1 } }
+
+events:
+  arcana.0200:
+    theme: arcane
+    icon: "🌕"
+    triggered_only: true
+    trigger: { stress: ">= 40" }
+    cooldown: { years: 4 }
+    options:
+      # пойти на огни за холмом
+      - effect:
+          random_list:
+            - weight: 55
+              add_stress: -40
+              add_modifier: { id: moonlit_calm, years: 1 }
+            - weight: 45
+              add_stress: 15
+              add_prestige: -15
+        ai_chance: { value: 15, add: { value: ai_boldness, multiply: 10 } }
+      - effect: { add_stress: -5 }
+        ai_chance: 30
+      # колдовской взгляд: это фейские огни
+      - skill: { skill: sorcery, min: 6 }
+        effect:
+          - add_stress: -25
+          - add_arcane_power: 20
+        ai_chance: 60
+      # учёность: в бестиарии сказано, что это за огни
+      - skill: { skill: learning, check: 14 }
+        success:
+          - add_stress: -20
+          - add_lifestyle_xp: 50
+        failure:
+          add_stress: 10
+        ai_chance: { value: 10, add: { value: learning, multiply: 1.5 } }
+      # вампиру ночь — дом родной
+      - trigger: { has_trait: vampire }
+        effect: { add_stress: -35 }
+        ai_chance: 80

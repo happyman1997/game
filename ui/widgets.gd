@@ -168,6 +168,9 @@ static func stress_tip(app: App, c: Dictionary) -> String:
 	var state := 0 if st < 50.0 else (1 if lvl == 0 else mini(4, lvl + 1))
 	var state_txt := app.t("ui.stress_state_%d" % state)
 	var bb := BB.title(app.t("ui.stress")) + "\n" + (BB.bad(state_txt) if state >= 2 else BB.muted(state_txt))
+	var sp: Variant = Spirit.state_of(c) if g.engine.has_feature("spirit") else null
+	if sp != null:
+		bb += "\n" + BB.esc(app.t("ui.spirit") + ": " + g.name_of("spirit_states", str(sp)))
 	bb += "\n" + BB.esc(app.t("ui.stress_tip"))
 	var log: Array = c.vars.get("stress_log", [])
 	if not log.is_empty():
@@ -323,6 +326,23 @@ static func traits(app: App, c: Dictionary) -> Control:
 		var mtxt := BB.modifiers(g, amods)
 		if mtxt != "":
 			tb += "\n" + mtxt
+		K.tip(chip, tb)
+		f.add_child(chip)
+	# состояние духа: безмятежность, порыв, надлом
+	var sp: Variant = Spirit.state_of(c) if g.engine.has_feature("spirit") else null
+	var spd: Variant = g.content.get_def("spirit_states", sp) if sp != null else null
+	if spd != null:
+		var sname := g.name_of("spirit_states", str(sp))
+		var chip := K.panel(K.hbox([K.icon(spd.get("icon", "star"), 16), K.label(sname, "SmallLabel")], 3))
+		var calm: bool = Data.as_array(spd.get("stress")).size() >= 2 and Data.num(spd.stress[0]) <= 0.0
+		chip.add_theme_stylebox_override("panel", UiArt.flat(Color("#23353a") if calm else Color("#3d2630"), Color(UiArt.BRONZE, 0.6), 1, 3, 3))
+		var tb := BB.title(app.t("ui.spirit") + ": " + sname)
+		var sd := g.desc_of("spirit_states", str(sp))
+		if sd != "":
+			tb += "\n" + BB.i(sd)
+		var mt := BB.modifiers(g, spd.get("modifiers"))
+		if mt != "":
+			tb += "\n" + mt
 		K.tip(chip, tb)
 		f.add_child(chip)
 	# испытание пути: цели и срок

@@ -1,0 +1,295 @@
+# События духа: приходят правителю в порыве, на грани надлома или в
+# безмятежности (on_action on_spirit_pulse, механика spirit). В каждом —
+# голоса характера (варианты по чертам) и навыков.
+on_actions:
+  on_spirit_pulse:
+    random_events:
+      events:
+        stress.0010: 10
+        stress.0011: 8
+        stress.0012: 8
+        stress.0013: 6
+        stress.0014: 6
+        stress.0015: 5
+        stress.0016: 7
+        stress.0017: 5
+        stress.0018: 8
+        stress.0019: 6
+
+events:
+  # Бессонная ночь
+  stress.0010:
+    theme: stress
+    icon: "🌙"
+    triggered_only: true
+    trigger: { stress: ">= 40" }
+    cooldown: { years: 2 }
+    options:
+      - skill: { skill: learning, check: 10 }
+        success:
+          - add_lifestyle_xp: 60
+          - add_stress: -10
+        failure:
+          add_stress: 5
+        ai_chance: { value: 10, add: { value: learning, multiply: 1.5 } }
+      - effect: { add_stress: -15, add_prestige: 5 }
+        ai_chance: 30
+      - effect:
+          - add_stress: -25
+          - random: { chance: 15, add_trait: drunkard }
+        ai_chance: { value: 20, add: { value: ai_sociability, multiply: 5 } }
+      - trigger: { has_trait: paranoid }
+        effect:
+          - add_stress: -10
+          - random: { chance: 50, discover_scheme_against: yes }
+        ai_chance: 50
+      - skill: { skill: martial, min: 14 }
+        effect: { add_stress: -20, add_prestige: 10 }
+        ai_chance: 40
+
+  # Вспышка гнева
+  stress.0011:
+    theme: stress
+    icon: "💢"
+    triggered_only: true
+    trigger:
+      num_courtiers: ">= 1"
+      OR:
+        - has_trait: wrathful
+        - stress: ">= 50"
+    cooldown: { years: 2 }
+    immediate:
+      random_courtier: { limit: { is_adult: yes }, save_scope_as: victim }
+    options:
+      - trigger: { exists: scope:victim }
+        effect:
+          - add_stress: -30
+          - add_dread: 5
+          - scope:victim: { add_opinion: { target: root, modifier: insulted, value: -30 } }
+        ai_chance: { value: 10, add: { value: ai_aggression, multiply: 10 } }
+      - effect: { add_stress: 10 }
+        ai_chance: 20
+      - skill: { skill: diplomacy, check: 12 }
+        trigger: { exists: scope:victim }
+        success:
+          - add_stress: -15
+          - scope:victim: { add_opinion: { target: root, modifier: grateful } }
+        failure:
+          - add_stress: 5
+          - add_prestige: -10
+        ai_chance: { value: 10, add: { value: diplomacy, multiply: 1.5 } }
+      - skill: { skill: prowess, min: 14 }
+        effect: { add_stress: -20, add_dread: 3 }
+        ai_chance: 30
+      - trigger: { has_trait: calm }
+        effect: { add_stress: -20 }
+        ai_chance: 60
+
+  # Шут говорит правду
+  stress.0012:
+    theme: stress
+    icon: "🃏"
+    triggered_only: true
+    trigger: { stress: ">= 30" }
+    cooldown: { years: 3 }
+    options:
+      - effect: { add_stress: -20 }
+        ai_chance: 30
+      - effect: { add_stress: -5, add_dread: 5 }
+        ai_chance: { value: 10, add: { value: ai_compassion, multiply: -5 } }
+      - skill: { skill: learning, check: 12 }
+        success:
+          - discover_secret: yes
+          - add_stress: -10
+        failure:
+          add_stress: 5
+        ai_chance: { value: 10, add: { value: learning, multiply: 1.5 } }
+      - trigger: { has_trait: arrogant }
+        effect: { add_stress: -10, add_prestige: 10 }
+        ai_chance: 50
+
+  # Сон о предке
+  stress.0013:
+    theme: stress
+    icon: "🏺"
+    triggered_only: true
+    trigger:
+      stress: ">= 40"
+      exists: father
+      father: { is_alive: no }
+    cooldown: { years: 5 }
+    immediate:
+      father: { save_scope_as: ancestor }
+    options:
+      - effect: { add_piety: 20, add_stress: -15 }
+        ai_chance: 30
+      - effect: { add_stress: -5 }
+        ai_chance: 20
+      - skill: { skill: learning, min: 14 }
+        effect:
+          - add_modifier: { id: ancestor_blessing, years: 2 }
+          - add_stress: -10
+        ai_chance: 50
+      - trigger: { has_trait: zealous, gold: ">= 30" }
+        effect: { add_gold: -30, add_piety: 50, add_stress: -20 }
+        ai_chance: 50
+
+  # Друг юности
+  stress.0014:
+    theme: stress
+    icon: "🍻"
+    triggered_only: true
+    trigger:
+      stress: ">= 30"
+      any_courtier: { is_adult: yes, opinion: { target: root, value: ">= 10" } }
+    cooldown: { years: 5 }
+    immediate:
+      random_courtier:
+        limit: { is_adult: yes, opinion: { target: root, value: ">= 10" } }
+        save_scope_as: friend
+    options:
+      - trigger: { exists: scope:friend }
+        effect:
+          - add_stress: -25
+          - add_gold: -10
+          - scope:friend: { add_opinion: { target: root, modifier: grateful } }
+        ai_chance: { value: 20, add: { value: ai_sociability, multiply: 10 } }
+      - effect:
+          - add_stress: 5
+          - scope:friend: { add_opinion: { target: root, modifier: insulted, value: -10 } }
+        ai_chance: 10
+      - skill: { skill: diplomacy, min: 12 }
+        trigger: { exists: scope:friend }
+        effect:
+          - add_stress: -30
+          - scope:friend: { add_opinion: { target: root, modifier: grateful, value: 30 } }
+        ai_chance: 50
+      - trigger: { has_trait: shy }
+        effect: { add_stress: -10 }
+        ai_chance: 40
+
+  # Письмо самому себе
+  stress.0015:
+    theme: stress
+    icon: "✉"
+    triggered_only: true
+    trigger: { stress: ">= 50" }
+    cooldown: { years: 5 }
+    options:
+      - effect:
+          - add_modifier: { id: quiet_vow, years: 3 }
+          - add_stress: -20
+        ai_chance: { value: 20, if: { limit: { has_trait: [content, calm] }, add: 30 } }
+      - effect:
+          - add_modifier: { id: inner_resolve, years: 3 }
+          - add_stress: 10
+        ai_chance: { value: 20, if: { limit: { has_trait: [ambitious, diligent] }, add: 30 } }
+      - effect: { add_stress: -5 }
+        ai_chance: 10
+      - skill: { skill: intrigue, min: 14 }
+        effect:
+          - add_stress: -15
+          - add_lifestyle_xp: 30
+        ai_chance: 40
+
+  # Разгул
+  stress.0016:
+    theme: stress
+    icon: "🍷"
+    triggered_only: true
+    trigger:
+      gold: ">= 50"
+      OR:
+        - has_trait: [gluttonous, lustful, drunkard, reveler]
+        - stress: ">= 60"
+    cooldown: { years: 2 }
+    options:
+      - effect:
+          - add_stress: -40
+          - add_gold: -30
+          - add_prestige: -10
+          - random: { chance: 15, add_trait: ill }
+        ai_chance: { value: 20, add: { value: ai_sociability, multiply: 10 } }
+      - effect: { add_stress: 5 }
+        ai_chance: 20
+      - skill: { skill: diplomacy, check: 10 }
+        success:
+          - add_gold: -50
+          - add_stress: -25
+          - every_vassal: { add_opinion: { target: root, modifier: grateful } }
+        failure:
+          - add_gold: -50
+          - add_prestige: -20
+        ai_chance: { value: 10, add: { value: diplomacy, multiply: 1.5 } }
+      - trigger: { has_trait: temperate }
+        effect: { add_stress: -10, add_piety: 10 }
+        ai_chance: 60
+
+  # Видение
+  stress.0017:
+    theme: stress
+    icon: "👁"
+    triggered_only: true
+    trigger:
+      stress: ">= 50"
+      OR:
+        - has_trait: zealous
+        - learning: ">= 14"
+    cooldown: { years: 5 }
+    options:
+      - effect: { add_piety: 50, add_stress: -20 }
+        ai_chance: { value: 20, add: { value: ai_zeal, multiply: 10 } }
+      - effect: { add_stress: -5 }
+        ai_chance: 20
+      - skill: { skill: learning, check: 14 }
+        success:
+          - add_modifier: { id: prophetic_insight, years: 2 }
+          - add_stress: -15
+        failure:
+          add_stress: 15
+        ai_chance: { value: 10, add: { value: learning, multiply: 1.5 } }
+      - trigger: { has_trait: cynical }
+        effect: { add_stress: -10, add_prestige: 5 }
+        ai_chance: 60
+
+  # Тихое утро — безмятежность и её изнанка, беспечность
+  stress.0018:
+    theme: court
+    icon: "🌅"
+    triggered_only: true
+    trigger: { spirit_state: serenity }
+    cooldown: { years: 3 }
+    options:
+      - effect: { add_lifestyle_xp: 40 }
+        ai_chance: 40
+      - effect: { add_lifestyle_xp: 20, add_prestige: -10 }
+        ai_chance: { value: 10, if: { limit: { has_trait: lazy }, add: 40 } }
+      - skill: { skill: intrigue, check: 12 }
+        success:
+          discover_scheme_against: yes
+        failure:
+          add_stress: 10
+        ai_chance: { value: 10, add: { value: intrigue, multiply: 1.5 } }
+
+  # На краю — последняя ночь перед надломом
+  stress.0019:
+    theme: stress
+    icon: "🕳"
+    triggered_only: true
+    trigger: { stress: ">= 80" }
+    cooldown: { years: 2 }
+    options:
+      - effect: { add_piety: -20, add_stress: -30 }
+        ai_chance: { value: 20, add: { value: ai_zeal, multiply: 5 } }
+      - effect: { add_stress: -40, add_dread: 5, add_prestige: -20 }
+        ai_chance: { value: 10, add: { value: ai_aggression, multiply: 5 } }
+      - effect:
+          - add_lifestyle_xp: { value: stress, max: 200 }
+          - add_stress: 10
+        ai_chance: { value: 10, if: { limit: { has_trait: diligent }, add: 30 } }
+      - skill: { skill: diplomacy, min: 14 }
+        trigger: { exists: spouse }
+        effect:
+          - add_stress: -40
+          - spouse: { add_opinion: { target: root, modifier: grateful } }
+        ai_chance: 50

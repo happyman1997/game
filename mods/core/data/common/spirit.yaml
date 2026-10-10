@@ -1,0 +1,89 @@
+# Состояние духа (механика spirit). Стресс — не только минус: долгое
+# спокойствие расслабляет, средний стресс толкает на крайности — у каждого
+# характера свои, — а от сотни начинается надлом (штраф навыкам и срывы в
+# событиях stress.0001/0002). Берётся первое подходящее по order.
+#   stress: [мин, макс] — пределы стресса; months — сколько месяцев подряд
+#   (для безмятежности: стресс не выше defines.spirit.calm_max);
+#   traits — для кого (хотя бы одна черта).
+defines:
+  spirit:
+    calm_max: 10                # «почти ноль» для безмятежности
+    recover_below: 50           # пришёл в себя после надлома — закалка
+    hardened_trait: hardened
+    shattered_trait: shattered
+    pulse_min_stress: 30        # с какого стресса правителю приходят события духа
+    pulse_chance_player: 0.12   # в месяц
+    pulse_chance_ai: 0.03
+    pulse_calm_mult: 0.25       # в безмятежности события духа реже
+
+spirit_states:
+  broken:      { order: 1, icon: "💔", stress: [100, 100000] }
+  fury:        { order: 2, icon: "🔥", stress: [40, 99], traits: [wrathful],
+                 modifiers: { prowess: 3, martial: 2, diplomacy: -2, general_opinion: -5 } }
+  sleepless:   { order: 3, icon: "🌙", stress: [40, 99], traits: [paranoid],
+                 modifiers: { scheme_defense: 20, intrigue: 2, stewardship: -1, health: -0.5 } }
+  obsession:   { order: 4, icon: "🎯", stress: [40, 99], traits: [ambitious],
+                 modifiers: { stewardship: 2, martial: 1, monthly_prestige: 0.5, vassal_opinion: -5, stress_gain_mult: 0.1 } }
+  rapture:     { order: 5, icon: "✨", stress: [40, 99], traits: [zealous],
+                 modifiers: { monthly_piety: 1, learning: 2, general_opinion: -5 } }
+  longing:     { order: 6, icon: "🍂", stress: [40, 99], traits: [shy, depressed],
+                 modifiers: { learning: 3, lifestyle_xp_mult: 0.15, diplomacy: -3 } }
+  revelry:     { order: 7, icon: "🍷", stress: [40, 99], traits: [gluttonous, lustful, drunkard, reveler],
+                 modifiers: { diplomacy: 2, attraction_opinion: 5, stewardship: -2, monthly_income: -1, health: -0.3 } }
+  unease:      { order: 8, icon: "😬", stress: [40, 99],
+                 modifiers: { intrigue: 1, scheme_defense: 5, diplomacy: -1 } }
+  serenity:    { order: 9, icon: "🕊", stress: [0, 10], months: 24,
+                 modifiers: { lifestyle_xp_mult: 0.15, scheme_defense: -10 } }
+
+traits:
+  # Закалка: пережил надлом и пришёл в себя
+  hardened:
+    category: health
+    icon: "🛡"
+    good: true
+    modifiers: { stress_gain_mult: -0.25, prowess: 1 }
+  # Второй надлом закалённого: душа треснула
+  shattered:
+    category: health
+    icon: "🥀"
+    modifiers: { stress_gain_mult: 0.25, diplomacy: -1, learning: -1 }
+
+  # характер (механика personality): усердному работа на износ по душе, ленивому — мука
+  diligent:
+    stress_reactions: { work_to_exhaustion: -10 }
+  lazy:
+    stress_reactions: { work_to_exhaustion: 25 }
+
+modifiers:
+  overworked: { icon: "🕯", modifiers: { health: -1, stress_gain_mult: 0.15 } }
+  inner_resolve: { icon: "🔆", good: true, modifiers: { martial: 1, stewardship: 1, diplomacy: 1 } }
+  ancestor_blessing: { icon: "🏺", good: true, modifiers: { monthly_prestige: 1, learning: 1 } }
+  prophetic_insight: { icon: "👁", good: true, modifiers: { learning: 2, monthly_piety: 0.5 } }
+  quiet_vow: { icon: "🕯", good: true, modifiers: { stress_gain_mult: -0.2, diplomacy: 1 } }
+
+decisions:
+  # Работать на износ: стресс — в дело. Чем он выше, тем больше выучено и
+  # сделано, но здоровье платит, а стресс не уходит.
+  work_to_exhaustion:
+    icon: "🕯"
+    is_shown: { is_adult: yes, stress: ">= 20" }
+    is_valid:
+      NOT: { has_modifier: overworked }
+      is_imprisoned: no
+    effect:
+      - add_lifestyle_xp: { value: stress, multiply: 3, max: 400 }
+      - if:
+          limit: { is_ruler: yes }
+          capital: { add_development: 1 }
+      - add_modifier: { id: overworked, years: 2 }
+      - add_stress: 10
+    ai_check_months: 12
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { has_trait: [diligent, ambitious] }
+          add: 20
+        - limit: { stress: ">= 60" }
+          add: 10
+        - limit: { has_trait: [lazy, content] }
+          multiply: 0

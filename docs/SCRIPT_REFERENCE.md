@@ -109,6 +109,7 @@
 | `same_culture_as` | character | Та же культура | core |
 | `same_dynasty_as` | character | Та же династия | core |
 | `same_faith_as` | character | Та же вера | core |
+| `spirit_state` | character | Состояние духа (id из spirit_states, список или yes/no) | core/spirit |
 | `terrain` | province | Местность | core |
 | `tier_is` | title | Ранг титула: county/duchy/kingdom/empire | core |
 | `var` | любой | Сравнение переменной: var: { name: x, value: ">= 2" } | core |
@@ -256,6 +257,7 @@
 | `beast_control` | character | Власть оборотня над зверем: −100 (одичал) … 100 (вожак стаи) | arcana |
 | `blood_potency` | character | Сила крови вампира (растёт с годами и кормлением) | arcana |
 | `blood_thirst` | character | Жажда крови вампира (0–100) | arcana |
+| `calm_months` | character | Сколько месяцев подряд стресс почти нулевой | core/spirit |
 | `commander_advantage` | character | Характеристика: commander_advantage | core |
 | `council_size` | character | Число занятых мест в совете | core/council |
 | `crown_authority_level` | character | Уровень закона группы crown_authority (−1, если не действует) | core/laws |
@@ -477,6 +479,7 @@
 | `duels` | Поединки: вызов на бой один на один, поборники из рыцарей | да |
 | `deeds` | Деяния: летопись поступков персонажа и прозвища, которые из неё растут | да |
 | `trials` | Испытания архетипов: связку навыков нужно заслужить делами | да |
+| `spirit` | Состояние духа: безмятежность, порывы по характеру, надлом и закалка | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -486,9 +489,9 @@
 - **cb_targets**: `claim`, `de_jure`, `independence`, `adjacent_county`, `holy_war`, `faction`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
 - **interaction_deciders**: `payer`
-- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `momentum`, `plague_fear`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `momentum`, `spirit`, `plague_fear`
 - **province_modifier_providers**: `lands`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `arcana_faith`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `deeds`, `trials`
-- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `momentum` (13), `trials` (14), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `deeds`, `trials`, `spirit`
+- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `spirit` (12), `momentum` (13), `trials` (14), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`
