@@ -488,7 +488,7 @@
 | `renown` | Слава и благочестие: уровни престижа и благочестия меняют мнение подданных | да |
 | `lands` | Вера и культура земель: чужие графства дают меньше, их можно обратить | да |
 | `populace` | Народ графств: мнение о владельце, контроль, крестьянские и народные мятежи | да |
-| `momentum` | Кураж и хандра: полосы удач и неудач в одной сфере меняют навык и стресс | да |
+| `momentum` | Удачи и неудачи: успех снимает стресс, провал добавляет | да |
 | `duels` | Поединки: вызов на бой один на один, поборники из рыцарей | да |
 | `deeds` | Деяния: летопись поступков персонажа и прозвища, которые из неё растут | да |
 | `trials` | Испытания архетипов: связку навыков нужно заслужить делами | да |
@@ -502,9 +502,9 @@
 - **cb_targets**: `claim`, `de_jure`, `independence`, `adjacent_county`, `holy_war`, `faction`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
 - **interaction_deciders**: `payer`
-- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `momentum`, `spirit`, `plague_fear`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `spirit`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `arcana_faith`
 - **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `populace`, `deeds`, `trials`, `spirit`
-- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `spirit` (12), `momentum` (13), `trials` (14), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
+- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

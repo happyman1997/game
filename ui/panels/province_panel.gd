@@ -114,7 +114,8 @@ static func build(app: App, id: String) -> Control:
 	if st.get("siege") != null:
 		root.add_child(K.vbox([W.stat("tower", "%s: %d%%" % [app.t("ui.siege"), int(st.siege.progress)]), K.bar(st.siege.progress, 100, Color("#c9a040"))], 2))
 	# чужая вера или культура графства (механика lands)
-	if g.engine.has_feature("lands"):
+	# с механикой populace чужая вера и культура видны в мнении графства
+	if g.engine.has_feature("lands") and not g.engine.has_feature("populace"):
 		var strange := K.flow([], 4)
 		for part in Lands.strangeness(g, id):
 			var chip := K.panel(K.hbox([K.icon("piety" if part.kind == "faith" else "speech", 16), K.label(app.t("ui.foreign_" + part.kind), "SmallLabel")], 3))
@@ -209,6 +210,9 @@ static func _populace_block(app: App, id: String) -> Control:
 		var parts := Populace.opinion_parts(g, id)
 		if not parts.is_empty():
 			bb += "\n" + BB.breakdown(parts)
+		var om := Populace.output_mult(g, id)
+		if om != 0.0:
+			bb += "\n" + BB.modifiers(g, {"tax_mult": om, "levy_mult": om})
 		return bb
 	var ctl_tip := func():
 		var bb := BB.title(app.t("ui.control")) + "\n" + BB.esc(app.t("ui.control_tip"))

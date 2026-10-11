@@ -9,8 +9,8 @@ defines:
   character:
     max_archetypes: 2
   trials:
-    years: 5                  # срок испытания по умолчанию
-    fail_stress: 30           # не успел — стресс
+    years: 6                  # срок испытания по умолчанию
+    fail_stress: 20           # не успел — стресс
     cooldown_years: 5         # и перерыв на этот путь
     ai_check_months: 12       # ИИ раз в столько месяцев думает о пути
     ai_goal_will: 40          # ИИ на испытании охотнее делает то, что нужно для целей,

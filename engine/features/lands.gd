@@ -6,6 +6,8 @@ extends EngineFeature
 ##                    foreign_culture: {модификаторы графства} }
 ## Обращают задачи совета и решения из данных (эффекты convert_to_holder_faith,
 ## convert_to_holder_culture); после обращения графство — как родное.
+## С механикой populace эти модификаторы не действуют: чужая вера и культура
+## владельца снижают мнение графства, а оно — налог и ополчение.
 
 const OWNER := "core/lands"
 
@@ -70,6 +72,9 @@ static func convert(game: Game, prov_id: String, kind: String) -> bool:
 
 func install(engine: GameEngine) -> void:
 	engine.province_modifier_providers.register("lands", {"fn": func(game: Game, prov_id: String) -> Variant:
+		# с механикой populace чужая вера и культура сказываются через мнение графства
+		if game.engine.has_feature("populace"):
+			return null
 		var out := {}
 		for part in Lands.strangeness(game, prov_id):
 			Stats.add_into(out, part.modifiers)

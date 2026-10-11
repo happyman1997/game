@@ -8,6 +8,7 @@
 defines:
   spirit:
     calm_max: 10                # «почти ноль» для безмятежности
+    hysteresis: 5               # состояние держится, пока стресс не уйдёт за его пределы на столько
     recover_below: 50           # пришёл в себя после надлома — закалка
     hardened_trait: hardened
     shattered_trait: shattered
@@ -32,7 +33,7 @@ spirit_states:
                  modifiers: { diplomacy: 2, attraction_opinion: 5, stewardship: -2, monthly_income: -1, health: -0.3 } }
   unease:      { order: 8, icon: "😬", stress: [40, 99],
                  modifiers: { intrigue: 1, scheme_defense: 5, diplomacy: -1 } }
-  serenity:    { order: 9, icon: "🕊", stress: [0, 10], months: 24,
+  serenity:    { order: 9, icon: "🕊", stress: [0, 10], months: 36,
                  modifiers: { lifestyle_xp_mult: 0.15, scheme_defense: -10 } }
 
 traits:

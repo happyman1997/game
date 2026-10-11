@@ -197,10 +197,40 @@ decisions:
         - limit: { gold: 250 }
           add: 40
 
+  # Вложиться в земли: казна идёт в дороги, мельницы и распашку. Каждое
+  # графство домена +1 к развитию, а народ доволен заботой.
+  invest_in_lands:
+    icon: "🌿"
+    is_shown: { is_ruler: yes }
+    is_valid:
+      is_at_war: no
+    cost: { gold: invest_cost }
+    cooldown: { years: 2 }
+    effect:
+      - every_domain_province:
+          limit: { is_occupied: no }
+          add_development: 1
+          add_county_opinion: lands_invested
+    ai_check_months: 6
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { gold: ">= 400" }
+          add: 30
+        - limit: { gold: ">= 1000" }
+          add: 50
+        - limit: { has_trait: greedy }
+          multiply: 0.5
+
 script_values:
+  invest_cost:
+    value: num_counties
+    multiply: 40
+    min: 40
   feast_cost:
     value: 30
     add: { value: tier, multiply: 20 }
 
 opinion_modifiers:
   confided_in: { value: 10, years: 3 }
+  lands_invested: { value: 5, years: 5 }      # мнение графства: владелец вкладывается в земли

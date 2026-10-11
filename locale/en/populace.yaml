@@ -17,7 +17,7 @@ fx:
   take_faction_counties: "{who} takes the faction's counties and rules them"
 ui:
   county_opinion: County opinion
-  county_opinion_tip: "How the county regards its holder. Counties at −30 or lower join popular factions."
+  county_opinion_tip: "How the county regards its holder. A content county pays more taxes and gives more levies, an unhappy one less; at −30 or lower unhappy counties join popular factions."
   control: Control
   control_tip: "How firm the holder's grip is. Low control cuts the county's taxes and levies and angers the people. It drops after conquest, enemy occupation and revolts and recovers on its own — faster with the marshal on «Restore Order»."
   in_popular_faction: "In faction: {faction}"

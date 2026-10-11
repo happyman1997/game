@@ -526,7 +526,10 @@ static func _consider_building(game: Game, c: Dictionary) -> void:
 	var reserve = game.def_num("ai.gold_reserve", 60)
 	if c.gold < reserve:
 		return
-	if not game.rng.chance(game.def_num("ai.build_chance", 0.3)):
+	# богатый строит охотнее: золото не должно лежать мёртвым грузом
+	var rich := game.def_num("ai.rich_gold", 400)
+	var chance := game.def_num("ai.build_chance", 0.3) * (1.0 + maxf(0.0, float(c.gold) - rich) / rich)
+	if not game.rng.chance(minf(1.0, chance)):
 		return
 	var opts := Decisions.domain_build_options(game, c).filter(func(o):
 		var cost: Variant = o.def.get("cost")

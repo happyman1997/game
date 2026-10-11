@@ -124,6 +124,7 @@ defines:
     marriage_chance: 0.5
     gold_reserve: 60
     build_chance: 0.3
+    rich_gold: 400            # богаче — строит и вкладывается охотнее
     use_hook_min_will: 30          # ИИ давит крюком, только если очень хочет
     use_hook_on_player_min_will: 60
 
@@ -170,13 +171,8 @@ defines:
     focus_change_cooldown_months: 12
 
   momentum:
-    max_level: 3              # ступеней куража и хандры
-    skill_per_level: 1        # навык за ступень
-    decay_days: 365           # без новых удач и неудач ступень уходит к нулю
-    success_stress: -4        # успех снимает стресс (на полосе — больше)
-    failure_stress: 4
-    uplift_level: 2           # кураж с этой ступени — «душевный подъём»
-    uplift_stress_gain: -0.2  # стресс копится на 20% медленнее
+    success_stress: -5        # успех в своём деле снимает стресс
+    failure_stress: 5         # провал добавляет
 
   events:
     # проверки навыка в событиях: шанс = check_base + (навык − сложность) × check_per_point

@@ -9,8 +9,6 @@ msg:
   faction_negotiated: "Переговоры удались: фракция «{faction}» расходится, не получив от {liege} уступок."
   duel_result: "Поединок: {winner} одолевает {loser}."
   duel_died: "Поединок: {winner} сразил(а) {loser} насмерть."
-  momentum_up: "Полоса удач: кураж в навыке «{skill}» (ступень {n})."
-  momentum_down: "Полоса неудач: хандра в навыке «{skill}» (ступень {n})."
   check_success: "Проверка навыка «{skill}» удалась (шанс был {chance}%)."
   check_failure: "Проверка навыка «{skill}» не удалась (шанс был {chance}%)."
   stress_reaction_bad: "«{action}» далось вам тяжело ({traits}): стресс {value}."

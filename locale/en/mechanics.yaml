@@ -9,8 +9,6 @@ msg:
   faction_negotiated: "Negotiations succeeded: the {faction} disbands without concessions from {liege}."
   duel_result: "Duel: {winner} defeats {loser}."
   duel_died: "Duel: {winner} slays {loser}."
-  momentum_up: "A winning streak: momentum in {skill} (level {n})."
-  momentum_down: "A losing streak: despondency in {skill} (level {n})."
   check_success: "The {skill} check succeeded (the chance was {chance}%)."
   check_failure: "The {skill} check failed (the chance was {chance}%)."
   stress_reaction_bad: "«{action}» weighed on you ({traits}): stress {value}."

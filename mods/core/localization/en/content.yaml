@@ -159,6 +159,7 @@ succession_law_desc:
   equal_primogeniture: The eldest child inherits everything regardless of gender.
 
 opinion_modifier:
+  lands_invested: Our lord invests in our lands
   generic: Opinion
   gift: Gift
   grateful: Grateful
@@ -263,6 +264,7 @@ scheme:
   fabricate_claim: Fabricate Claim
 
 decision:
+  invest_in_lands: Invest in the Lands
   hold_feast: Hold a Feast
   go_hunting: Go Hunting
   go_on_pilgrimage: Go on Pilgrimage
@@ -274,6 +276,7 @@ decision:
   unite_britannia: Unite Britannia
   hire_mercenaries: Hire Mercenaries
 decision_desc:
+  invest_in_lands: "The treasury pays for roads, mills and new fields: every county of your domain gains +1 development, and the people appreciate the care. Costs 40 gold per domain county."
   hold_feast: Invite your vassals to a feast. Prestige, goodwill and some relief from worries.
   go_hunting: Hunting relieves stress and brings glory — with some luck.
   go_on_pilgrimage: A long road to the holy places will strengthen your faith.

@@ -14,7 +14,9 @@ extends EngineFeature
 ##     подходящее по order.
 ##   defines.spirit: { calm_max, recover_below, hardened_trait, shattered_trait,
 ##                     pulse_min_stress, pulse_chance_player, pulse_chance_ai,
-##                     pulse_calm_mult }
+##                     pulse_calm_mult, hysteresis }
+## Состояние без срока держится, пока стресс не выйдет за его пределы больше
+## чем на hysteresis (без этого оно мигало бы на границе каждый месяц).
 ## Закалка: кто пережил надлом (стресс от 100) и пришёл в себя (ниже
 ## recover_below), получает hardened_trait; надлом закалённого — shattered_trait.
 ## Раз в месяц правитель со стрессом от pulse_min_stress (или безмятежный)
@@ -53,6 +55,7 @@ static func _plan(game: Game) -> Dictionary:
 		"pulse_player": game.def_num("spirit.pulse_chance_player", 0.12),
 		"pulse_ai": game.def_num("spirit.pulse_chance_ai", 0.03),
 		"pulse_calm": game.def_num("spirit.pulse_calm_mult", 0.25),
+		"hysteresis": game.def_num("spirit.hysteresis", 5),
 	}
 	# быстрый путь: в спокойном диапазоне нет состояний «по чертам» — давно
 	# спокойному персонажу состояние можно не пересчитывать
@@ -116,6 +119,21 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 			_give(game, c, plan.hardened, "msg.spirit_hardened")
 	var cur: Variant = state_of(c)
 	var nxt: Variant = cur if plan.calm_fast and calm > int(plan.max_months) + 1 else _pick(plan, c, s, calm)
+	# запас на границе: состояние без срока держится, пока стресс не ушёл
+	# за его пределы на hysteresis — иначе оно мигало бы каждый месяц
+	# (состояние важнее по order — надлом — наступает сразу)
+	if cur != null and nxt != cur:
+		var ci := -1
+		var ni := -1
+		for i in plan.states.size():
+			if plan.states[i][0] == cur:
+				ci = i
+			if plan.states[i][0] == nxt:
+				ni = i
+		if ci >= 0 and (nxt == null or ni > ci):
+			var st: Array = plan.states[ci]
+			if int(st[3]) == 0 and s >= float(st[1]) - plan.hysteresis and s <= float(st[2]) + plan.hysteresis:
+				nxt = cur
 	if nxt != cur:
 		if nxt == null:
 			c.vars.erase("spirit")

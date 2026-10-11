@@ -36,7 +36,7 @@ traits:
   generous:
     stress_reactions: { send_gift: -10, give_alms: -10, emergency_taxes: 15, impose_heavy_duties: 10, demand_ransom: 10 }
   greedy:
-    stress_reactions: { send_gift: 15, give_alms: 20, grant_privileges: 15, hold_feast: 10, emergency_taxes: -10 }
+    stress_reactions: { send_gift: 15, give_alms: 20, grant_privileges: 15, hold_feast: 10, emergency_taxes: -10, invest_in_lands: 10 }
     stress_monthly: { trigger: { gold: "< 0" }, value: 5, desc: stress_when.in_debt }
   gregarious:
     stress_reactions: { hold_feast: -20, convene_great_council: -10, seek_solitude: 10 }

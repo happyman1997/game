@@ -13,6 +13,10 @@ extends EngineFeature
 ##   (постройки, модификаторы провинции), временные модификаторы из
 ##   opinion_modifiers (эффект add_county_opinion), части модов (хук
 ##   populace.opinion → [{label, value}]).
+## Мнение меняет налог и ополчение графства: opinion_output за очко (не
+## ниже opinion_output_min и не выше opinion_output_max) — довольный народ
+## платит больше. Чужая вера и культура владельца сказываются только так
+## (модификаторы механики lands действуют, лишь когда populace выключена).
 ## Контроль (0–100): падает до conquest_control, когда графство уходит в
 ## чужую державу при живом прежнем владельце, и на occupation_control_loss,
 ## когда его берёт враг; растёт на control_regen в месяц плюс control_gain
@@ -74,8 +78,7 @@ static func set_control(game: Game, prov_id: String, v: float) -> void:
 		p.vars.erase("control")
 	else:
 		p.vars["control"] = v
-	game.stat_cache.erase("prov:" + prov_id)
-	game.month_cache.erase("pop:op:" + prov_id)
+	_forget(game, prov_id)
 
 
 static func add_control(game: Game, prov_id: String, dv: float) -> void:
@@ -113,7 +116,7 @@ static func opinion_parts(game: Game, prov_id: String, labels: bool = true) -> A
 		if months > 0.0:
 			add.call("levies", -minf(_d(game, "levy_opinion_max", 25), roundf(months * _d(game, "levy_opinion", 2))))
 	add.call("holder", Stats.stat(game, h, "county_opinion"))
-	add.call("county", Stats.prov_stat(game, prov_id, "county_opinion"))
+	add.call("county", _county_flat(game, p))
 	for e in Data.as_array(p.vars.get("copinions")):
 		if e.get("expires") == null or int(e.expires) > game.date:
 			out.append({"label": game.name_of("opinion_modifiers", e.mod) if labels else e.mod, "value": float(e.value)})
@@ -122,6 +125,28 @@ static func opinion_parts(game: Game, prov_id: String, labels: bool = true) -> A
 			if part is Dictionary and Data.num(part.get("value")) != 0.0:
 				out.append(part)
 	return out
+
+
+## county_opinion построек и модификаторов графства (без поставщиков:
+## поставщик налога сам спрашивает мнение графства).
+static func _county_flat(game: Game, p: Dictionary) -> float:
+	var v := 0.0
+	for b in p.buildings:
+		var bd: Variant = game.content.get_def("buildings", b)
+		if bd != null and bd.get("modifiers") is Dictionary:
+			v += Data.num(bd.modifiers.get("county_opinion"))
+	for m in p.modifiers:
+		var md: Variant = game.content.get_def("modifiers", m.id)
+		if md != null and md.get("modifiers") is Dictionary:
+			v += Data.num(md.modifiers.get("county_opinion"))
+	return v
+
+
+## Налог и ополчение графства от мнения: opinion_output за очко,
+## в пределах [opinion_output_min, opinion_output_max].
+static func output_mult(game: Game, prov_id: String) -> float:
+	var op := opinion(game, prov_id)
+	return clampf(op * _d(game, "opinion_output", 0.006), _d(game, "opinion_output_min", -0.5), _d(game, "opinion_output_max", 0.2))
 
 
 ## Мнение графства о владельце (−100…100), на месяц.
@@ -150,7 +175,7 @@ static func add_county_opinion(game: Game, prov_id: String, mod_id: String, valu
 	var list: Array = Data.as_array(p.vars.get("copinions")).filter(func(x): return x.mod != mod_id)
 	list.append(e)
 	p.vars["copinions"] = list
-	game.month_cache.erase("pop:op:" + prov_id)
+	_forget(game, prov_id)
 
 
 static func remove_county_opinion(game: Game, prov_id: String, mod_id: String) -> void:
@@ -162,12 +187,18 @@ static func remove_county_opinion(game: Game, prov_id: String, mod_id: String) -
 		p.vars.erase("copinions")
 	else:
 		p.vars.copinions = list
+	_forget(game, prov_id)
+
+
+## Мнение графства изменилось: сбросить его и налог с ополчением графства.
+static func _forget(game: Game, prov_id: String) -> void:
 	game.month_cache.erase("pop:op:" + prov_id)
+	game.stat_cache.erase("prov:" + prov_id)
 
 
 static func _forget_domain_opinions(game: Game, c: Dictionary) -> void:
 	for cid in Titles.domain_counties(game, c):
-		game.month_cache.erase("pop:op:" + cid)
+		_forget(game, cid)
 
 
 # ------------------------------------------------------------ народные фракции
@@ -412,6 +443,7 @@ static func monthly(game: Game) -> void:
 					p.vars.erase("copinions")
 				else:
 					p.vars.copinions = keep
+				_forget(game, p.id)
 		if p.vars.has("revolt_cd") and int(p.vars.revolt_cd) <= game.date:
 			p.vars.erase("revolt_cd")
 	if not game.engine.has_feature("factions") or popular_defs(game).is_empty():
@@ -516,12 +548,16 @@ static func _manage_revolts(game: Game) -> void:
 func install(engine: GameEngine) -> void:
 	engine.systems.register("populace", {"id": "populace", "order": 59, "on_month": Populace.monthly}, OWNER)
 	# низкий контроль — меньше налога и ополчения
+	# контроль (крепость власти) и мнение графства (отношение народа) —
+	# налог и ополчение графства
 	engine.province_modifier_providers.register("populace", {"fn": func(game: Game, prov_id: String) -> Variant:
-		var ctl := Populace.control(game, prov_id)
-		if ctl >= 100.0:
+		if Titles.county_holder(game, prov_id) == null:
 			return null
-		var m := (ctl / 100.0 - 1.0) * Populace._d(game, "control_effect", 0.75)
-		return {"tax_mult": m, "levy_mult": m}
+		var ctl := Populace.control(game, prov_id)
+		var m := Populace.output_mult(game, prov_id)
+		if ctl < 100.0:
+			m += (ctl / 100.0 - 1.0) * Populace._d(game, "control_effect", 0.75)
+		return {"tax_mult": m, "levy_mult": m} if m != 0.0 else null
 	}, OWNER)
 	var H := engine.hooks
 	# завоевание: графство ушло в чужую державу при живом прежнем владельце
@@ -530,7 +566,7 @@ func install(engine: GameEngine) -> void:
 		var tid: String = p.title
 		if Titles.tier_of(game, tid) != 1:
 			return
-		game.month_cache.erase("pop:op:" + tid)
+		Populace._forget(game, tid)
 		var old: Variant = game.ch(p.get("from"))
 		var neo: Variant = game.ch(p.get("to"))
 		if old == null or neo == null or old.death != null:
