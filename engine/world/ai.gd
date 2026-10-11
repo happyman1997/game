@@ -83,7 +83,6 @@ static func _consider_war(game: Game, c: Dictionary) -> void:
 	if targets.is_empty():
 		return
 	var my_str := Economy.military_strength(game, c)
-	# молва: врага, чья слава обгоняет правду, боятся больше, чем следует
 	var need = game.def_num("ai.war_strength_ratio", 1.3) - Data.num(p.get("boldness")) * 0.02 - Data.num(p.get("aggression")) * 0.02
 	var best: Variant = null
 	var best_score := 0.0
@@ -113,7 +112,7 @@ static func _consider_war(game: Game, c: Dictionary) -> void:
 		chance += Personality.ai_will_shift(game, c, "declare_war") * 0.01
 	# испытание пути требует побед
 	if c.vars.has("trial") and Trials.ai_wants_war(game, c):
-		chance += game.def_num("trials.ai_war_chance", 0.25)
+		chance += game.def_num("trials.ai_war_chance", 0.1)
 	if game.rng.chance(chance):
 		Wars.declare_war(game, c, best)
 
@@ -433,15 +432,58 @@ static func _arrange_marriages(game: Game, c: Dictionary) -> void:
 		return
 
 
+## Решения для ИИ: [одиночные, {группа: [решения]}] — решения с ai_group ИИ
+## обдумывает вместе, одной проверкой (например, пути архетипов).
+static func _ai_decision_defs(game: Game) -> Array:
+	var hit: Variant = game.engine.cache.get("ai:decisions")
+	if hit == null:
+		var single := []
+		var groups := {}
+		for def in game.content.all("decisions"):
+			if def.get("ai_will_do") == null:
+				continue
+			var grp: Variant = def.get("ai_group")
+			if grp == null:
+				single.append(def)
+			else:
+				if not groups.has(grp):
+					groups[grp] = []
+				groups[grp].append(def)
+		hit = [single, groups]
+		game.engine.cache["ai:decisions"] = hit
+	return hit
+
+
 static func _consider_decisions(game: Game, c: Dictionary) -> void:
 	var has_personality := game.engine.has_feature("personality")
 	# один контекст на все проверки; сохранённые условиями скоупы сбрасываются
 	var ctx := Decisions.context(game, c)
 	var base_scopes := ctx.scopes.duplicate()
 	var on_trial: bool = c.vars.has("trial")
-	for def in game.content.all("decisions"):
-		if def.get("ai_will_do") == null:
+	var split := _ai_decision_defs(game)
+	# группа: раз в ai_check_months первого решения — выбор по весу из доступных
+	for grp in split[1]:
+		var defs: Array = split[1][grp]
+		if not game.rng.chance(1.0 / Data.num(defs[0].get("ai_check_months"), 6)):
 			continue
+		# ai_potential первого решения — общее условие группы, один раз
+		if defs[0].get("ai_potential") != null and not Interp.eval_trigger(ctx, ctx.root, defs[0].ai_potential):
+			continue
+		var cands := []
+		for def in defs:
+			if ctx.scopes.size() != base_scopes.size() or not ctx.values.is_empty():
+				ctx = Decisions.context(game, c)
+			if not Decisions.is_shown(game, def, c, ctx) or not Decisions.can_take(game, def, c, ctx):
+				continue
+			var w := Interp.eval_value(ctx, ctx.root, def.ai_will_do)
+			if has_personality:
+				w += Personality.ai_will_shift(game, c, str(def.id))
+			if w > 0.0:
+				cands.append([def, w])
+		var pick: Variant = game.rng.weighted(cands, func(x): return x[1])
+		if pick != null and game.rng.next() * 100.0 < pick[1]:
+			Decisions.take(game, pick[0], c)
+	for def in split[0]:
 		var months := Data.num(def.get("ai_check_months"), 6)
 		var trial_shift := Trials.ai_will_shift(game, c, "decision:" + str(def.id)) if on_trial else 0.0
 		if trial_shift > 0.0:
@@ -450,6 +492,8 @@ static func _consider_decisions(game: Game, c: Dictionary) -> void:
 			continue
 		if ctx.scopes.size() != base_scopes.size() or not ctx.values.is_empty():
 			ctx = Decisions.context(game, c)
+		if def.get("ai_potential") != null and not Interp.eval_trigger(ctx, ctx.root, def.ai_potential):
+			continue
 		if not Decisions.is_shown(game, def, c, ctx) or not Decisions.can_take(game, def, c, ctx):
 			continue
 		var will := Interp.eval_value(ctx, ctx.root, def.ai_will_do)

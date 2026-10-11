@@ -77,6 +77,7 @@ static func validate(engine: GameEngine) -> Array:
 				v.issue("skill_archetypes/%s: нет навыка \"%s\"" % [a.id, sk])
 	for d in c.all("decisions"):
 		v.trigger(d.get("is_shown"), "decisions/%s is_shown" % d.id)
+		v.trigger(d.get("ai_potential"), "decisions/%s ai_potential" % d.id)
 		v.trigger(d.get("is_valid"), "decisions/%s is_valid" % d.id)
 		v.effect(d.get("effect"), "decisions/%s effect" % d.id)
 	for d in c.all("interactions"):

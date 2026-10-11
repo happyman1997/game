@@ -382,6 +382,52 @@ static func _add_flat(out: Dictionary, pair: Variant) -> void:
 		out[k] = float(out.get(k, 0.0)) + vals[j]
 
 
+## Характеристика только из «простых» источников — черт, модификаторов и
+## заслуженных архетипов — без полного расчёта. Для поставщиков модификаторов,
+## которые сами входят в расчёт и не могут звать Stats.stat (законы).
+static func raw_stat(game: Game, c: Dictionary, key: String) -> float:
+	var v := 0.0
+	var ft := _flat_of(game, "traits")
+	for t in c.traits:
+		v += _flat_get(ft.get(t), key)
+	if not c.modifiers.is_empty():
+		var fm := _flat_of(game, "modifiers")
+		for md in c.modifiers:
+			v += _flat_get(fm.get(md.id), key)
+	var have: Variant = c.vars.get("archetypes")
+	if have is Array and not have.is_empty():
+		var fa := _flat_of(game, "skill_archetypes")
+		for aid in have:
+			v += _flat_get(fa.get(aid), key)
+	return v
+
+
+## Дешёвая оценка характеристики без полного расчёта: raw_stat плюс вклад
+## навыков «за очко» (per_point, ruler_per_point) по базовым значениям навыков.
+## Если характеристики персонажа уже посчитаны — берёт точное значение.
+## Для редких проверок у тех, кого в этом месяце больше никто не считает
+## (пленники, жертвы ревизии), — чтобы не пересчитывать их целиком.
+static func cheap_stat(game: Game, c: Dictionary, key: String) -> float:
+	var cached: Variant = game.stat_cache.get(c.id)
+	if cached != null:
+		return float(cached.get(key, 0.0))
+	var v := raw_stat(game, c, key)
+	var plan := _derived_plan(game)
+	var ruler: bool = not c.titles.is_empty()
+	for item in plan.per_skill:
+		var coef := float(item[1].get(key, 0.0)) + (float(item[7].get(key, 0.0)) if ruler else 0.0)
+		if coef != 0.0:
+			v += coef * maxf(0.0, float(c.skills.get(item[0], 0.0)))
+	return v
+
+
+static func _flat_get(pair: Variant, key: String) -> float:
+	if pair == null:
+		return 0.0
+	var i: int = (pair[0] as PackedStringArray).find(key)
+	return pair[1][i] if i >= 0 else 0.0
+
+
 ## То же, что сумма _sources(), но без промежуточных массивов (горячий путь).
 static func _accumulate(game: Game, c: Dictionary, out: Dictionary) -> void:
 	out["health"] = float(c.health)

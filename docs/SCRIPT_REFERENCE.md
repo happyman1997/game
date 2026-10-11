@@ -7,7 +7,7 @@
 
 | Имя | Скоупы | Описание | Источник |
 |---|---|---|---|
-| `can_begin_trial` | character | Может встать на путь связки навыков (испытание): can_begin_trial: <архетип> | core/trials |
+| `can_begin_trial` | character | Может встать на путь связки навыков (испытание): can_begin_trial: <архетип> или yes (хоть на один) | core/trials |
 | `can_marry` | character | Может вступить в брак с персонажем | core |
 | `can_use_hook_on` | character | Крюк на персонажа можно использовать сейчас | core |
 | `capital_has_disease` | character | В столице персонажа (или его сюзерена) эпидемия. | plague |
@@ -17,7 +17,7 @@
 | `faction_type` | faction | Тип фракции | core/factions |
 | `faith` | character, province | Вера равна | core |
 | `global_var` | любой | Сравнение глобальной переменной | core |
-| `has_active_trial` | character | Проходит испытание (yes/no или id архетипа) | core/trials |
+| `has_active_trial` | character | Проходит испытание (yes/no, id архетипа или список) | core/trials |
 | `has_any_claim` | character | Есть претензии | core |
 | `has_archetype` | character | Есть архетип — связка высоких навыков (skill_archetypes): has_archetype: <id> или yes | core |
 | `has_building` | province | Есть постройка | core |

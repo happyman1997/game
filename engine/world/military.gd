@@ -402,7 +402,7 @@ static func _progress_sieges(game: Game) -> void:
 		var holder_id: Variant = game.state.titles[a.location].holder if game.state.titles.has(a.location) else null
 		var hc: Variant = game.ch(holder_id) if holder_id != null else null
 		if hc != null and hc.capital == a.location:
-			daily /= maxf(0.2, 1.0 + Stats.stat(game, hc, "capital_defense"))
+			daily /= maxf(0.2, 1.0 + Stats.cheap_stat(game, hc, "capital_defense"))
 		p.siege.progress = float(p.siege.progress) + minf(game.def_num("military.siege_max_daily", 12), daily)
 		if p.siege.progress >= 100.0:
 			p.siege = null
@@ -441,7 +441,7 @@ static func province_fort(game: Game, prov_id: String) -> float:
 	var t: Variant = game.state.titles.get(prov_id)
 	var h: Variant = game.ch(t.holder) if t != null and t.holder != null else null
 	if h != null:
-		fort += Stats.stat(game, h, "domain_fort")
+		fort += Stats.cheap_stat(game, h, "domain_fort")
 	return fort
 
 

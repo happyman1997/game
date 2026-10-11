@@ -150,6 +150,10 @@ interactions:
     ai_potential:
       - prowess: ">= 12"
       - NOT: { has_trait: [craven, wounded] }
+      # задиры: вспыльчивые, гордые, храбрые, честолюбивые — или идущие воинским путём
+      - OR:
+          - has_trait: [wrathful, arrogant, brave, ambitious]
+          - has_active_trial: [warrior_king, courtly_knight, hero_of_songs]
     ai_will_do:
       value: 3
       add: { value: "opinion(scope:recipient)", multiply: -0.3 }

@@ -171,7 +171,7 @@ defines:
 | `casus_belli` | `core/data/common/war.yaml` | Поводы к войне: `targets` (поставщик целей), `is_valid`, `cost`, `on_victory`, `on_white_peace`, `on_defeat`, `ai_will_do`, `truce_years`, `war_name`, `manual` (не предлагать игроку и ИИ — только для скриптов, например мятежей). |
 | `interactions` | `core/data/common/interactions.yaml` | Взаимодействия персонажей (см. раздел 6). |
 | `schemes` | `core/data/common/schemes.yaml` | Интриги: `progress`, `success_chance`, `discovery_chance`, `on_success`, `on_failure`, `on_discovered`. |
-| `decisions` | `core/data/common/decisions.yaml` | `is_shown`, `is_valid`, `cost`, `effect`, `cooldown`, `major`, `ai_will_do`, `ai_check_months`. |
+| `decisions` | `core/data/common/decisions.yaml` | `is_shown`, `is_valid`, `cost`, `effect`, `cooldown`, `major`, `ai_will_do`, `ai_check_months`, `ai_potential` (условие для ИИ до всех проверок; у группы — первого решения), `ai_group` (решения одной группы ИИ обдумывает вместе — одна проверка, выбор по весу). |
 | `events`, `on_actions` | `core/data/events/`, `core/data/common/on_actions.yaml` | События и точки их вызова — раздел 5. |
 | `script_values`, `scripted_triggers`, `scripted_effects` | `core/data/common/decisions.yaml` | Именованные формулы и блоки скрипта для повторного использования. |
 | `event_themes`, `map_modes` | `core/data/common/ui.yaml` | Оформление событий; режимы карты без кода (значение + градиент). |
@@ -1000,12 +1000,17 @@ skill_archetypes:                                              # связки н
 испытании охотнее и чаще принимает решения и взаимодействия, которые ведут к
 его целям (`ai_goal_will`, `ai_goal_frequency`; для деяний-сигналов — по
 `ai_hint` деяния), и чаще воюет, если цели военные (`ai_war_chance`).
-Скрипт: `can_begin_trial: <id>`, `has_active_trial`, `num_archetypes`,
+Скрипт: `can_begin_trial: <id>` (или `yes` — хоть на один путь),
+`has_active_trial` (yes/no, id или список), `num_archetypes`,
 эффекты `begin_trial`, `grant_archetype`. Характеристики-правила путей,
 которые читает движок: `scapegoat` (раскрытую интригу валят на придворного),
 `home_advantage` (сила войска на своей земле, %), `domain_fort` (крепости
 домена), `capital_defense` (столица держит осаду дольше), `income_per_hook`,
-`duel_prestige_mult`, `knight_cap`, `loot_mult`, `peace_persuasion`.
+`duel_prestige_mult`, `knight_cap`, `loot_mult`, `peace_persuasion`,
+`feud_decay` (ссоры между вассалами — модификаторы мнения с `feud: yes` —
+тают на столько очков в месяц) и `law_no_resentment` (законы не дают минуса
+к мнению вассалов; эту характеристику движок берёт из черт, модификаторов и
+заслуженных архетипов — `Stats.raw_stat`).
 
 ### Деяния
 

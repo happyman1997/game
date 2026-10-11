@@ -135,7 +135,7 @@ static func monthly(game: Game) -> void:
 			continue
 		Chars.change_stress(game, c, game.def_num("prison.monthly_stress", 2), "prison")
 		# тайные ходы (интрига): знает, где в стене плохо держится камень
-		var escape := game.def_num("prison.escape_chance", 0.004) + Stats.stat(game, c, "secret_passages") * game.def_num("prison.escape_per_passage", 0.02)
+		var escape := game.def_num("prison.escape_chance", 0.004) + Stats.cheap_stat(game, c, "secret_passages") * game.def_num("prison.escape_per_passage", 0.02)
 		if game.rng.chance(escape):
 			release(game, c, "escaped")
 

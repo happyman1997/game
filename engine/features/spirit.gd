@@ -54,6 +54,17 @@ static func _plan(game: Game) -> Dictionary:
 		"pulse_ai": game.def_num("spirit.pulse_chance_ai", 0.03),
 		"pulse_calm": game.def_num("spirit.pulse_calm_mult", 0.25),
 	}
+	# быстрый путь: в спокойном диапазоне нет состояний «по чертам» — давно
+	# спокойному персонажу состояние можно не пересчитывать
+	var calm_max: float = hit.calm_max
+	var fast := true
+	var max_months := 0
+	for st in states:
+		max_months = maxi(max_months, int(st[3]))
+		if not (st[4] as Array).is_empty() and st[1] <= calm_max:
+			fast = false
+	hit["calm_fast"] = fast
+	hit["max_months"] = max_months
 	game.engine.cache["spirit:plan"] = hit
 	return hit
 
@@ -103,8 +114,8 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 		c.vars.erase("broke")
 		if not c.traits.has(plan.hardened) and not c.traits.has(plan.shattered):
 			_give(game, c, plan.hardened, "msg.spirit_hardened")
-	var nxt: Variant = _pick(plan, c, s, calm)
 	var cur: Variant = state_of(c)
+	var nxt: Variant = cur if plan.calm_fast and calm > int(plan.max_months) + 1 else _pick(plan, c, s, calm)
 	if nxt != cur:
 		if nxt == null:
 			c.vars.erase("spirit")
@@ -140,11 +151,13 @@ func install(engine: GameEngine) -> void:
 		var sid: Variant = c.vars.get("spirit")
 		if sid == null:
 			return null
-		var d: Variant = game.content.get_def("spirit_states", sid)
-		if d == null or not (d.get("modifiers") is Dictionary):
-			return null
-		var sname: String = sid
-		return [{"label": func(): return game.name_of("spirit_states", sname), "modifiers": d.modifiers}]
+		# одна запись на состояние (на месяц) — не создавать её при каждом пересчёте
+		return game.cached_monthly("spirit:mods:" + str(sid), func() -> Variant:
+			var d: Variant = game.content.get_def("spirit_states", sid)
+			if d == null or not (d.get("modifiers") is Dictionary):
+				return null
+			var sname: String = sid
+			return [{"label": func(): return game.name_of("spirit_states", sname), "modifiers": d.modifiers}])
 	}, OWNER)
 	engine.content_validators.register("spirit", func(e: GameEngine, v: ScriptValidator):
 		for d in e.content.all("spirit_states"):

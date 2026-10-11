@@ -109,6 +109,7 @@ stat:
   capital_defense: Capital siege resistance
   income_per_hook: Silver per hook
   duel_prestige_mult: Glory from duels
+  feud_decay: Vassal feuds fade (per month)
   knight_effectiveness: Knight effectiveness
   knight_cap: Knight slots
   ally_persuasion: Allies join wars

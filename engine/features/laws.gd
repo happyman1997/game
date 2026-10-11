@@ -137,13 +137,19 @@ func install(engine: GameEngine) -> void:
 		if c.titles.is_empty():
 			return null
 		var out := []
+		# law_no_resentment (Реформатор): законы не обижают вассалов
+		var calm_vassals := Stats.raw_stat(game, c, "law_no_resentment") > 0.0
 		for gd in Laws.groups(game):
 			if not Laws.is_group_shown(game, c, gd):
 				continue
 			var l: Variant = Laws.current(game, c, gd.id)
 			if l != null and l.get("modifiers") is Dictionary:
 				var lid: String = l.id
-				out.append({"label": func(): return game.name_of("realm_laws", lid), "modifiers": l.modifiers})
+				var mods: Dictionary = l.modifiers
+				if calm_vassals and Data.num(mods.get("vassal_opinion")) < 0.0:
+					mods = mods.duplicate()
+					mods.erase("vassal_opinion")
+				out.append({"label": func(): return game.name_of("realm_laws", lid), "modifiers": mods})
 		return out
 	}, OWNER)
 

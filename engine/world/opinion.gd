@@ -75,7 +75,9 @@ static func has_opinion_modifier(a: Dictionary, b: Dictionary, mod_id: String) -
 	return a.opinions.has(b.id) and a.opinions[b.id].any(func(e): return e.mod == mod_id)
 
 
-## Ежемесячно: истечение и затухание модификаторов мнения.
+## Ежемесячно: истечение и затухание модификаторов мнения. Модификатор с
+## feud: yes — ссора: между вассалами одного сюзерена с feud_decay (Третейский
+## судья) она тает ещё на feud_decay очков в месяц.
 static func decay_opinions(game: Game) -> void:
 	for c in game.living():
 		for target in c.opinions.keys():
@@ -84,17 +86,30 @@ static func decay_opinions(game: Game) -> void:
 				if e.expires != null and e.expires <= game.date:
 					continue
 				var def: Variant = game.content.get_def("opinion_modifiers", e.mod)
-				if def != null and def.get("decay") != null:
-					var s := signf(e.value)
-					e.value -= s * Data.num(def.decay)
-					if signf(e.value) != s or e.value == 0.0:
-						continue
+				if def != null:
+					var d := Data.num(def.get("decay"))
+					if def.get("feud", false) and c.liege != null and not c.titles.is_empty():
+						d += _feud_decay(game, c, target)
+					if d != 0.0:
+						var s := signf(e.value)
+						e.value -= s * d
+						if signf(e.value) != s or e.value == 0.0:
+							continue
 				kept.append(e)
 			var t: Variant = game.ch(target)
 			if not kept.is_empty() and t != null and t.death == null:
 				c.opinions[target] = kept
 			else:
 				c.opinions.erase(target)
+
+
+## Дополнительное затухание ссоры c с target: оба — вассалы одного сюзерена.
+static func _feud_decay(game: Game, c: Dictionary, target: String) -> float:
+	var t: Variant = game.ch(target)
+	if t == null or t.liege != c.liege or t.titles.is_empty():
+		return 0.0
+	var l: Variant = game.ch(c.liege)
+	return maxf(0.0, Stats.stat(game, l, "feud_decay")) if l != null else 0.0
 
 
 # ------------------------------------------------------------ встроенные поставщики

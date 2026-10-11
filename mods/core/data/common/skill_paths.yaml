@@ -2,13 +2,22 @@
 # данных: дописываются к чужим записям слиянием (файл грузится после них) или
 # добавляют свои. Правила, которые читает движок, — характеристики в modifiers
 # архетипа: scapegoat, home_advantage, domain_fort, capital_defense,
-# income_per_hook, duel_prestige_mult, loot_mult, peace_persuasion, knight_cap.
+# income_per_hook, duel_prestige_mult, loot_mult, peace_persuasion, knight_cap,
+# feud_decay (ссоры вассалов тают быстрее), law_no_resentment (законы не
+# обижают вассалов).
 
 modifiers:
   golden_age: { icon: "☀", good: true, modifiers: { development_growth: 0.3, stress_gain_mult: -0.3, vassal_opinion: 10, monthly_prestige: 1 } }
   hero_legacy: { icon: "🎶", good: true, modifiers: { monthly_prestige: 1.5, vassal_opinion: 10, knight_effectiveness: 0.1 } }
 
 opinion_modifiers:
+  # ссоры (feud): у вассалов Третейского судьи тают быстрее (feud_decay)
+  rival: { feud: yes }
+  insulted: { feud: yes }
+  humiliated: { feud: yes }
+  caught_sowing_discord: { feud: yes }
+  slandered_me: { feud: yes }
+  bested_in_duel: { feud: yes }
   respects_unifier: { value: 25, years: 10 }
   merchant_gift: { value: 20, decay: 1 }
   mediated_peace: { value: 20, years: 10 }

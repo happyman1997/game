@@ -321,7 +321,7 @@ static func traits(app: App, c: Dictionary) -> Control:
 		if raw is Dictionary:
 			for k in raw:
 				# правила-флаги описаны в тексте архетипа
-				if k != "self_knight" and k != "scapegoat":
+				if k != "self_knight" and k != "scapegoat" and k != "law_no_resentment":
 					amods[k] = raw[k]
 		var mtxt := BB.modifiers(g, amods)
 		if mtxt != "":

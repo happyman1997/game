@@ -195,7 +195,7 @@ static func monthly(game: Game) -> void:
 			# событие у жертвы, scope:culprit — владелец секрета
 			if def.get("audit_event") != null and s.get("target") != null and not s.known.has(s.target):
 				var victim: Variant = game.ch(s.target)
-				if victim != null and Chars.is_alive(victim) and game.rng.next() * 100.0 < Stats.stat(game, victim, "audit_chance"):
+				if victim != null and Chars.is_alive(victim) and game.rng.next() * 100.0 < Stats.cheap_stat(game, victim, "audit_chance"):
 					game.events.trigger(str(def.audit_event), {"type": "character", "id": victim.id}, {"culprit": {"type": "character", "id": owner.id}})
 			if def.get("discovered_by") == null:
 				continue

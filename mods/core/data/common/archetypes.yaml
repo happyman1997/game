@@ -15,7 +15,7 @@ defines:
     ai_check_months: 12       # ИИ раз в столько месяцев думает о пути
     ai_goal_will: 40          # ИИ на испытании охотнее делает то, что нужно для целей,
     ai_goal_frequency: 3      # и втрое чаще об этом думает
-    ai_war_chance: 0.25       # военные цели — охотнее воюет
+    ai_war_chance: 0.1        # военные цели — чуть охотнее воюет
 
 skill_archetypes:
   # ---------------------------------------------------------------- пары
@@ -40,12 +40,12 @@ skill_archetypes:
     icon: "⚖"
     modifiers: { vassal_tax_mult: 0.1, monthly_income: 1 }
     trial: { goals: [ { deed: gifts, count: 2 }, { trigger: { gold: ">= 300" }, desc: trial_goal.gold_300 } ] }
-  # посредник: мирит чужие войны (взаимодействие mediate_peace)
+  # посредник: мирит чужие войны (взаимодействие mediate_peace); ссоры его вассалов быстро тают
   arbiter:
     skills: [diplomacy, learning]
     min: 14
     icon: "📜"
-    modifiers: { general_opinion: 5, monthly_prestige: 0.5, monthly_piety: 0.3 }
+    modifiers: { general_opinion: 5, monthly_prestige: 0.5, monthly_piety: 0.3, feud_decay: 3 }
     trial: { goals: [ { deed: judgments, count: 1 }, { deed: devotions, count: 1 } ] }
   # +2 рыцаря; победы в поединках — вдвое славнее
   courtly_knight:
@@ -89,12 +89,12 @@ skill_archetypes:
     icon: "🗝"
     modifiers: { vassal_tax_mult: 0.1, scheme_defense: 5, income_per_hook: 0.5 }
     trial: { goals: [ { deed: blackmails, count: 2 }, { trigger: { gold: ">= 250" }, desc: trial_goal.gold_250 } ] }
-  # законы вдвое дешевле, а недовольство вассалов реформам не мешает
+  # законы вдвое дешевле, не обижают вассалов, а их недовольство реформам не мешает
   reformer:
     skills: [stewardship, learning]
     min: 14
     icon: "📖"
-    modifiers: { law_cost_mult: -0.5, development_growth: 0.05 }
+    modifiers: { law_cost_mult: -0.5, development_growth: 0.05, law_no_resentment: 1 }
     trial: { goals: [ { deed: buildings, count: 3 }, { deed: charity, count: 1 } ] }
   # столица держит осаду вдвое дольше
   castellan:

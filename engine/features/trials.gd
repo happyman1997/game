@@ -87,6 +87,18 @@ static func can_begin(game: Game, c: Dictionary, arch: String) -> bool:
 	return skills_fit(game, c, arch)
 
 
+## Можно ли начать хоть одно испытание (быстрая проверка для ИИ).
+static func any_trial(game: Game, c: Dictionary) -> bool:
+	if c.death != null or c.get("prison") != null or active(c) != null:
+		return false
+	if earned(c).size() >= int(game.def_num("character.max_archetypes", 2)):
+		return false
+	for a in game.content.all("skill_archetypes"):
+		if can_begin(game, c, str(a.id)):
+			return true
+	return false
+
+
 static func begin(game: Game, c: Dictionary, arch: String) -> void:
 	var tr := _trial(game, arch)
 	if Data.as_array(tr.get("goals")).is_empty():
@@ -218,6 +230,8 @@ func install(engine: GameEngine) -> void:
 			"is_shown": {"can_begin_trial": str(a.id)},
 			"effect": {"begin_trial": str(a.id)},
 			"ai_will_do": tr.get("ai_will_do", 50),
+			"ai_group": "trials",
+			"ai_potential": {"can_begin_trial": "yes"},
 			"ai_check_months": engine.content.singleton("defines").get("trials", {}).get("ai_check_months", 12),
 		})
 	engine.content_validators.register("trials", func(e: GameEngine, v: ScriptValidator):
@@ -241,15 +255,19 @@ func install(engine: GameEngine) -> void:
 func register_script(engine: GameEngine) -> void:
 	var r := engine.scripting
 	var CH := ["character"]
-	r.triggers.register("can_begin_trial", {"scopes": CH, "doc": "Может встать на путь связки навыков (испытание): can_begin_trial: <архетип>", "eval": func(ctx, s, arg):
+	r.triggers.register("can_begin_trial", {"scopes": CH, "doc": "Может встать на путь связки навыков (испытание): can_begin_trial: <архетип> или yes (хоть на один)", "eval": func(ctx, s, arg):
 		var c: Variant = ctx.game.ch(s.id)
-		return c != null and Trials.can_begin(ctx.game, c, str(arg)),
+		if c == null:
+			return false
+		if arg is bool or (arg is String and (arg == "yes" or arg == "no")):
+			return Trials.any_trial(ctx.game, c) == ScriptContext.is_yes(arg)
+		return Trials.can_begin(ctx.game, c, str(arg)),
 		"describe": func(ctx, _s, arg): return ctx.game.loc.t("tr.can_begin_trial", {"name": ctx.game.name_of("skill_archetypes", str(arg))}),
 	}, OWNER)
-	r.triggers.register("has_active_trial", {"scopes": CH, "doc": "Проходит испытание (yes/no или id архетипа)", "eval": func(ctx, s, arg):
+	r.triggers.register("has_active_trial", {"scopes": CH, "doc": "Проходит испытание (yes/no, id архетипа или список)", "eval": func(ctx, s, arg):
 		var t: Variant = Trials.active(ctx.game.ch(s.id))
-		if arg is String and arg != "yes" and arg != "no":
-			return t != null and str(t.id) == arg
+		if arg is Array or (arg is String and arg != "yes" and arg != "no"):
+			return t != null and Data.as_array(arg).has(str(t.id))
 		return (t != null) == ScriptContext.is_yes(arg)
 	}, OWNER)
 	r.values.register("num_archetypes", {"scopes": CH, "doc": "Сколько архетипов заслужено", "get": func(ctx, s, _a):

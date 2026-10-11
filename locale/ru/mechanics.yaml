@@ -109,6 +109,7 @@ stat:
   capital_defense: Стойкость столицы в осаде
   income_per_hook: Серебро с каждого крюка
   duel_prestige_mult: Слава поединков
+  feud_decay: Ссоры вассалов тают (в месяц)
   knight_effectiveness: Сила рыцарей
   knight_cap: Мест для рыцарей
   ally_persuasion: Союзники вступают в войну
