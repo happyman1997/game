@@ -218,8 +218,10 @@ static func factions(app: App, p: Dictionary) -> Array:
 	if types.is_empty():
 		return out
 	var threshold := g.def_num("factions.power_threshold", 80)
-	if not g.vassals_of(p.id).is_empty():
-		var against := Factions.against(g, p.id)
+	var against_me := Factions.against(g, p.id)
+	# народные фракции (графства) бывают и у правителя без вассалов
+	if not g.vassals_of(p.id).is_empty() or not against_me.is_empty():
+		var against := against_me
 		var cards := [K.para(app.t("ui.faction_hint", {"n": threshold}), "SmallLabel")]
 		for f in against:
 			cards.append(_faction_card(app, f, false))
@@ -272,12 +274,26 @@ static func _faction_card(app: App, f: Dictionary, as_vassal: bool) -> Control:
 	var head := K.hbox([K.icon(def.get("icon", "fist") if def != null else "fist", 20), K.label(g.name_of("factions", f.type), "SubheaderLabel")], 6)
 	K.tip(head, BB.i(g.desc_of("factions", f.type)))
 	box.add_child(head)
-	box.add_child(K.hbox([K.label(app.t("ui.faction_leader") + ":", "MutedLabel"), W.char_link(app, f.leader, true)], 4))
+	if g.ch(f.get("leader")) != null:
+		box.add_child(K.hbox([K.label(app.t("ui.faction_leader") + ":", "MutedLabel"), W.char_link(app, f.leader, true)], 4))
+	else:
+		box.add_child(K.label(app.t("ui.faction_no_leader"), "MutedLabel"))
 	if f.get("claimant") != null:
 		box.add_child(K.hbox([K.label(app.t("ui.faction_claimant") + ":", "MutedLabel"), W.char_link(app, f.claimant, true)], 4))
 	box.add_child(K.label(app.t("ui.faction_power", {"n": power}), "BadLabel" if power >= g.def_num("factions.power_threshold", 80) else "MutedLabel"))
 	box.add_child(K.label(app.t("ui.faction_discontent", {"n": roundi(f.discontent)}), "MutedLabel"))
 	box.add_child(K.bar(f.discontent, 100, Color("#b8443a")))
+	# народная фракция: её члены — графства
+	if f.get("popular", false):
+		var thr: Variant = def.get("popular", {}).get("power_threshold") if def != null else null
+		box.add_child(K.para(app.t("ui.popular_grows_always") if thr == null else app.t("ui.popular_grows_power", {"n": roundi(Data.num(thr))}), "SmallLabel"))
+		var names := K.flow([], 4)
+		for cid in f.get("counties", []):
+			var cl := K.button(g.name_of("provinces", cid), func(): app.open_province(cid, true), {"variation": "FlatButton"})
+			names.add_child(cl)
+		box.add_child(K.label(app.t("ui.faction_counties", {"n": f.get("counties", []).size()}), "SmallLabel"))
+		box.add_child(names)
+		return K.panel(box, "InsetPanel")
 	var members := K.flow([], 3)
 	for id in f.members:
 		var c: Variant = g.ch(id)

@@ -621,6 +621,8 @@ func init(api: ModApi) -> void:
 | `hook.added`, `hook.used` | `owner`, `target`, `strong` | |
 | `secret.added`, `secret.learned`, `secret.blackmailed`, `secret.exposed` | `owner`, `secret`, `knower`/`exposer` | |
 | `law.changed` | `character`, `law`, `previous` | |
+| `populace.opinion` | `province`, `holder` | **collect**: `[{ label, value }]` — части мнения графства о владельце |
+| `populace.revolt` | `faction`, `war` | народная фракция подняла мятеж |
 
 > **Потоки.** Мир считается в отдельном потоке симуляции, поэтому хуки
 > и эффекты вызываются **не** в главном потоке Godot. Из них нельзя трогать
@@ -631,7 +633,7 @@ func init(api: ModApi) -> void:
 
 ---
 
-## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари, политика, характер, слава, вера земель
+## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари, политика, характер, слава, вера земель, народ
 
 Крупные подсистемы в стиле CK3 устроены как **механики** (`engine/features`).
 Механика — модуль, который при запуске регистрирует свои системы, триггеры,
@@ -649,7 +651,7 @@ func init(api: ModApi) -> void:
 
   (доступны `lifestyles`, `council`, `prison`, `factions`, `regiments`,
   `secrets`, `laws`, `knights`, `politics`, `personality`, `renown`, `lands`,
-  `momentum`, `duels`, `deeds`, `trials`, `spirit`;
+  `populace`, `momentum`, `duels`, `deeds`, `trials`, `spirit`;
   интерфейс скрывает вкладки и разделы выключенных механик). Словарь скриптов
   механики (её триггеры, эффекты, значения) остаётся зарегистрированным, так что
   чужие данные, которые его упоминают, не ломаются — на пустом состоянии
@@ -1173,6 +1175,80 @@ traits:
 `num_foreign_culture_counties`, эффекты графства `convert_to_holder_faith`,
 `convert_to_holder_culture`. Хук `lands.converted` — `{province, kind, from, to, holder}`.
 
+### Народ: мнение графств, контроль, народные фракции
+
+Механика `populace` (данные — `core/data/common/populace.yaml`), по образцу CK3.
+У каждого графства есть **мнение о владельце** (−100…100) и **контроль** (0–100).
+
+Мнение складывается из частей (подсказка графства показывает их списком):
+чужая вера владельца (`defines.populace.foreign_religion` — другая религия,
+`foreign_faith` — та же), чужая культура (`foreign_culture_group` /
+`foreign_culture`), низкий контроль (`control_opinion` за очко ниже 100),
+ополчение, собранное дольше `levy_free_months` (`levy_opinion` в месяц, до
+`levy_opinion_max`), модификатор `county_opinion` владельца (черты, перки,
+законы) и графства (постройки, модификаторы провинции), временные
+модификаторы — обычные `opinion_modifiers`, которые эффект
+`add_county_opinion` вешает на графство:
+
+```yaml
+decisions:
+  give_alms:
+    effect:
+      $append:
+        - every_domain_province: { add_county_opinion: alms_for_the_poor }   # +10 на 3 года
+```
+
+Контроль падает до `conquest_control`, когда графство уходит в чужую державу
+при живом прежнем владельце, и на `occupation_control_loss`, когда его берёт
+враг; растёт на `control_regen` в месяц плюс `control_gain` владельца (задача
+маршала `restore_control`). Низкий контроль режет налог и ополчение графства
+(при нуле — на `control_effect`) и портит мнение.
+
+**Народные фракции** — записи `factions` с полем `popular`. Их члены — графства,
+а не вассалы: графство с мнением не выше `join_opinion` вступает в первую
+подходящую по `order` (условие `can_join`, root — графство, `scope:holder` —
+владелец) против своего владельца и выходит, когда мнение выше `leave_opinion`.
+
+```yaml
+factions:
+  populist_faction:
+    cb: populist_revolt
+    ultimatum_event: populace.0002
+    order: 1
+    can_join: { OR: [ { has_holder_faith: no }, { has_holder_culture: no } ] }
+    popular:
+      join_opinion: -30
+      leave_opinion: -15
+      group_by: [faith, culture]      # отдельная фракция на каждую веру и культуру графств
+      discontent_gain: 5
+      power_threshold: 100            # без порога недовольство растёт всегда (крестьяне)
+      army_mult: 1.5                  # войско = ополчение графств × множитель
+      leader: { traits: [popular_hero], skills: { martial: [10, 17] }, age: [25, 45], dynasty: new }
+    ai_accept_demands: { value: -90, add: { value: scope:faction.faction_power, multiply: 0.4 } }
+    on_demands_accepted:
+      - take_faction_counties: { create_titles: yes }
+```
+
+На 100% недовольства — ультиматум, как у обычных фракций (`ai_accept_demands`,
+`on_demands_accepted`, `ultimatum_event`; root — вожак, `scope:liege` —
+владелец). Вожак — новый персонаж веры и культуры графств; он появляется к
+ультиматуму. Отказ — мятеж: война с поводом `cb` (с `manual: yes`), где вожак
+без земли ведёт войско из ополчения графств; восставшие графства не платят
+владельцу ни налога, ни ополчения, а каждое взятое мятежниками графство
+пополняет их войско (`occupy_levy_mult`). Мятежники, потерявшие войско,
+проиграли. Итог — в `on_victory`/`on_defeat` повода: эффект
+`take_faction_counties` (вожак забирает графства фракции и правит сам;
+`create_titles` — ещё и ничейное де-юре герцогство, если у него половина его
+графств). После ультиматума графства `revolt_cooldown_years` не бунтуют,
+подавленные теряют `crushed_control_loss` контроля.
+
+Скрипт: значения графства `county_opinion`, `control`; условия `in_popular_faction`,
+`is_in_revolt`; эффекты графства `add_control`, `add_county_opinion`,
+`remove_county_opinion`; значения правителя `num_unhappy_counties`,
+`num_low_control_counties`; у фракции — значение `num_faction_counties`, список
+`faction_county`; эффект `take_faction_counties`. Режимы карты
+`county_opinion` и `control`.
+
 ### Связи между механиками
 
 Механики задуманы так, чтобы влиять друг на друга:
@@ -1186,6 +1262,10 @@ traits:
   любят, а любимому реже грозят фракции;
 - **вера и культура ↔ совет ↔ экономика**: завоёванные чужие земли платят
   меньше, пока духовник и канцлер их не обратят;
+- **война ↔ народ ↔ мятежи**: завоевание и оккупация роняют контроль, долгое
+  ополчение и чрезвычайные поборы злят графства, а недовольные графства
+  поднимают крестьянские и народные мятежи; маршал наводит порядок, милостыня
+  и уступки успокаивают;
 - **секреты и крюки ↔ фракции**: тайный советник ищет секреты прежде всего у
   заговорщиков (`defines.secrets.plotter_weight`), ИИ шантажирует именно их, а
   крюком заставляет выйти из фракции (взаимодействие `demand_leave_faction`);

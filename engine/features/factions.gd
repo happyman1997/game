@@ -104,6 +104,8 @@ static func ai_join_score(game: Game, c: Dictionary, def: Dictionary, liege: Dic
 
 ## Сила фракции в процентах от силы сюзерена (без её членов).
 static func power(game: Game, f: Dictionary) -> int:
+	if f.get("popular", false):
+		return Populace.power(game, f)
 	var liege: Variant = game.ch(f.target)
 	if liege == null:
 		return 0
@@ -182,6 +184,8 @@ static func dissolve(game: Game, f: Dictionary, cooldown: bool = true) -> void:
 	if not game.state.factions.has(f.id):
 		return
 	game.state.factions.erase(f.id)
+	if f.get("popular", false):
+		Populace.on_dissolved(game, f, cooldown)
 	if cooldown:
 		var until := game.date + roundi(game.def_num("factions.cooldown_years", 5) * 365)
 		for id in f.members:
@@ -213,6 +217,8 @@ static func negotiate(game: Game, f: Dictionary) -> void:
 	if liege == null:
 		return
 	game.emit("faction.ultimatum", {"faction": f, "accepted": false, "negotiated": true})
+	if f.get("popular", false):
+		Populace.on_negotiated(game, f)
 	var om := str(game.def_val("factions.negotiated_opinion", "heard_out"))
 	for id in f.members:
 		var m: Variant = game.ch(id)
@@ -232,6 +238,8 @@ static func negotiation_chance(game: Game, liege: Dictionary) -> float:
 
 ## Ультиматум отвергнут — мятеж.
 static func revolt(game: Game, f: Dictionary) -> bool:
+	if f.get("popular", false):
+		return Populace.revolt(game, f)
 	var def: Variant = game.content.get_def("factions", f.type)
 	var leader: Variant = game.ch(f.leader)
 	var liege: Variant = game.ch(f.target)
@@ -340,7 +348,8 @@ static func monthly(game: Game) -> void:
 		if not Chars.is_alive(liege) or liege.titles.is_empty():
 			dissolve(game, f, false)
 			continue
-		if _faction_at_war(game, f):
+		# народные фракции (графства) ведёт механика populace
+		if _faction_at_war(game, f) or f.get("popular", false):
 			continue
 		f.members = f.members.filter(func(id):
 			var m: Variant = game.ch(id)
@@ -356,7 +365,7 @@ static func monthly(game: Game) -> void:
 
 	# 3. недовольство и ультиматумы
 	for f in game.state.factions.values():
-		if not game.state.factions.has(f.id) or _faction_at_war(game, f):
+		if not game.state.factions.has(f.id) or _faction_at_war(game, f) or f.get("popular", false):
 			continue
 		var liege: Variant = game.ch(f.target)
 		if liege == null:

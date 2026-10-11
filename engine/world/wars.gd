@@ -291,12 +291,13 @@ static func ally_will_join(game: Game, ally: Dictionary, leader: Dictionary, ene
 
 static func new_war_record() -> Dictionary:
 	return {"id": "", "cb": "", "attacker": "", "defender": "", "attackers": [], "defenders": [], "target": null,
-		"target_counties": [], "start": 0, "battle_score": 0.0, "ticking": 0.0, "name": null, "scopes": null, "faction": null}
+		"target_counties": [], "start": 0, "battle_score": 0.0, "ticking": 0.0, "name": null, "scopes": null, "faction": null, "popular": false}
 
 
 ## opts: free — без цены повода (мятежи, скрипты); attackers — дополнительные
 ## участники нападения; scopes — именованные скоупы войны (scope:claimant);
-## faction — фракция, поднявшая мятеж.
+## faction — фракция, поднявшая мятеж; popular — мятеж графств (механика
+## populace): вожак нападения может быть без земли.
 static func declare_war(game: Game, attacker: Dictionary, t: Dictionary, opts: Dictionary = {}) -> Variant:
 	var cb: Variant = game.content.get_def("casus_belli", t.cb)
 	var defender: Variant = game.ch(t.defender)
@@ -323,6 +324,7 @@ static func declare_war(game: Game, attacker: Dictionary, t: Dictionary, opts: D
 		w.scopes = opts.scopes.duplicate()
 	if opts.get("faction") != null:
 		w.faction = opts.faction
+	w.popular = opts.get("popular", false)
 	for id in Data.as_array(opts.get("attackers")):
 		if not w.attackers.has(id) and id != defender.id and game.is_alive(id):
 			w.attackers.append(id)
@@ -496,10 +498,18 @@ static func end_war(game: Game, w: Dictionary, outcome: String) -> void:
 ## Ежемесячная проверка: война теряет смысл, если лидеры умерли или цель утрачена.
 static func validate_wars(game: Game) -> void:
 	for w in game.state.wars.values():
-		w.attackers = w.attackers.filter(func(id): return game.is_alive(id) and not game.ch(id).titles.is_empty())
+		var landless_ok: bool = w.get("popular", false)
+		w.attackers = w.attackers.filter(func(id): return game.is_alive(id) and (landless_ok or not game.ch(id).titles.is_empty()))
 		w.defenders = w.defenders.filter(func(id): return game.is_alive(id) and not game.ch(id).titles.is_empty())
 		if not game.is_alive(w.attacker) or not game.is_alive(w.defender) or not w.attackers.has(w.attacker) or not w.defenders.has(w.defender):
 			end_war(game, w, "white_peace")
+			continue
+		if w.get("popular", false):
+			# мятеж графств: у владельца не осталось ни одного из них
+			if not w.target_counties.any(func(c):
+				var h: Variant = _holder(game, c)
+				return h != null and h.id == w.defender):
+				end_war(game, w, "white_peace")
 			continue
 		if w.get("faction") != null:
 			if game.ch(w.attacker).liege != w.defender:

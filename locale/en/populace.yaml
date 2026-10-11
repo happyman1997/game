@@ -1,0 +1,28 @@
+copinion:
+  religion: Holder of a foreign religion
+  faith: Holder of another faith
+  culture_group: Holder of a foreign people
+  culture: Holder of another culture
+  control: Low control
+  levies: Levies raised for too long
+  holder: The holder's character and deeds
+  county: County buildings and events
+msg:
+  popular_faction_created: "{place} joins the {faction}: the people are unhappy with you."
+  popular_revolt: "{leader} raises the {faction} in {place} against {holder}!"
+  popular_realm: "{leader} now rules the lands won in the uprising: {n} counties."
+fx:
+  add_control: "Control over {place}: {value}"
+  add_county_opinion: "Opinion of {place}: {value} ({name})"
+  take_faction_counties: "{who} takes the faction's counties and rules them"
+ui:
+  county_opinion: County opinion
+  county_opinion_tip: "How the county regards its holder. Counties at −30 or lower join popular factions."
+  control: Control
+  control_tip: "How firm the holder's grip is. Low control cuts the county's taxes and levies and angers the people. It drops after conquest, enemy occupation and revolts and recovers on its own — faster with the marshal on «Restore Order»."
+  in_popular_faction: "In faction: {faction}"
+  revolt_cooldown: Revolted recently
+  faction_counties: "Counties: {n}"
+  faction_no_leader: No leader has risen yet
+  popular_grows_always: "Discontent grows on its own, however weak they are."
+  popular_grows_power: "Discontent grows while their strength is at least {n}% of the holder's levies."

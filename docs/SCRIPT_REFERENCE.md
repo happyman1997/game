@@ -53,6 +53,7 @@
 | `has_truce_with` | character | Перемирие с персонажем | core |
 | `has_var` | character | Есть переменная | core |
 | `holds_title` | character | Владеет титулом | core |
+| `in_popular_faction` | province | Графство во народной фракции (yes/no или тип фракции) | core/populace |
 | `is_adult` | character | Совершеннолетний | core |
 | `is_ai` | character | Персонаж ИИ | core |
 | `is_alive` | character | Жив | core |
@@ -76,6 +77,7 @@
 | `is_imprisoned_by` | character | В темнице у персонажа | core/prison |
 | `is_in_faction` | character | Состоит во фракции (yes/no или тип) | core/factions |
 | `is_in_realm_of` | character | Состоит в державе персонажа | core |
+| `is_in_revolt` | province | Графство поднялось на мятеж | core/populace |
 | `is_independent` | character | Независимый правитель | core |
 | `is_knight` | character | Служит рыцарем у своего сюзерена | core/knights |
 | `is_known_monster` | character | Разоблачённое чудовище (вампир, лич, некромант, оборотень) | arcana |
@@ -126,6 +128,8 @@
 | `add_blood_thirst` | Изменить жажду крови | arcana |
 | `add_building` | Добавить постройку | core |
 | `add_claim` | Претензия на титул | core |
+| `add_control` | Изменить контроль над графством: add_control: 20 | core/populace |
+| `add_county_opinion` | Модификатор мнения графства о владельце: add_county_opinion: <id из opinion_modifiers> или { modifier, value } | core/populace |
 | `add_courtier` | Принять ко двору | core |
 | `add_deed` | Записать деяние: add_deed: <id> или { id, value } | core/deeds |
 | `add_development` | Изменить развитие | core |
@@ -204,6 +208,7 @@
 | `release_from_prison` | Освободить этого персонажа из темницы | core/prison |
 | `remove_building` | Убрать постройку | core |
 | `remove_claim` | Убрать претензию | core |
+| `remove_county_opinion` | Убрать модификатор мнения графства | core/populace |
 | `remove_flag` | Убрать флаг | core |
 | `remove_from_council` | Советник лишается места в совете сюзерена | core/politics |
 | `remove_global_flag` | Убрать глобальный флаг | core |
@@ -233,6 +238,7 @@
 | `sow_discord` | Посеять раздор между вассалом и его ближайшим союзником: sow_discord: scope:recipient | core/politics |
 | `start_disease` | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
 | `start_scheme` | Начать интригу: { type, target } | core |
+| `take_faction_counties` | Вожак народной фракции (scope:faction) забирает её графства и правит сам: yes или { create_titles: yes } | core/populace |
 | `take_title` | Отобрать титул себе: { title, from? } | core |
 | `witch_hunt` | Охота на ведьм в державе | arcana |
 
@@ -259,7 +265,9 @@
 | `blood_thirst` | character | Жажда крови вампира (0–100) | arcana |
 | `calm_months` | character | Сколько месяцев подряд стресс почти нулевой | core/spirit |
 | `commander_advantage` | character | Характеристика: commander_advantage | core |
+| `control` | province | Контроль над графством (0–100) | core/populace |
 | `council_size` | character | Число занятых мест в совете | core/council |
+| `county_opinion` | province | Мнение графства о владельце (−100…100) | core/populace |
 | `crown_authority_level` | character | Уровень закона группы crown_authority (−1, если не действует) | core/laws |
 | `current_year` | любой | Текущий год | core |
 | `days_since_start` | любой | Дней с начала партии | core |
@@ -321,6 +329,7 @@
 | `num_counties` | character | Графств в домене | core |
 | `num_courtiers` | character | Число придворных | core |
 | `num_de_jure_counties` | title | Де-юре графств в титуле | core |
+| `num_faction_counties` | faction | Графств в народной фракции | core/populace |
 | `num_faction_members` | faction | Число членов фракции | core/factions |
 | `num_foreign_culture_counties` | character | Графств домена чужой культуры | core/lands |
 | `num_foreign_faith_counties` | character | Графств домена чужой веры | core/lands |
@@ -328,6 +337,7 @@
 | `num_hooks` | character | Число крюков персонажа на других | core |
 | `num_knights` | character | Число рыцарей | core/knights |
 | `num_known_secrets` | character | Сколько чужих секретов знает персонаж | core/secrets |
+| `num_low_control_counties` | character | Графств домена с низким контролем (ниже defines.populace.low_control) | core/populace |
 | `num_perks` | character | Число открытых перков | core/lifestyles |
 | `num_powerful_vassals` | character | Число влиятельных вассалов | core/politics |
 | `num_prisoners` | character | Число пленников | core/prison |
@@ -335,6 +345,7 @@
 | `num_secrets` | character | Число секретов персонажа | core/secrets |
 | `num_spouses` | character | Число супругов | core |
 | `num_traits` | character | Число черт | core |
+| `num_unhappy_counties` | character | Графств домена, недовольных владельцем (мнение не выше defines.populace.unhappy_opinion) | core/populace |
 | `num_vassals` | character | Число прямых вассалов | core |
 | `num_wars` | character | Число войн | core |
 | `opinion` | character | Мнение о персонаже: opinion(scope:x) | core |
@@ -421,6 +432,7 @@
 | `domain_province` | character | Провинции домена | core |
 | `dynasty_member` | character | Живые члены династии | core |
 | `faction_against` | character | Фракции против персонажа | core/factions |
+| `faction_county` | faction | Графства народной фракции | core/populace |
 | `faction_member` | faction | Члены фракции | core/factions |
 | `grandchild` | character | Внуки | core |
 | `held_title` | character | Титулы | core |
@@ -475,6 +487,7 @@
 | `personality` | Характер: черты отзываются стрессом на поступки, ИИ поступает по характеру | да |
 | `renown` | Слава и благочестие: уровни престижа и благочестия меняют мнение подданных | да |
 | `lands` | Вера и культура земель: чужие графства дают меньше, их можно обратить | да |
+| `populace` | Народ графств: мнение о владельце, контроль, крестьянские и народные мятежи | да |
 | `momentum` | Кураж и хандра: полосы удач и неудач в одной сфере меняют навык и стресс | да |
 | `duels` | Поединки: вызов на бой один на один, поборники из рыцарей | да |
 | `deeds` | Деяния: летопись поступков персонажа и прозвища, которые из неё растут | да |
@@ -490,8 +503,8 @@
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
 - **interaction_deciders**: `payer`
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `momentum`, `spirit`, `plague_fear`
-- **province_modifier_providers**: `lands`
+- **province_modifier_providers**: `lands`, `populace`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `arcana_faith`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `deeds`, `trials`, `spirit`
-- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `spirit` (12), `momentum` (13), `trials` (14), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `populace`, `deeds`, `trials`, `spirit`
+- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `spirit` (12), `momentum` (13), `trials` (14), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

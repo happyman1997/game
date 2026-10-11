@@ -123,6 +123,9 @@ static func build(app: App, id: String) -> Control:
 			strange.add_child(chip)
 		if strange.get_child_count() > 0:
 			root.add_child(strange)
+	# мнение графства о владельце и контроль (механика populace)
+	if g.engine.has_feature("populace") and holder != null:
+		root.add_child(_populace_block(app, id))
 	if not st.modifiers.is_empty():
 		var mods := K.flow([], 4)
 		for m in st.modifiers:
@@ -194,6 +197,43 @@ static func build(app: App, id: String) -> Control:
 		elif r is Control:
 			root.add_child(K.section(g.loc.resolve(s.get("title", s.id)), [r]))
 	return root
+
+
+## Мнение графства, контроль, народная фракция.
+static func _populace_block(app: App, id: String) -> Control:
+	var g := app.game
+	var op := Populace.opinion(g, id)
+	var ctl := Populace.control(g, id)
+	var op_tip := func():
+		var bb := BB.title(app.t("ui.county_opinion")) + "\n" + BB.esc(app.t("ui.county_opinion_tip"))
+		var parts := Populace.opinion_parts(g, id)
+		if not parts.is_empty():
+			bb += "\n" + BB.breakdown(parts)
+		return bb
+	var ctl_tip := func():
+		var bb := BB.title(app.t("ui.control")) + "\n" + BB.esc(app.t("ui.control_tip"))
+		if ctl < 100.0:
+			var m := (ctl / 100.0 - 1.0) * g.def_num("populace.control_effect", 0.75)
+			bb += "\n" + BB.modifiers(g, {"tax_mult": m, "levy_mult": m})
+		return bb
+	var row := K.hbox([
+		W.stat("person", "%s: %s" % [app.t("ui.county_opinion"), K.signed(op, 0)], op_tip, UiArt.C_GOOD if op > 0 else (UiArt.C_BAD if op <= g.def_num("populace.unhappy_opinion", -20) else UiArt.C_TEXT), 16),
+		W.stat("shield", "%s: %d%%" % [app.t("ui.control"), roundi(ctl)], ctl_tip, UiArt.C_BAD if ctl < g.def_num("populace.low_control", 60) else UiArt.C_TEXT, 16),
+	], 14)
+	var box := K.vbox([row], 4)
+	if ctl < 100.0:
+		box.add_child(K.bar(ctl, 100, Color("#c8904a"), 6))
+	var f: Variant = Populace.faction_of_county(g, id)
+	var st: Variant = g.prov(id)
+	if f != null:
+		var fdef: Variant = g.content.get_def("factions", f.type)
+		var chip := K.panel(K.hbox([K.icon(fdef.get("icon", "fist") if fdef != null else "fist", 16), K.label(app.t("ui.in_popular_faction", {"faction": g.name_of("factions", f.type)}), "SmallLabel")], 3))
+		chip.add_theme_stylebox_override("panel", UiArt.flat(Color("#4a2a2a"), Color(UiArt.BRONZE, 0.6), 1, 3, 3))
+		K.tip(chip, BB.title(g.name_of("factions", f.type)) + "\n" + BB.i(g.desc_of("factions", f.type)) + "\n" + app.t("ui.faction_discontent", {"n": roundi(f.discontent)}))
+		box.add_child(chip)
+	elif st != null and st.vars.has("revolt_cd"):
+		box.add_child(K.label(app.t("ui.revolt_cooldown"), "MutedLabel"))
+	return box
 
 
 static func build_title(app: App, id: String) -> Control:

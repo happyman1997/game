@@ -1,0 +1,241 @@
+# Народ графств (механика populace) — по образцу CK3. У каждого графства есть
+# мнение о владельце и контроль. Недовольные графства вступают в народные
+# фракции: крестьянскую (против тягот: недовольство растёт всегда, войско
+# слабое) и народную (земли чужой веры или культуры хотят своего правителя:
+# бунтуют, только когда сильны). Отказ на ультиматум — мятеж; итог войны —
+# в поводах peasant_revolt и populist_revolt.
+defines:
+  populace:
+    foreign_religion: -25        # владелец другой религии
+    foreign_faith: -10           # та же религия, другая вера
+    foreign_culture_group: -15   # культура другой группы
+    foreign_culture: -5          # та же группа, другая культура
+    control_opinion: 0.3         # мнение за очко контроля ниже 100
+    control_effect: 0.75         # при нулевом контроле налог и ополчение −75%
+    control_regen: 1             # контроль в месяц
+    conquest_control: 25         # контроль после завоевания
+    occupation_control_loss: 40  # графство взято врагом
+    crushed_control_loss: 30     # мятеж подавлен
+    victory_control: 50          # контроль победивших мятежников над своими графствами
+    levy_free_months: 12         # ополчение под знамёнами без ропота
+    levy_opinion: 2              # потом — минус в месяц
+    levy_opinion_max: 25
+    join_chance: 0.3             # шанс в месяц, что недовольное графство вступит во фракцию
+    revolt_cooldown_years: 10    # после ультиматума графства долго не бунтуют
+    occupy_levy_mult: 0.5        # взятое мятежниками графство пополняет их войско
+    create_title_share: 0.5      # народный вождь получает ничейное герцогство, если держит половину его графств
+    unhappy_opinion: -20         # для ИИ и подсказок: недовольное графство
+    low_control: 60              # для ИИ и подсказок: низкий контроль
+    negotiated_modifier: heard_out_people
+
+factions:
+  # Земли чужой веры или культуры требуют правителя своей крови и веры.
+  populist_faction:
+    requires_feature: [populace, factions]
+    icon: "🏴"
+    order: 1
+    cb: populist_revolt
+    ultimatum_event: populace.0002
+    can_join:
+      OR:
+        - has_holder_faith: no
+        - has_holder_culture: no
+    popular:
+      join_opinion: -30
+      leave_opinion: -15
+      group_by: [faith, culture]
+      discontent_gain: 5
+      power_threshold: 100
+      army_mult: 1.5
+      leader: { traits: [popular_hero], skills: { martial: [10, 17], diplomacy: [6, 12] }, age: [25, 45], dynasty: new }
+    ai_accept_demands:
+      value: -90
+      add: { value: scope:faction.faction_power, multiply: 0.4 }
+    on_demands_accepted:
+      - take_faction_counties: { create_titles: yes }
+      - add_prestige: 100
+      - scope:liege: { add_prestige: -150 }
+
+  # Крестьяне против тягот: долгие войны, завоевания, поборы.
+  peasant_faction:
+    requires_feature: [populace, factions]
+    icon: "🔥"
+    order: 2
+    cb: peasant_revolt
+    ultimatum_event: populace.0001
+    popular:
+      join_opinion: -30
+      leave_opinion: -15
+      discontent_gain: 4
+      army_mult: 0.6
+      leader: { traits: [peasant_leader], skills: { martial: [6, 13], prowess: [8, 16] }, age: [22, 45], dynasty: none }
+    ai_accept_demands:
+      value: -50
+      add: { value: scope:faction.faction_power, multiply: 0.5 }
+    on_demands_accepted:
+      - scope:faction:
+          every_faction_county:
+            add_county_opinion: peasant_demands_met
+            add_province_modifier: { id: peasant_concessions, years: 10 }
+      - scope:liege: { add_prestige: -60 }
+
+casus_belli:
+  peasant_revolt:
+    requires_feature: [populace, factions]
+    icon: "🔥"
+    targets: faction
+    manual: yes
+    # Победа крестьян: вожак правит отвоёванными графствами.
+    on_victory:
+      - take_faction_counties: yes
+      - add_gold: 50
+      - scope:defender: { add_prestige: -100 }
+    on_defeat:
+      - scope:defender:
+          add_prestige: 40
+          add_dread: 5
+          imprison: { target: scope:attacker, reason: rebellion }
+    on_white_peace:
+      - scope:defender: { add_prestige: -30 }
+    truce_years: 0
+    war_name: cb.peasant_revolt.war_name
+
+  populist_revolt:
+    requires_feature: [populace, factions]
+    icon: "🏴"
+    targets: faction
+    manual: yes
+    on_victory:
+      - take_faction_counties: { create_titles: yes }
+      - add_gold: 100
+      - add_prestige: 150
+      - scope:defender: { add_prestige: -200 }
+    on_defeat:
+      - scope:defender:
+          add_prestige: 80
+          add_dread: 10
+          imprison: { target: scope:attacker, reason: rebellion }
+    on_white_peace:
+      - scope:defender: { add_prestige: -50 }
+    truce_years: 0
+    war_name: cb.populist_revolt.war_name
+
+events:
+  # Ультиматум крестьян правителю-игроку (root — владелец).
+  populace.0001:
+    requires_feature: [populace, factions]
+    theme: war
+    icon: "🔥"
+    triggered_only: true
+    options:
+      - effect: { scope:faction: { faction_enforce_demands: yes } }
+        ai_chance: 20
+      - effect: { scope:faction: { faction_start_war: yes } }
+        ai_chance: 70
+      # голос дипломатии: выйти к восставшим и уговорить их разойтись
+      - skill: { skill: diplomacy, check: 14 }
+        success:
+          scope:faction: { faction_negotiate: yes }
+        failure:
+          add_prestige: -20
+          scope:faction: { faction_start_war: yes }
+        ai_chance: { value: 5, add: { value: diplomacy, multiply: 2 } }
+  # Ультиматум народной фракции: отпустить земли под власть их вождя.
+  populace.0002:
+    requires_feature: [populace, factions]
+    theme: war
+    icon: "🏴"
+    triggered_only: true
+    options:
+      - effect: { scope:faction: { faction_enforce_demands: yes } }
+        ai_chance: 10
+      - effect: { scope:faction: { faction_start_war: yes } }
+        ai_chance: 90
+      - skill: { skill: diplomacy, check: 18 }
+        success:
+          scope:faction: { faction_negotiate: yes }
+        failure:
+          add_prestige: -30
+          scope:faction: { faction_start_war: yes }
+        ai_chance: { value: 5, add: { value: diplomacy, multiply: 2 } }
+
+# Модификаторы мнения графств (эффект add_county_opinion).
+opinion_modifiers:
+  peasant_demands_met: { value: 40, years: 10 }
+  heard_out_people: { value: 20, years: 5 }
+  emergency_taxes_levied: { value: -15, years: 3 }
+  alms_for_the_poor: { value: 10, years: 3 }
+  harsh_crackdown: { value: -15, years: 5 }
+  grievances_heard: { value: 15, years: 5 }
+
+modifiers:
+  peasant_concessions: { icon: "🌾", modifiers: { tax_mult: -0.3 } }
+  # волнения теперь бьют и по мнению графства
+  peasant_unrest: { modifiers: { county_opinion: -10 } }
+
+traits:
+  peasant_leader:
+    requires_feature: populace
+    category: fame
+    icon: "🔥"
+    modifiers: { martial: 2, prowess: 3, diplomacy: 1 }
+  popular_hero:
+    requires_feature: populace
+    category: fame
+    icon: "🏴"
+    good: true
+    modifiers: { martial: 3, diplomacy: 2, monthly_prestige: 0.5 }
+  # характер владельца — его народ это чувствует
+  just: { modifiers: { county_opinion: 5 } }
+  arbitrary: { modifiers: { county_opinion: -5 } }
+  generous: { modifiers: { county_opinion: 5 } }
+  greedy: { modifiers: { county_opinion: -5 } }
+  compassionate: { modifiers: { county_opinion: 5 } }
+  callous: { modifiers: { county_opinion: -5 } }
+
+council_tasks:
+  # Маршал наводит порядок: контроль над графствами домена растёт быстрее.
+  restore_control:
+    requires_feature: populace
+    position: marshal
+    icon: "🛡"
+    liege_modifiers:
+      control_gain: { value: martial, multiply: 0.3 }
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { num_low_control_counties: ">= 1" }
+          add: { value: num_low_control_counties, multiply: 8, add: 12, max: 45 }
+
+decisions:
+  give_alms:
+    effect:
+      $append:
+        - every_domain_province: { add_county_opinion: alms_for_the_poor }
+    ai_will_do:
+      if:
+        $append:
+          - limit: { num_unhappy_counties: ">= 1" }
+            add: { value: num_unhappy_counties, multiply: 10, add: 10, max: 40 }
+  emergency_taxes:
+    effect:
+      $append:
+        - every_domain_province: { add_county_opinion: emergency_taxes_levied }
+
+map_modes:
+  county_opinion:
+    requires_feature: populace
+    icon: "👤"
+    order: 55
+    value: county_opinion
+    min: -60
+    max: 40
+    gradient: ["#a83a2a", "#c9a84a", "#5aa04a"]
+  control:
+    requires_feature: populace
+    icon: "🛡"
+    order: 56
+    value: control
+    min: 0
+    max: 100
+    gradient: ["#7a2a2a", "#c8904a", "#e8dcb0"]

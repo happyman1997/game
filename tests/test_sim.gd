@@ -86,3 +86,44 @@ func test_features_installed_and_work() -> void:
 	Secrets.add_secret(game, victim, "secret_murder", null, [spy.id])
 	check(Secrets.blackmail(game, spy, victim), "шантаж")
 	check(Leverage.hook_on(game, spy, victim.id) != null, "крюк получен")
+
+
+func test_populace_opinion_control_and_revolt() -> void:
+	var e := TestEnv.engine()
+	check(e.has_feature("populace"), "механика populace")
+	var game := e.new_game("b1066", 5)
+	var w: Dictionary = game.ch("william")
+	var h: Dictionary = game.ch("harold")
+	# завоевание: контроль падает, налог режется, чужое графство недовольно
+	var hc: String = Titles.domain_counties(game, h)[0]
+	var tax0 := Economy.county_tax(game, hc)
+	Titles.transfer_title(game, hc, w.id)
+	check(Populace.control(game, hc) <= 25.0, "контроль после завоевания")
+	check(Economy.county_tax(game, hc) < tax0, "низкий контроль режет налог")
+	check(Populace.opinion(game, hc) <= -30.0, "чужая культура и низкий контроль злят графство")
+	# временный модификатор мнения
+	var wc: String = Titles.domain_counties(game, w)[0]
+	var op0 := Populace.opinion(game, wc)
+	Populace.add_county_opinion(game, wc, "alms_for_the_poor")
+	check(Populace.opinion(game, wc) > op0, "милостыня радует графство")
+	# недовольное графство вступает в народную фракцию
+	var f: Variant = null
+	for i in 60:
+		game.month_cache.clear()
+		Populace.monthly(game)
+		f = Populace.faction_of_county(game, hc)
+		if f != null:
+			break
+	check(f != null and f.type == "populist_faction", "народная фракция")
+	# мятеж: вожак без земли ведёт войско, война заканчивается
+	check(Populace.revolt(game, f), "мятеж")
+	var war: Variant = null
+	for x in game.state.wars.values():
+		if x.get("popular", false):
+			war = x
+	check(war != null, "война мятежников")
+	var leader: Dictionary = game.ch(war.attacker)
+	check(leader.titles.is_empty() and not Military.armies_of(game, leader.id).is_empty(), "вожак без земли, с войском")
+	TestEnv.ticks(game, 400)
+	check(not game.state.wars.has(war.id), "мятеж закончился")
+	check(not game.state.provinces[hc].vars.has("revolt"), "метка мятежа снята")

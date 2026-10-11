@@ -9,7 +9,7 @@ static func county_tax(game: Game, county_id: String) -> float:
 	if p == null:
 		return 0.0
 	var base := Stats.prov_stat(game, county_id, "tax")
-	return base * (1.0 + Data.num(p.development) * game.def_num("economy.development_tax", 0.02)) * (1.0 + Stats.prov_stat(game, county_id, "tax_mult"))
+	return base * (1.0 + Data.num(p.development) * game.def_num("economy.development_tax", 0.02)) * maxf(0.0, 1.0 + Stats.prov_stat(game, county_id, "tax_mult"))
 
 
 static func county_levy(game: Game, county_id: String) -> float:
@@ -17,7 +17,7 @@ static func county_levy(game: Game, county_id: String) -> float:
 	if p == null:
 		return 0.0
 	var base := Stats.prov_stat(game, county_id, "levy")
-	return base * (1.0 + Data.num(p.development) * game.def_num("economy.development_levy", 0.01)) * (1.0 + Stats.prov_stat(game, county_id, "levy_mult"))
+	return base * (1.0 + Data.num(p.development) * game.def_num("economy.development_levy", 0.01)) * maxf(0.0, 1.0 + Stats.prov_stat(game, county_id, "levy_mult"))
 
 
 static func domain_limit(game: Game, c: Dictionary) -> int:
@@ -42,7 +42,8 @@ static func _compute_domain_tax(game: Game, c: Dictionary) -> float:
 	var counties := Titles.domain_counties(game, c)
 	var total := 0.0
 	for cid in counties:
-		if not _is_occupied(game, cid):
+		# занятые врагом и восставшие (мятеж графств) графства налог не платят
+		if not _is_occupied(game, cid) and not game.state.provinces[cid].vars.has("revolt"):
 			total += county_tax(game, cid)
 	var skill_mult = 1.0 + Stats.skill(game, c, str(game.def_val("economy.tax_skill", "stewardship"))) * game.def_num("economy.tax_per_skill", 0.02)
 	var over := maxi(0, counties.size() - domain_limit(game, c))
@@ -127,7 +128,7 @@ static func monthly_piety(game: Game, c: Dictionary) -> float:
 static func domain_levy(game: Game, c: Dictionary) -> float:
 	var total := 0.0
 	for cid in Titles.domain_counties(game, c):
-		if not _is_occupied(game, cid):
+		if not _is_occupied(game, cid) and not game.state.provinces[cid].vars.has("revolt"):
 			total += county_levy(game, cid)
 	return total * (1.0 + Stats.stat(game, c, "levy_mult")) * float(c.levy_ratio)
 

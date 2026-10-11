@@ -1,0 +1,53 @@
+stat:
+  county_opinion: County opinion
+  control_gain: Control growth per month
+faction:
+  populist_faction: Populist Faction
+  peasant_faction: Peasant Faction
+faction_desc:
+  populist_faction: "Lands of a foreign faith or culture want a ruler of their own blood. They revolt only when strong; if they win, they break away under their own leader."
+  peasant_faction: "Peasants worn down by wars, conquest and levies. Their discontent grows on its own; their host is weak, but every county they take gives them more men."
+casus_belli:
+  peasant_revolt: Peasant Revolt
+  populist_revolt: Popular Revolt
+cb:
+  peasant_revolt:
+    war_name: "Peasant revolt of [scope:attacker] against [scope:defender]"
+  populist_revolt:
+    war_name: "Popular revolt of [scope:attacker] against [scope:defender]"
+ev:
+  populace.0001:
+    t: The Peasants Rise
+    desc: "Smoke rises over the villages of your domain. [scope:faction_leader] has gathered the discontented — those ruined by wars and levies — and demands that their burden be eased. Refuse, and the peasants will take up their pitchforks."
+    a: "Give in: lower taxes for ten years"
+    b: "Disperse the rabble!"
+    c: "Ride out to the rebels and talk"
+  populace.0002:
+    t: The Land Asks for Its Own Lord
+    desc: "Lands that share neither your faith nor your blood refuse to serve you. [scope:faction_leader] speaks for them: they want a ruler of their own. Refuse, and there will be war."
+    a: Let these lands go
+    b: Never!
+    c: Persuade them to stay under your hand
+opinion_modifier:
+  peasant_demands_met: Our demands were met
+  heard_out_people: We were heard out
+  emergency_taxes_levied: Emergency levies
+  alms_for_the_poor: Alms for the poor
+  harsh_crackdown: Harsh crackdown
+  grievances_heard: Our grievances were heard
+modifier:
+  peasant_concessions: Concessions to the Peasants
+trait:
+  peasant_leader: Rebel Leader
+  popular_hero: Hero of the People
+trait_desc:
+  peasant_leader: Led the peasants against their lord.
+  popular_hero: Raised their people against foreign rule.
+council_task:
+  restore_control: Restore Order
+council_task_desc:
+  restore_control: "The marshal pacifies the domain's counties: control over them grows faster — especially after conquest and revolts."
+ui:
+  mapmode:
+    county_opinion: County opinion of their holders
+    control: Control over counties
