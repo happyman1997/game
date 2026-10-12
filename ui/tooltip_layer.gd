@@ -146,6 +146,10 @@ func _update_content() -> bool:
 		text.visible = false
 		custom_holder.add_child(content)
 		_last_content = content
+	if not panel.visible:
+		panel.modulate.a = 0.0
+		var tw := panel.create_tween()
+		tw.tween_property(panel, "modulate:a", 1.0, 0.12)
 	panel.visible = true
 	return true
 

@@ -30,6 +30,7 @@ var _cluster_sig := ""
 var _tabs_sig := ""
 var _modes_sig := ""
 var _window_key := ""
+var _window_closing := false
 var _window_at := 0
 var _window_due := false
 var _seen_messages := 0
@@ -86,6 +87,7 @@ func build() -> void:
 	date_panel.offset_right = -10
 	date_panel.offset_bottom = -10
 	pause_btn = K.round_button("pause", func(): app.toggle_pause(), t("ui.pause_hint"), 46)
+	pause_btn.set_meta("silent", true)
 	date_label = K.label("", "HeaderLabel")
 	date_label.custom_minimum_size.x = 210
 	date_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -590,17 +592,38 @@ func _refresh_messages() -> void:
 		bar.color = Color(color)
 		bar.custom_minimum_size = Vector2(3, 0)
 		messages.add_child(row)
+		# свежие записи проявляются; война и битвы — с барабаном
+		if i < fresh and fresh < 6:
+			UiFx.fade_in(row, 0.0, 0.35)
+			if m.get("kind") == "war":
+				UiSound.play("war", 1.0, -4.0)
 
 
 func _refresh_window(full: bool = true) -> void:
 	var ref: Variant = app.panel_ref
 	if ref == null:
-		window.visible = false
+		# окно уезжает влево и гаснет
+		if window.visible and not _window_closing:
+			_window_closing = true
+			UiSound.play("close")
+			UiFx.slide_out(window, func():
+				window.visible = false
+				_window_closing = false)
 		_window_key = ""
 		return
-	window.visible = true
 	# вкладки окна — часть ключа: другая вкладка прокручивается с начала
 	var key: String = ref.kind + ":" + str(ref.id) + "|" + str(app.subtabs)
+	if not window.visible or _window_closing:
+		_window_closing = false
+		window.visible = true
+		UiSound.play("open")
+		UiFx.slide_in(window)
+	elif key != _window_key and _window_key != "":
+		# другое окно или вкладка — шелест страницы (если щелчок не прозвучал
+		# только что) и мягкое проявление
+		if UiSound.quiet_for(150):
+			UiSound.play("tab")
+		UiFx.fade_in(window_body, 0.2)
 	if not full and key == _window_key and Time.get_ticks_msec() - _window_at < LIVE_WINDOW_MS:
 		return
 	_window_at = Time.get_ticks_msec()

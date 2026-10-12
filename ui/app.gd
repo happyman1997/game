@@ -93,6 +93,8 @@ func _ready() -> void:
 	map_view.army_clicked.connect(func(id): locked(select_army.bind(id)))
 	map_view.tooltip_provider = province_tooltip
 	map_view.overlay.army_tooltip = army_tooltip
+	# звуки и анимации интерфейса: кнопки, окна, переходы
+	UiFx.install(self)
 	boot.call_deferred()
 
 
@@ -382,12 +384,18 @@ func _autosave() -> void:
 
 func toggle_pause() -> void:
 	paused = not paused
+	UiSound.play("pause" if paused else "unpause")
 	mark_dirty(true)
 
 
 func set_speed(s: int) -> void:
 	speed = clampi(s, 1, 5)
 	mark_dirty(true)
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion:
+		UiFx.note_motion()
 
 
 func _unhandled_key_input(event: InputEvent) -> void:
@@ -557,6 +565,7 @@ func back() -> void:
 
 
 func select_army(id: String) -> void:
+	UiSound.play("click")
 	map_view.selected_army = id
 	open_panel({"kind": "army", "id": id})
 
@@ -571,6 +580,7 @@ func selected_army() -> Variant:
 func _on_province_clicked(id: String) -> void:
 	if game == null:
 		return
+	UiSound.play("select")
 	map_view.selected_army = null
 	if pick_mode:
 		var t: Variant = game.title(id)
@@ -687,6 +697,8 @@ func modal(content: Control, opts: Dictionary = {}) -> Callable:
 	root.add_child(center)
 	center.add_child(content)
 	modal_layer.add_child(root)
+	UiFx.pop_in(root, content)
+	UiSound.play(str(opts.get("sound", "open")))
 	var entry := {"node": root, "closable": opts.get("closable", true), "on_close": opts.get("on_close", Callable())}
 	_modals.append(entry)
 	if entry.closable:
@@ -701,7 +713,9 @@ func _close_entry(entry: Dictionary) -> void:
 	if not _modals.has(entry):
 		return
 	_modals.erase(entry)
-	entry.node.queue_free()
+	var node: Control = entry.node
+	UiSound.play("close")
+	UiFx.pop_out(node, node.queue_free)
 	if entry.on_close is Callable and entry.on_close.is_valid():
 		entry.on_close.call()
 	mark_dirty(true)
@@ -735,7 +749,10 @@ func toast(text: String, kind: String = "info") -> void:
 	p.add_child(l)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	toast_box.add_child(p)
+	UiSound.play({"good": "notify_good", "bad": "notify_bad"}.get(kind, "notify"))
+	p.modulate.a = 0.0
 	var tw := p.create_tween()
+	tw.tween_property(p, "modulate:a", 1.0, 0.2)
 	tw.tween_interval(3.5)
 	tw.tween_property(p, "modulate:a", 0.0, 0.7)
 	tw.tween_callback(p.queue_free)
@@ -769,13 +786,13 @@ func _render_pending() -> void:
 			var close_ref := [Callable()]
 			var close := modal(EventWindow.build(self, ev, func():
 				close_ref[0].call()
-				_shown_event = null), {"closable": false, "dim": 0.35})
+				_shown_event = null), {"closable": false, "dim": 0.35, "sound": "event"})
 			close_ref[0] = close
 		return
 	if not g.state.pending_requests.is_empty():
 		var rq: Dictionary = g.state.pending_requests[0]
 		var close_ref := [Callable()]
-		close_ref[0] = modal(EventWindow.build_request(self, rq, func(): close_ref[0].call()), {"closable": false, "dim": 0.35})
+		close_ref[0] = modal(EventWindow.build_request(self, rq, func(): close_ref[0].call()), {"closable": false, "dim": 0.35, "sound": "event"})
 
 
 ## Короткий ранг + имя для списков.

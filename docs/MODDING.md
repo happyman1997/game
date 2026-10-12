@@ -569,6 +569,17 @@ func init(api: ModApi) -> void:
 Панель мода получает `ui` — объект приложения: `ui.open_character(id)`,
 `ui.open_province(id, true)`, `ui.open_tab(id)`, `ui.toast(text)`.
 
+Звуки и анимации подключаются сами: любая кнопка, созданная где угодно
+(в том числе в панели мода), подсвечивается при наведении, вдавливается и
+щёлкает при нажатии (звук зависит от вида кнопки: `GoldButton` — с
+золотым звоном, `FlatButton`/`LinkText` — тихий щелчок, `WindowTab` —
+шелест страницы). Кнопке, у которой звук даёт само действие, поставьте
+`button.set_meta("silent", true)`. Свой звук — `UiSound.play("coin")`
+(список звуков — в `ui/fx/ui_sound.gd`), свои переходы —
+`UiFx.fade_in(control)`, `UiFx.slide_in(control)`, `UiFx.pop_in(root, content)`.
+Звуки синтезируются кодом; файл `res://assets/sounds/<имя>.ogg` или `.wav`
+(например, `click.ogg`) заменяет встроенный звук.
+
 ### Что есть в `api`
 
 | Поле / метод | Назначение |

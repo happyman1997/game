@@ -60,6 +60,19 @@ static func open(app: App, on_close: Callable = Callable()) -> void:
 		Platform.set_setting("vsync", on)
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if on else DisplayServer.VSYNC_DISABLED))
 	body.add_child(_row(app.t("ui.setting_vsync"), vsync))
+	# звуки интерфейса: щелчки, шелест окон, колокол событий
+	var vol := HSlider.new()
+	vol.min_value = 0
+	vol.max_value = 100
+	vol.step = 5
+	vol.value = roundf(float(Platform.setting("ui_volume", 0.7)) * 100.0)
+	vol.custom_minimum_size = Vector2(220, 24)
+	vol.focus_mode = Control.FOCUS_NONE
+	vol.value_changed.connect(func(v):
+		Platform.set_setting("ui_volume", v / 100.0)
+		UiSound.set_volume(v / 100.0))
+	vol.drag_ended.connect(func(_changed): UiSound.play("click"))
+	body.add_child(_row(app.t("ui.setting_ui_sound"), vol))
 	body.add_child(K.sep())
 	body.add_child(K.flow([
 		K.button(app.t("ui.open_saves_folder"), func(): Platform.open_folder("saves"), {"tip": Platform.folder("saves")}),
