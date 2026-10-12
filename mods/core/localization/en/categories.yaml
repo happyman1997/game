@@ -1,0 +1,44 @@
+# Names of list categories (ui_categories).
+ui_category:
+  interactions:
+    diplomacy: Diplomacy
+    family: Family & Marriage
+    realm: Vassals & Realm
+    personal: Personal
+    intrigue: Intrigue
+    hostile: Hostile
+    prison: Prison
+    other: Other
+  decisions:
+    major: Major
+    realm: Realm
+    ashes: The Ashes & the Crown
+    personal: Personal
+    faith: Faith
+    paths: Paths & Trials
+    other: Other
+  casus_belli:
+    claims: Rights & Claims
+    conquest: Conquest
+    faith: Faith
+    crown: The Sun Crown
+    freedom: Freedom
+    other: Other
+  buildings:
+    special: Special
+    fortification: Fortifications
+    military: Military
+    economy: Economy
+    faith: Faith
+    other: Other
+  regiment_types:
+    infantry: Infantry
+    ranged: Ranged
+    cavalry: Cavalry
+    special: Special & Cultural
+    other: Other
+  schemes:
+    personal: Personal
+    political: Political
+    hostile: Hostile
+    other: Other

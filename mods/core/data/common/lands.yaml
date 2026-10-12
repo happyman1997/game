@@ -41,6 +41,7 @@ council_tasks:
 
 decisions:
   send_missionaries:
+    category: faith
     requires_feature: lands
     icon: "📿"
     is_shown:

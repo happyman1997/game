@@ -110,6 +110,7 @@ decisions:
 
   # Государь-философ: раз в жизни — «Золотой век»
   golden_age:
+    category: realm
     icon: "☀"
     is_shown: { is_ruler: yes, has_archetype: philosopher_king }
     is_valid:

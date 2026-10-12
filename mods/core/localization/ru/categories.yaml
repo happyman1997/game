@@ -1,0 +1,44 @@
+# Названия категорий в списках (ui_categories).
+ui_category:
+  interactions:
+    diplomacy: Дипломатия
+    family: Семья и брак
+    realm: Вассалы и держава
+    personal: Расположение
+    intrigue: Интриги
+    hostile: Враждебные
+    prison: Темница
+    other: Прочее
+  decisions:
+    major: Важнейшие
+    realm: Держава
+    ashes: Пепелище и венец
+    personal: Личные
+    faith: Вера
+    paths: Пути и испытания
+    other: Прочее
+  casus_belli:
+    claims: Права и претензии
+    conquest: Завоевание
+    faith: Вера
+    crown: Солнечный венец
+    freedom: Свобода
+    other: Прочее
+  buildings:
+    special: Особые
+    fortification: Укрепления
+    military: Военные
+    economy: Хозяйство
+    faith: Вера
+    other: Прочее
+  regiment_types:
+    infantry: Пехота
+    ranged: Стрелки
+    cavalry: Конница
+    special: Особые и народные
+    other: Прочее
+  schemes:
+    personal: Личные
+    political: Политические
+    hostile: Враждебные
+    other: Прочие

@@ -263,7 +263,7 @@ ev:
     b: Call volunteers from over the sea
   marches.0006:
     t: The Assembly on the Terp
-    desc: "Frisia has no lords: every county holds an assembly, and the leader is elected for ten years from the heads of the leading houses. Your term ends in five years. Edzard Attena, brother-in-law of the northern margrave, already treats the village elders. If the assembly chooses him, you remain head of the house of Ukkena and fight on."
+    desc: "Frisia has no lords: every county holds an assembly, and the leader is elected for ten years from the heads of the leading houses. Your term ends in five years. Edzard Attena, brother-in-law of the northern margrave, already treats the village elders. If the assembly chooses him, you remain head of the house of Ukkena and fight on. Behind the marshes stands the Sea League with Flanders: the merchants of Bruges and Terpenholm stand by each other."
     a: Speak at the assembly
     b: Mend the dikes together
   marches.0007:
@@ -275,3 +275,6 @@ ev:
     t: A Master from the Ore Mountains
     desc: "A zwerg has come to your court: short, broad-shouldered, his beard braided with copper rings. Silently he lays on the table a letter of recommendation from the council of masters — and a pouch of ore samples from your own lands."
     a: Welcome
+
+opinion_modifier:
+  sea_league: Sea League

@@ -3,6 +3,26 @@
 on_actions:
   on_player_start:
     events: { $append: [marches.0001, marches.0002, marches.0003, marches.0004, marches.0005, marches.0006, marches.0007] }
+  # Морской союз: каждый старшина Фрисии возобновляет союз с Фландрией
+  on_yearly_pulse:
+    effect:
+      $append:
+        - if:
+            limit:
+              holds_title: k_frisia
+              government: people_republic
+              title:d_flanders: { is_held: yes }
+            then:
+              title:d_flanders:
+                holder: { save_scope_as: sea_ally }
+              if:
+                limit:
+                  NOR: [ { is_allied_with: scope:sea_ally }, { is_at_war_with: scope:sea_ally } ]
+                  scope:sea_ally: { faith: catholic }
+                then:
+                  add_alliance: scope:sea_ally
+              add_opinion: { target: scope:sea_ally, modifier: sea_league }
+              scope:sea_ally: { add_opinion: { target: root, modifier: sea_league } }
   # всеобщее ополчение: на народную республику напали — встаёт весь народ
   on_war_started:
     effect:

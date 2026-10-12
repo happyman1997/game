@@ -24,6 +24,7 @@ modifiers:
 
 decisions:
   close_city_gates:
+    category: realm
     icon: "🚧"
     is_shown:
       is_ruler: yes

@@ -56,7 +56,8 @@ func install(engine: GameEngine) -> void:
 		var d: Variant = g.content.get_def("interactions", p.interaction)
 		if d == null or d.get("scheme") != null or ScriptContext.is_yes(d.get("auto_accept", false)) or d.get("ai_accept") == null:
 			return
-		var cat := str(d.get("category", ""))
-		if cat == "diplomacy" or cat == "intrigue":
-			Momentum.record(g, g.ch(p.actor), cat, p.accepted)
+		# навык взаимодействия: поле skill, иначе категория diplomacy/intrigue
+		var sk := str(d.get("skill", d.get("category", "")))
+		if sk == "diplomacy" or sk == "intrigue":
+			Momentum.record(g, g.ch(p.actor), sk, p.accepted)
 	, 0, OWNER)

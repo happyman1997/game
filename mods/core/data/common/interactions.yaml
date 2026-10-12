@@ -6,7 +6,8 @@
 interactions:
   arrange_marriage:
     icon: "💍"
-    category: diplomacy
+    category: family
+    skill: diplomacy
     decider: guardian
     is_shown:
       scope:recipient: { is_married: no, is_adult: yes }

@@ -3,6 +3,7 @@
 # scope:attacker, scope:defender, scope:target (титул), scope:war.
 casus_belli:
   claim:
+    category: claims
     icon: "📜"
     targets: claim
     cost:
@@ -24,6 +25,7 @@ casus_belli:
     war_name: cb.claim.war_name
 
   de_jure:
+    category: claims
     icon: "🗺"
     targets: de_jure
     is_valid:
@@ -44,6 +46,7 @@ casus_belli:
     war_name: cb.de_jure.war_name
 
   independence:
+    category: freedom
     icon: "⛓"
     targets: independence
     is_valid:
@@ -70,6 +73,7 @@ casus_belli:
 
   # Набеговые завоевания соседних графств — для кельтских и норманно-скандинавских мелких королей.
   county_conquest:
+    category: conquest
     icon: "🪓"
     targets: adjacent_county
     is_valid:
@@ -93,6 +97,7 @@ casus_belli:
     war_name: cb.county_conquest.war_name
 
   holy_war:
+    category: faith
     icon: "✝"
     targets: holy_war
     cost:

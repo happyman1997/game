@@ -52,6 +52,7 @@ artifacts:
 decisions:
   # Поход в пепелище: найти сокровища, реликвии и след венца.
   ash_expedition:
+    category: ashes
     requires_feature: [wilds, artifacts]
     icon: "🔥"
     major: true
@@ -89,6 +90,7 @@ decisions:
 
   # Заселить пепелище: ничейное графство у границы становится вашим.
   settle_ashlands:
+    category: ashes
     requires_feature: wilds
     icon: "⛺"
     is_shown:
@@ -121,6 +123,7 @@ decisions:
 
   # Возродить Солнечную империю: венец на голове, Зонненштадт отстроен.
   restore_sun_empire:
+    category: major
     requires_feature: artifacts
     icon: "☀"
     major: true
@@ -148,6 +151,7 @@ decisions:
 
   # Отдать венец ордену: братья вернут его пеплу.
   give_crown_to_order:
+    category: ashes
     requires_feature: artifacts
     icon: "⚱"
     is_shown:
@@ -172,6 +176,7 @@ decisions:
 casus_belli:
   # Война за венец: отнять Солнечный венец у того, кто его держит.
   crown_war:
+    category: crown
     requires_feature: artifacts
     icon: "👑"
     targets: artifact_holder
@@ -198,6 +203,7 @@ casus_belli:
 
   # Кара Стражей Пепла: орден идёт на всякого, кто ищет проклятый венец.
   ash_crusade:
+    category: faith
     requires_feature: [artifacts, governments]
     icon: "⚱"
     targets: independent_ruler

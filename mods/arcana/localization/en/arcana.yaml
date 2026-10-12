@@ -430,3 +430,12 @@ ev:
     desc: "The court mage did not leave the astrolabe all night. In the morning he says: the stars favor your house — if the moment is not missed."
     a: Heed the prophecy
     b: Announce it at court
+ui_category:
+  decisions:
+    arcane: Arcane Arts
+  casus_belli:
+    arcane: Arcane Arts
+  buildings:
+    arcane: Arcane Arts
+  regiment_types:
+    arcane: Arcane Arts

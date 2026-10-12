@@ -117,6 +117,7 @@ buildings:
 regiment_types:
   # Горные роты: наёмники Южной марки, пикинёры с гор.
   mountain_companies:
+    category: special
     icon: "⛰"
     order: 14
     size: 100
@@ -129,6 +130,7 @@ regiment_types:
     ai_will_do: 60
   # Ополчение дамб: фризы бьются там, где конница вязнет.
   dike_militia:
+    category: special
     icon: "🌊"
     order: 15
     size: 100
@@ -141,6 +143,7 @@ regiment_types:
     ai_will_do: 60
   # Железнобокие: цверги в кованых латах, медленные и неудержимые.
   ironclads:
+    category: special
     icon: "⚒"
     order: 16
     size: 50
@@ -161,6 +164,7 @@ modifiers:
 decisions:
   # Пригласить мастера-цверга: цверги служат при дворах людей.
   invite_zwerg_master:
+    category: realm
     icon: "⛏"
     is_shown:
       is_ruler: yes
@@ -181,6 +185,7 @@ decisions:
 
   # Торговый договор с Подгорьем: десять лет доходов обеим сторонам.
   trade_with_underhill:
+    category: realm
     icon: "⚒"
     is_shown:
       is_ruler: yes
@@ -199,3 +204,7 @@ decisions:
           add_opinion: { target: root, modifier: grateful }
     ai_check_months: 24
     ai_will_do: 30
+
+opinion_modifiers:
+  # Морской союз Фрисии и Фландрии
+  sea_league: { value: 30, years: 2 }

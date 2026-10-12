@@ -16,18 +16,21 @@ holdings:
 # owner_modifiers — для владельца графства.
 buildings:
   walls:
+    category: fortification
     icon: "🧱"
     holding: castle
     cost: { gold: 120 }
     days: 365
     modifiers: { fort: 2 }
   barracks:
+    category: military
     icon: "🛡"
     holding: castle
     cost: { gold: 100 }
     days: 300
     modifiers: { levy_mult: 0.3 }
   training_grounds:
+    category: military
     icon: "🎯"
     holding: castle
     requires: [barracks]
@@ -36,17 +39,20 @@ buildings:
     modifiers: { levy_mult: 0.2 }
     owner_modifiers: { commander_advantage: 3, prowess: 1 }
   farms:
+    category: economy
     icon: "🌾"
     cost: { gold: 80 }
     days: 240
     modifiers: { tax_mult: 0.15, development_growth: 0.05 }
   market:
+    category: economy
     icon: "⚖"
     holding: city
     cost: { gold: 110 }
     days: 300
     modifiers: { tax_mult: 0.3 }
   guild_hall:
+    category: economy
     icon: "🏛"
     holding: city
     requires: [market]
@@ -54,6 +60,7 @@ buildings:
     days: 450
     modifiers: { tax_mult: 0.35, development_growth: 0.05 }
   monastery:
+    category: faith
     icon: "📿"
     holding: temple
     cost: { gold: 100 }
@@ -61,6 +68,7 @@ buildings:
     modifiers: { tax_mult: 0.1 }
     owner_modifiers: { monthly_piety: 0.3, learning: 1 }
   cathedral:
+    category: faith
     icon: "⛪"
     holding: temple
     requires: [monastery]
@@ -69,6 +77,7 @@ buildings:
     modifiers: { development_growth: 0.05 }
     owner_modifiers: { monthly_piety: 0.6, monthly_prestige: 0.3 }
   hunting_grounds:
+    category: other
     icon: "🦌"
     cost: { gold: 70 }
     days: 200

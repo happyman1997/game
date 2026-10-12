@@ -92,6 +92,7 @@ decisions:
   # Агитация перед выборами схода: глава рода тратит серебро на угощения,
   # подарки старостам и речи — на выборах за него проголосует больше графств.
   campaign_for_assembly:
+    category: realm
     requires_feature: governments
     icon: "⚖"
     is_shown:

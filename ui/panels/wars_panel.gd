@@ -140,9 +140,9 @@ static func build(app: App) -> Control:
 				W.char_link(app, t.defender, true),
 			], 0)
 			info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			rows.append(K.panel(K.hbox([K.icon(cb.get("icon", "swords") if cb != null else "swords", 22), info,
-				K.button(app.t("ui.declare"), func(): open_declare_war(app, did))], 8), "RowPanel"))
-		root.add_child(K.section(app.t("ui.possible_wars"), rows, "banner"))
+			rows.append([W.category_of(g, "casus_belli", cb) if cb != null else "other", K.panel(K.hbox([K.icon(cb.get("icon", "swords") if cb != null else "swords", 22), info,
+				K.button(app.t("ui.declare"), func(): open_declare_war(app, did))], 8), "RowPanel")])
+		root.add_child(K.section(app.t("ui.possible_wars"), [W.grouped(app, "casus_belli", rows)], "banner"))
 	return root
 
 
@@ -165,7 +165,7 @@ static func open_declare_war(app: App, defender_id: String) -> void:
 		], 2)),
 		W.portrait(app, def, 72, {"clickable": false, "coa": true}),
 	], 12, BoxContainer.ALIGNMENT_CENTER))
-	var list := K.vbox([], 6)
+	var cards := []
 	for t in targets:
 		var cb: Variant = g.content.get_def("casus_belli", t.cb)
 		var cost := Wars.war_cost(g, p, t)
@@ -184,7 +184,10 @@ static func open_declare_war(app: App, defender_id: String) -> void:
 					app.toast(app.t("ui.war_declared"), "bad")
 				app.open_tab("wars"), {"variation": "GoldButton", "disabled": not afford}),
 		], 4)
-		list.add_child(K.panel(card, "InsetPanel"))
+		cards.append([W.category_of(g, "casus_belli", cb) if cb != null else "other", K.panel(card, "InsetPanel")])
+	var list := K.vbox([], 6)
+	if not cards.is_empty():
+		list.add_child(W.grouped(app, "casus_belli", cards))
 	if targets.is_empty():
 		list.add_child(K.label(app.t("ui.no_cb"), "MutedLabel"))
 	var sc := K.scroll(list)

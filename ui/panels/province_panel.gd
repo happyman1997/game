@@ -155,7 +155,7 @@ static func build(app: App, id: String) -> Control:
 	if p != null and holder != null and holder.id == p.id:
 		var cands := Decisions.building_candidates(g, p, id)
 		if not cands.is_empty():
-			var list := K.vbox([], 4)
+			var items := []
 			for item in cands:
 				var bd: Dictionary = item.def
 				var blockers: Array = item.blockers
@@ -174,8 +174,8 @@ static func build(app: App, id: String) -> Control:
 						if not blockers.is_empty():
 							bb += "\n" + BB.reasons(blockers)
 						return bb})
-				list.add_child(b)
-			root.add_child(K.section(app.t("ui.build"), [list], "plus"))
+				items.append([W.category_of(g, "buildings", bd), b])
+			root.add_child(K.section(app.t("ui.build"), [W.grouped(app, "buildings", items, true)], "plus"))
 	var armies := Military.armies_at(g, id)
 	if not armies.is_empty():
 		var al := K.vbox([], 3)

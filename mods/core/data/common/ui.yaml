@@ -30,3 +30,52 @@ map_modes:
     min: 0
     max: 6
     gradient: ["#3a2a2a", "#8a7a2a", "#f0d050"]
+
+# Категории в списках (как в CK3): взаимодействия в окне персонажа, решения,
+# поводы к войне, постройки, отряды. Запись попадает в группу по своему полю
+# category (includes — другие категории, которые показываются в этой группе);
+# без категории — в «Прочее» (решения с major: yes — в «Важнейшие»).
+# Название группы — ключ локализации ui_category.<вид>.<id>.
+ui_categories:
+  interactions:
+    diplomacy: { order: 1, icon: handshake }
+    family: { order: 2, icon: ring }
+    realm: { order: 3, icon: crown }
+    personal: { order: 4, icon: heart, includes: [friendly] }
+    intrigue: { order: 5, icon: eye, includes: [political] }
+    hostile: { order: 6, icon: dagger }
+    prison: { order: 7, icon: chain }
+    other: { order: 99, icon: scroll }
+  decisions:
+    major: { order: 1, icon: crown }
+    realm: { order: 2, icon: castle }
+    ashes: { order: 3, icon: fire }
+    personal: { order: 4, icon: person }
+    faith: { order: 5, icon: cross }
+    paths: { order: 6, icon: star }
+    other: { order: 99, icon: scroll }
+  casus_belli:
+    claims: { order: 1, icon: scroll }
+    conquest: { order: 2, icon: swords }
+    faith: { order: 3, icon: cross }
+    crown: { order: 4, icon: crown }
+    freedom: { order: 5, icon: banner }
+    other: { order: 99, icon: swords }
+  buildings:
+    special: { order: 1, icon: star }
+    fortification: { order: 2, icon: tower }
+    military: { order: 3, icon: swords }
+    economy: { order: 4, icon: gold }
+    faith: { order: 5, icon: cross }
+    other: { order: 99, icon: castle }
+  regiment_types:
+    infantry: { order: 1, icon: spear }
+    ranged: { order: 2, icon: banner }
+    cavalry: { order: 3, icon: tournament }
+    special: { order: 4, icon: star }
+    other: { order: 99, icon: swords }
+  schemes:
+    personal: { order: 1, icon: heart }
+    political: { order: 2, icon: scroll }
+    hostile: { order: 3, icon: dagger }
+    other: { order: 99, icon: eye }

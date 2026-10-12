@@ -18,6 +18,7 @@ traits:
 # ---------------------------------------------------------------- постройка
 buildings:
   tilting_yard:
+    category: military
     icon: "🎠"
     holding: castle
     cost: { gold: 90 }
@@ -28,6 +29,7 @@ buildings:
 # ---------------------------------------------------------------- решение
 decisions:
   hold_tournament:
+    category: personal
     icon: "🏇"
     is_shown: { is_ruler: yes, tier: ">= duchy" }
     is_valid:

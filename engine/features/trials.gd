@@ -225,6 +225,7 @@ func install(engine: GameEngine) -> void:
 		engine.content.set_def("decisions", did, {
 			"icon": a.get("icon", "star"),
 			"major": true,
+			"category": "paths",
 			"name": {"key": "decision.begin_trial", "params": {"name": "skill_archetype." + str(a.id)}},
 			"desc": "skill_archetype_desc." + str(a.id),
 			"is_shown": {"can_begin_trial": str(a.id)},

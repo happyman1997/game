@@ -217,6 +217,7 @@ map_links:
 # Норвежское вторжение: Харальд Суровый собирает флот, чтобы взять Англию.
 decisions:
   prepare_norse_invasion:
+    category: major
     icon: "🛶"
     major: true
     is_shown:

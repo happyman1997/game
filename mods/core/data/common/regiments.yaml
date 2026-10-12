@@ -4,6 +4,7 @@
 # upkeep — жалованье в месяц (в поднятой армии — × raised_upkeep_mult).
 regiment_types:
   light_footmen:
+    category: infantry
     icon: "🗡"
     order: 1
     size: 100
@@ -13,6 +14,7 @@ regiment_types:
     terrain: { forest: 0.25, hills: 0.15, wetlands: 0.15 }
     ai_will_do: 10
   archers:
+    category: ranged
     icon: "🏹"
     order: 2
     size: 100
@@ -23,6 +25,7 @@ regiment_types:
     terrain: { hills: 0.25, forest: 0.1 }
     ai_will_do: 10
   pikemen:
+    category: infantry
     icon: "🔱"
     order: 3
     size: 100
@@ -32,6 +35,7 @@ regiment_types:
     counters: { heavy_cavalry: 0.6, light_cavalry: 0.5, chevaliers: 0.5 }
     ai_will_do: 10
   light_cavalry:
+    category: cavalry
     icon: "🐎"
     order: 4
     size: 100
@@ -42,6 +46,7 @@ regiment_types:
     terrain: { plains: 0.2, farmlands: 0.2, forest: -0.3, hills: -0.2, mountains: -0.4, wetlands: -0.4 }
     ai_will_do: 8
   heavy_infantry:
+    category: infantry
     icon: "🛡"
     order: 5
     size: 100
@@ -52,6 +57,7 @@ regiment_types:
     can_recruit: { tier: ">= duchy" }
     ai_will_do: 8
   heavy_cavalry:
+    category: cavalry
     icon: "🏇"
     order: 6
     size: 50
@@ -64,6 +70,7 @@ regiment_types:
     ai_will_do: { value: 6, if: { limit: { gold: ">= 300" }, add: 6 } }
   # ---------------------------------------------------- культурные
   housecarls:
+    category: special
     icon: "🪓"
     order: 10
     size: 100
@@ -74,6 +81,7 @@ regiment_types:
     can_recruit: { culture: [english, norse, danish, swedish] }
     ai_will_do: 60
   chevaliers:
+    category: special
     icon: "⚜"
     order: 11
     size: 50
@@ -85,6 +93,7 @@ regiment_types:
     can_recruit: { culture: [norman, french, flemish], tier: ">= duchy" }
     ai_will_do: 60
   gallowglass:
+    category: special
     icon: "⚔"
     order: 12
     size: 100
@@ -96,6 +105,7 @@ regiment_types:
     can_recruit: { culture: [scottish, irish] }
     ai_will_do: 60
   longbowmen:
+    category: special
     icon: "🎯"
     order: 13
     size: 100

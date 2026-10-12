@@ -1,0 +1,10 @@
+# Тайные искусства — своя категория в списках решений, поводов, построек и отрядов.
+ui_categories:
+  decisions:
+    arcane: { order: 7, icon: star }
+  casus_belli:
+    arcane: { order: 6, icon: skull }
+  buildings:
+    arcane: { order: 6, icon: star }
+  regiment_types:
+    arcane: { order: 5, icon: skull }

@@ -183,6 +183,7 @@ interactions:
 decisions:
   # Архивариус: в старых грамотах всегда найдётся право на соседнюю землю
   search_archives:
+    category: personal
     icon: "📜"
     is_shown: { is_ruler: yes, has_archetype: archivist }
     cost: { gold: 50 }

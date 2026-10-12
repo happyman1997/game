@@ -27,6 +27,8 @@ var history: Array = []
 var subtabs := {}
 ## Свёрнутые разделы обзора справа: {id раздела: true}.
 var outliner_collapsed := {}
+## Свёрнутые категории в списках: {"<вид>:<категория>": true}.
+var collapsed := {}
 var ui_theme: Theme
 
 var map_view: MapView

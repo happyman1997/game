@@ -466,3 +466,66 @@ static func tabs(app: App, key: String, tabs_list: Array, build: Callable) -> Co
 	if content is Control:
 		box.add_child(content)
 	return box
+
+
+## Категории списков (как в CK3) — из данных ui_categories.<kind>.
+static func categories(g: Game, kind: String) -> Dictionary:
+	var d: Variant = g.content.get_def("ui_categories", kind)
+	var out := {}
+	if d is Dictionary:
+		for k in d:
+			if d[k] is Dictionary:
+				out[k] = d[k]
+	return out
+
+
+## Категория записи: поле category (или группа, которая включает его через
+## includes); без категории — major (решения с major: yes), special (особые
+## постройки) или other.
+static func category_of(g: Game, kind: String, def: Dictionary) -> String:
+	var cats := categories(g, kind)
+	var c := str(def.get("category", ""))
+	if c != "" and not cats.has(c):
+		for k in cats:
+			if Data.as_array(cats[k].get("includes")).has(c):
+				return k
+	if c == "":
+		if kind == "decisions" and def.get("major", false):
+			c = "major"
+		elif kind == "buildings" and def.get("special", false):
+			c = "special"
+	return c if cats.has(c) else "other"
+
+
+## Список по категориям: items — [[категория, Control], ...]. Группы идут по
+## order; у каждой — заголовок со значком и числом, клик сворачивает группу
+## (запоминается). flow — элементы в строку с переносом (кнопки).
+static func grouped(app: App, kind: String, items: Array, flow := false) -> Control:
+	var g := app.game
+	var cats := categories(g, kind)
+	var by := {}
+	for it in items:
+		if not by.has(it[0]):
+			by[it[0]] = []
+		by[it[0]].append(it[1])
+	var keys: Array = by.keys()
+	keys.sort_custom(func(a, b): return Data.num(cats.get(a, {}).get("order", 50)) < Data.num(cats.get(b, {}).get("order", 50)))
+	var box := K.vbox([], 4)
+	for k in keys:
+		var key: String = kind + ":" + str(k)
+		var collapsed: bool = app.collapsed.get(key, false)
+		var lk := "ui_category.%s.%s" % [kind, k]
+		var name: String = g.loc.t(lk) if g.loc.has(lk) else str(k)
+		var head := K.button("%s %s  (%d)" % ["▸" if collapsed else "▾", name, by[k].size()], func():
+			app.collapsed[key] = not app.collapsed.get(key, false)
+			app.mark_dirty(true), {"variation": "FlatButton", "icon": cats.get(k, {}).get("icon", "scroll"), "align": HORIZONTAL_ALIGNMENT_LEFT})
+		head.add_theme_color_override("font_color", UiArt.C_GOLD)
+		head.add_theme_color_override("font_hover_color", Color("#fff0b8"))
+		box.add_child(head)
+		if collapsed:
+			continue
+		var body: Container = K.flow([], 6) if flow else K.vbox([], 6)
+		for c in by[k]:
+			body.add_child(c)
+		box.add_child(K.margin(body, 10, 0, 0, 6))
+	return box

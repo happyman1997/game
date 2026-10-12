@@ -2,6 +2,7 @@
 # root (scope:actor) — принимающий решение.
 decisions:
   hold_feast:
+    category: personal
     icon: "🍖"
     is_shown: { is_ruler: yes }
     is_valid:
@@ -21,6 +22,7 @@ decisions:
           add: 25
 
   go_hunting:
+    category: personal
     icon: "🏹"
     is_shown: { is_ruler: yes }
     is_valid:
@@ -41,6 +43,7 @@ decisions:
           add: 15
 
   go_on_pilgrimage:
+    category: faith
     icon: "🧭"
     is_shown: { is_ruler: yes, faith: catholic }
     is_valid:
@@ -55,6 +58,7 @@ decisions:
       add: { value: ai_zeal, multiply: 8 }
 
   give_alms:
+    category: faith
     icon: "🪙"
     is_shown: { is_ruler: yes }
     cost: { gold: 40 }
@@ -71,6 +75,7 @@ decisions:
           add: 20
 
   seek_solitude:
+    category: personal
     icon: "🕯"
     is_shown: { is_adult: yes }
     is_valid:
@@ -91,6 +96,7 @@ decisions:
 
   # супруг — опора: выговориться
   confide_in_spouse:
+    category: personal
     icon: "💬"
     is_shown: { is_adult: yes, is_married: yes }
     is_valid:
@@ -112,6 +118,7 @@ decisions:
           add: 35
 
   commission_chronicle:
+    category: personal
     icon: "📚"
     is_shown: { is_ruler: yes, tier: ">= duchy" }
     cost: { gold: 120 }
@@ -127,6 +134,7 @@ decisions:
           add: 25
 
   emergency_taxes:
+    category: realm
     icon: "🪙"
     is_shown: { is_ruler: yes, tier: ">= duchy" }
     is_valid:
@@ -144,6 +152,7 @@ decisions:
           add: 50
 
   prepare_invasion_of_england:
+    category: major
     icon: "⚓"
     major: true
     is_shown:
@@ -162,6 +171,7 @@ decisions:
     ai_check_months: 1
 
   unite_britannia:
+    category: major
     icon: "👑"
     major: true
     is_shown:
@@ -189,6 +199,7 @@ decisions:
     ai_will_do: 100
 
   hire_mercenaries:
+    category: realm
     icon: "🗡"
     is_shown: { is_ruler: yes, is_at_war: yes }
     is_valid:
@@ -205,6 +216,7 @@ decisions:
   # Вложиться в земли: казна идёт в дороги, мельницы и распашку. Каждое
   # графство домена +1 к развитию, а народ доволен заботой.
   invest_in_lands:
+    category: realm
     icon: "🌿"
     is_shown: { is_ruler: yes }
     is_valid:

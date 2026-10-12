@@ -360,3 +360,5 @@ bookmarks:
     alliances:
       $append:
         - [adalbert_kronwald, gero_eisenwart]
+        # Морской союз: Фрисия и Фландрия торгуют через устья рек и стоят друг за друга
+        - [poppo_ukkena, baldwin_v]

@@ -27,10 +27,9 @@ static func intrigue(app: App) -> Control:
 		row.add_child(K.button("", func():
 			Schemes.end_scheme(g, sid)
 			app.mark_dirty(true), {"icon": "close", "tip": app.t("ui.abandon")}))
-		rows.append(K.panel(row, "InsetPanel"))
-	if rows.is_empty():
-		rows.append(K.label(app.t("ui.none"), "MutedLabel"))
-	root.add_child(K.section(app.t("ui.my_schemes"), rows, "dagger"))
+		rows.append([W.category_of(g, "schemes", def) if def != null else "other", K.panel(row, "InsetPanel")])
+	var mine_box: Control = W.grouped(app, "schemes", rows) if not rows.is_empty() else K.label(app.t("ui.none"), "MutedLabel")
+	root.add_child(K.section(app.t("ui.my_schemes"), [mine_box], "dagger"))
 	var against: Array = g.state.schemes.values().filter(func(s): return s.target == p.id and s.get("discovered", false))
 	if not against.is_empty():
 		var al := []
@@ -55,6 +54,7 @@ static func decisions(app: App) -> Control:
 	var root := K.vbox([], 8)
 	var defs: Array = g.content.all("decisions").filter(func(d): return Decisions.is_shown(g, d, p))
 	Data.sort_by(defs, func(d): return 0 if d.get("major", false) else 1)
+	var items := []
 	for d in defs:
 		var blockers := Decisions.blockers(g, d, p)
 		var cost := Decisions.cost(g, d, p)
@@ -72,7 +72,9 @@ static func decisions(app: App) -> Control:
 		var card := K.panel(K.hbox([K.icon(d.get("icon", "scroll"), 34), info], 10), "InsetPanel")
 		if not blockers.is_empty():
 			card.modulate = Color(0.8, 0.8, 0.8)
-		root.add_child(card)
+		items.append([W.category_of(g, "decisions", d), card])
+	if not items.is_empty():
+		root.add_child(W.grouped(app, "decisions", items))
 	if defs.is_empty():
 		root.add_child(K.label(app.t("ui.no_decisions"), "MutedLabel"))
 	return root

@@ -389,17 +389,18 @@ static func regiments(app: App, p: Dictionary) -> Variant:
 		list.add_child(row)
 	if regs.is_empty():
 		list.add_child(K.label(app.t("ui.no_regiments"), "MutedLabel"))
-	var shop := K.flow([], 4)
+	var shop_items := []
 	for def in types:
 		if not Regiments.is_type_shown(g, p, def) and def.get("can_recruit") != null and JSON.stringify(def.can_recruit).contains("culture"):
 			continue
 		var blockers := Regiments.recruit_blockers(g, p, def)
 		var cost := Regiments.cost(g, p, def)
 		var did: String = def.id
-		shop.add_child(K.button(g.name_of("regiment_types", def.id), func():
+		shop_items.append([W.category_of(g, "regiment_types", def), K.button(g.name_of("regiment_types", def.id), func():
 			Regiments.recruit(g, p, did)
 			app.mark_dirty(true), {"icon": def.get("icon", "spear"), "disabled": not blockers.is_empty(),
-			"tip": func(): return regiment_tip(app, def) + "\n" + BB.cost(g, cost) + ("\n" + BB.reasons(blockers) if not blockers.is_empty() else "")}))
+			"tip": func(): return regiment_tip(app, def) + "\n" + BB.cost(g, cost) + ("\n" + BB.reasons(blockers) if not blockers.is_empty() else "")})])
+	var shop := W.grouped(app, "regiment_types", shop_items, true)
 	return K.section("%s — %s" % [app.t("ui.regiments"), app.t("ui.regiments_n", {"n": regs.size(), "cap": cap})],
 		[K.para(app.t("ui.regiments_hint"), "SmallLabel"), list, K.label(app.t("ui.recruit_regiment"), "GoldLabel"), shop], "shield")
 

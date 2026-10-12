@@ -150,6 +150,7 @@ opinion_modifiers:
 
 regiment_types:
   risen_dead:
+    category: arcane
     icon: "💀"
     order: 20
     size: 120
@@ -160,6 +161,7 @@ regiment_types:
     can_recruit: { has_perk: raise_dead }
     ai_will_do: { value: 0, if: { limit: { has_perk: raise_dead }, add: 30 } }
   silver_flame:
+    category: arcane
     icon: "🛡"
     order: 21
     size: 80
@@ -175,6 +177,7 @@ regiment_types:
 
 casus_belli:
   monster_hunt:
+    category: arcane
     icon: "🗡"
     targets: monster_hunt
     is_valid:
@@ -198,6 +201,7 @@ casus_belli:
 
 decisions:
   feed_on_blood:
+    category: arcane
     icon: "🩸"
     is_shown: { has_trait: vampire }
     is_valid:
@@ -208,6 +212,7 @@ decisions:
     # ИИ-вампиры кормятся сами (см. скрипт) — решение только для игрока
 
   exorcism:
+    category: arcane
     icon: "✝"
     is_shown:
       religion: christianity
@@ -234,6 +239,7 @@ decisions:
     ai_check_months: 6
 
   purge_restless_dead:
+    category: arcane
     icon: "🔥"
     is_shown: { is_ruler: yes, realm_has_restless_dead: yes }
     is_valid:
@@ -248,6 +254,7 @@ decisions:
     ai_check_months: 2
 
   consecrate_lands:
+    category: arcane
     icon: "✝"
     is_shown:
       is_ruler: yes
@@ -264,6 +271,7 @@ decisions:
     ai_check_months: 3
 
   command_the_dead:
+    category: arcane
     icon: "💀"
     is_shown: { has_trait: [necromancer, lich], realm_has_restless_dead: yes }
     is_valid:
@@ -277,6 +285,7 @@ decisions:
     ai_check_months: 2
 
   hunt_the_dragon:
+    category: arcane
     icon: "🐉"
     is_shown: { is_ruler: yes, near_dragon_lair: yes }
     is_valid:
@@ -303,6 +312,7 @@ decisions:
 
   # ---------------------------------------------------------- вершины путей ночи
   summon_night:
+    category: arcane
     icon: "🦇"
     is_shown: { vampire_tier: ">= 4" }
     is_valid:
@@ -318,6 +328,7 @@ decisions:
     ai_check_months: 3
 
   lead_the_pack:
+    category: arcane
     icon: "🐺"
     is_shown: { has_trait: lycanthrope, beast_control: ">= 50" }
     is_valid:
@@ -333,6 +344,7 @@ decisions:
     ai_check_months: 2
 
   wolf_hunt:
+    category: arcane
     icon: "🌕"
     is_shown: { has_trait: lycanthrope, beast_control: ">= 50" }
     is_valid:

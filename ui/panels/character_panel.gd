@@ -148,20 +148,21 @@ static func _overview_tab(app: App, c: Dictionary) -> Control:
 	var root := K.vbox([], 10)
 
 	# действия — первыми: ради них окно и открывают
+	# взаимодействия — по категориям, как в CK3
 	if p != null and alive and not app.pick_mode and g.state.game_over == null:
-		var acts := K.flow([], 6)
+		var items := []
 		for def in Interactions.defs(g):
 			if not Interactions.is_shown(g, def, p, c):
 				continue
-			acts.add_child(_interaction_button(app, def, p.id, c.id))
+			items.append([W.category_of(g, "interactions", def), _interaction_button(app, def, p.id, c.id)])
 		if not is_me and not c.titles.is_empty():
 			var top := Titles.top_liege(g, c)
 			var targets := Wars.available_war_targets(g, p).filter(func(tt): return tt.defender == c.id or tt.defender == top.id)
 			if not targets.is_empty():
 				var def_id: String = targets[0].defender
-				acts.add_child(K.button(app.t("ui.declare_war"), func(): WarsPanel.open_declare_war(app, def_id), {"icon": "swords", "variation": "GoldButton"}))
-		if acts.get_child_count() > 0:
-			root.add_child(K.section(app.t("ui.self_actions" if is_me else "ui.interactions"), [acts], "scroll"))
+				items.append(["hostile", K.button(app.t("ui.declare_war"), func(): WarsPanel.open_declare_war(app, def_id), {"icon": "swords", "variation": "GoldButton"})])
+		if not items.is_empty():
+			root.add_child(K.section(app.t("ui.self_actions" if is_me else "ui.interactions"), [W.grouped(app, "interactions", items, true)], "scroll"))
 
 	var tf := W.traits(app, c)
 	if tf.get_child_count() > 0:

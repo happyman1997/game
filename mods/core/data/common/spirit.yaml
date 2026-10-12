@@ -66,6 +66,7 @@ decisions:
   # Работать на износ: стресс — в дело. Чем он выше, тем больше выучено и
   # сделано, но здоровье платит, а стресс не уходит.
   work_to_exhaustion:
+    category: personal
     icon: "🕯"
     is_shown: { is_adult: yes, stress: ">= 20" }
     is_valid:

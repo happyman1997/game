@@ -175,6 +175,7 @@ defines:
 | `events`, `on_actions` | `core/data/events/`, `core/data/common/on_actions.yaml` | События и точки их вызова — раздел 5. |
 | `script_values`, `scripted_triggers`, `scripted_effects` | `core/data/common/decisions.yaml` | Именованные формулы и блоки скрипта для повторного использования. |
 | `event_themes`, `map_modes` | `core/data/common/ui.yaml` | Оформление событий; режимы карты без кода (значение + градиент). |
+| `ui_categories` | `core/data/common/ui.yaml` | Категории в списках, как в CK3: `ui_categories.<вид>.<категория>: { order, icon, includes }` для видов `interactions`, `decisions`, `casus_belli`, `buildings`, `regiment_types`, `schemes`. Запись попадает в группу по своему полю `category` (`includes` — какие ещё категории показывать в этой группе); без категории — в `other` (решения с `major: yes` — в `major`, особые постройки — в `special`). Название — ключ локализации `ui_category.<вид>.<категория>`. Мод добавляет свою группу слиянием — так arcana заводит «Тайные искусства». |
 | `lifestyles`, `focuses`, `perks` | `core/data/common/lifestyles.yaml` | Образ жизни: фокусы и деревья перков — раздел 10. |
 | `council_positions`, `council_tasks` | `core/data/common/council.yaml` | Совет: должности и задачи — раздел 10. |
 | `factions` | `core/data/common/factions.yaml` | Фракции вассалов и их мятежи — раздел 10. |
@@ -394,7 +395,8 @@ ev:
 interactions:
   ask_for_blessing:
     icon: "🙏"
-    category: friendly
+    category: friendly          # группа в окне персонажа (ui_categories.interactions)
+    skill: diplomacy            # необязательно: навык, чьи удачи и неудачи считает механика momentum
     is_shown: { scope:recipient: { has_trait: zealous } }
     is_valid: { scope:actor: { piety: 50 } }
     cost: { piety: 50 }

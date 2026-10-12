@@ -203,6 +203,7 @@ interactions:
 
 decisions:
   convene_great_council:
+    category: realm
     requires_feature: politics
     icon: "🏛"
     is_shown:

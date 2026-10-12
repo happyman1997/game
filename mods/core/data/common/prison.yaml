@@ -64,7 +64,8 @@ interactions:
   release_prisoner:
     requires_feature: prison
     icon: "🔓"
-    category: diplomacy
+    category: prison
+    skill: diplomacy
     prisoner: only
     is_shown:
       scope:recipient: { is_imprisoned_by: scope:actor }
@@ -90,7 +91,7 @@ interactions:
   execute_prisoner:
     requires_feature: prison
     icon: "🪓"
-    category: hostile
+    category: prison
     prisoner: only
     is_shown:
       scope:recipient: { is_imprisoned_by: scope:actor }
@@ -133,7 +134,8 @@ interactions:
   demand_ransom:
     requires_feature: prison
     icon: "💰"
-    category: diplomacy
+    category: prison
+    skill: diplomacy
     prisoner: only
     decider: payer
     is_shown:
