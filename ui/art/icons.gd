@@ -31,7 +31,7 @@ static var BODIES := {
 	"scales": '<path d="M12 3 V20 M7 20.5 H17 M4 6 H20" fill="none" stroke-width="1.8"/><path d="M1.5 13 L4.5 6.5 L7.5 13 Z M16.5 13 L19.5 6.5 L22.5 13 Z"/><path d="M1.5 13 A3 2 0 0 0 7.5 13 Z M16.5 13 A3 2 0 0 0 22.5 13 Z"/>',
 	"fist": '<path d="M7 21 V14 L5.5 11 V7.5 A1.5 1.5 0 0 1 8.5 7.5 V6 A1.5 1.5 0 0 1 11.5 6 V5.5 A1.5 1.5 0 0 1 14.5 5.5 V6.5 A1.5 1.5 0 0 1 17.5 6.5 V13 L16 15 V21 Z"/>',
 	"spear": '<path d="M12 1.5 L15 7 L13 8 V22 H11 V8 L9 7 Z"/><path d="M8.5 9 H15.5" fill="none" stroke-width="1.6"/>',
-	"eye": '<path d="M1.5 12 Q12 1.5 22.5 12 Q12 22.5 1.5 12 Z"/><circle cx="12" cy="12" r="3.6" fill="#1c140a"/><circle cx="13.2" cy="10.8" r="1.1" fill="#fff3c8"/>',
+	"eye": '<ellipse cx="12" cy="12" rx="10.8" ry="7.4"/><circle cx="12" cy="12" r="3.6" fill="#1c140a"/><circle cx="13.2" cy="10.8" r="1.1" fill="#fff3c8"/>',
 	"helm": '<path d="M5 20 V11 C5 6.5 8 3.5 12 3.5 C16 3.5 19 6.5 19 11 V20 Z"/><path d="M7.5 11 H16.5 M12 11 V18" fill="none" stroke-width="1.8"/>',
 	"menu": '<rect x="4" y="5.5" width="16" height="2.4" rx="1"/><rect x="4" y="10.8" width="16" height="2.4" rx="1"/><rect x="4" y="16.1" width="16" height="2.4" rx="1"/>',
 	"play": '<path d="M7.5 4.5 L19.5 12 L7.5 19.5 Z"/>',
@@ -132,6 +132,7 @@ static func texture(name: String, size: int = 24, tint: String = "gold") -> Text
 	var cols: Array = {
 		"gold": ["#f6dea0", "#b0843a"], "silver": ["#f2f2ee", "#9a9a94"], "red": ["#f08a7a", "#9a2a20"],
 		"green": ["#bfe8a0", "#4a8a30"], "blue": ["#a8c8f0", "#3a5a9a"], "ink": ["#5a4020", "#2a1a08"],
+		"neon": ["#d8fdff", "#22b8d6"], "neon_red": ["#ffc0d0", "#e0285a"], "neon_dim": ["#3a6a78", "#1a3a48"],
 	}.get(tint, ["#f6dea0", "#b0843a"])
 	var img := Image.new()
 	# Рисуем вдвое крупнее и уменьшаем — так мелкие иконки чётче.

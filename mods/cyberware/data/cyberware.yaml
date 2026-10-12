@@ -1,0 +1,190 @@
+# «Киберимпланты»: системы тела, импланты, человечность и киберпсихоз.
+# Логика — scripts/main.gd, экран имплантов — scripts/cyber_ui.gd.
+defines:
+  cyberware:
+    humanity_base: 100        # человечность без имплантов
+    unstable_below: 40        # ниже — стресс каждый месяц
+    psychosis_below: 20       # ниже — риск киберпсихоза
+    psychosis_chance: 0.06    # в месяц, если человечность ниже psychosis_below
+    recovery_chance: 0.12     # шанс выйти из киберпсихоза, вернув человечность
+    unstable_stress: 4
+    surgery_risk: 0.12        # шанс осложнения операции (минус учёность × 0.005)
+    surgery_risk_min: 0.03
+    removal_cost: 30
+    removal_stress: 8
+    zealot_opinion: -15       # набожные о тех, в ком много хрома
+    zealot_threshold: 2
+    ai_chance: 0.03           # ИИ-правитель решается на имплант (в месяц)
+    ai_min_humanity: 55       # смелые идут дальше — до 30
+
+# черты меняют запас человечности
+traits:
+  calm: { modifiers: { humanity: 10 } }
+  compassionate: { modifiers: { humanity: 10 } }
+  content: { modifiers: { humanity: 5 } }
+  wrathful: { modifiers: { humanity: -10 } }
+  callous: { modifiers: { humanity: -10 } }
+  cyberpsychosis:
+    category: health
+    icon: glitch
+    modifiers: { prowess: 4, diplomacy: -4, stewardship: -2, general_opinion: -20, dread_gain_mult: 0.5, stress_gain_mult: 0.25 }
+
+opinion_modifiers:
+  cyber_rampage: { value: -40, years: 10 }
+  cyber_burned_doc: { value: 10, years: 5 }
+
+event_themes:
+  chrome: { icon: chip, color: "#1fb8d0" }
+
+# ---------------------------------------------------------------- системы тела
+# side — колонка на экране, zone — точка на голограмме (SVG 220×400)
+cyber_systems:
+  frontal_cortex: { order: 1, slots: 3, side: left,  zone: [110, 34],  icon: brain }
+  ocular:         { order: 2, slots: 1, side: left,  zone: [101, 50],  icon: optic }
+  circulatory:    { order: 3, slots: 3, side: left,  zone: [122, 126], icon: heart }
+  integumentary:  { order: 4, slots: 2, side: left,  zone: [80, 150],  icon: hexskin }
+  arms:           { order: 5, slots: 1, side: left,  zone: [52, 196],  icon: cyberarm }
+  os:             { order: 6, slots: 1, side: right, zone: [122, 60],  icon: deck }
+  nervous:        { order: 7, slots: 2, side: right, zone: [110, 170], icon: spine }
+  skeleton:       { order: 8, slots: 2, side: right, zone: [126, 214], icon: bone }
+  hands:          { order: 9, slots: 1, side: right, zone: [172, 246], icon: cyberhand }
+  legs:           { order: 10, slots: 1, side: right, zone: [128, 318], icon: cyberleg }
+
+# ---------------------------------------------------------------- качество
+cyber_tiers:
+  "1": { color: "#b8c2cc" }
+  "2": { color: "#6ee08a" }
+  "3": { color: "#4ab0ff" }
+  "4": { color: "#c27cff" }
+  "5": { color: "#ffaa33" }
+
+# ---------------------------------------------------------------- импланты
+# system, tier (1–5), price (золото), humanity (сколько съедает),
+# modifiers, cures — какие черты лечит (кибер-рука вместо потерянной)
+implants:
+  # лобная кора
+  memory_boost:     { system: frontal_cortex, tier: 1, price: 60,  humanity: 5,  icon: chip, modifiers: { learning: 2, lifestyle_xp_mult: 0.05 } }
+  empathy_chip:     { system: frontal_cortex, tier: 2, price: 120, humanity: 6,  icon: chip, modifiers: { diplomacy: 2, general_opinion: 5 } }
+  ledger_chip:      { system: frontal_cortex, tier: 2, price: 120, humanity: 6,  icon: chip, modifiers: { stewardship: 2, tax_mult: 0.05 } }
+  tactical_cortex:  { system: frontal_cortex, tier: 3, price: 220, humanity: 8,  icon: chip, modifiers: { martial: 3, commander_advantage: 4 } }
+  lie_analyzer:     { system: frontal_cortex, tier: 3, price: 220, humanity: 8,  icon: chip, modifiers: { intrigue: 2, scheme_defense: 15 } }
+  neural_crown:     { system: frontal_cortex, tier: 5, price: 600, humanity: 14, icon: brain, modifiers: { learning: 3, diplomacy: 2, stewardship: 2, lifestyle_xp_mult: 0.1 } }
+  # операционная система
+  cyberdeck:        { system: os, tier: 3, price: 260, humanity: 12, icon: deck, modifiers: { intrigue: 4, scheme_power: 15 } }
+  chrono_booster:   { system: os, tier: 4, price: 400, humanity: 16, icon: deck, modifiers: { prowess: 8, battle_survival: 0.2 } }
+  berserk:          { system: os, tier: 4, price: 400, humanity: 16, icon: deck, modifiers: { prowess: 6, health: 0.5, dread_gain_mult: 0.25 } }
+  overmind:         { system: os, tier: 5, price: 650, humanity: 18, icon: deck, modifiers: { intrigue: 6, scheme_power: 25, scheme_defense: 15 } }
+  # глаза
+  hawk_optics:      { system: ocular, tier: 1, price: 60,  humanity: 3, icon: optic, modifiers: { intrigue: 1, martial: 1 } }
+  thermal_vision:   { system: ocular, tier: 2, price: 120, humanity: 4, icon: optic, modifiers: { commander_advantage: 3, pursuit: 0.1 } }
+  mirror_pupils:    { system: ocular, tier: 2, price: 110, humanity: 4, icon: optic, modifiers: { attraction_opinion: 10, diplomacy: 1 } }
+  oracle_eye:       { system: ocular, tier: 4, price: 380, humanity: 8, icon: optic, modifiers: { intrigue: 3, scheme_defense: 20, learning: 1 } }
+  # кровеносная система
+  biomonitor:       { system: circulatory, tier: 1, price: 50,  humanity: 3,  icon: heart, modifiers: { health: 0.5 } }
+  blood_pump:       { system: circulatory, tier: 2, price: 120, humanity: 5,  icon: heart, modifiers: { health: 0.4, stress_gain_mult: -0.1 } }
+  toxin_filter:     { system: circulatory, tier: 2, price: 110, humanity: 4,  icon: heart, modifiers: { scheme_defense: 15, health: 0.2 } }
+  synth_heart:      { system: circulatory, tier: 4, price: 420, humanity: 10, icon: heart, modifiers: { health: 1.5, battle_survival: 0.25 } }
+  # нервная система
+  reflex_tuner:     { system: nervous, tier: 2, price: 120, humanity: 6, icon: spine, modifiers: { prowess: 3 } }
+  neofiber:         { system: nervous, tier: 3, price: 220, humanity: 7, icon: spine, modifiers: { prowess: 3, battle_survival: 0.1 } }
+  calm_regulator:   { system: nervous, tier: 3, price: 230, humanity: 8, icon: spine, modifiers: { stress_gain_mult: -0.25 } }
+  # кожа
+  subdermal_armor:  { system: integumentary, tier: 2, price: 140, humanity: 7,  icon: hexskin, modifiers: { prowess: 2, battle_survival: 0.2, health: 0.2 } }
+  pain_editor:      { system: integumentary, tier: 3, price: 220, humanity: 7,  icon: hexskin, modifiers: { stress_gain_mult: -0.1, health: 0.3, prowess: 1 } }
+  optical_camo:     { system: integumentary, tier: 4, price: 380, humanity: 10, icon: hexskin, modifiers: { intrigue: 3, scheme_power: 10 } }
+  # скелет
+  bionic_lungs:     { system: skeleton, tier: 1, price: 70,  humanity: 4, icon: bone, modifiers: { health: 0.3, march_speed: 0.05 } }
+  titanium_bones:   { system: skeleton, tier: 2, price: 140, humanity: 6, icon: bone, modifiers: { prowess: 2, health: 0.3 } }
+  reinforced_spine: { system: skeleton, tier: 3, price: 220, humanity: 7, icon: bone, modifiers: { knight_effectiveness: 0.1, prowess: 2 } }
+  # руки
+  power_fists:      { system: arms, tier: 3, price: 260, humanity: 12, icon: cyberarm, cures: [maimed], modifiers: { prowess: 5, siege_speed: 0.1 } }
+  wrist_launcher:   { system: arms, tier: 3, price: 280, humanity: 12, icon: cyberarm, cures: [maimed], modifiers: { prowess: 4, commander_advantage: 3 } }
+  sickle_blades:    { system: arms, tier: 4, price: 420, humanity: 14, icon: cyberarm, cures: [maimed], modifiers: { prowess: 7, dread_gain_mult: 0.2 } }
+  monowire:         { system: arms, tier: 4, price: 400, humanity: 12, icon: cyberarm, cures: [maimed], modifiers: { prowess: 4, intrigue: 2, scheme_power: 5 } }
+  # кисти
+  smart_link:       { system: hands, tier: 2, price: 100, humanity: 4, icon: cyberhand, modifiers: { martial: 1, knight_effectiveness: 0.05 } }
+  surgeon_fingers:  { system: hands, tier: 2, price: 100, humanity: 3, icon: cyberhand, modifiers: { learning: 1, stewardship: 1 } }
+  ballistic_coproc: { system: hands, tier: 3, price: 200, humanity: 5, icon: cyberhand, modifiers: { prowess: 2, commander_advantage: 1 } }
+  # ноги
+  fortified_ankles:   { system: legs, tier: 1, price: 70,  humanity: 4, icon: cyberleg, cures: [maimed], modifiers: { health: 0.2, battle_survival: 0.1 } }
+  reinforced_tendons: { system: legs, tier: 2, price: 120, humanity: 5, icon: cyberleg, cures: [maimed], modifiers: { prowess: 1, pursuit: 0.1 } }
+  jump_boosters:      { system: legs, tier: 3, price: 220, humanity: 6, icon: cyberleg, cures: [maimed], modifiers: { orderly_retreat: 0.1, pursuit: 0.1, prowess: 1 } }
+
+# ---------------------------------------------------------------- события
+on_actions:
+  on_monthly_pulse:
+    random_events:
+      events:
+        cyber.0001: 6
+        cyber.0002: 30
+        cyber.0003: 4
+
+events:
+  # потрошитель у ворот
+  cyber.0001:
+    theme: chrome
+    icon: chip
+    trigger:
+      is_ruler: yes
+      is_adult: yes
+      gold: 60
+    cooldown: { years: 6 }
+    options:
+      # поставить оптику за полцены
+      - trigger: { gold: 40 }
+        effect:
+          add_gold: -40
+          install_implant: hawk_optics
+        ai_chance: { value: 10, add: { value: ai_boldness, multiply: 10 } }
+      # прогнать
+      - effect: { add_prestige: -5 }
+        ai_chance: 40
+      # сжечь как колдуна
+      - trigger: { has_trait: zealous }
+        effect: { add_piety: 30, add_stress: 5 }
+        ai_chance: 30
+
+  # приступ киберпсихоза
+  cyber.0002:
+    theme: chrome
+    icon: glitch
+    trigger: { has_trait: cyberpsychosis }
+    cooldown: { years: 1 }
+    immediate:
+      random_courtier:
+        limit: { is_adult: yes }
+        save_scope_as: victim
+    options:
+      # запереться и переждать
+      - effect: { add_stress: 15, add_prestige: -20 }
+        ai_chance: 40
+      # дать волю ярости
+      - trigger: { exists: scope:victim }
+        effect:
+          add_dread: 20
+          scope:victim:
+            add_trait: wounded
+            add_opinion: { target: root, modifier: cyber_rampage }
+          add_stress: -20
+        ai_chance: 40
+      # вырвать часть хрома
+      - trigger: { num_implants: "> 0" }
+        effect: { remove_implant: random, add_stress: 10 }
+        ai_chance: 20
+
+  # Церковь осуждает хром
+  cyber.0003:
+    theme: faith
+    icon: cross
+    trigger:
+      is_ruler: yes
+      num_implants: ">= 2"
+    cooldown: { years: 5 }
+    options:
+      # покаяться и заплатить
+      - trigger: { gold: 80 }
+        effect: { add_gold: -80, add_piety: 40 }
+        ai_chance: 30
+      # пусть ворчат
+      - effect: { add_piety: -40, add_prestige: 10 }
+        ai_chance: 50

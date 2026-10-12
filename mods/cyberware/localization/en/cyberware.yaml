@@ -1,0 +1,166 @@
+# Cyberware.
+cyber_system:
+  frontal_cortex: Frontal Cortex
+  ocular: Ocular System
+  circulatory: Circulatory System
+  integumentary: Integumentary System
+  arms: Arms
+  os: Operating System
+  nervous: Nervous System
+  skeleton: Skeleton
+  hands: Hands
+  legs: Legs
+
+implant:
+  memory_boost: Memory Boost
+  empathy_chip: Empathy Module
+  ledger_chip: Ledger Neurochip
+  tactical_cortex: Tactical Coprocessor
+  lie_analyzer: Lie Analyzer
+  neural_crown: Neural Crown “Logos”
+  cyberdeck: Cyberdeck “Ghost”
+  chrono_booster: Chrono Booster “Blink”
+  berserk: Berserk “Fury”
+  overmind: Cyberdeck “Overmind”
+  hawk_optics: Optics “Hawk”
+  thermal_vision: Thermal Vision
+  mirror_pupils: Mirror Pupils
+  oracle_eye: Oracle's Eye
+  biomonitor: Biomonitor
+  blood_pump: Blood Pump
+  toxin_filter: Toxin Filter
+  synth_heart: Synthetic Heart
+  reflex_tuner: Reflex Tuner
+  neofiber: Neofiber
+  calm_regulator: Calm Regulator
+  subdermal_armor: Subdermal Armor
+  pain_editor: Pain Editor
+  optical_camo: Optical Camo
+  bionic_lungs: Bionic Lungs
+  titanium_bones: Titanium Bones
+  reinforced_spine: Reinforced Spine
+  power_fists: Power Fists
+  wrist_launcher: Wrist Launcher
+  sickle_blades: Sickle Blades
+  monowire: Monowire
+  smart_link: Smart Link
+  surgeon_fingers: Surgeon's Fingers
+  ballistic_coproc: Ballistic Coprocessor
+  fortified_ankles: Fortified Ankles
+  reinforced_tendons: Reinforced Tendons
+  jump_boosters: Jump Boosters
+implant_desc:
+  memory_boost: "Chronicles, psalms, debt ledgers — all remembered word for word."
+  empathy_chip: "Hears what is in a person's heart before they speak."
+  ledger_chip: "Taxes, tolls and interest add up on their own."
+  tactical_cortex: "The battlefield seen from above — like a chessboard."
+  lie_analyzer: "Pulse, pupils, a tremor in the voice: a liar gives themselves away in an instant."
+  neural_crown: "A crown beneath the skull. Its bearer thinks for three."
+  cyberdeck: "Breaks locks, seals and other people's thoughts."
+  chrono_booster: "The world slows: the arrow hangs in the air, the enemy's sword crawls."
+  berserk: "Pain switched off, blood boiling. Stopping is harder than starting."
+  overmind: "A web of spies in the head; ciphers and plots laid bare."
+  hawk_optics: "Sees a rider three miles off and a coin at the bottom of a well."
+  thermal_vision: "An ambush in the woods glows like a campfire."
+  mirror_pupils: "Eyes to drown in. The court cannot look away."
+  oracle_eye: "Sees not only through walls but through smiles."
+  biomonitor: "Warns of illness before the physician does."
+  blood_pump: "A steady pulse in battle and in council alike."
+  toxin_filter: "Poison in the cup? The filter works before the poisoner can rejoice."
+  synth_heart: "A heart of star-iron. It cannot be pierced at the first blow."
+  reflex_tuner: "The hand moves before the thought."
+  neofiber: "Nerves of light: no blow can catch up."
+  calm_regulator: "Anxiety muffled, sleep comes. Only feelings grow quieter."
+  subdermal_armor: "Plates beneath the skin: an arrow bounces off the shoulder."
+  pain_editor: "Pain is just a number that can be erased."
+  optical_camo: "The skin takes the color of the wall. Guards look right through."
+  bionic_lungs: "Breath never falters, on the march or in the mountains."
+  titanium_bones: "Bones that even a mace cannot break."
+  reinforced_spine: "A back that keeps you in the saddle in full armor."
+  power_fists: "A blow that cracks castle gates."
+  wrist_launcher: "Small, roaring death in the forearm."
+  sickle_blades: "Blades slide out of the forearms. The court flinches when you gesture."
+  monowire: "A thread thinner than hair cuts plate like cheese."
+  smart_link: "The weapon in hand seems to know where to strike."
+  surgeon_fingers: "Fingers finer than a quill: stitches, letters and abacus alike."
+  ballistic_coproc: "The hand corrects its own aim."
+  fortified_ankles: "Legs that survive a fall from a castle wall."
+  reinforced_tendons: "A stride that outruns a horse."
+  jump_boosters: "A leap across the moat — and back."
+
+trait:
+  cyberpsychosis: Cyberpsychosis
+trait_desc:
+  cyberpsychosis: "More chrome than human now. Rage without cause, emptiness where pity was — the court is afraid and whispers."
+
+opinion_modifier:
+  cyber_rampage: Hurt in a Cyberpsychosis
+  cyber_burned_doc: Burned the Ripperdoc
+
+stat:
+  humanity: Humanity
+stress_src:
+  cyberware: Chrome in the body
+
+cyber:
+  ui_title: Cyberware
+  ui_class: "{system} · class {n}"
+  ui_cures: "Replaces a lost limb (cures maiming)"
+  ui_humanity_cost: "−{n} humanity"
+  ui_effects: "Cyberware effects ({n})"
+  ui_no_implants: A clean body — not a gram of chrome
+  ui_clinic: Ripperdoc's Clinic
+  ui_clinic_info: "Complication risk: {risk}% (learning lowers it) · humanity: {h} · gold: {gold}"
+  ui_empty_slot: "Free slot: {system}"
+  ui_click_install: Click to install an implant
+  ui_humanity: Humanity
+  ui_humanity_tip: "Every implant eats away at humanity. Below {u} — instability and stress each month; below {p} — risk of cyberpsychosis. The calm and compassionate endure more, the wrathful and callous less."
+  ui_humanity_parts: "Base {base}, traits {traits}, eaten by implants {used}"
+  ui_installed_on: "Installed: {date}"
+  ui_remove: "Remove ({n} gold)"
+  ui_all: All systems
+  ui_install: Install
+  status_stable: Stable
+  status_unstable: Unstable
+  status_critical: On the edge
+  status_psycho: Cyberpsychosis
+  err_unknown: No such implant
+  err_have: Already installed
+  err_full: "No free slot: {system}"
+  err_gold: "Need {n} gold"
+  err_humanity: Not enough humanity
+  err_child: Too young for surgery
+  msg_installed: "The ripperdoc is done: {name} installed."
+  msg_installed_bad: "{name} installed, but the surgery went badly — you are wounded."
+  msg_recovered: "You feel human again: the cyberpsychosis has receded."
+  msg_psycho: "{who}: cyberpsychosis! More chrome than human now."
+  msg_psycho_own: "Cyberpsychosis. You are no longer sure where the iron ends and you begin."
+  opinion_chrome: Unholy Iron
+  tr_has_any: Has cyberware
+  tr_has_any.not: Has no cyberware
+  tr_has: "Implant installed: {value}"
+  fx_install: "{who}: implant “{value}” installed"
+  fx_remove: "{who}: implant “{value}” removed"
+  fx_remove_random: "{who} loses one of their implants"
+  alert_unstable: "Humanity {n}: chrome weighs on the mind"
+  alert_critical: "Humanity {n}: on the edge of cyberpsychosis!"
+  alert_psycho: "Cyberpsychosis! Humanity {n}"
+
+ev:
+  cyber.0001:
+    t: A Ripperdoc at the Gates
+    desc: "The guards bring in a strange healer in black. His chest hums, and his hands gleam with metal. “The star did not fall for nothing, my lord,” he says. “Let me make your eyes keener than a hawk's. Almost for free.”"
+    a: Let him install the optics (−40 gold)
+    b: Send him away
+    c: Burn the sorcerer
+  cyber.0002:
+    t: An Episode
+    desc: "Light cuts the eyes, the court's voices sound like grinding metal. The iron inside demands action — any action. [scope:victim] stands too close."
+    a: Lock yourself in your chambers and wait it out
+    b: Let the fury out
+    c: Tear out some of the chrome
+  cyber.0003:
+    t: The Church Condemns Chrome
+    desc: "From the pulpit the bishop curses “iron men,” and the flock eyes your hands. They say star-iron is the devil's work."
+    a: Repent and pay the church (−80 gold)
+    b: Let them grumble

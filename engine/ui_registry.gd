@@ -8,6 +8,8 @@ extends RefCounted
 ##   legend?: Callable(game) -> Array[{color, label}], tooltip?: Callable(game, prov_id) -> String}
 ## Панель мода (кнопка внизу): {id, name, icon, order?, render: Callable(game, ui) -> Control}
 ## Раздел окна персонажа/провинции: {id, title, order?, render: Callable(game, id, ui) -> Control}
+## Вкладка окна персонажа: {id, name, icon?, order?, shown?: Callable(game, c) -> bool,
+##   badge?: Callable(game, c) -> int, render: Callable(game, c_id, ui) -> Control}
 ## Виджет верхней панели: {id, order?, render: Callable(game) -> {icon?, text, tooltip?} | null}
 ## Оповещение: {id, order?, check: Callable(game) -> {icon, text, kind?, action?} | Array | null}
 ##   action: {tab?, character?, title?, province?}
@@ -15,6 +17,7 @@ extends RefCounted
 var map_modes := Registry.new("режим карты")
 var panels := Registry.new("панель")
 var character_sections := Registry.new("раздел персонажа")
+var character_tabs := Registry.new("вкладка персонажа")
 var province_sections := Registry.new("раздел провинции")
 var top_bar := Registry.new("виджет")
 var alerts := Registry.new("оповещение")

@@ -62,7 +62,23 @@ static func build(app: App, id: String) -> Control:
 		tabs.append({"id": "realm", "name": app.t("ui.ctab.realm"), "icon": "crown", "badge": c.titles.size()})
 	if g.engine.has_feature("artifacts") and (is_me or not Artifacts.items_of(g, c).is_empty()):
 		tabs.append({"id": "inventory", "name": app.t("ui.ctab.inventory"), "icon": "bag", "badge": Artifacts.items_of(g, c).size()})
+	# вкладки модов
+	var mod_tabs: Array = g.engine.ui.character_tabs.values()
+	Data.sort_by(mod_tabs, func(x): return Data.num(x.get("order")))
+	for mt in mod_tabs:
+		if mt.get("shown") is Callable and not mt.shown.call(g, c):
+			continue
+		var tb := {"id": "mod:" + str(mt.id), "name": g.loc.resolve(mt.get("name", mt.id)), "icon": mt.get("icon", "star")}
+		if mt.get("badge") is Callable:
+			var n: int = int(mt.badge.call(g, c))
+			if n > 0:
+				tb["badge"] = n
+		tabs.append(tb)
 	root.add_child(W.tabs(app, "character", tabs, func(tab_id: String) -> Control:
+		if tab_id.begins_with("mod:"):
+			var spec: Variant = g.engine.ui.character_tabs.get_item(tab_id.substr(4))
+			if spec != null:
+				return spec.render.call(g, c.id, app)
 		match tab_id:
 			"family": return _family_tab(app, c)
 			"realm": return _realm_tab(app, c)

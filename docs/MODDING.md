@@ -561,7 +561,20 @@ func init(api: ModApi) -> void:
 		"render": func(game: Game, char_id: String, ui): return "[b]3[/b] сокола"})  # BBCode или Control
 	api.ui.province_sections.register("falcons", {"id": "falcons", "title": "Соколы",
 		"render": func(game: Game, prov_id: String, ui): return null})
+	# своя вкладка в окне персонажа (рядом с «Обзором», «Семьёй», «Вещами»)
+	api.ui.character_tabs.register("falcons", {"id": "falcons", "name": "Соколы", "icon": "🦅",
+		"shown": func(game: Game, c: Dictionary) -> bool: return not c.titles.is_empty(),
+		"badge": func(game: Game, c: Dictionary) -> int: return 3,
+		"render": func(game: Game, char_id: String, ui) -> Control: return Label.new()})
 ```
+
+Целиком своё оформление показывает мод `cyberware` («Киберимпланты»): экран
+имплантов в неоновом стиле (`scripts/cyber_ui.gd`) — голограмма тела в SVG,
+системы со слотами и линиями к точкам вживления, шкала человечности,
+клиника потрошителя; логика — `scripts/main.gd` (свой тип контента
+`implants` и `cyber_systems`, состояние в `game.mod_data`, система, поставщики
+модификаторов и мнения, условия `has_implant`, значения `num_implants` и
+`humanity`, эффекты `install_implant`, `remove_implant`).
 
 Иконки интерфейса: можно указать эмодзи (`"🦅"`) или имя встроенной
 нарисованной иконки (`"crown"`, `"swords"`, `"castle"`…, полный список —
@@ -592,7 +605,7 @@ func init(api: ModApi) -> void:
 | `api.on(name, fn, priority)`, `api.emit` | Хуки. |
 | `api.registries` | `succession_algorithms`, `cb_targets`, `interaction_targets`, `interaction_deciders`, `modifier_providers`, `province_modifier_providers`, `opinion_providers`, `content_validators`. Поставщик модификаторов возвращает словарь или массив `[{label, modifiers}]`; `label` может быть `Callable() -> String` — подпись считается только для подсказки (характеристики пересчитываются часто). |
 | `api.add_feature`, `api.has_feature`, `api.list_features` | Механики; `EngineFeature.eval_modifiers(ctx, scope, mods)` — модификаторы со скриптовыми значениями. |
-| `api.ui` | `map_modes`, `panels`, `character_sections`, `province_sections`, `top_bar`, `alerts`, `event_themes`. |
+| `api.ui` | `map_modes`, `panels`, `character_sections`, `character_tabs`, `province_sections`, `top_bar`, `alerts`, `event_themes`. |
 | `api.formats` | Форматы файлов данных (YAML, JSON и свои). |
 | `api.log(msg)` | Сообщение в консоль с именем мода. |
 
