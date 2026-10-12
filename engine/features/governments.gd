@@ -21,6 +21,7 @@ extends EngineFeature
 ##     members: { trait, per_year: [от, до], age: [от, до], cultures: [...],
 ##                skills: {...}, max } — ежегодно ко двору приходят новые
 ##                члены (добровольцы ордена) с чертой trait;
+##     war_cbs: [...]           — наступательные войны только по этим поводам;
 ##     ai_war_mult: множитель шанса ИИ начать войну } }
 ## Черта с celibate: yes запрещает брак её носителю; черты с race: <id> —
 ## браки только внутри своей расы (без поля — люди).
@@ -344,12 +345,25 @@ func install(engine: GameEngine) -> void:
 	, 0, OWNER)
 	# сход одобряет наступательную войну
 	H.on("war.allowed", func(p): return Governments.assembly_allows_war(p.game, p.attacker), 0, OWNER)
+	# правление с war_cbs воюет только по этим поводам
+	H.on("war.cb_allowed", func(p):
+		var cbs: Variant = Governments.rule(p.game, p.attacker, "war_cbs")
+		return cbs == null or Data.as_array(cbs).has(p.cb)
+	, 0, OWNER)
 	H.on("war.before_declare", func(p):
 		var game: Game = p.game
 		var opts: Dictionary = p.get("options", {})
 		if opts.get("free", false):
 			return true
 		return Governments.assembly_allows_war(game, p.attacker)
+	, 0, OWNER)
+	# срок вожака из истории: characters.<id>.term_start: "1061.5.1"
+	H.on("game.setup", func(p):
+		var game: Game = p.game
+		for d in game.content.all("characters"):
+			var ch: Variant = game.state.characters.get(d.id)
+			if d.get("term_start") != null and ch != null:
+				ch.vars["term_start"] = GameDate.parse(str(d.term_start))
 	, 0, OWNER)
 	# игрок в правлении с play_family продолжает за свой род
 	H.on("player.next_character", func(p):

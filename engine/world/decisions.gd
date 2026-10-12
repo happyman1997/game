@@ -81,6 +81,13 @@ static func building_slots(game: Game, prov_id: String) -> int:
 	return maxi(1, n) * int(game.def_num("buildings.slots_per_holding", 2))
 
 
+## Особые постройки (special: yes) не строятся и не занимают места: они даны
+## графству с начала игры или событием.
+static func is_special_building(game: Game, b: String) -> bool:
+	var d: Variant = game.content.get_def("buildings", b)
+	return d != null and d.get("special", false)
+
+
 ## [{def, blockers}]
 static func building_candidates(game: Game, c: Dictionary, prov_id: String) -> Array:
 	var p: Variant = game.state.provinces.get(prov_id)
@@ -88,10 +95,11 @@ static func building_candidates(game: Game, c: Dictionary, prov_id: String) -> A
 	if p == null or pdef == null:
 		return []
 	var out := []
-	var full: bool = p.buildings.size() >= building_slots(game, prov_id)
+	var used := Data.count(p.buildings, func(b): return not is_special_building(game, b))
+	var full: bool = used >= building_slots(game, prov_id)
 	var holdings := Data.as_array(pdef.get("holdings"))
 	for b in game.content.all("buildings"):
-		if p.buildings.has(b.id):
+		if p.buildings.has(b.id) or b.get("special", false):
 			continue
 		if b.get("holding") != null and not holdings.has(b.holding):
 			continue

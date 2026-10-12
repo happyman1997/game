@@ -1,0 +1,362 @@
+# Пепельные марки в 1066 году. Полвека назад, в день летнего солнцестояния
+# 1016 года, император Отгар Сожжённый поджёг себя и Зонненштадт; с ним сгорел
+# наследник, и мужская линия Зоннингов пресеклась. Четыре дочери императора
+# были замужем за маркграфами — их сыновья и дочь правят марками сегодня, и
+# каждый считает себя законным наследником. Венец пропал в пепле.
+dynasties:
+  sonning: { culture: marcher, prestige: 1000 }
+  kronwald: { culture: marcher, prestige: 500 }
+  wolfing: { culture: marcher, prestige: 350 }
+  felsen: { culture: marcher, prestige: 300 }
+  eisenwart: { culture: marcher, prestige: 300 }
+  ukkena: { culture: frisian, prestige: 150 }
+  attena: { culture: frisian, prestige: 120 }
+  benninga: { culture: frisian, prestige: 100 }
+  idzinga: { culture: frisian, prestige: 80 }
+  gorynichi: { culture: zwerg, prestige: 400 }
+  rudomirichi: { culture: zwerg, prestige: 200 }
+  zlatoyarichi: { culture: zwerg, prestige: 150 }
+  kremenichi: { culture: zwerg, prestige: 120 }
+
+characters:
+  # ================================================ Солнечная империя (до пожара)
+  otgar_burned: { name: Otgar, nickname: nick.burned, dynasty: sonning, culture: marcher, faith: catholic, birth: "958.3.1", death: "1016.6.21", spouse: adelheid_empress }
+  adelheid_empress: { name: Adelheid, female: true, culture: marcher, faith: catholic, birth: "965.1.1", death: "1031.2.1" }
+  siegmar_sonning: { name: Siegmar, dynasty: sonning, culture: marcher, faith: catholic, birth: "986.1.1", death: "1016.6.21", father: otgar_burned, mother: adelheid_empress }
+  richenza_sonning: { name: Richenza, female: true, dynasty: sonning, culture: marcher, faith: catholic, birth: "988.1.1", death: "1050.3.1", father: otgar_burned, mother: adelheid_empress, spouse: ekbert_kronwald }
+  hedwig_sonning: { name: Hedwig, female: true, dynasty: sonning, culture: marcher, faith: catholic, birth: "991.1.1", death: "1044.1.1", father: otgar_burned, mother: adelheid_empress, spouse: brun_eisenwart }
+  gisela_sonning: { name: Gisela, female: true, dynasty: sonning, culture: marcher, faith: ash_penitence, birth: "993.1.1", death: "1060.1.1", father: otgar_burned, mother: adelheid_empress, spouse: hartmut_wolfing }
+  uta_sonning: { name: Uta, female: true, dynasty: sonning, culture: marcher, faith: ash_penitence, birth: "997.1.1", death: "1052.1.1", father: otgar_burned, mother: adelheid_empress, spouse: dietmar_felsen }
+  ekbert_kronwald: { name: Ekbert, dynasty: kronwald, culture: marcher, faith: catholic, birth: "982.1.1", death: "1041.1.1" }
+  brun_eisenwart: { name: Brun, dynasty: eisenwart, culture: marcher, faith: catholic, birth: "986.1.1", death: "1039.1.1" }
+  hartmut_wolfing: { name: Hartmut, dynasty: wolfing, culture: marcher, faith: ash_penitence, birth: "985.1.1", death: "1058.1.1" }
+  dietmar_felsen: { name: Dietmar, dynasty: felsen, culture: marcher, faith: ash_penitence, birth: "990.1.1", death: "1049.1.1" }
+
+  # ================================================ Рейнская марка
+  # Адальберт Хранитель — сын старшей дочери императора. В Кронхафене он
+  # хранит скипетр, державу и меч империи; недостаёт только венца.
+  adalbert_kronwald:
+    name: Adalbert
+    nickname: nick.keeper
+    dynasty: kronwald
+    culture: marcher
+    faith: ash_penitence
+    birth: "1018.4.2"
+    father: ekbert_kronwald
+    mother: richenza_sonning
+    spouse: irmgard_eisenwart
+    traits: [diligent, arrogant, just, education_stewardship_3]
+    skills: { diplomacy: 12, martial: 8, stewardship: 14, intrigue: 9, learning: 11, prowess: 7 }
+    claims: [e_sun_empire]
+    gold: 300
+    prestige: 900
+  konrad_kronwald: { name: Konrad, dynasty: kronwald, culture: marcher, faith: ash_penitence, birth: "1047.2.1", father: adalbert_kronwald, mother: irmgard_eisenwart, traits: [brave, honest, education_martial_3] }
+  mechthild_kronwald: { name: Mechthild, female: true, dynasty: kronwald, culture: marcher, faith: ash_penitence, birth: "1050.6.1", father: adalbert_kronwald, mother: irmgard_eisenwart, traits: [patient, education_learning_2] }
+  lothar_kronwald: { name: Lothar, dynasty: kronwald, culture: marcher, faith: ash_penitence, birth: "1054.9.1", father: adalbert_kronwald, mother: irmgard_eisenwart }
+  # Младший брат — герцог Маасланда; считает, что марка досталась не тому.
+  ruprecht_kronwald:
+    name: Ruprecht
+    dynasty: kronwald
+    culture: marcher
+    faith: ash_penitence
+    birth: "1022.1.1"
+    father: ekbert_kronwald
+    mother: richenza_sonning
+    spouse: oda_maasland
+    traits: [ambitious, deceitful, gregarious, education_intrigue_3]
+    skills: { diplomacy: 11, martial: 9, stewardship: 8, intrigue: 14, learning: 7, prowess: 9 }
+    claims: [k_rhine_march, e_sun_empire]
+    gold: 120
+  oda_maasland: { name: Oda, female: true, culture: marcher, faith: ash_penitence, birth: "1030.1.1", traits: [greedy] }
+  udo_kronwald: { name: Udo, dynasty: kronwald, culture: marcher, faith: ash_penitence, birth: "1052.1.1", father: ruprecht_kronwald, mother: oda_maasland }
+
+  # ================================================ Северная марка
+  # Вольфрам — воин и сын третьей дочери. Он не ждёт, пока венец найдут:
+  # он думает, что венец достанется тому, у кого больше мечей.
+  wolfram_wolfing:
+    name: Wolfram
+    dynasty: wolfing
+    culture: marcher
+    faith: ash_penitence
+    birth: "1028.11.1"
+    father: hartmut_wolfing
+    mother: gisela_sonning
+    spouse: foelke_attena
+    traits: [brave, wrathful, ambitious, education_martial_4]
+    skills: { diplomacy: 7, martial: 16, stewardship: 6, intrigue: 8, learning: 5, prowess: 17 }
+    claims: [e_sun_empire, c_glockenfurt]
+    gold: 120
+    prestige: 600
+  # жена-фризка: брак ради мира на побережье
+  foelke_attena: { name: Foelke, female: true, dynasty: attena, culture: frisian, faith: catholic, birth: "1034.1.1", father: okko_attena, traits: [stubborn, honest] }
+  brun_wolfing: { name: Brun, dynasty: wolfing, culture: marcher, faith: ash_penitence, birth: "1052.3.1", father: wolfram_wolfing, mother: foelke_attena, traits: [brave, education_martial_2] }
+  liutgard_wolfing: { name: Liutgard, female: true, dynasty: wolfing, culture: marcher, faith: ash_penitence, birth: "1055.1.1", father: wolfram_wolfing, mother: foelke_attena }
+  hartmut_wolfing_y: { name: Hartmut, dynasty: wolfing, culture: marcher, faith: ash_penitence, birth: "1058.1.1", father: wolfram_wolfing, mother: foelke_attena }
+  ortwin_wolfing:
+    name: Ortwin
+    dynasty: wolfing
+    culture: marcher
+    faith: ash_penitence
+    birth: "1031.1.1"
+    father: hartmut_wolfing
+    mother: gisela_sonning
+    traits: [brave, honest, calm, education_martial_3]
+    skills: { martial: 13, prowess: 15 }
+
+  # ================================================ Южная марка
+  # Кунигунда — дочь младшей дочери императора. Её горные роты служат
+  # за серебро любому двору, а серебро копится в Зольдбурге.
+  kunigunde_felsen:
+    name: Kunigunde
+    female: true
+    dynasty: felsen
+    culture: marcher
+    faith: ash_penitence
+    birth: "1024.5.1"
+    father: dietmar_felsen
+    mother: uta_sonning
+    spouse: siegfried_iron
+    traits: [deceitful, greedy, diligent, education_intrigue_3]
+    skills: { diplomacy: 11, martial: 9, stewardship: 13, intrigue: 15, learning: 8, prowess: 5 }
+    claims: [e_sun_empire]
+    gold: 450
+    prestige: 500
+  # муж — безродный капитан наёмников; дети носят имя Фельзенов
+  siegfried_iron:
+    name: Siegfried
+    nickname: nick.iron_company
+    culture: marcher
+    faith: ash_penitence
+    birth: "1019.1.1"
+    court: kunigunde_felsen
+    traits: [brave, gregarious, wrathful, education_martial_4]
+    skills: { diplomacy: 6, martial: 16, stewardship: 5, intrigue: 6, learning: 4, prowess: 16 }
+  udo_felsen: { name: Udo, dynasty: felsen, culture: marcher, faith: ash_penitence, birth: "1046.1.1", father: siegfried_iron, mother: kunigunde_felsen, traits: [ambitious, brave, education_martial_3] }
+  walburga_felsen: { name: Walburga, female: true, dynasty: felsen, culture: marcher, faith: ash_penitence, birth: "1049.1.1", father: siegfried_iron, mother: kunigunde_felsen, traits: [deceitful, education_intrigue_2] }
+  volkmar_felsen: { name: Volkmar, dynasty: felsen, culture: marcher, faith: ash_penitence, birth: "1053.1.1", father: siegfried_iron, mother: kunigunde_felsen }
+
+  # ================================================ Восточная марка
+  # Геро Старый — сын второй дочери, старейший из внуков Отгара. Строит
+  # крепости, торгует с цвергами и не верит никому — особенно своему наследнику.
+  gero_eisenwart:
+    name: Gero
+    nickname: nick.old
+    dynasty: eisenwart
+    culture: marcher
+    faith: ash_penitence
+    birth: "1012.2.1"
+    father: brun_eisenwart
+    mother: hedwig_sonning
+    spouse: ermentrud_eisenwart
+    traits: [patient, paranoid, just, education_martial_3]
+    skills: { diplomacy: 8, martial: 13, stewardship: 12, intrigue: 10, learning: 9, prowess: 6 }
+    health: 3
+    claims: [e_sun_empire]
+    gold: 250
+    prestige: 600
+  ermentrud_eisenwart: { name: Ermentrud, female: true, culture: marcher, faith: ash_penitence, birth: "1014.1.1", death: "1050.1.1" }
+  irmgard_eisenwart: { name: Irmgard, female: true, dynasty: eisenwart, culture: marcher, faith: ash_penitence, birth: "1030.1.1", father: gero_eisenwart, mother: ermentrud_eisenwart, traits: [compassionate, patient] }
+  dietrich_eisenwart:
+    name: Dietrich
+    dynasty: eisenwart
+    culture: marcher
+    faith: ash_penitence
+    birth: "1036.1.1"
+    father: gero_eisenwart
+    mother: ermentrud_eisenwart
+    traits: [ambitious, deceitful, brave, education_intrigue_2]
+    skills: { intrigue: 12, martial: 10 }
+    claims: [c_gem_mines]
+  hermann_eisenwart: { name: Hermann, dynasty: eisenwart, culture: marcher, faith: ash_penitence, birth: "1040.1.1", father: gero_eisenwart, mother: ermentrud_eisenwart, traits: [humble, diligent, education_stewardship_3] }
+  # цверг-мастер на службе маркграфа: ведёт казну и торг с Подгорьем
+  kremen_master:
+    name: Kremen
+    dynasty: kremenichi
+    culture: zwerg
+    faith: ancestor_cult
+    birth: "985.1.1"
+    court: gero_eisenwart
+    traits: [diligent, honest, calm, education_stewardship_4]
+    skills: { diplomacy: 8, martial: 6, stewardship: 18, intrigue: 7, learning: 12, prowess: 10 }
+
+  # ================================================ Орден Стражей Пепла
+  # Орден основал духовник Отгара на пепелище: венец проклят, и кто его
+  # наденет, снова зажжёт огонь. Братья дают обет безбрачия.
+  gottfried_grandmaster:
+    name: Gottfried
+    nickname: nick.ashen
+    culture: marcher
+    faith: ash_penitence
+    birth: "1008.1.1"
+    traits: [order_brother, zealous, chaste, stubborn, education_martial_4]
+    skills: { diplomacy: 9, martial: 15, stewardship: 8, intrigue: 7, learning: 12, prowess: 13 }
+    gold: 200
+    piety: 600
+    prestige: 400
+  # младший брат Адальберта: отрёкся от притязаний и стал маршалом ордена
+  anselm_kronwald:
+    name: Anselm
+    dynasty: kronwald
+    culture: marcher
+    faith: ash_penitence
+    birth: "1026.1.1"
+    father: ekbert_kronwald
+    mother: richenza_sonning
+    court: gottfried_grandmaster
+    traits: [order_brother, zealous, honest, brave, education_martial_3]
+    skills: { martial: 14, prowess: 15, learning: 8 }
+  berthold_brother: { name: Berthold, culture: marcher, faith: ash_penitence, birth: "1028.1.1", court: gottfried_grandmaster, traits: [order_brother, just, patient, education_learning_3], skills: { learning: 14, martial: 8 } }
+  engelbert_brother: { name: Engelbert, culture: marcher, faith: ash_penitence, birth: "1035.1.1", court: gottfried_grandmaster, traits: [order_brother, wrathful, zealous, education_martial_2], skills: { martial: 11, prowess: 14 } }
+  wigbert_brother: { name: Wigbert, culture: marcher, faith: ash_penitence, birth: "1040.1.1", court: gottfried_grandmaster, traits: [order_brother, humble, diligent] }
+  # добровольцы из-за моря
+  robert_volunteer: { name: Robert, culture: norman, faith: ash_penitence, birth: "1038.1.1", court: gottfried_grandmaster, traits: [order_brother, brave, ambitious, education_martial_3], skills: { martial: 12, prowess: 14 } }
+  esbern_volunteer: { name: Esbern, culture: danish, faith: ash_penitence, birth: "1041.1.1", court: gottfried_grandmaster, traits: [order_brother, brave, gregarious], skills: { prowess: 15 } }
+
+  # ================================================ Вольная Фрисия
+  # Вожака выбирает сход на десять лет из глав видных родов. Поппо Уккена
+  # избран в 1061 году; Эдзард Аттена, шурин северного маркграфа, ждёт выборов.
+  poppo_ukkena:
+    name: Poppo
+    dynasty: ukkena
+    culture: frisian
+    faith: catholic
+    birth: "1020.1.1"
+    spouse: wendelke_ukkena
+    traits: [honest, stubborn, just, education_stewardship_3]
+    skills: { diplomacy: 12, martial: 8, stewardship: 14, intrigue: 6, learning: 9, prowess: 8 }
+    term_start: "1061.5.1"
+    gold: 150
+    prestige: 300
+  wendelke_ukkena: { name: Wendelke, female: true, culture: frisian, faith: catholic, birth: "1025.1.1", traits: [generous] }
+  ubbo_ukkena: { name: Ubbo, dynasty: ukkena, culture: frisian, faith: catholic, birth: "1046.1.1", father: poppo_ukkena, mother: wendelke_ukkena, traits: [diligent, education_stewardship_2] }
+  imke_ukkena: { name: Imke, female: true, dynasty: ukkena, culture: frisian, faith: catholic, birth: "1049.1.1", father: poppo_ukkena, mother: wendelke_ukkena }
+  okko_attena: { name: Okko, dynasty: attena, culture: frisian, faith: catholic, birth: "1000.1.1", death: "1059.1.1" }
+  edzard_attena:
+    name: Edzard
+    dynasty: attena
+    culture: frisian
+    faith: catholic
+    birth: "1026.1.1"
+    father: okko_attena
+    court: poppo_ukkena
+    spouse: gela_attena
+    traits: [ambitious, gregarious, deceitful, education_diplomacy_3]
+    skills: { diplomacy: 15, martial: 7, stewardship: 9, intrigue: 12, learning: 6, prowess: 7 }
+    gold: 180
+  gela_attena: { name: Gela, female: true, culture: frisian, faith: catholic, birth: "1030.1.1", court: poppo_ukkena }
+  enno_attena: { name: Enno, dynasty: attena, culture: frisian, faith: catholic, birth: "1050.1.1", father: edzard_attena, mother: gela_attena }
+  sicco_benninga: { name: Sicco, dynasty: benninga, culture: frisian, faith: catholic, birth: "1018.1.1", court: poppo_ukkena, traits: [generous, content, calm, education_stewardship_2], gold: 90 }
+  feike_benninga: { name: Feike, dynasty: benninga, culture: frisian, faith: catholic, birth: "1044.1.1", father: sicco_benninga, court: poppo_ukkena }
+  haio_idzinga: { name: Haio, dynasty: idzinga, culture: frisian, faith: catholic, birth: "1035.1.1", court: poppo_ukkena, traits: [brave, wrathful, honest, education_martial_3], skills: { martial: 13, prowess: 14 }, gold: 60 }
+
+  # ================================================ Подгорное царство
+  # Огнедар — старший мастер уже шестьдесят лет. Цверги живут вдвое дольше
+  # людей; правит не сын, а лучший мастер.
+  ognedar_gorynichi:
+    name: Ognedar
+    dynasty: gorynichi
+    culture: zwerg
+    faith: ancestor_cult
+    birth: "958.1.1"
+    spouse: malakhita_gorynichi
+    traits: [diligent, stubborn, just, education_stewardship_4]
+    skills: { diplomacy: 8, martial: 10, stewardship: 19, intrigue: 6, learning: 14, prowess: 9 }
+    gold: 500
+    prestige: 400
+  malakhita_gorynichi: { name: Malakhita, female: true, culture: zwerg, faith: ancestor_cult, birth: "965.1.1", traits: [patient, calm] }
+  srebren_gorynichi: { name: Srebren, dynasty: gorynichi, culture: zwerg, faith: ancestor_cult, birth: "1010.1.1", father: ognedar_gorynichi, mother: malakhita_gorynichi, traits: [lazy, gregarious, education_diplomacy_2] }
+  rudomir_master:
+    name: Rudomir
+    dynasty: rudomirichi
+    culture: zwerg
+    faith: ancestor_cult
+    birth: "985.1.1"
+    court: ognedar_gorynichi
+    traits: [ambitious, diligent, wrathful, education_stewardship_4]
+    skills: { stewardship: 17, learning: 10, martial: 9, prowess: 12 }
+  zlata_master:
+    name: Zlata
+    female: true
+    dynasty: zlatoyarichi
+    culture: zwerg
+    faith: ancestor_cult
+    birth: "990.1.1"
+    court: ognedar_gorynichi
+    traits: [patient, honest, education_learning_4]
+    skills: { stewardship: 14, learning: 17, diplomacy: 10 }
+
+bookmarks:
+  b1066:
+    playable: { $append: [adalbert_kronwald, wolfram_wolfing, kunigunde_felsen, gero_eisenwart, gottfried_grandmaster, poppo_ukkena, ognedar_gorynichi] }
+    holders:
+      # Рейнская марка
+      k_rhine_march: adalbert_kronwald
+      d_kronland: adalbert_kronwald
+      c_kronhafen: adalbert_kronwald
+      c_glockenfurt: adalbert_kronwald
+      c_altenrhein: adalbert_kronwald
+      d_maasland: ruprecht_kronwald
+      c_silberau: ruprecht_kronwald
+      c_rosental: ruprecht_kronwald
+      # Северная марка
+      k_north_march: wolfram_wolfing
+      d_wolfsmark: wolfram_wolfing
+      c_wolfsgard: wolfram_wolfing
+      c_hammerfurt: wolfram_wolfing
+      c_grauberg: wolfram_wolfing
+      d_nordgau: ortwin_wolfing
+      c_sturmfeld: ortwin_wolfing
+      c_holstenburg: ortwin_wolfing
+      # Южная марка
+      k_south_march: kunigunde_felsen
+      d_soldgau: kunigunde_felsen
+      c_soldburg: kunigunde_felsen
+      c_adelweiss: kunigunde_felsen
+      c_edelgau: kunigunde_felsen
+      # Восточная марка
+      k_east_march: gero_eisenwart
+      d_grenzmark: gero_eisenwart
+      c_grenzburg: gero_eisenwart
+      c_kohlheide: gero_eisenwart
+      c_osterau: gero_eisenwart
+      d_erzgau: dietrich_eisenwart
+      c_erzfurt: dietrich_eisenwart
+      c_brandwacht: dietrich_eisenwart
+      # Орден
+      k_ash_order: gottfried_grandmaster
+      d_ashwatch: gottfried_grandmaster
+      d_bussland: gottfried_grandmaster
+      c_aschenwacht: gottfried_grandmaster
+      c_todtenwacht: gottfried_grandmaster
+      c_grauenkreuz: gottfried_grandmaster
+      c_bussfeld: gottfried_grandmaster
+      c_klostergau: gottfried_grandmaster
+      c_flammerschein: gottfried_grandmaster
+      # Фрисия
+      k_frisia: poppo_ukkena
+      d_wadden: poppo_ukkena
+      d_dijkland: poppo_ukkena
+      c_terpenholm: poppo_ukkena
+      c_waddenmoor: poppo_ukkena
+      c_osterfenn: poppo_ukkena
+      c_dijkshorn: poppo_ukkena
+      c_slijkzand: poppo_ukkena
+      c_zeewarf: poppo_ukkena
+      c_hunnegat: poppo_ukkena
+      # Подгорное царство
+      k_underhill: ognedar_gorynichi
+      d_ore_mountains: ognedar_gorynichi
+      d_stone_belt: ognedar_gorynichi
+      c_copper_mountain: ognedar_gorynichi
+      c_gem_mines: ognedar_gorynichi
+      c_iron_hall: ognedar_gorynichi
+      c_stone_belt: ognedar_gorynichi
+      c_silver_spring: ognedar_gorynichi
+      c_burning_stone: ognedar_gorynichi
+    vassal_of:
+      ruprecht_kronwald: adalbert_kronwald
+      ortwin_wolfing: wolfram_wolfing
+      dietrich_eisenwart: gero_eisenwart
+    alliances:
+      $append:
+        - [adalbert_kronwald, gero_eisenwart]

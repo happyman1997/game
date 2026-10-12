@@ -98,6 +98,8 @@ static func normalize(content: ContentStore) -> void:
 		def["color"] = color
 		def["capital"] = p.id
 		def["province"] = p.id
+		if p.get("no_generate", false):
+			def["no_generate"] = true
 		content.set_def("titles", p.id, def)
 	for c in content.all("cultures"):
 		c["color"] = parse_color(c.get("color"), c.id)

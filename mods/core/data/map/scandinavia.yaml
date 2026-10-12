@@ -174,24 +174,11 @@ provinces:
   c_jamtland:   { lat: 63.15, lon: 14.3, duchy: d_norrland, terrain: mountains, culture: swedish, faith: norse_pagan, development: 3, holdings: [castle] }
 
   # --------------------------------------------------- непроходимые земли за краем карты
-  w_frisia:       { lat: 53.2,  lon: 7.6,  impassable: true, terrain: wetlands }
-  w_westphalia:   { lat: 52.0,  lon: 8.2,  impassable: true, terrain: hills }
-  w_lower_saxony: { lat: 52.7,  lon: 9.9,  impassable: true, terrain: plains }
-  w_holstein:     { lat: 54.0,  lon: 10.0, impassable: true, terrain: farmlands }
-  w_mecklenburg:  { lat: 53.7,  lon: 12.2, impassable: true, terrain: forest }
   w_pomerania:    { lat: 53.9,  lon: 15.6, impassable: true, terrain: forest }
   w_prussia:      { lat: 54.0,  lon: 19.0, impassable: true, terrain: forest }
-  w_brandenburg:  { lat: 52.5,  lon: 13.3, impassable: true, terrain: forest }
   w_greater_poland: { lat: 52.4, lon: 17.2, impassable: true, terrain: plains }
   w_silesia:      { lat: 50.9,  lon: 16.8, impassable: true, terrain: plains }
   w_lesser_poland: { lat: 50.2, lon: 19.3, impassable: true, terrain: hills }
-  w_saxony:       { lat: 51.3,  lon: 12.5, impassable: true, terrain: hills }
-  w_thuringia:    { lat: 50.9,  lon: 10.8, impassable: true, terrain: forest }
-  w_hesse:        { lat: 50.6,  lon: 8.8,  impassable: true, terrain: hills }
-  w_rhineland:    { lat: 50.6,  lon: 7.1,  impassable: true, terrain: hills }
-  w_franconia:    { lat: 49.8,  lon: 10.5, impassable: true, terrain: forest }
-  w_swabia:       { lat: 48.6,  lon: 9.2,  impassable: true, terrain: hills }
-  w_bavaria:      { lat: 48.3,  lon: 12.2, impassable: true, terrain: farmlands }
   w_bohemia:      { lat: 49.9,  lon: 14.6, impassable: true, terrain: hills }
   w_moravia:      { lat: 49.3,  lon: 17.0, impassable: true, terrain: hills }
   w_austria:      { lat: 47.9,  lon: 15.6, impassable: true, terrain: hills }

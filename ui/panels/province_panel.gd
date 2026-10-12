@@ -142,14 +142,15 @@ static func build(app: App, id: String) -> Control:
 	for b in st.buildings:
 		var bd: Variant = g.content.get_def("buildings", b)
 		var row := K.panel(K.hbox([K.icon(bd.get("icon", "castle") if bd != null else "castle", 20), K.label(g.name_of("buildings", b))], 6), "RowPanel")
-		K.tip(row, BB.title(g.name_of("buildings", b)) + "\n" + BB.modifiers(g, bd.get("modifiers") if bd != null else null) + "\n" + BB.modifiers(g, bd.get("owner_modifiers") if bd != null else null))
+		var bdesc := g.desc_of("buildings", b)
+		K.tip(row, BB.title(g.name_of("buildings", b)) + ("\n" + BB.i(bdesc) if bdesc != "" else "") + "\n" + BB.modifiers(g, bd.get("modifiers") if bd != null else null) + "\n" + BB.modifiers(g, bd.get("owner_modifiers") if bd != null else null))
 		builds.add_child(row)
 	if st.get("construction") != null:
 		var bd: Variant = g.content.get_def("buildings", st.construction.building)
 		var total := int(Data.num(bd.get("days"), 1)) if bd != null else 1
 		var left: int = st.construction.done - g.date
 		builds.add_child(K.vbox([K.label("%s — %s" % [g.name_of("buildings", st.construction.building), app.t("ui.days_left", {"n": left})]), K.bar(total - left, total)], 2))
-	root.add_child(K.section("%s (%d/%d)" % [app.t("ui.buildings"), st.buildings.size(), Decisions.building_slots(g, id)], [builds], "castle"))
+	root.add_child(K.section("%s (%d/%d)" % [app.t("ui.buildings"), Data.count(st.buildings, func(b): return not Decisions.is_special_building(g, b)), Decisions.building_slots(g, id)], [builds], "castle"))
 	var p: Variant = g.player
 	if p != null and holder != null and holder.id == p.id:
 		var cands := Decisions.building_candidates(g, p, id)

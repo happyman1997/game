@@ -421,6 +421,7 @@ static func create_character(game: Game, o: Dictionary) -> Dictionary:
 
 	for t in Data.as_array(o.get("traits")):
 		add_trait(game, c, str(t))
+	add_culture_traits(game, c)
 	if not o.get("bare", false):
 		assign_congenital(game, c, father, mother)
 		assign_personality(game, c)
@@ -428,6 +429,16 @@ static func create_character(game: Game, o: Dictionary) -> Dictionary:
 			assign_education(game, c)
 	game.mark_people_dirty()
 	return c
+
+
+## Врождённые черты культуры (cultures.<id>.traits) — например, раса.
+static func add_culture_traits(game: Game, c: Dictionary) -> void:
+	var cul: Variant = game.content.get_def("cultures", c.culture)
+	if cul == null:
+		return
+	for t in Data.as_array(cul.get("traits")):
+		if not c.traits.has(t) and trait_def(game, t) != null:
+			add_trait(game, c, str(t))
 
 
 ## Пустая запись персонажа со всеми полями (необязательные — null).

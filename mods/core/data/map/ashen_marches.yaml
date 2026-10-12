@@ -1,0 +1,149 @@
+# Пепельные марки — земли павшей Солнечной империи. В 1016 году последний
+# император Отгар Сожжённый поджёг себя и свою столицу Зонненштадт; огонь
+# выжег сердце империи, а Солнечный венец пропал в пепле. Четыре маркграфа —
+# внуки Отгара по дочерям — правят окраинами и ищут венец; рыцарский орден
+# Стражей Пепла верит, что венец проклят, и не даёт его найти; на севере
+# крестьяне болот живут без господ, на востоке в Рудных горах — цверги.
+# Пепелище посредине — дикие земли без владельцев.
+titles:
+  e_sun_empire: { tier: empire, color: "#c9a23a", capital: c_sonnenstadt }
+
+  # ---------------------------------------------------------- Рейнская марка
+  # Старый двор: в Кронхафене хранятся императорские регалии — кроме венца.
+  k_rhine_march: { tier: kingdom, liege: e_sun_empire, color: "#b8433a", capital: c_kronhafen }
+  d_kronland: { tier: duchy, liege: k_rhine_march, color: "#c24f44", capital: c_kronhafen }
+  d_maasland: { tier: duchy, liege: k_rhine_march, color: "#a83b34", capital: c_silberau }
+  d_weingau: { tier: duchy, liege: k_rhine_march, color: "#b8565a", capital: c_weinberg }
+  d_wasgau: { tier: duchy, liege: k_rhine_march, color: "#9e3a30", capital: c_goldbach }
+
+  # ---------------------------------------------------------- Северная марка
+  # Воины пустошей и побережья: лучшее войско марок, бедная казна.
+  k_north_march: { tier: kingdom, liege: e_sun_empire, color: "#4f6a8c", capital: c_wolfsgard }
+  d_wolfsmark: { tier: duchy, liege: k_north_march, color: "#5a779a", capital: c_wolfsgard }
+  d_heideland: { tier: duchy, liege: k_north_march, color: "#465f80", capital: c_heidemoor }
+  d_nordgau: { tier: duchy, liege: k_north_march, color: "#5f7fa4", capital: c_sturmfeld }
+  d_rossgau: { tier: duchy, liege: k_north_march, color: "#3f5675", capital: c_rossmark }
+
+  # ---------------------------------------------------------- Южная марка
+  # Горцы-наёмники: их роты служат любому, кто платит.
+  k_south_march: { tier: kingdom, liege: e_sun_empire, color: "#5a8a4a", capital: c_soldburg }
+  d_soldgau: { tier: duchy, liege: k_south_march, color: "#659856", capital: c_soldburg }
+  d_alpenmark: { tier: duchy, liege: k_south_march, color: "#4f7c40", capital: c_felsengau }
+  d_tannenland: { tier: duchy, liege: k_south_march, color: "#46703a", capital: c_steinach }
+  d_talgau: { tier: duchy, liege: k_south_march, color: "#6fa25e", capital: c_talmark }
+
+  # ---------------------------------------------------------- Восточная марка
+  # Крепости на границе и торг с цвергами.
+  k_east_march: { tier: kingdom, liege: e_sun_empire, color: "#8a6a3a", capital: c_grenzburg }
+  d_grenzmark: { tier: duchy, liege: k_east_march, color: "#967544", capital: c_grenzburg }
+  d_seemark: { tier: duchy, liege: k_east_march, color: "#7e6034", capital: c_wachtholm }
+  d_erzgau: { tier: duchy, liege: k_east_march, color: "#a07d4a", capital: c_erzfurt }
+
+  # ---------------------------------------------------------- Орден Стражей Пепла
+  # Крепости-монастыри у края пепелища.
+  k_ash_order: { tier: kingdom, liege: e_sun_empire, government: order, color: "#d8d4c8", capital: c_aschenwacht }
+  d_ashwatch: { tier: duchy, liege: k_ash_order, color: "#e0dccf", capital: c_aschenwacht }
+  d_bussland: { tier: duchy, liege: k_ash_order, color: "#cdc8b8", capital: c_bussfeld }
+
+  # ---------------------------------------------------------- Пепелище
+  d_ash_heart: { tier: duchy, liege: e_sun_empire, color: "#5e5a56", capital: c_sonnenstadt, no_generate: yes }
+
+  # ---------------------------------------------------------- Вольная Фрисия
+  # Крестьяне болот без господ: сход в каждом графстве, вожак на десять лет.
+  k_frisia: { tier: kingdom, government: people_republic, color: "#3a9aa8", capital: c_terpenholm }
+  d_wadden: { tier: duchy, liege: k_frisia, color: "#44a8b5", capital: c_terpenholm }
+  d_dijkland: { tier: duchy, liege: k_frisia, color: "#328c99", capital: c_dijkshorn }
+
+  # ---------------------------------------------------------- Подгорное царство
+  # Цверги Рудных гор: правит лучший мастер.
+  k_underhill: { tier: kingdom, government: master_council, color: "#7a4a8a", capital: c_copper_mountain }
+  d_ore_mountains: { tier: duchy, liege: k_underhill, color: "#86569a", capital: c_copper_mountain }
+  d_stone_belt: { tier: duchy, liege: k_underhill, color: "#6c3f7a", capital: c_stone_belt }
+
+provinces:
+  # ---------------------------------------------------------- Рейнская марка
+  c_kronhafen:    { lat: 50.9,  lon: 6.95, duchy: d_kronland, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 16, holdings: [castle, city, temple], buildings: [imperial_regalia, market] }
+  c_glockenfurt:  { lat: 51.4,  lon: 6.45, duchy: d_kronland, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 11, holdings: [castle, city] }
+  c_altenrhein:   { lat: 50.3,  lon: 7.55, duchy: d_kronland, terrain: hills, culture: marcher, faith: ash_penitence, development: 11, holdings: [castle, temple] }
+  c_silberau:     { lat: 50.8,  lon: 5.75, duchy: d_maasland, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 12, holdings: [castle, city, temple] }
+  c_rosental:     { lat: 51.4,  lon: 5.35, duchy: d_maasland, terrain: plains, culture: marcher, faith: ash_penitence, development: 9, holdings: [castle, city] }
+  c_nebelwald:    { lat: 50.15, lon: 5.75, duchy: d_maasland, terrain: forest, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle] }
+  c_weinberg:     { lat: 49.75, lon: 8.0,  duchy: d_weingau, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 12, holdings: [castle, city, temple], buildings: [farms] }
+  c_sternwald:    { lat: 49.35, lon: 7.3,  duchy: d_weingau, terrain: forest, culture: marcher, faith: ash_penitence, development: 7, holdings: [castle, temple] }
+  c_hohenfels:    { lat: 49.35, lon: 6.45, duchy: d_weingau, terrain: hills, culture: marcher, faith: ash_penitence, development: 8, holdings: [castle] }
+  c_goldbach:     { lat: 48.6,  lon: 7.75, duchy: d_wasgau, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 13, holdings: [castle, city, temple] }
+  c_adlerstein:   { lat: 47.95, lon: 7.4,  duchy: d_wasgau, terrain: hills, culture: marcher, faith: ash_penitence, development: 8, holdings: [castle, temple] }
+  c_falkenreich:  { lat: 48.7,  lon: 6.4,  duchy: d_wasgau, terrain: forest, culture: marcher, faith: ash_penitence, development: 8, holdings: [castle, city] }
+
+  # ---------------------------------------------------------- Северная марка
+  c_wolfsgard:    { lat: 52.4,  lon: 9.7,  duchy: d_wolfsmark, terrain: plains, culture: marcher, faith: ash_penitence, development: 11, holdings: [castle, city, temple], buildings: [wolf_hall, barracks] }
+  c_hammerfurt:   { lat: 52.25, lon: 10.7, duchy: d_wolfsmark, terrain: plains, culture: marcher, faith: ash_penitence, development: 9, holdings: [castle, city] }
+  c_grauberg:     { lat: 51.75, lon: 10.45, duchy: d_wolfsmark, terrain: mountains, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle] }
+  c_heidemoor:    { lat: 52.95, lon: 10.15, duchy: d_heideland, terrain: plains, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle, temple] }
+  c_trauerwald:   { lat: 52.85, lon: 11.35, duchy: d_heideland, terrain: forest, culture: marcher, faith: ash_penitence, development: 5, holdings: [castle] }
+  c_schildmark:   { lat: 53.65, lon: 11.2, duchy: d_heideland, terrain: forest, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle, temple] }
+  c_sturmfeld:    { lat: 53.55, lon: 10.0, duchy: d_nordgau, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 10, holdings: [castle, city] }
+  c_holstenburg:  { lat: 54.05, lon: 9.75, duchy: d_nordgau, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 8, holdings: [castle, temple] }
+  c_nordholm:     { lat: 53.35, lon: 8.95, duchy: d_nordgau, terrain: wetlands, culture: marcher, faith: ash_penitence, development: 7, holdings: [castle, city] }
+  c_rossmark:     { lat: 52.15, lon: 7.7,  duchy: d_rossgau, terrain: plains, culture: marcher, faith: ash_penitence, development: 9, holdings: [castle, city, temple] }
+  c_eisenheid:    { lat: 51.9,  lon: 8.75, duchy: d_rossgau, terrain: hills, culture: marcher, faith: ash_penitence, development: 7, holdings: [castle] }
+
+  # ---------------------------------------------------------- Южная марка
+  c_soldburg:     { lat: 48.35, lon: 10.9, duchy: d_soldgau, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 13, holdings: [castle, city, temple], buildings: [mercenary_market, market] }
+  c_adelweiss:    { lat: 48.15, lon: 11.65, duchy: d_soldgau, terrain: plains, culture: marcher, faith: ash_penitence, development: 10, holdings: [castle, city] }
+  c_edelgau:      { lat: 48.6,  lon: 12.8, duchy: d_soldgau, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 9, holdings: [castle, temple] }
+  c_felsengau:    { lat: 47.75, lon: 10.3, duchy: d_alpenmark, terrain: mountains, culture: marcher, faith: ash_penitence, development: 7, holdings: [castle, temple] }
+  c_hochgrant:    { lat: 47.55, lon: 11.3, duchy: d_alpenmark, terrain: mountains, culture: marcher, faith: ash_penitence, development: 5, holdings: [castle] }
+  c_alpenheim:    { lat: 47.75, lon: 12.55, duchy: d_alpenmark, terrain: mountains, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle, city] }
+  c_steinach:     { lat: 48.75, lon: 9.2,  duchy: d_tannenland, terrain: hills, culture: marcher, faith: ash_penitence, development: 10, holdings: [castle, city, temple] }
+  c_wintertal:    { lat: 48.05, lon: 8.4,  duchy: d_tannenland, terrain: forest, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle] }
+  c_talmark:      { lat: 49.4,  lon: 11.1, duchy: d_talgau, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 11, holdings: [castle, city] }
+  c_schneewald:   { lat: 49.35, lon: 12.4, duchy: d_talgau, terrain: forest, culture: marcher, faith: ash_penitence, development: 5, holdings: [castle, temple] }
+  c_dannfurt:     { lat: 49.8,  lon: 9.9,  duchy: d_talgau, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 10, holdings: [castle, city, temple] }
+
+  # ---------------------------------------------------------- Восточная марка
+  c_grenzburg:    { lat: 52.45, lon: 13.35, duchy: d_grenzmark, terrain: plains, culture: marcher, faith: ash_penitence, development: 10, holdings: [castle, city, temple], buildings: [border_citadel, walls] }
+  c_kohlheide:    { lat: 52.9,  lon: 12.4, duchy: d_grenzmark, terrain: forest, culture: marcher, faith: ash_penitence, development: 5, holdings: [castle] }
+  c_osterau:      { lat: 52.4,  lon: 14.5, duchy: d_grenzmark, terrain: wetlands, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle, city], buildings: [walls] }
+  c_wachtholm:    { lat: 53.5,  lon: 13.3, duchy: d_seemark, terrain: plains, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle, temple] }
+  c_seewacht:     { lat: 54.0,  lon: 12.45, duchy: d_seemark, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 8, holdings: [castle, city] }
+  c_erzfurt:      { lat: 51.4,  lon: 12.65, duchy: d_erzgau, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 12, holdings: [castle, city, temple] }
+  c_brandwacht:   { lat: 51.95, lon: 12.1, duchy: d_erzgau, terrain: plains, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle] }
+  c_marchenfeld:  { lat: 51.85, lon: 13.3, duchy: d_erzgau, terrain: plains, culture: marcher, faith: ash_penitence, development: 7, holdings: [castle, temple] }
+  c_schwarzwacht: { lat: 51.7,  lon: 14.3, duchy: d_erzgau, terrain: forest, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle], buildings: [walls] }
+
+  # ---------------------------------------------------------- Орден Стражей Пепла
+  c_aschenwacht:  { lat: 50.85, lon: 9.9,  duchy: d_ashwatch, terrain: hills, culture: marcher, faith: ash_penitence, development: 8, holdings: [castle, temple], buildings: [ash_citadel, monastery] }
+  c_todtenwacht:  { lat: 50.35, lon: 9.75, duchy: d_ashwatch, terrain: hills, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle, temple], buildings: [walls] }
+  c_grauenkreuz:  { lat: 51.3,  lon: 9.45, duchy: d_ashwatch, terrain: forest, culture: marcher, faith: ash_penitence, development: 8, holdings: [castle, city, temple], buildings: [monastery] }
+  c_bussfeld:     { lat: 50.55, lon: 8.65, duchy: d_bussland, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 9, holdings: [castle, temple] }
+  c_klostergau:   { lat: 51.05, lon: 8.55, duchy: d_bussland, terrain: forest, culture: marcher, faith: ash_penitence, development: 7, holdings: [temple, castle] }
+  c_flammerschein: { lat: 50.1, lon: 9.0,  duchy: d_bussland, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 10, holdings: [castle, city, temple] }
+
+  # ---------------------------------------------------------- Пепелище (без владельцев)
+  c_sonnenstadt:  { lat: 50.95, lon: 11.05, duchy: d_ash_heart, terrain: ash, culture: marcher, faith: ash_penitence, development: 2, holdings: [city], no_generate: yes, buildings: [burnt_palace] }
+  c_ash_waste:    { lat: 51.4,  lon: 11.25, duchy: d_ash_heart, terrain: ash, culture: marcher, faith: ash_penitence, development: 1, holdings: [castle], no_generate: yes }
+  c_charred_forest: { lat: 50.55, lon: 10.65, duchy: d_ash_heart, terrain: ash, culture: marcher, faith: ash_penitence, development: 1, holdings: [castle], no_generate: yes }
+  c_sun_road:     { lat: 50.85, lon: 11.8, duchy: d_ash_heart, terrain: ash, culture: marcher, faith: ash_penitence, development: 1, holdings: [castle], no_generate: yes }
+
+  # ---------------------------------------------------------- Вольная Фрисия
+  # Ни одного замка: города на терпах и церкви.
+  c_terpenholm:   { lat: 53.15, lon: 6.0,  duchy: d_wadden, terrain: wetlands, culture: frisian, faith: catholic, development: 11, holdings: [city, temple], buildings: [great_dike, market] }
+  c_waddenmoor:   { lat: 53.35, lon: 7.1,  duchy: d_wadden, terrain: wetlands, culture: frisian, faith: catholic, development: 8, holdings: [city, temple] }
+  c_osterfenn:    { lat: 53.1,  lon: 8.05, duchy: d_wadden, terrain: wetlands, culture: frisian, faith: catholic, development: 7, holdings: [city] }
+  c_dijkshorn:    { lat: 52.75, lon: 4.95, duchy: d_dijkland, terrain: wetlands, culture: frisian, faith: catholic, development: 9, holdings: [city, temple] }
+  c_slijkzand:    { lat: 52.2,  lon: 4.75, duchy: d_dijkland, terrain: wetlands, culture: frisian, faith: catholic, development: 10, holdings: [city, temple], buildings: [market] }
+  c_zeewarf:      { lat: 52.95, lon: 5.75, duchy: d_dijkland, terrain: wetlands, culture: frisian, faith: catholic, development: 8, holdings: [city] }
+  c_hunnegat:     { lat: 52.5,  lon: 6.3,  duchy: d_dijkland, terrain: plains, culture: frisian, faith: catholic, development: 7, holdings: [city, temple] }
+
+  # ---------------------------------------------------------- Подгорное царство
+  c_copper_mountain: { lat: 50.55, lon: 12.95, duchy: d_ore_mountains, terrain: mountains, culture: zwerg, faith: ancestor_cult, development: 14, holdings: [castle, city, temple], buildings: [deep_forges, walls] }
+  c_gem_mines:    { lat: 50.4,  lon: 12.25, duchy: d_ore_mountains, terrain: mountains, culture: zwerg, faith: ancestor_cult, development: 11, holdings: [castle, city] }
+  c_iron_hall:    { lat: 50.9,  lon: 13.6, duchy: d_ore_mountains, terrain: mountains, culture: zwerg, faith: ancestor_cult, development: 12, holdings: [castle, city], buildings: [walls] }
+  c_stone_belt:   { lat: 50.3,  lon: 13.75, duchy: d_stone_belt, terrain: mountains, culture: zwerg, faith: ancestor_cult, development: 9, holdings: [castle, temple] }
+  c_silver_spring: { lat: 50.95, lon: 14.45, duchy: d_stone_belt, terrain: hills, culture: zwerg, faith: ancestor_cult, development: 10, holdings: [castle, city] }
+  c_burning_stone: { lat: 50.6, lon: 14.95, duchy: d_stone_belt, terrain: hills, culture: zwerg, faith: ancestor_cult, development: 8, holdings: [castle] }
+
+# Переправа через Северное море: фризские торговцы ходят в Норфолк.
+map_links:
+  frisia_east_anglia: { a: c_slijkzand, b: c_norfolk }

@@ -203,6 +203,9 @@ static func builtin_cb_targets() -> Dictionary:
 				var def := Titles.top_liege(game, h)
 				if def.faith == attacker.faith or def.id == attacker.id:
 					continue
+				# ереси одной религии священных войн друг другу не объявляют
+				if _religion(game, def.faith) == _religion(game, attacker.faith):
+					continue
 				var td: Variant = game.content.get_def("titles", c)
 				var duchy: Variant = td.get("liege") if td != null else null
 				var key = "%s:%s" % [def.id, duchy if duchy != null else c]
@@ -216,6 +219,11 @@ static func builtin_cb_targets() -> Dictionary:
 				out.append({"defender": def.id, "title": duchy if duchy != null else c, "counties": counties})
 			return out},
 	}
+
+
+static func _religion(game: Game, faith: String) -> String:
+	var f: Variant = game.content.get_def("faiths", faith)
+	return str(f.get("religion", faith)) if f != null else faith
 
 
 static func cb_context(game: Game, attacker: String, t: Dictionary, war_id: Variant = null, extra: Variant = null) -> ScriptContext:
@@ -239,6 +247,9 @@ static func available_war_targets(game: Game, attacker: Dictionary, defender: Va
 	for cb in game.content.all("casus_belli"):
 		if cb.get("manual", false):
 			continue # только из скриптов/механик (мятежи фракций)
+		# правление может ограничить поводы (орден воюет только с искателями венца)
+		if not game.engine.hooks.veto("war.cb_allowed", {"game": game, "attacker": attacker, "cb": cb.id}):
+			continue
 		var prov: Variant = game.engine.cb_targets.get_item(str(cb.get("targets")))
 		if prov == null:
 			game.script_error("Нет поставщика целей войны \"%s\"" % cb.get("targets"))

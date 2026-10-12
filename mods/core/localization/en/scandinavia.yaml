@@ -51,31 +51,18 @@ c_gotland: Gotland
 c_halsingland: Hälsingland
 c_medelpad: Medelpad
 c_jamtland: Jämtland
-w_frisia: Frisia (Holy Roman Empire)
-w_westphalia: Westphalia (Holy Roman Empire)
-w_lower_saxony: Lower Saxony (Holy Roman Empire)
-w_holstein: Holstein (Holy Roman Empire)
-w_mecklenburg: Mecklenburg (Obotrites)
 w_pomerania: Pomerania
 w_prussia: Prussia
-w_brandenburg: Brandenburg (Lutici)
 w_greater_poland: Greater Poland
 w_silesia: Silesia
 w_lesser_poland: Lesser Poland
-w_saxony: Saxony (Holy Roman Empire)
-w_thuringia: Thuringia (Holy Roman Empire)
-w_hesse: Hesse (Holy Roman Empire)
-w_rhineland: Rhineland (Holy Roman Empire)
-w_franconia: Franconia (Holy Roman Empire)
-w_swabia: Swabia (Holy Roman Empire)
-w_bavaria: Bavaria (Holy Roman Empire)
 w_bohemia: Bohemia
 w_moravia: Moravia
-w_austria: Austria (Holy Roman Empire)
+w_austria: Austria
 w_hungary: Hungary
-w_tyrol: Tyrol (Holy Roman Empire)
-w_switzerland: Switzerland (Holy Roman Empire)
-w_carinthia: Carinthia (Holy Roman Empire)
+w_tyrol: Tyrol
+w_switzerland: Switzerland
+w_carinthia: Carinthia
 w_lombardy: Lombardy (Italy)
 w_piedmont: Piedmont (Italy)
 w_venetia: Venice

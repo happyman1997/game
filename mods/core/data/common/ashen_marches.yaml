@@ -1,0 +1,150 @@
+# Пепельные марки: народы, веры, местность и особые постройки.
+cultures:
+  # Потомки подданных Солнечной империи. Марки неделимы — так велел ещё
+  # император, и маркграфы держатся этого закона.
+  marcher:
+    group: imperial
+    color: "#9a7a4a"
+    skin: [0.05, 0.3]
+    hair: [0.2, 0.9]
+    succession_law: primogeniture
+    dynasty_pattern: place
+    modifiers: { monthly_prestige: 0.1 }
+    male_names: [Otgar, Adalbert, Konrad, Ekbert, Gero, Udo, Dietmar, Wolfram, Hartmut, Ruprecht, Siegmar, Ortwin, Gottfried, Reinhard, Lothar, Brun, Dietrich, Hermann, Anselm, Engelbert, Berthold, Wigbert, Siegfried, Volkmar]
+    female_names: [Adelheid, Hedwig, Kunigunde, Gisela, Irmgard, Mechthild, Richenza, Uta, Walburga, Liutgard, Ermentrud, Hildegund, Oda, Gerberga]
+  # Крестьяне болот: никогда не знали господ и строят дамбы всем миром.
+  frisian:
+    group: frisian
+    color: "#4aa3b0"
+    skin: [0.0, 0.2]
+    hair: [0.45, 1.0]
+    succession_law: partition
+    dynasty_pattern: place
+    modifiers: { stewardship: 1 }
+    male_names: [Poppo, Sicco, Haio, Eilert, Tjark, Folkert, Ubbo, Edzard, Wiard, Enno, Hero, Sjoerd, Douwe, Feike, Rienk, Okko]
+    female_names: [Foelke, Hiske, Ebba, Almuth, Gela, Imke, Tjada, Wendelke, Ida, Reinste, Teetje, Swaantje]
+  # Цверги Рудных гор: живут вдвое дольше людей, дети у них редки.
+  zwerg:
+    group: dwarven
+    color: "#7a4a8a"
+    skin: [0.2, 0.5]
+    hair: [0.15, 0.75]
+    succession_law: equal_primogeniture
+    dynasty_pattern: name
+    traits: [dwarf]
+    male_names: [Goryn, Rudomir, Ognedar, Kamneslav, Zlatoyar, Tverdislav, Zharomir, Dobromysl, Srebren, Medyan, Ugryum, Khmur, Yarun, Molchan, Bueslav]
+    female_names: [Malakhita, Yashma, Rudana, Zlata, Ogneslava, Iskra, Medunitsa, Srebrena, Daryona, Agata, Ladomira, Beloslava]
+
+faiths:
+  # Пепельное покаяние: пепел — кара за гордыню империи. Ересь, близкая к
+  # старой церкви: те же таинства, но гордыня и честолюбие — первые грехи.
+  ash_penitence:
+    religion: christianity
+    color: "#8c8478"
+    icon: "⚱"
+    doctrines: { polygamy: false, divorce: approval }
+    virtues: [humble, patient, temperate, chaste, just]
+    sins: [arrogant, ambitious, wrathful, greedy]
+  # Завет предков: цверги чтут предков-мастеров, чьи имена высечены в камне.
+  ancestor_cult:
+    religion: ancestors
+    color: "#6a5a8a"
+    icon: "🕯"
+    doctrines: { polygamy: false }
+    virtues: [diligent, patient, honest, stubborn]
+    sins: [lazy, fickle, deceitful, greedy]
+
+terrain:
+  # Пепелище: мёртвая земля, где ничего не растёт.
+  ash: { color: "#5f5a55", defense: 0.1, movement: 1.5, height: 0.12, development_growth: -0.2 }
+
+traits:
+  # Раса цвергов: браки только между своими, живут вдвое дольше.
+  dwarf:
+    category: congenital
+    icon: "⛏"
+    genetic: true
+    inherit_chance: 0.5
+    race: dwarf
+    modifiers: { stewardship: 2, prowess: 2, health: 1, fertility: -0.5, lifespan_mult: 1.0 }
+
+# Особые постройки (special: yes): не строятся и не занимают места — они
+# достаются тому, кто держит графство.
+buildings:
+  imperial_regalia:
+    special: true
+    icon: "👑"
+    modifiers: { tax_mult: 0.1 }
+    owner_modifiers: { monthly_prestige: 1.5, vassal_opinion: 10 }
+  wolf_hall:
+    special: true
+    icon: "🐺"
+    modifiers: { levy_mult: 0.25 }
+    owner_modifiers: { knight_cap: 2, knight_effectiveness: 0.15, prowess: 2 }
+  mercenary_market:
+    special: true
+    icon: "💰"
+    modifiers: { tax_mult: 0.3 }
+    owner_modifiers: { army_upkeep_mult: -0.15, regiment_power: 0.1 }
+  border_citadel:
+    special: true
+    icon: "🏯"
+    modifiers: { fort: 4 }
+    owner_modifiers: { domain_fort: 1, commander_advantage: 2 }
+  ash_citadel:
+    special: true
+    icon: "🛡"
+    modifiers: { fort: 3 }
+    owner_modifiers: { monthly_piety: 1, knight_effectiveness: 0.1 }
+  great_dike:
+    special: true
+    icon: "🌊"
+    modifiers: { tax_mult: 0.2, development_growth: 0.1 }
+    owner_modifiers: { county_opinion: 5 }
+  deep_forges:
+    special: true
+    icon: "⚒"
+    modifiers: { tax_mult: 0.3, fort: 2 }
+    owner_modifiers: { build_cost_mult: -0.1, regiment_power: 0.1 }
+  burnt_palace:
+    special: true
+    icon: "🏚"
+    owner_modifiers: { monthly_prestige: 2 }
+
+regiment_types:
+  # Горные роты: наёмники Южной марки, пикинёры с гор.
+  mountain_companies:
+    icon: "⛰"
+    order: 14
+    size: 100
+    power: 3.2
+    cost: { gold: 60 }
+    upkeep: 0.4
+    counters: { heavy_cavalry: 0.6, light_cavalry: 0.5, chevaliers: 0.5 }
+    terrain: { mountains: 0.35, hills: 0.25 }
+    can_recruit: { culture: marcher }
+    ai_will_do: 60
+  # Ополчение дамб: фризы бьются там, где конница вязнет.
+  dike_militia:
+    icon: "🌊"
+    order: 15
+    size: 100
+    power: 2.4
+    cost: { gold: 35 }
+    upkeep: 0.25
+    counters: { heavy_cavalry: 0.5, chevaliers: 0.5 }
+    terrain: { wetlands: 0.5 }
+    can_recruit: { culture: frisian }
+    ai_will_do: 60
+  # Железнобокие: цверги в кованых латах, медленные и неудержимые.
+  ironclads:
+    icon: "⚒"
+    order: 16
+    size: 50
+    power: 9.0
+    cost: { gold: 150 }
+    upkeep: 0.9
+    counters: { pikemen: 0.5, light_footmen: 0.5, heavy_infantry: 0.3 }
+    terrain: { mountains: 0.3, hills: 0.2 }
+    can_recruit: { culture: zwerg }
+    ai_will_do: 60

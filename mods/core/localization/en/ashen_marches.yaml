@@ -1,0 +1,223 @@
+# The Ashen Marches: titles, counties, peoples, faiths, dynasties, names.
+e_sun_empire: Sun Empire
+e_sun_empire_full: The Sun Empire
+e_sun_empire_rank_m: Emperor
+e_sun_empire_rank_f: Empress
+k_rhine_march: Rhine March
+k_rhine_march_full: The Rhine March
+k_rhine_march_rank_m: Margrave
+k_rhine_march_rank_f: Margravine
+k_north_march: North March
+k_north_march_full: The North March
+k_north_march_rank_m: Margrave
+k_north_march_rank_f: Margravine
+k_south_march: South March
+k_south_march_full: The South March
+k_south_march_rank_m: Margrave
+k_south_march_rank_f: Margravine
+k_east_march: East March
+k_east_march_full: The East March
+k_east_march_rank_m: Margrave
+k_east_march_rank_f: Margravine
+k_ash_order: Order of the Ash Wardens
+k_ash_order_full: Order of the Ash Wardens
+k_ash_order_rank_m: Grand Master
+k_ash_order_rank_f: Grand Master
+k_frisia: Free Frisia
+k_frisia_full: Free Frisia
+k_frisia_rank_m: Elder of the Assembly
+k_frisia_rank_f: Elder of the Assembly
+k_underhill: Underhill Realm
+k_underhill_full: The Underhill Realm
+k_underhill_rank_m: Eldest Master
+k_underhill_rank_f: Eldest Master
+
+d_kronland: Kronland
+d_maasland: Maasland
+d_weingau: Weingau
+d_wasgau: Wasgau
+d_wolfsmark: Wolfsmark
+d_heideland: Heideland
+d_nordgau: Nordgau
+d_rossgau: Rossgau
+d_soldgau: Soldgau
+d_alpenmark: Alpenmark
+d_tannenland: Tannenland
+d_talgau: Talgau
+d_grenzmark: Grenzmark
+d_seemark: Seemark
+d_erzgau: Erzgau
+d_ashwatch: Ash Watch
+d_ashwatch_full: Commandery of the Ash Watch
+d_ashwatch_rank_m: Commander
+d_ashwatch_rank_f: Commander
+d_bussland: Bussland
+d_bussland_full: Commandery of Bussland
+d_bussland_rank_m: Commander
+d_bussland_rank_f: Commander
+d_ash_heart: The Ashes
+d_ash_heart_full: The Ashes
+d_wadden: Wadden
+d_wadden_full: The Wadden Land
+d_wadden_rank_m: Elder
+d_wadden_rank_f: Elder
+d_dijkland: Dijkland
+d_dijkland_full: The Dijkland
+d_dijkland_rank_m: Elder
+d_dijkland_rank_f: Elder
+d_ore_mountains: Ore Mountains
+d_ore_mountains_full: The Ore Mountains
+d_ore_mountains_rank_m: Master
+d_ore_mountains_rank_f: Master
+d_stone_belt: Stone Belt
+d_stone_belt_full: The Stone Belt
+d_stone_belt_rank_m: Master
+d_stone_belt_rank_f: Master
+
+c_kronhafen: Kronhafen
+c_glockenfurt: Glockenfurt
+c_altenrhein: Altenrhein
+c_silberau: Silberau
+c_rosental: Rosental
+c_nebelwald: Nebelwald
+c_weinberg: Weinberg
+c_sternwald: Sternwald
+c_hohenfels: Hohenfels
+c_goldbach: Goldbach
+c_adlerstein: Adlerstein
+c_falkenreich: Falkenreich
+c_wolfsgard: Wolfsgard
+c_hammerfurt: Hammerfurt
+c_grauberg: Grauberg
+c_heidemoor: Heidemoor
+c_trauerwald: Trauerwald
+c_schildmark: Schildmark
+c_sturmfeld: Sturmfeld
+c_holstenburg: Holstenburg
+c_nordholm: Nordholm
+c_rossmark: Rossmark
+c_eisenheid: Eisenheid
+c_soldburg: Soldburg
+c_adelweiss: Adelweiss
+c_edelgau: Edelgau
+c_felsengau: Felsengau
+c_hochgrant: Hochgrant
+c_alpenheim: Alpenheim
+c_steinach: Steinach
+c_wintertal: Wintertal
+c_talmark: Talmark
+c_schneewald: Schneewald
+c_dannfurt: Dannfurt
+c_grenzburg: Grenzburg
+c_kohlheide: Kohlheide
+c_osterau: Osterau
+c_wachtholm: Wachtholm
+c_seewacht: Seewacht
+c_erzfurt: Erzfurt
+c_brandwacht: Brandwacht
+c_marchenfeld: Marchenfeld
+c_schwarzwacht: Schwarzwacht
+c_aschenwacht: Aschenwacht
+c_todtenwacht: Todtenwacht
+c_grauenkreuz: Grauenkreuz
+c_bussfeld: Bussfeld
+c_klostergau: Klostergau
+c_flammerschein: Flammerschein
+c_sonnenstadt: Sonnenstadt
+c_ash_waste: The Ash Waste
+c_charred_forest: The Charred Forest
+c_sun_road: The Sun Road
+c_terpenholm: Terpenholm
+c_waddenmoor: Waddenmoor
+c_osterfenn: Osterfenn
+c_dijkshorn: Dijkshorn
+c_slijkzand: Slijkzand
+c_zeewarf: Zeewarf
+c_hunnegat: Hunnegat
+c_copper_mountain: Copper Mountain
+c_gem_mines: Gem Mines
+c_iron_hall: Iron Hall
+c_stone_belt: Stone Belt
+c_silver_spring: Silver Spring
+c_burning_stone: Burning Stone
+
+culture:
+  marcher: Marcher
+  frisian: Frisian
+  zwerg: Zwerg
+
+faith:
+  ash_penitence: Ashen Penitence
+  ancestor_cult: Covenant of the Ancestors
+faith_desc:
+  ash_penitence: "The ash is punishment for the pride of the empire. The sacraments of the old church — but pride and ambition are the first of sins."
+  ancestor_cult: "The zwerge honour their ancestor-masters, whose names are carved in stone, and swear by their hammers."
+
+terrain:
+  ash: Ashlands
+
+stat:
+  lifespan_mult: Longevity
+
+trait:
+  dwarf: Zwerg
+trait_desc:
+  dwarf: "The zwerge live twice as long as men, but their children are rare. They marry only their own kind."
+
+building:
+  imperial_regalia: Imperial Regalia
+  wolf_hall: Wolf Hall
+  mercenary_market: Mercenary Market
+  border_citadel: Border Citadel
+  ash_citadel: Ash Citadel
+  great_dike: Great Dike
+  deep_forges: Deep Forges
+  burnt_palace: Burnt Palace
+building_desc:
+  imperial_regalia: "The sceptre, orb and sword of the Sun Empire. Only the crown is missing."
+  wolf_hall: "Here the margraves of the North feast with their knights and pick the best fighters."
+  mercenary_market: "The mountain companies hire out here to anyone who pays in silver."
+  border_citadel: "Walls built over half a century: a chain of fortresses from Grenzburg to the mountains."
+  ash_citadel: "A fortress-monastery on the edge of the ashes. The brothers keep watch day and night."
+  great_dike: "A dike the Frisians built together: it holds back the sea — and holds them together."
+  deep_forges: "The forges deep in the Copper Mountain have not gone out for a thousand years."
+  burnt_palace: "The charred walls of Otgar's palace. Whoever holds them holds the memory of the empire."
+
+regiment_type:
+  mountain_companies: Mountain Companies
+  dike_militia: Dike Militia
+  ironclads: Ironclads
+regiment_type_desc:
+  mountain_companies: Pikemen from the mountains of the South March. Mercenaries famed across the empire; none match them in the mountains.
+  dike_militia: Frisian peasants with hooks and flails. In the marshes, knights' horses sink before their eyes.
+  ironclads: Zwerge in forged plate. Slow, but nearly impossible to stop.
+
+dynasty:
+  sonning: Sonning
+  kronwald: von Kronwald
+  wolfing: Wolfing
+  felsen: von Felsen
+  eisenwart: Eisenwart
+  ukkena: Ukkena
+  attena: Attena
+  benninga: Benninga
+  idzinga: Idzinga
+  gorynichi: Gorynich
+  rudomirichi: Rudomirich
+  zlatoyarichi: Zlatoyarich
+  kremenichi: Kremenich
+
+dynasty_pattern:
+  marcher: "von {place}"
+  frisian: "ten {place}"
+  zwerg: "{name}ich"
+
+nick:
+  burned: the Burned
+  keeper: the Keeper
+  iron_company: Iron Company
+  old: the Old
+  ashen: the Ashen
+
+name:
+  Kremen: Kremen

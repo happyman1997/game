@@ -245,11 +245,7 @@ c_chalon: Chalon
 c_clermont: Clermont
 c_bourges: Bourges
 c_bourbon: Bourbon
-w_holland: Holland (Holy Roman Empire)
-w_brabant: Brabant (Holy Roman Empire)
-w_lorraine: Lorraine (Holy Roman Empire)
-w_alsace: Alsace (Holy Roman Empire)
-w_franche: Free County of Burgundy (Holy Roman Empire)
-w_lyonnais: Lyonnais (Holy Roman Empire)
+w_franche: Free County of Burgundy
+w_lyonnais: Lyonnais
 w_toulouse: Toulouse
 w_rouergue: Rouergue

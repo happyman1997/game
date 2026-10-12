@@ -113,6 +113,7 @@ static func setup_new_game(engine: GameEngine, bookmark_id: String, seed: int = 
 				Chars.add_trait(game, c, t)
 			else:
 				game.script_error("Персонаж %s: нет черты \"%s\"" % [d.id, t])
+		Chars.add_culture_traits(game, c)
 	for d in born:
 		var c: Dictionary = state.characters[d.id]
 		for p in [d.get("father"), d.get("mother")]:
@@ -279,7 +280,7 @@ static func generate_missing_holders(game: Game, generated: Dictionary) -> void:
 	for d in content.all("titles"):
 		if d.tier != "county":
 			continue
-		if game.state.titles[d.id].holder != null or not game.state.provinces.has(d.id):
+		if game.state.titles[d.id].holder != null or not game.state.provinces.has(d.id) or d.get("no_generate", false):
 			continue
 		var count = _new_ruler(game, d.id, generated)
 		Titles.transfer_title(game, d.id, count.id)

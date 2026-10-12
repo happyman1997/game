@@ -1,0 +1,316 @@
+# Пепельные марки: титулы, графства, народы, веры, династии, имена.
+e_sun_empire: Солнечная империя
+e_sun_empire_full: Солнечная империя
+e_sun_empire_rank_m: Император
+e_sun_empire_rank_f: Императрица
+k_rhine_march: Рейнская марка
+k_rhine_march_full: Рейнская марка
+k_rhine_march_rank_m: Маркграф
+k_rhine_march_rank_f: Маркграфиня
+k_north_march: Северная марка
+k_north_march_full: Северная марка
+k_north_march_rank_m: Маркграф
+k_north_march_rank_f: Маркграфиня
+k_south_march: Южная марка
+k_south_march_full: Южная марка
+k_south_march_rank_m: Маркграф
+k_south_march_rank_f: Маркграфиня
+k_east_march: Восточная марка
+k_east_march_full: Восточная марка
+k_east_march_rank_m: Маркграф
+k_east_march_rank_f: Маркграфиня
+k_ash_order: Орден Стражей Пепла
+k_ash_order_full: Орден Стражей Пепла
+k_ash_order_rank_m: Великий магистр
+k_ash_order_rank_f: Великий магистр
+k_frisia: Вольная Фрисия
+k_frisia_full: Вольная Фрисия
+k_frisia_rank_m: Старшина схода
+k_frisia_rank_f: Старшина схода
+k_underhill: Подгорное царство
+k_underhill_full: Подгорное царство
+k_underhill_rank_m: Старший мастер
+k_underhill_rank_f: Старшая мастерица
+
+d_kronland: Кронланд
+d_maasland: Маасланд
+d_weingau: Вайнгау
+d_wasgau: Васгау
+d_wolfsmark: Вольфсмарк
+d_heideland: Хайделанд
+d_nordgau: Нордгау
+d_rossgau: Россгау
+d_soldgau: Зольдгау
+d_alpenmark: Альпенмарк
+d_tannenland: Танненланд
+d_talgau: Тальгау
+d_grenzmark: Гренцмарк
+d_seemark: Зеемарк
+d_erzgau: Эрцгау
+d_ashwatch: Пепельный дозор
+d_ashwatch_full: Комтурство Пепельного дозора
+d_ashwatch_rank_m: Комтур
+d_ashwatch_rank_f: Комтур
+d_bussland: Бусланд
+d_bussland_full: Комтурство Бусланд
+d_bussland_rank_m: Комтур
+d_bussland_rank_f: Комтур
+d_ash_heart: Пепелище
+d_ash_heart_full: Пепелище
+d_wadden: Ваддены
+d_wadden_full: Земля Ваддены
+d_wadden_rank_m: Старшина
+d_wadden_rank_f: Старшина
+d_dijkland: Дейкланд
+d_dijkland_full: Земля Дейкланд
+d_dijkland_rank_m: Старшина
+d_dijkland_rank_f: Старшина
+d_ore_mountains: Рудные горы
+d_ore_mountains_full: Рудные горы
+d_ore_mountains_rank_m: Мастер
+d_ore_mountains_rank_f: Мастерица
+d_stone_belt: Каменный пояс
+d_stone_belt_full: Каменный пояс
+d_stone_belt_rank_m: Мастер
+d_stone_belt_rank_f: Мастерица
+
+c_kronhafen: Кронхафен
+c_glockenfurt: Глокенфурт
+c_altenrhein: Альтенрайн
+c_silberau: Зильберау
+c_rosental: Розенталь
+c_nebelwald: Небельвальд
+c_weinberg: Вайнберг
+c_sternwald: Штернвальд
+c_hohenfels: Хоэнфельс
+c_goldbach: Гольдбах
+c_adlerstein: Адлерштайн
+c_falkenreich: Фалькенрайх
+c_wolfsgard: Вольфсгард
+c_hammerfurt: Хаммерфурт
+c_grauberg: Грауберг
+c_heidemoor: Хайдемор
+c_trauerwald: Траурвальд
+c_schildmark: Шильдмарк
+c_sturmfeld: Штурмфельд
+c_holstenburg: Хольстенбург
+c_nordholm: Нордхольм
+c_rossmark: Россмарк
+c_eisenheid: Эйзенхайд
+c_soldburg: Зольдбург
+c_adelweiss: Адельвайс
+c_edelgau: Эдельгау
+c_felsengau: Фельзенгау
+c_hochgrant: Хохгрант
+c_alpenheim: Альпенхайм
+c_steinach: Штайнах
+c_wintertal: Винтерталь
+c_talmark: Тальмарк
+c_schneewald: Шнеевальд
+c_dannfurt: Даннфурт
+c_grenzburg: Гренцбург
+c_kohlheide: Кольхайде
+c_osterau: Остерау
+c_wachtholm: Вахтхольм
+c_seewacht: Зеевахт
+c_erzfurt: Эрцфурт
+c_brandwacht: Брандвахт
+c_marchenfeld: Мархенфельд
+c_schwarzwacht: Шварцвахт
+c_aschenwacht: Ашенвахт
+c_todtenwacht: Тоденвахт
+c_grauenkreuz: Грауэнкройц
+c_bussfeld: Бусфельд
+c_klostergau: Клостергау
+c_flammerschein: Фламмершайн
+c_sonnenstadt: Зонненштадт
+c_ash_waste: Пепельная пустошь
+c_charred_forest: Обугленный лес
+c_sun_road: Солнечная дорога
+c_terpenholm: Терпенхольм
+c_waddenmoor: Ваддемор
+c_osterfenn: Остерфенн
+c_dijkshorn: Дейксхорн
+c_slijkzand: Слейкзанд
+c_zeewarf: Зееварф
+c_hunnegat: Хуннегат
+c_copper_mountain: Медная гора
+c_gem_mines: Самоцветные копи
+c_iron_hall: Железный чертог
+c_stone_belt: Каменный пояс
+c_silver_spring: Серебряный ключ
+c_burning_stone: Горючий камень
+
+culture:
+  marcher: Маркская
+  frisian: Фризская
+  zwerg: Цверги
+
+faith:
+  ash_penitence: Пепельное покаяние
+  ancestor_cult: Завет предков
+faith_desc:
+  ash_penitence: "Пепел — кара за гордыню империи. Те же таинства, что у старой церкви, но первые грехи — гордыня и честолюбие."
+  ancestor_cult: "Цверги чтут предков-мастеров, чьи имена высечены в камне, и клянутся их молотами."
+
+terrain:
+  ash: Пепелище
+
+stat:
+  lifespan_mult: Долголетие
+
+trait:
+  dwarf: Цверг
+trait_desc:
+  dwarf: "Цверги живут вдвое дольше людей, но дети у них редки. Браки — только между своими."
+
+building:
+  imperial_regalia: Императорские регалии
+  wolf_hall: Волчий зал
+  mercenary_market: Наёмный рынок
+  border_citadel: Пограничная цитадель
+  ash_citadel: Пепельная твердыня
+  great_dike: Великая дамба
+  deep_forges: Глубинные горны
+  burnt_palace: Сожжённый дворец
+building_desc:
+  imperial_regalia: "Скипетр, держава и меч Солнечной империи. Нет лишь венца."
+  wolf_hall: "Здесь маркграфы Севера пируют со своими рыцарями и выбирают лучших бойцов."
+  mercenary_market: "Горные роты нанимаются здесь на службу к любому, кто платит серебром."
+  border_citadel: "Стены, что строились полвека: от Гренцбурга до гор — цепь крепостей."
+  ash_citadel: "Крепость-монастырь на краю пепелища. Братья несут дозор днём и ночью."
+  great_dike: "Дамба, которую фризы строили всем миром: она держит море — и держит их вместе."
+  deep_forges: "Горны в глубине Медной горы не гаснут уже тысячу лет."
+  burnt_palace: "Обугленные стены дворца Отгара. Тот, кто держит их, держит память империи."
+
+regiment_type:
+  mountain_companies: Горные роты
+  dike_militia: Ополчение дамб
+  ironclads: Железнобокие
+regiment_type_desc:
+  mountain_companies: Пикинёры с гор Южной марки. Наёмники, известные на всю империю; в горах им нет равных.
+  dike_militia: Фризские крестьяне с баграми и цепами. На болотах конница рыцарей вязнет у них на глазах.
+  ironclads: Цверги в кованых латах. Медленны, но остановить их почти невозможно.
+
+dynasty:
+  sonning: Зоннинг
+  kronwald: фон Кронвальд
+  wolfing: Вольфинг
+  felsen: фон Фельзен
+  eisenwart: Эйзенварт
+  ukkena: Уккена
+  attena: Аттена
+  benninga: Беннинга
+  idzinga: Идзинга
+  gorynichi: Горыничи
+  rudomirichi: Рудомиричи
+  zlatoyarichi: Златояричи
+  kremenichi: Кременичи
+
+dynasty_pattern:
+  marcher: "фон {place}"
+  frisian: "тен {place}"
+  zwerg: "{name}ичи"
+
+nick:
+  burned: Сожжённый
+  keeper: Хранитель
+  iron_company: Железная Рота
+  old: Старый
+  ashen: Пепельный
+
+name:
+  Otgar: Отгар
+  Adalbert: Адальберт
+  Konrad: Конрад
+  Ekbert: Экберт
+  Gero: Геро
+  Udo: Удо
+  Dietmar: Дитмар
+  Wolfram: Вольфрам
+  Hartmut: Хартмут
+  Ruprecht: Рупрехт
+  Siegmar: Зигмар
+  Ortwin: Ортвин
+  Gottfried: Готфрид
+  Reinhard: Рейнхард
+  Lothar: Лотарь
+  Brun: Брун
+  Dietrich: Дитрих
+  Hermann: Германн
+  Anselm: Ансельм
+  Engelbert: Энгельберт
+  Berthold: Бертольд
+  Wigbert: Вигберт
+  Siegfried: Зигфрид
+  Volkmar: Фолькмар
+  Adelheid: Адельгейда
+  Hedwig: Хедвига
+  Kunigunde: Кунигунда
+  Gisela: Гизела
+  Irmgard: Ирмгард
+  Mechthild: Мехтильда
+  Richenza: Рихенца
+  Uta: Ута
+  Walburga: Вальбурга
+  Liutgard: Лиутгарда
+  Ermentrud: Эрментруда
+  Hildegund: Хильдегунда
+  Oda: Ода
+  Gerberga: Герберга
+  Poppo: Поппо
+  Sicco: Сикко
+  Haio: Хайо
+  Eilert: Эйлерт
+  Tjark: Тьярк
+  Folkert: Фолькерт
+  Ubbo: Уббо
+  Edzard: Эдзард
+  Wiard: Виард
+  Enno: Энно
+  Hero: Херо
+  Sjoerd: Шурд
+  Douwe: Доуве
+  Feike: Файке
+  Rienk: Ринк
+  Okko: Окко
+  Foelke: Фёльке
+  Hiske: Хиске
+  Ebba: Эбба
+  Almuth: Альмут
+  Gela: Гела
+  Imke: Имке
+  Tjada: Тьяда
+  Wendelke: Венделке
+  Ida: Ида
+  Reinste: Рейнсте
+  Teetje: Теэтье
+  Swaantje: Сваантье
+  Goryn: Горын
+  Rudomir: Рудомир
+  Ognedar: Огнедар
+  Kamneslav: Камнеслав
+  Zlatoyar: Златояр
+  Tverdislav: Твердислав
+  Zharomir: Жаромир
+  Dobromysl: Добромысл
+  Srebren: Сребрен
+  Medyan: Медян
+  Ugryum: Угрюм
+  Khmur: Хмур
+  Yarun: Ярун
+  Kremen: Кремень
+  Molchan: Молчан
+  Bueslav: Буеслав
+  Malakhita: Малахита
+  Yashma: Яшма
+  Rudana: Рудана
+  Zlata: Злата
+  Ogneslava: Огнеслава
+  Iskra: Искра
+  Medunitsa: Медуница
+  Srebrena: Сребрена
+  Daryona: Дарёна
+  Agata: Агата
+  Ladomira: Ладомира
+  Beloslava: Белослава

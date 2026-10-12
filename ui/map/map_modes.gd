@@ -8,7 +8,10 @@ static func realm_color(game: Game, prov: String) -> Variant:
 	var t: Variant = game.title(prov)
 	var h: Variant = game.ch(t.holder) if t != null else null
 	if h == null:
-		return "#7a7468"
+		# ничейная земля — цветом своей местности
+		var pd: Variant = game.content.get_def("provinces", prov)
+		var td: Variant = game.content.get_def("terrain", str(pd.get("terrain", ""))) if pd != null else null
+		return td.color if td != null and td.get("color") != null else "#7a7468"
 	var top := Titles.top_liege(game, h)
 	if top.titles.is_empty():
 		return "#7a7468"
