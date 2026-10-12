@@ -521,7 +521,18 @@ static func grouped(app: App, kind: String, items: Array, flow := false) -> Cont
 			app.mark_dirty(true), {"variation": "FlatButton", "icon": cats.get(k, {}).get("icon", "scroll"), "align": HORIZONTAL_ALIGNMENT_LEFT})
 		head.add_theme_color_override("font_color", UiArt.C_GOLD)
 		head.add_theme_color_override("font_hover_color", Color("#fff0b8"))
-		box.add_child(head)
+		head.add_theme_font_override("font", Fonts.heading(700))
+		head.add_theme_font_size_override("font_size", 19)
+		# орнаментальная линия до края, как у заголовков разделов
+		var line := NinePatchRect.new()
+		line.texture = UiArt.texture("section_line", UiArt.section_line_svg())
+		line.patch_margin_left = 12
+		line.patch_margin_right = 4
+		line.custom_minimum_size = Vector2(30, 10)
+		line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		line.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(K.hbox([head, line], 6))
 		if collapsed:
 			continue
 		var body: Container = K.flow([], 6) if flow else K.vbox([], 6)

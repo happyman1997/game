@@ -52,7 +52,7 @@ static func open(app: App, on_close: Callable = Callable()) -> void:
 		opts.append([z, "%d%%" % roundi(z * 100)])
 	body.add_child(_row(app.t("ui.setting_zoom"), _select(opts, cur, func(v):
 		Platform.set_setting("ui_scale", v)
-		app.get_tree().root.content_scale_factor = float(v))))
+		app.apply_ui_scale())))
 	var vsync := CheckBox.new()
 	vsync.focus_mode = Control.FOCUS_NONE
 	vsync.button_pressed = Platform.setting("vsync", true)

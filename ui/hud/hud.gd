@@ -38,11 +38,15 @@ var _res_sig := ""
 var _date_sig := ""
 var _outliner_sig := ""
 var _messages_sig := ""
+var _ol_scroll: ScrollContainer
+var _msg_panel: Control
+var _right: Control
+var _modes_panel: Control
 
 ## Пока игра идёт, открытое окно обновляется не чаще (мс).
 const LIVE_WINDOW_MS := 1000
 ## Ширина окна слева.
-const WINDOW_W := 640
+const WINDOW_W := 700
 
 
 func _init() -> void:
@@ -133,12 +137,20 @@ func build() -> void:
 	outliner = K.vbox([], 2)
 	var ol_panel := K.panel(outliner, "DarkPanel")
 	ol_panel.name = "Outliner"
-	right.add_child(ol_panel)
+	# обзор прокручивается, если не помещается над режимами карты
+	_ol_scroll = ScrollContainer.new()
+	_ol_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_ol_scroll.add_child(ol_panel)
+	ol_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right.add_child(_ol_scroll)
 	messages = K.vbox([], 2)
-	var msg_panel := K.panel(messages, "DarkPanel")
-	msg_panel.name = "Messages"
-	right.add_child(msg_panel)
+	_msg_panel = K.panel(messages, "DarkPanel")
+	_msg_panel.name = "Messages"
+	right.add_child(_msg_panel)
 	add_child(right)
+	_right = right
+	_modes_panel = modes_panel
+	get_viewport().size_changed.connect(func(): _fit_right.call_deferred())
 
 	# ---- слева внизу: медальон игрока, герб и полоса разделов
 	cluster = Control.new()
@@ -163,14 +175,17 @@ func build() -> void:
 	window.offset_bottom = -166
 	window.visible = false
 	var head := K.hbox([], 6)
-	window_back = K.button("", func(): app.back(), {"icon": "back", "variation": "CloseButton", "min_w": 32, "min_h": 32, "tip": t("ui.back")})
+	window_back = K.button("", func(): app.back(), {"icon": "back", "variation": "CloseButton", "min_w": 34, "min_h": 34, "tip": t("ui.back")})
 	window_title = K.label("", "HeaderLabel")
-	window_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	window_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	window_title.clip_text = true
-	var close := K.button("", func(): app.close_panel(), {"icon": "close", "variation": "CloseButton", "min_w": 32, "min_h": 32, "tip": t("ui.close")})
+	var close := K.button("", func(): app.close_panel(), {"icon": "close", "variation": "CloseButton", "min_w": 34, "min_h": 34, "tip": t("ui.close")})
 	head.add_child(window_back)
+	# заголовок между завитками
+	head.add_child(K.expand())
+	head.add_child(K.flourish(false))
 	head.add_child(window_title)
+	head.add_child(K.flourish(true))
+	head.add_child(K.expand())
 	head.add_child(close)
 	var head_panel := K.panel(head, "HeaderPanel")
 	window_body = ScrollContainer.new()
@@ -195,6 +210,7 @@ func refresh(full: bool = true) -> void:
 	_refresh_modes()
 	_refresh_outliner(p)
 	_refresh_messages()
+	_fit_right.call_deferred()
 	if full:
 		_refresh_window(true)
 	else:
@@ -560,6 +576,22 @@ func _outliner_sections(p: Dictionary) -> Array:
 	return out
 
 
+## Обзор справа — не ниже режимов карты: высота по содержимому, а что не
+## поместилось — прокручивается.
+func _fit_right() -> void:
+	if _ol_scroll == null or not is_inside_tree():
+		return
+	var inner := _ol_scroll.get_child(0) as Control
+	var want := inner.get_combined_minimum_size().y if inner.visible else 0.0
+	var bottom := _modes_panel.get_global_rect().position.y - 10.0 if _modes_panel.visible else get_viewport_rect().size.y - 180.0
+	var msg_h := _msg_panel.get_combined_minimum_size().y + 8.0 if _msg_panel.visible else 0.0
+	var avail := maxf(80.0, bottom - _right.get_global_rect().position.y - msg_h)
+	var h := minf(want, avail)
+	if not is_equal_approx(_ol_scroll.custom_minimum_size.y, h):
+		_ol_scroll.custom_minimum_size.y = h
+	_ol_scroll.visible = inner.visible
+
+
 func _refresh_messages() -> void:
 	var g := app.game
 	var all: Array = g.state.messages
@@ -572,7 +604,7 @@ func _refresh_messages() -> void:
 	_seen_messages = all.size()
 	K.clear(messages)
 	var panel := messages.get_parent() as Control
-	var n := mini(6, all.size())
+	var n := mini(5, all.size())
 	panel.visible = n > 0
 	for i in n:
 		var m: Dictionary = all[all.size() - 1 - i]
@@ -585,7 +617,7 @@ func _refresh_messages() -> void:
 		var text := "[color=%s]%d.%d.%d[/color]  %s" % [BB.MUTED, d.d, d.m, d.y, BB.c(m.text, "#e9dfc6" if i >= fresh else "#fff3cf")]
 		var r := K.rich(text)
 		r.custom_minimum_size.x = 280
-		r.add_theme_font_size_override("normal_font_size", 13)
+		r.add_theme_font_size_override("normal_font_size", 14)
 		var ref: Variant = m.get("ref")
 		if ref is Dictionary:
 			K.on_click(r, func(): app.open_ref(ref))

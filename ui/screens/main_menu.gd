@@ -27,8 +27,15 @@ static func build(app: App) -> Control:
 
 	var crown := K.tex(Icons.texture("crown", 84), Vector2(84, 84))
 	col.add_child(K.center(crown))
-	var title := K.label(app.t("ui.game_title"), "TitleLabel")
-	title.add_theme_font_size_override("font_size", 58)
+	# название — в две строки: «Корона / и Династия»
+	var tt := app.t("ui.game_title")
+	for conj in [" и ", " & ", " and "]:
+		if tt.contains(conj):
+			tt = tt.replace(conj, "\n" + conj.strip_edges() + " ")
+			break
+	var title := K.label(tt, "TitleLabel")
+	title.add_theme_font_size_override("font_size", 60)
+	title.add_theme_constant_override("line_spacing", -8)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	col.add_child(title)

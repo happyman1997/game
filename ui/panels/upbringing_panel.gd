@@ -28,7 +28,7 @@ static func section(app: App, c: Dictionary) -> Control:
 		return K.section(app.t("ui.upbringing"), [box], "baby")
 	# направление воспитания
 	var focus: Variant = Upbringing.focus_of(g, c)
-	var fl := K.hbox([], 4)
+	var fl := K.flow([], 4)
 	for s in Upbringing.focuses(g):
 		var sd: Variant = g.content.get_def("skills", s)
 		var sid: String = s
@@ -42,7 +42,8 @@ static func section(app: App, c: Dictionary) -> Control:
 				Upbringing.set_focus(app.game, ch, sid)
 				app.mark_dirty(true), {"variation": "WindowTab", "icon": sd.get("icon", "star") if sd != null else "star", "icon_size": 16,
 			"toggled": str(focus) == s, "disabled": not manage, "tip": tipbb})
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.custom_minimum_size.x = 120
+		b.add_theme_font_size_override("font_size", 15)
 		fl.add_child(b)
 	box.add_child(K.vbox([K.label(app.t("ui.education_focus"), "SmallLabel", app.t("ui.education_focus_tip")), fl], 2))
 	# опекун

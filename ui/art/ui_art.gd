@@ -73,19 +73,42 @@ static func _box(tex: Texture2D, margin: float, content: Vector4, scale: float =
 
 # ------------------------------------------------------------ панели
 
-## Окно: ткань + двойная бронзовая окантовка + уголки.
+## Окно: ткань с виньеткой, бронзово-золотая окантовка с фаской, тонкая
+## внутренняя кайма и узорные уголки (всё — в пределах полей 9-patch,
+## чтобы орнамент не растягивался).
+const PANEL_MARGIN := 22
+
+
 static func panel_svg(top: String = SLATE_TOP, bottom: String = SLATE_BOTTOM) -> String:
-	return """<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+	return """<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
 <defs>
  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="%s"/><stop offset="1" stop-color="%s"/></linearGradient>
- <linearGradient id="br" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="%s"/><stop offset="0.45" stop-color="%s"/><stop offset="0.55" stop-color="%s"/><stop offset="1" stop-color="%s"/></linearGradient>
+ <radialGradient id="vg" cx="50%%" cy="35%%" r="75%%"><stop offset="0" stop-color="#ffffff" stop-opacity="0.05"/><stop offset="0.7" stop-color="#000000" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.35"/></radialGradient>
+ <linearGradient id="br" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="%s"/><stop offset="0.3" stop-color="%s"/><stop offset="0.5" stop-color="%s"/><stop offset="0.7" stop-color="%s"/><stop offset="1" stop-color="%s"/></linearGradient>
 </defs>
-<rect x="0" y="0" width="96" height="96" rx="3" fill="%s"/>
-<rect x="1.5" y="1.5" width="93" height="93" rx="2" fill="url(#bg)" stroke="url(#br)" stroke-width="3"/>
-<rect x="5" y="5" width="86" height="86" fill="none" stroke="%s" stroke-width="1"/>
-<rect x="6.2" y="6.2" width="83.6" height="83.6" fill="none" stroke="%s" stroke-opacity="0.35" stroke-width="0.8"/>
+<rect x="0" y="0" width="128" height="128" rx="4" fill="%s"/>
+<rect x="2" y="2" width="124" height="124" rx="3" fill="url(#bg)"/>
+<rect x="2" y="2" width="124" height="124" rx="3" fill="url(#vg)"/>
+<rect x="2.5" y="2.5" width="123" height="123" rx="3" fill="none" stroke="url(#br)" stroke-width="3.5"/>
+<rect x="4.6" y="4.6" width="118.8" height="118.8" rx="2" fill="none" stroke="%s" stroke-opacity="0.45" stroke-width="0.8"/>
+<rect x="7" y="7" width="114" height="114" fill="none" stroke="%s" stroke-width="1.2"/>
+<rect x="8.6" y="8.6" width="110.8" height="110.8" fill="none" stroke="%s" stroke-opacity="0.4" stroke-width="0.8"/>
 %s
-</svg>""" % [top, bottom, BRONZE_DARK, GOLD, GOLD_LIGHT, BRONZE_DARK, INK, INK, GOLD, _corners(96)]
+</svg>""" % [top, bottom, BRONZE_DARK, GOLD, GOLD_LIGHT, GOLD, BRONZE_DARK, INK, GOLD_LIGHT, INK, GOLD, ornate_corners(128)]
+
+
+## Узорный уголок (для верхнего левого; остальные — отражения).
+static func _corner_ornament() -> String:
+	return """<path d="M7 19 V10.5 Q7 7 10.5 7 H19" fill="none" stroke="%s" stroke-width="2.2" stroke-linecap="round"/>
+<path d="M7 19 V10.5 Q7 7 10.5 7 H19" fill="none" stroke="%s" stroke-width="0.9" stroke-linecap="round"/>
+<path d="M11.5 7.6 L14.5 10.6 L11.5 13.6 L8.5 10.6 Z" fill="%s" stroke="%s" stroke-width="0.7"/>
+<circle cx="19.5" cy="7" r="1.3" fill="%s" stroke="%s" stroke-width="0.5"/>
+<circle cx="7" cy="19.5" r="1.3" fill="%s" stroke="%s" stroke-width="0.5"/>""" % [INK, GOLD_LIGHT, GOLD, INK, GOLD, INK, GOLD, INK]
+
+
+static func ornate_corners(size: float) -> String:
+	var o := _corner_ornament()
+	return "<g>%s</g><g transform=\"translate(%s 0) scale(-1 1)\">%s</g><g transform=\"translate(0 %s) scale(1 -1)\">%s</g><g transform=\"translate(%s %s) scale(-1 -1)\">%s</g>" % [o, size, o, size, o, size, size, o]
 
 
 static func _corners(size: float) -> String:
@@ -96,35 +119,133 @@ static func _corners(size: float) -> String:
 
 
 static func panel_box(scale: float = 1.0) -> StyleBoxTexture:
-	return _box(texture("panel", panel_svg(), scale), 12, Vector4(16, 14, 16, 14), scale)
+	return _box(texture("panel", panel_svg(), scale), PANEL_MARGIN, Vector4(20, 18, 20, 18), scale)
 
 
-## Внутренняя «врезка» (секция внутри окна): темнее, тонкая рамка.
+## Внутренняя «врезка» (секция внутри окна): темнее, тень сверху, тонкая
+## бронзовая рамка с золотыми точками в углах.
 static func inset_svg() -> String:
 	return """<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
-<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f1417" stop-opacity="0.85"/><stop offset="1" stop-color="#1a2226" stop-opacity="0.85"/></linearGradient></defs>
-<rect x="0.5" y="0.5" width="47" height="47" rx="2" fill="url(#bg)" stroke="%s" stroke-opacity="0.7" stroke-width="1"/>
-<rect x="1.5" y="1.5" width="45" height="45" rx="1.5" fill="none" stroke="#000" stroke-opacity="0.6" stroke-width="1"/>
-</svg>""" % BRONZE
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b0f12" stop-opacity="0.92"/><stop offset="0.25" stop-color="#121a1e" stop-opacity="0.88"/><stop offset="1" stop-color="#1b252a" stop-opacity="0.85"/></linearGradient></defs>
+<rect x="0.5" y="0.5" width="47" height="47" rx="2.5" fill="url(#bg)" stroke="%s" stroke-opacity="0.75" stroke-width="1"/>
+<rect x="1.5" y="1.5" width="45" height="45" rx="2" fill="none" stroke="#000" stroke-opacity="0.6" stroke-width="1"/>
+<circle cx="3.5" cy="3.5" r="1" fill="%s"/><circle cx="44.5" cy="3.5" r="1" fill="%s"/><circle cx="3.5" cy="44.5" r="1" fill="%s"/><circle cx="44.5" cy="44.5" r="1" fill="%s"/>
+</svg>""" % [BRONZE, GOLD, GOLD, GOLD, GOLD]
 
 
 static func inset_box() -> StyleBoxTexture:
-	return _box(texture("inset", inset_svg()), 6, Vector4(10, 8, 10, 8))
+	return _box(texture("inset", inset_svg()), 6, Vector4(12, 9, 12, 9))
 
 
-## Заголовок окна: тёмная полоса с золотой нижней линией.
+## Тёмная плашка (обзор справа, журнал, режимы карты): полупрозрачная ткань,
+## бронзовая кайма и золотые уголки.
+static func dark_svg() -> String:
+	return """<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#161d21" stop-opacity="0.9"/><stop offset="1" stop-color="#0a0e10" stop-opacity="0.9"/></linearGradient></defs>
+<rect x="0.5" y="0.5" width="39" height="39" rx="3" fill="url(#bg)" stroke="%s" stroke-opacity="0.7" stroke-width="1"/>
+<rect x="2.5" y="2.5" width="35" height="35" rx="2" fill="none" stroke="%s" stroke-opacity="0.18" stroke-width="0.8"/>
+<path d="M1.5 7 V3 Q1.5 1.5 3 1.5 H7" fill="none" stroke="%s" stroke-width="1.2"/>
+<path d="M33 1.5 H37 Q38.5 1.5 38.5 3 V7" fill="none" stroke="%s" stroke-width="1.2"/>
+<path d="M1.5 33 V37 Q1.5 38.5 3 38.5 H7" fill="none" stroke="%s" stroke-width="1.2"/>
+<path d="M33 38.5 H37 Q38.5 38.5 38.5 37 V33" fill="none" stroke="%s" stroke-width="1.2"/>
+</svg>""" % [BRONZE, GOLD_LIGHT, GOLD, GOLD, GOLD, GOLD]
+
+
+static func dark_box() -> StyleBoxTexture:
+	return _box(texture("dark", dark_svg()), 8, Vector4(10, 8, 10, 8))
+
+
+## Строка списка: лёгкий свет слева, тонкая золотая черта снизу.
+static func row_svg() -> String:
+	return """<svg xmlns="http://www.w3.org/2000/svg" width="64" height="24" viewBox="0 0 64 24">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff" stop-opacity="0.07"/><stop offset="1" stop-color="#ffffff" stop-opacity="0.015"/></linearGradient>
+<linearGradient id="ln" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="%s" stop-opacity="0.55"/><stop offset="1" stop-color="%s" stop-opacity="0.05"/></linearGradient></defs>
+<rect x="0" y="0" width="64" height="23" rx="2" fill="url(#bg)"/>
+<rect x="0" y="0" width="2" height="23" fill="%s" fill-opacity="0.45"/>
+<rect x="0" y="23" width="64" height="1" fill="url(#ln)"/>
+</svg>""" % [GOLD, GOLD, GOLD]
+
+
+static func row_box() -> StyleBoxTexture:
+	var sb := _box(texture("row", row_svg()), 3, Vector4(8, 4, 6, 5))
+	sb.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_STRETCH
+	return sb
+
+
+## Вкладка окна: тёмная плашка; у наведённой — светлее, у активной — тёплый
+## золотой свет снизу и яркая черта.
+static func tab_svg(kind: String) -> String:
+	var glow := 0.0
+	var line := BRONZE
+	var line_w := 1.0
+	var top := "#1c2428"
+	var bottom := "#141a1d"
+	match kind:
+		"hover":
+			glow = 0.12
+			line = GOLD
+			top = "#232d32"
+		"active":
+			glow = 0.32
+			line = GOLD_LIGHT
+			line_w = 3.0
+			top = "#2a2a22"
+			bottom = "#241f14"
+	return """<svg xmlns="http://www.w3.org/2000/svg" width="48" height="36" viewBox="0 0 48 36">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="%s"/><stop offset="1" stop-color="%s"/></linearGradient>
+<linearGradient id="gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="%s" stop-opacity="0"/><stop offset="1" stop-color="%s" stop-opacity="%s"/></linearGradient></defs>
+<path d="M0 36 V4 Q0 0 4 0 H44 Q48 0 48 4 V36 Z" fill="url(#bg)"/>
+<path d="M0 36 V4 Q0 0 4 0 H44 Q48 0 48 4 V36 Z" fill="url(#gl)"/>
+<path d="M0.5 36 V4 Q0.5 0.5 4 0.5 H44 Q47.5 0.5 47.5 4 V36" fill="none" stroke="%s" stroke-opacity="0.35" stroke-width="1"/>
+<rect x="0" y="%s" width="48" height="%s" fill="%s"/>
+</svg>""" % [top, bottom, GOLD, GOLD, glow, BRONZE, 36 - line_w, line_w, line]
+
+
+static func tab_box(kind: String) -> StyleBoxTexture:
+	var sb := _box(texture("tab_" + kind, tab_svg(kind)), 5, Vector4(12, 6, 12, 7))
+	sb.texture_margin_bottom = 4
+	return sb
+
+
+## Завиток по сторонам заголовка (right — зеркально, для правой стороны).
+static func flourish_svg(right: bool) -> String:
+	var g := """<defs><linearGradient id="ln" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="%s" stop-opacity="0"/><stop offset="0.6" stop-color="%s"/><stop offset="1" stop-color="%s"/></linearGradient></defs>
+<path d="M2 9 H62" stroke="url(#ln)" stroke-width="1.4"/>
+<path d="M44 9 Q52 2 60 6 Q64 8 62 11 Q60 13 57 11" fill="none" stroke="%s" stroke-width="1.3" stroke-linecap="round"/>
+<path d="M44 9 Q52 16 60 12" fill="none" stroke="%s" stroke-opacity="0.6" stroke-width="1"/>
+<path d="M68 9 L72 5 L76 9 L72 13 Z" fill="%s" stroke="%s" stroke-width="0.7"/>
+<circle cx="66" cy="9" r="1.2" fill="%s"/>""" % [GOLD, GOLD, GOLD_LIGHT, GOLD, GOLD, GOLD, INK, GOLD_LIGHT]
+	var body := ("<g transform=\"translate(80 0) scale(-1 1)\">%s</g>" % g) if right else g
+	return '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="18" viewBox="0 0 80 18">%s</svg>' % body
+
+
+## Линия под заголовком раздела: ромб у начала и золото, гаснущее вправо.
+static func section_line_svg() -> String:
+	return """<svg xmlns="http://www.w3.org/2000/svg" width="256" height="10" viewBox="0 0 256 10">
+<defs><linearGradient id="ln" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="%s"/><stop offset="0.5" stop-color="%s" stop-opacity="0.45"/><stop offset="1" stop-color="%s" stop-opacity="0"/></linearGradient></defs>
+<path d="M1 5 L5 1 L9 5 L5 9 Z" fill="%s" stroke="%s" stroke-width="0.6"/>
+<rect x="11" y="4.4" width="245" height="1.3" fill="url(#ln)"/>
+</svg>""" % [GOLD, GOLD, GOLD, GOLD, INK]
+
+
+## Заголовок окна: тёмная полоса с отблеском сверху и двойной золотой
+## линией снизу.
 static func header_svg() -> String:
-	return """<svg xmlns="http://www.w3.org/2000/svg" width="64" height="40" viewBox="0 0 64 40">
-<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b2f22"/><stop offset="0.5" stop-color="#241d16"/><stop offset="1" stop-color="#16120e"/></linearGradient>
-<linearGradient id="ln" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="%s" stop-opacity="0"/><stop offset="0.2" stop-color="%s"/><stop offset="0.8" stop-color="%s"/><stop offset="1" stop-color="%s" stop-opacity="0"/></linearGradient></defs>
-<rect width="64" height="40" fill="url(#bg)"/>
-<rect y="36" width="64" height="2" fill="url(#ln)"/>
-<rect y="38" width="64" height="2" fill="#000" fill-opacity="0.5"/>
-</svg>""" % [GOLD, GOLD, GOLD, GOLD]
+	return """<svg xmlns="http://www.w3.org/2000/svg" width="64" height="48" viewBox="0 0 64 48">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#43352a"/><stop offset="0.45" stop-color="#271f18"/><stop offset="1" stop-color="#15110d"/></linearGradient>
+<linearGradient id="ln" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="%s" stop-opacity="0"/><stop offset="0.15" stop-color="%s"/><stop offset="0.85" stop-color="%s"/><stop offset="1" stop-color="%s" stop-opacity="0"/></linearGradient></defs>
+<rect width="64" height="48" rx="2" fill="url(#bg)"/>
+<rect y="1" width="64" height="1" fill="#fff3c8" fill-opacity="0.12"/>
+<rect y="41" width="64" height="2" fill="url(#ln)"/>
+<rect y="44" width="64" height="1" fill="url(#ln)" fill-opacity="0.5"/>
+<rect y="46" width="64" height="2" fill="#000" fill-opacity="0.5"/>
+</svg>""" % [GOLD, GOLD_LIGHT, GOLD_LIGHT, GOLD]
 
 
 static func header_box() -> StyleBoxTexture:
-	return _box(texture("header", header_svg()), 8, Vector4(14, 6, 14, 10))
+	var sb := _box(texture("header", header_svg()), 8, Vector4(14, 7, 14, 12))
+	sb.texture_margin_bottom = 9
+	return sb
 
 
 ## Пергамент окна событий.
@@ -197,15 +318,19 @@ static func button_svg(kind: String) -> String:
 			hi = "#fff3c8"
 			hi_op = 0.35
 	return """<svg xmlns="http://www.w3.org/2000/svg" width="48" height="32" viewBox="0 0 48 32">
-<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="%s"/><stop offset="1" stop-color="%s"/></linearGradient></defs>
-<rect x="0.5" y="0.5" width="47" height="31" rx="3" fill="%s"/>
-<rect x="1.5" y="1.5" width="45" height="29" rx="2.5" fill="url(#bg)" stroke="%s" stroke-width="1.4"/>
-<path d="M4 3.5 H44" stroke="%s" stroke-opacity="%s" stroke-width="1"/>
-</svg>""" % [top, bottom, INK, border, hi, hi_op]
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="%s"/><stop offset="1" stop-color="%s"/></linearGradient>
+<linearGradient id="sh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="%s"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#000000" stop-opacity="0.25"/></linearGradient></defs>
+<rect x="0.5" y="0.5" width="47" height="31" rx="3.5" fill="%s"/>
+<rect x="1.5" y="1.5" width="45" height="29" rx="3" fill="url(#bg)"/>
+<rect x="1.5" y="1.5" width="45" height="29" rx="3" fill="url(#sh)"/>
+<rect x="1.5" y="1.5" width="45" height="29" rx="3" fill="none" stroke="%s" stroke-width="1.4"/>
+<path d="M5 3.6 H43" stroke="%s" stroke-opacity="%s" stroke-width="1"/>
+<rect x="3.2" y="3.2" width="41.6" height="25.6" rx="2" fill="none" stroke="#000" stroke-opacity="0.25" stroke-width="0.8"/>
+</svg>""" % [top, bottom, hi_op * 0.8, INK, border, hi, hi_op]
 
 
 static func button_box(kind: String) -> StyleBoxTexture:
-	return _box(texture("button_" + kind, button_svg(kind)), 6, Vector4(12, 5, 12, 6))
+	return _box(texture("button_" + kind, button_svg(kind)), 6, Vector4(14, 6, 14, 7))
 
 
 ## Круглый медальон (кнопки вкладок, режимов карты, скорости).
@@ -306,19 +431,22 @@ static func bar_fill(color: Color) -> StyleBoxFlat:
 	return sb
 
 
-static func tooltip_box() -> StyleBoxFlat:
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = Color("#11171a", 0.97)
-	sb.border_color = Color(BRONZE)
-	sb.set_border_width_all(1)
-	sb.set_corner_radius_all(2)
-	sb.content_margin_left = 12
-	sb.content_margin_right = 12
-	sb.content_margin_top = 8
-	sb.content_margin_bottom = 9
-	sb.shadow_color = Color(0, 0, 0, 0.5)
-	sb.shadow_size = 8
-	return sb
+## Подсказка: тёмная ткань, бронзовая кайма с золотыми уголками и тень.
+static func tooltip_svg() -> String:
+	return """<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2226"/><stop offset="1" stop-color="#0d1214"/></linearGradient></defs>
+<rect x="0" y="0" width="48" height="48" rx="3" fill="%s" fill-opacity="0.9"/>
+<rect x="1" y="1" width="46" height="46" rx="2.5" fill="url(#bg)" stroke="%s" stroke-width="1.2"/>
+<rect x="3" y="3" width="42" height="42" rx="1.5" fill="none" stroke="%s" stroke-opacity="0.2" stroke-width="0.8"/>
+<path d="M1.5 8 V3.5 Q1.5 1.5 3.5 1.5 H8" fill="none" stroke="%s" stroke-width="1.4"/>
+<path d="M40 1.5 H44.5 Q46.5 1.5 46.5 3.5 V8" fill="none" stroke="%s" stroke-width="1.4"/>
+<path d="M1.5 40 V44.5 Q1.5 46.5 3.5 46.5 H8" fill="none" stroke="%s" stroke-width="1.4"/>
+<path d="M40 46.5 H44.5 Q46.5 46.5 46.5 44.5 V40" fill="none" stroke="%s" stroke-width="1.4"/>
+</svg>""" % [INK, BRONZE, GOLD_LIGHT, GOLD, GOLD, GOLD, GOLD]
+
+
+static func tooltip_box() -> StyleBoxTexture:
+	return _box(texture("tooltip", tooltip_svg()), 9, Vector4(14, 10, 14, 11))
 
 
 static func flat(color: Color, border: Color = Color(0, 0, 0, 0), width: int = 0, radius: int = 0, margin: float = -1) -> StyleBoxFlat:

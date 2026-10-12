@@ -120,6 +120,8 @@ static func _legacy_card(app: App, l: Dictionary, root_id: Variant, can_buy: boo
 	box.add_child(title)
 	var desc := K.rich(legacy_desc(app, l))
 	desc.custom_minimum_size.x = 170
+	for k in ["normal_font_size", "bold_font_size", "italics_font_size"]:
+		desc.add_theme_font_size_override(k, 14)
 	box.add_child(desc)
 	if owned:
 		box.add_child(K.label("✓ " + app.t("ui.legacy_owned"), "GoodLabel"))

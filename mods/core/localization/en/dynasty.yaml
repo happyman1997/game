@@ -85,7 +85,7 @@ ui_category:
 ev:
   upbringing.0001:
     t: A Ward's Progress
-    desc: "[scope:child]'s guardian reports: the child tries hard, but could do more. The children of the court are drawn to whoever takes the time with them."
+    desc: "The guardian reports: [scope:child] tries hard, but could do more. Children at court are drawn to whoever takes the time with them — and a parent's word weighs more than any lesson."
     a: Praise them
     b: Hire tutors (−40 gold)
     c: Teach the child myself

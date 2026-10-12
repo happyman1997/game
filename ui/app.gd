@@ -112,10 +112,30 @@ func _default_lang() -> String:
 
 
 func _apply_window_settings() -> void:
-	var scale := float(Platform.setting("ui_scale", 1.0))
-	get_tree().root.content_scale_factor = scale
+	apply_ui_scale()
+	get_tree().root.size_changed.connect(apply_ui_scale)
 	if Platform.setting("fullscreen", false):
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+
+
+## Интерфейс рассчитан на 1600×900: на большом экране он растёт вместе с
+## окном (на 1920×1080 — в 1,2 раза, на 2560×1440 — в 1,6), а «Масштаб» в
+## настройках умножает этот коэффициент.
+const BASE_SIZE := Vector2(1600, 900)
+
+
+func ui_scale_auto() -> float:
+	var sz := Vector2(get_tree().root.size)
+	if sz.x <= 0 or sz.y <= 0:
+		return 1.0
+	return clampf(minf(sz.x / BASE_SIZE.x, sz.y / BASE_SIZE.y), 0.75, 3.0)
+
+
+func apply_ui_scale() -> void:
+	var f := ui_scale_auto() * float(Platform.setting("ui_scale", 1.0))
+	var root := get_tree().root
+	if not is_equal_approx(root.content_scale_factor, f):
+		root.content_scale_factor = f
 
 
 func t(key: String, params: Dictionary = {}) -> String:

@@ -7,8 +7,8 @@ extends RefCounted
 ##   надписи — TitleLabel, HeaderLabel, SubheaderLabel, MutedLabel, SmallLabel,
 ##             InkLabel, InkTitle, GoodLabel, BadLabel, GoldLabel.
 
-const BODY := 15
-const SMALL := 13
+const BODY := 16
+const SMALL := 14
 
 
 static func build() -> Theme:
@@ -42,16 +42,16 @@ static func _labels(t: Theme) -> void:
 	t.set_constant("shadow_offset_x", "Label", 1)
 	t.set_constant("shadow_offset_y", "Label", 1)
 	t.set_constant("line_spacing", "Label", 1)
-	_label_variation(t, "TitleLabel", Color("#f3e2b0"), 34, Fonts.heading(700))
-	_label_variation(t, "HeaderLabel", UiArt.C_GOLD, 22, Fonts.heading(700))
-	_label_variation(t, "SubheaderLabel", UiArt.C_GOLD, 17, Fonts.heading(700))
+	_label_variation(t, "TitleLabel", Color("#f3e2b0"), 38, Fonts.heading(700))
+	_label_variation(t, "HeaderLabel", UiArt.C_GOLD, 25, Fonts.heading(700))
+	_label_variation(t, "SubheaderLabel", UiArt.C_GOLD, 20, Fonts.heading(700))
 	_label_variation(t, "MutedLabel", UiArt.C_MUTED)
 	_label_variation(t, "SmallLabel", UiArt.C_MUTED, SMALL)
 	_label_variation(t, "GoodLabel", UiArt.C_GOOD)
 	_label_variation(t, "BadLabel", UiArt.C_BAD)
 	_label_variation(t, "GoldLabel", UiArt.C_GOLD)
 	_label_variation(t, "InkLabel", UiArt.C_INK, 0, null, false)
-	_label_variation(t, "InkTitle", Color("#3a2410"), 30, Fonts.heading(700), false)
+	_label_variation(t, "InkTitle", Color("#3a2410"), 33, Fonts.heading(700), false)
 
 	t.set_color("default_color", "RichTextLabel", UiArt.C_TEXT)
 	t.set_color("font_shadow_color", "RichTextLabel", Color(0, 0, 0, 0.5))
@@ -71,9 +71,9 @@ static func _labels(t: Theme) -> void:
 	t.set_type_variation("InkText", "RichTextLabel")
 	t.set_color("default_color", "InkText", Color("#2b1d0c"))
 	t.set_color("font_shadow_color", "InkText", Color(0, 0, 0, 0))
-	t.set_font_size("normal_font_size", "InkText", 16)
-	t.set_font_size("bold_font_size", "InkText", 16)
-	t.set_font_size("italics_font_size", "InkText", 16)
+	t.set_font_size("normal_font_size", "InkText", 17)
+	t.set_font_size("bold_font_size", "InkText", 17)
+	t.set_font_size("italics_font_size", "InkText", 17)
 
 
 static func _panels(t: Theme) -> void:
@@ -83,16 +83,16 @@ static func _panels(t: Theme) -> void:
 		["InsetPanel", UiArt.inset_box()],
 		["HeaderPanel", UiArt.header_box()],
 		["ParchmentPanel", UiArt.parchment_box()],
-		["DarkPanel", UiArt.flat(Color("#0d1114", 0.86), Color(UiArt.BRONZE, 0.55), 1, 2, 8)],
+		["DarkPanel", UiArt.dark_box()],
 		["BarPanel", UiArt.bar_strip_box()],
-		["RowPanel", UiArt.flat(Color(1, 1, 1, 0.035), Color(0, 0, 0, 0), 0, 2, 4)],
+		["RowPanel", UiArt.row_box()],
 		["ClearPanel", StyleBoxEmpty.new()],
 	]:
 		t.set_type_variation(pair[0], "PanelContainer")
 		t.set_stylebox("panel", pair[0], pair[1])
 	t.set_stylebox("panel", "TooltipPanel", UiArt.tooltip_box())
 	t.set_color("font_color", "TooltipLabel", UiArt.C_TEXT)
-	t.set_font_size("font_size", "TooltipLabel", 14)
+	t.set_font_size("font_size", "TooltipLabel", 15)
 
 
 static func _button_states(t: Theme, type: String, boxes: Dictionary, colors: Dictionary, size: int = 0, font: Font = null) -> void:
@@ -129,7 +129,7 @@ static func _buttons(t: Theme) -> void:
 	_button_states(t, "GoldButton", {
 		"normal": UiArt.button_box("gold"), "hover": UiArt.button_box("gold_hover"), "pressed": UiArt.button_box("pressed"),
 		"hover_pressed": UiArt.button_box("pressed"), "disabled": UiArt.button_box("disabled"),
-	}, gold, 16, Fonts.bold())
+	}, gold, 17, Fonts.bold())
 
 	t.set_type_variation("RoundButton", "Button")
 	_button_states(t, "RoundButton", {
@@ -143,30 +143,17 @@ static func _buttons(t: Theme) -> void:
 		"hover_pressed": UiArt.round_box("active"), "disabled": UiArt.round_box("normal"),
 	}, light, 22, Fonts.emoji())
 
-	# Вкладка окна (как в CK3): тёмная плашка, у активной — золотая черта снизу.
+	# Вкладка окна (как в CK3): тёмная плашка, у активной — тёплый свет и
+	# яркая золотая черта снизу.
 	t.set_type_variation("WindowTab", "Button")
-	var tab_box := func(bg: Color, line: Color, line_w: int) -> StyleBoxFlat:
-		var sb := UiArt.flat(bg, Color(0, 0, 0, 0), 0, 3)
-		sb.corner_radius_bottom_left = 0
-		sb.corner_radius_bottom_right = 0
-		sb.border_color = line
-		sb.border_width_bottom = line_w
-		sb.content_margin_left = 10
-		sb.content_margin_right = 10
-		sb.content_margin_top = 5
-		sb.content_margin_bottom = 5
-		return sb
 	var tab_colors := light.duplicate()
 	tab_colors.font_color = UiArt.C_MUTED
 	tab_colors.font_pressed_color = Color("#fff0c0")
 	tab_colors.font_hover_pressed_color = Color("#fff0c0")
 	_button_states(t, "WindowTab", {
-		"normal": tab_box.call(Color(1, 1, 1, 0.04), Color(UiArt.BRONZE, 0.5), 1),
-		"hover": tab_box.call(Color(UiArt.GOLD, 0.12), Color(UiArt.GOLD, 0.7), 1),
-		"pressed": tab_box.call(Color(UiArt.GOLD, 0.2), Color(UiArt.GOLD_LIGHT), 3),
-		"hover_pressed": tab_box.call(Color(UiArt.GOLD, 0.24), Color(UiArt.GOLD_LIGHT), 3),
-		"disabled": tab_box.call(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0),
-	}, tab_colors, 15, Fonts.bold())
+		"normal": UiArt.tab_box("normal"), "hover": UiArt.tab_box("hover"), "pressed": UiArt.tab_box("active"),
+		"hover_pressed": UiArt.tab_box("active"), "disabled": UiArt.tab_box("normal"),
+	}, tab_colors, 16, Fonts.bold())
 
 	t.set_type_variation("FlatButton", "Button")
 	var row_hover := UiArt.flat(Color(UiArt.GOLD, 0.12), Color(UiArt.GOLD, 0.35), 1, 2, 4)
@@ -191,7 +178,7 @@ static func _buttons(t: Theme) -> void:
 	_button_states(t, "EventOption", {
 		"normal": UiArt.option_box("normal"), "hover": UiArt.option_box("hover"), "pressed": UiArt.option_box("hover"),
 		"hover_pressed": UiArt.option_box("hover"), "disabled": UiArt.option_box("disabled"),
-	}, ink, 16)
+	}, ink, 17)
 	t.set_color("font_shadow_color", "EventOption", Color(0, 0, 0, 0))
 
 	t.set_type_variation("CloseButton", "Button")
@@ -255,7 +242,7 @@ static func _inputs(t: Theme) -> void:
 	t.set_stylebox("background", "ProgressBar", UiArt.bar_bg())
 	t.set_stylebox("fill", "ProgressBar", UiArt.bar_fill(Color("#b8913f")))
 	t.set_color("font_color", "ProgressBar", UiArt.C_TEXT)
-	t.set_font_size("font_size", "ProgressBar", 12)
+	t.set_font_size("font_size", "ProgressBar", 13)
 
 
 static func _scroll(t: Theme) -> void:

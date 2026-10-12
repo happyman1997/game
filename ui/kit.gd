@@ -251,18 +251,31 @@ static func header(text: String, variation: String = "HeaderLabel") -> Label:
 
 ## Секция окна: заголовок с орнаментом и содержимое.
 static func section(title: String, children: Array = [], icon_name: Variant = null) -> VBoxContainer:
-	var head := hbox([], 6)
+	var head := hbox([], 8)
 	if icon_name != null:
-		head.add_child(icon(icon_name, 18))
+		head.add_child(icon(icon_name, 20))
 	head.add_child(label(title, "SubheaderLabel"))
-	var box := vbox([head], 4)
-	var line := ColorRect.new()
-	line.color = Color(UiArt.GOLD, 0.35)
-	line.custom_minimum_size = Vector2(0, 1)
+	# орнаментальная линия до правого края: ромб и золото, гаснущее вправо
+	var line := NinePatchRect.new()
+	line.texture = UiArt.texture("section_line", UiArt.section_line_svg())
+	line.patch_margin_left = 12
+	line.patch_margin_right = 4
+	line.custom_minimum_size = Vector2(40, 10)
+	line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	line.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(line)
+	head.add_child(line)
+	var box := vbox([head], 6)
 	_add_all(box, children)
 	return box
+
+
+## Завиток по сторонам заголовка окна.
+static func flourish(right: bool) -> TextureRect:
+	var r := tex(UiArt.texture("flourish_r" if right else "flourish_l", UiArt.flourish_svg(right)), Vector2(80, 18))
+	r.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	r.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return r
 
 
 static func bar(value: float, max_value: float, color: Color = Color("#b8913f"), height: int = 8, text: String = "") -> ProgressBar:
