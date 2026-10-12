@@ -561,7 +561,7 @@ static func open_commission(app: App) -> void:
 		var trow := K.hbox([], 6)
 		for t in tiers:
 			var tid: String = t.id
-			var b := K.button("%s\n%s" % [g.name_of("commission_tiers", tid), app.t("ui.inv_commission_cost", {"n": roundi(Data.num(t.get("cost"))), "m": roundi(Data.num(t.get("months")))})], func():
+			var b := K.button("%s\n%s" % [g.name_of("commission_tiers", tid), app.t("ui.inv_commission_cost", {"n": roundi(Artifacts.commission_cost(g, p, tid)), "m": roundi(Data.num(t.get("months")))})], func():
 				st.tier = tid
 				render_ref[0].call(), {"variation": "WindowTab", "toggled": st.tier == tid, "min_w": 190, "min_h": 54})
 			trow.add_child(b)

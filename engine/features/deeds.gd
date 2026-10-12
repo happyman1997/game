@@ -73,6 +73,13 @@ static func record(game: Game, c: Variant, deed: String, n: int = 1) -> void:
 	var d: Dictionary = c.vars.get("deeds", {})
 	d[deed] = int(d.get(deed, 0)) + n
 	c.vars["deeds"] = d
+	# стезя Учёного: каждое деяние — опыт текущего образа жизни
+	var xp := Stats.stat(game, c, "deed_lifestyle_xp")
+	if xp > 0.0 and game.engine.has_feature("lifestyles"):
+		var l: Variant = Lifestyles.current(game, c)
+		if l != null:
+			var st := Lifestyles.state_of(c)
+			st.xp[l.id] = Lifestyles.xp_of(c, l.id) + xp * n
 	game.emit("deed", {"character": c, "deed": deed, "count": d[deed]})
 	_check_nicknames(game, c, deed)
 

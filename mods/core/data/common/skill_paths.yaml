@@ -43,23 +43,25 @@ on_actions:
 
   on_yearly_pulse:
     effect:
-      # Архивариус: каждый год в архивах всплывает чужая тайна
-      - if:
-          limit: { has_archetype: archivist }
-          random_neighboring_ruler:
-            limit: { num_secrets: ">= 1" }
-            save_scope_as: archive_target
-          if:
-            limit: { exists: scope:archive_target }
-            learn_secret: { owner: scope:archive_target }
+      $append:
+        # Архивариус: каждый год в архивах всплывает чужая тайна
+        - if:
+            limit: { has_archetype: archivist }
+            random_neighboring_ruler:
+              limit: { num_secrets: ">= 1" }
+              save_scope_as: archive_target
+            if:
+              limit: { exists: scope:archive_target }
+              learn_secret: { owner: scope:archive_target }
 
   # Наследник (root) героя песен (scope:predecessor) получает его славу.
   on_inheritance:
     effect:
-      - if:
-          limit: { scope:predecessor: { has_archetype: hero_of_songs } }
-          add_modifier: { id: hero_legacy, years: 20 }
-          send_message: { text: msg.hero_legacy, kind: good }
+      $append:
+        - if:
+            limit: { scope:predecessor: { has_archetype: hero_of_songs } }
+            add_modifier: { id: hero_legacy, years: 20 }
+            send_message: { text: msg.hero_legacy, kind: good }
 
 interactions:
   # Объединитель: побеждённый им охотнее склоняется

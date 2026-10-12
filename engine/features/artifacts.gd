@@ -591,6 +591,8 @@ static func commission_chances(game: Game, c: Dictionary, tier: String) -> Array
 		return []
 	var skill := Stats.skill(game, c, str(game.def_val("artifacts.commission_skill", "stewardship")))
 	var bump := maxf(0.0, (skill - _n(game, "commission_skill_base", 8)) * _n(game, "commission_skill_step", 0.04))
+	# стезя Зодчего: лучшие мастера ищут его заказов
+	bump += maxf(0.0, Stats.stat(game, c, "commission_quality"))
 	var out := []
 	for r in td.get("chances", {}):
 		var w := Data.num(td.chances[r])
@@ -602,6 +604,14 @@ static func commission_chances(game: Game, c: Dictionary, tier: String) -> Array
 	return out
 
 
+## Цена заказа для персонажа (commission_cost_mult — стезя Зодчего).
+static func commission_cost(game: Game, c: Dictionary, tier: String) -> float:
+	var td: Variant = game.content.get_def("commission_tiers", tier)
+	if td == null:
+		return 0.0
+	return roundf(Data.num(td.get("cost")) * maxf(0.1, 1.0 + Stats.stat(game, c, "commission_cost_mult")))
+
+
 static func commission_blockers(game: Game, c: Dictionary, tier: String) -> Array:
 	var out := []
 	var td: Variant = game.content.get_def("commission_tiers", tier)
@@ -609,8 +619,8 @@ static func commission_blockers(game: Game, c: Dictionary, tier: String) -> Arra
 		return [game.loc.t("ui.inv_no_tier")]
 	if commission_of(c) != null:
 		out.append(game.loc.t("ui.inv_commission_busy"))
-	if float(c.gold) < Data.num(td.get("cost")):
-		out.append(game.loc.t("ui.inv_need_gold", {"n": roundi(Data.num(td.get("cost")))}))
+	if float(c.gold) < commission_cost(game, c, tier):
+		out.append(game.loc.t("ui.inv_need_gold", {"n": roundi(commission_cost(game, c, tier))}))
 	if not Chars.is_adult(game, c):
 		out.append(game.loc.t("ui.inv_too_young"))
 	return out
@@ -620,7 +630,7 @@ static func commission(game: Game, c: Dictionary, type: String, tier: String) ->
 	var td: Variant = game.content.get_def("commission_tiers", tier)
 	if td == null or not game.content.has("artifact_types", type) or not commission_blockers(game, c, tier).is_empty():
 		return false
-	c.gold = float(c.gold) - Data.num(td.get("cost"))
+	c.gold = float(c.gold) - commission_cost(game, c, tier)
 	var months := Data.num(td.get("months"), 6)
 	c.vars["commission"] = {"type": type, "tier": tier, "start": game.date, "done": game.date + roundi(months * 30.4)}
 	game.mark_chars_dirty([c.id])
@@ -684,7 +694,7 @@ static func _ai_commission(game: Game, c: Dictionary) -> void:
 	var tiers := commission_tiers(game)
 	var best: Variant = null
 	for t in tiers:
-		if float(c.gold) >= Data.num(t.get("cost")) * 2.0 + _n(game, "ai_commission_reserve", 60):
+		if float(c.gold) >= commission_cost(game, c, str(t.id)) * 2.0 + _n(game, "ai_commission_reserve", 60):
 			best = t
 	if best == null:
 		return

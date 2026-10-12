@@ -130,6 +130,16 @@ stat:
   siege_speed: Siege speed
   build_time_mult: Construction time
   battle_survival: Battle survival
+  prestige_opinion_mult: Glory in subjects' eyes
+  piety_opinion_mult: Piety in coreligionists' eyes
+  legacy_cost_mult: Dynasty legacy cost
+  ward_education_mult: Mentorship
+  attrition_mult: Attrition losses
+  dread_per_prisoner: Dread per prisoner (monthly)
+  deed_lifestyle_xp: Lifestyle experience per deed
+  archetype_skill_reduction: Paths open earlier (skill)
+  commission_cost_mult: Commission cost
+  commission_quality: Commission craftsmanship
 mastery:
   diplomacy: Soft Touch
   martial: Recklessness

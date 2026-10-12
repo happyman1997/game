@@ -39,67 +39,127 @@ focus_desc:
   focus_medicine: You study herbs and the works of ancient physicians.
 
 perk_tree:
-  august: August
-  family_first: Family First
-  strategist: Strategist
-  overseer: Overseer
-  architect: Architect
-  administrator: Administrator
-  schemer: Schemer
-  seducer: Seducer
-  scholarship: Scholar
-  theology: Theologian
+  august: Path of the Sovereign
+  family_first: Path of the Dynast
+  strategist: Path of the Commander
+  tyranny: Path of the Tyrant
+  chivalry: Path of the Knight
+  architect: Path of the Architect
+  administrator: Path of the Treasurer
+  schemer: Path of the Spider
+  seducer: Path of the Seducer
+  scholarship: Path of the Scholar
+  theology: Path of the Saint
+perk_tree_desc:
+  august: "Rules by glory: feasts, royal progresses, neighbours who ask to kneel."
+  family_first: "The house is the pillar: children add renown, legacies cost less, kin bring gifts."
+  strategist: "War of manoeuvre: no losses to attrition, captured knights for ransom, a grand muster."
+  tyranny: "Rules by fear: executions and the dungeon terrify, vassals can be intimidated and fleeced."
+  chivalry: "Personal valour: duels, trophies, a brotherhood of knights and a quest for glory."
+  architect: "Building and splendour: counties cheer new walls, craftsmen seek your commissions."
+  administrator: "Gold as a weapon: taxes, a Lombard loan and bribery."
+  schemer: "Secrets and hooks: ears everywhere, silver for silence, secrets for sale."
+  seducer: "Love as a weapon: pillow talk, lovers on a hook, a pact of hearts."
+  scholarship: "Knowledge speeds everything: experience for every deed, paths open earlier."
+  theology: "Piety and relics: pilgrimages, veneration of relics, miracles and holy war."
 
 perk:
   regal_bearing: Regal Bearing
-  court_etiquette: Court Etiquette
+  court_etiquette: Court Ceremonial
   statesman: Statesman
   august_majesty: August Majesty
   fecund_line: Fecund Line
   blood_ties: Blood Ties
   wise_mentor: Wise Mentor
   head_of_house: Head of the House
-  logistics: Logistics
-  battle_tactics: Battle Tactics
-  military_drills: Military Drills
-  master_strategist: Master Strategist
-  stalwart_leader: Stalwart Leader
-  iron_discipline: Iron Discipline
-  levy_reforms: Levy Reforms
-  overseer_of_men: Overseer
+  logistics: Baggage Trains
+  take_alive: Take Them Alive
+  military_drills: Veterans
+  master_strategist: Great Commander
+  stern_gaze: Heavy Gaze
+  bloody_justice: Bloody Justice
+  dungeon_dread: Shadows of the Dungeon
+  iron_fist: Iron Fist
+  knightly_vow: Knightly Vow
+  trophy_taker: Trophies
+  sword_brotherhood: Brotherhood of the Sword
+  paragon_of_chivalry: Paragon of Chivalry
   master_builder: Master Builder
   thriving_lands: Thriving Lands
-  bountiful_harvests: Bountiful Harvests
+  court_splendor: Splendour of the Court
   royal_architect: Royal Architect
   efficient_rule: Efficient Rule
-  tax_collectors: Tax Collectors
-  golden_obligations: Golden Obligations
-  great_administrator: Great Administrator
-  subtle_hand: Subtle Hand
-  prying_eyes: Prying Eyes
-  truth_is_relative: Truth Is Relative
-  master_schemer: Master Schemer
-  alluring: Alluring
-  sweet_words: Sweet Words
+  tax_collectors: Tax Farmers
+  lombard_loan: Lombard Loan
+  great_administrator: Great Treasurer
+  subtle_hand: Ears Everywhere
+  prying_eyes: Silver for Silence
+  secret_trade: Trade in Secrets
+  master_schemer: The Spider
+  alluring: Allure
+  pillow_talk: Pillow Talk
   heartbreaker: Heartbreaker
   irresistible: Irresistible
-  avid_reader: Avid Reader
+  avid_reader: Bookworm
   natural_philosophy: Natural Philosophy
   polymath: Polymath
   renowned_scholar: Renowned Scholar
-  devout_prayer: Devout Prayer
+  devout_prayer: Man of Prayer
   inner_peace: Inner Peace
-  healing_hands: Healing Hands
+  relic_keeper: Keeper of Relics
   doctor_of_theology: Doctor of Theology
 perk_desc:
-  head_of_house: You are the acknowledged head of your house. Your dynasty gains 100 prestige.
-  natural_philosophy: Studying nature speeds up the development of your lands and all learning.
-  levy_reforms: More soldiers, but vassals resent the new obligations.
+  regal_bearing: "Your glory weighs more: prestige levels raise your subjects' opinion half again as much."
+  court_etiquette: "Feasts cost half as much and add 50 prestige. You enjoy feasts — they relieve stress."
+  statesman: "Neighbours are readier to become your vassals: +10 acceptance per level of your prestige."
+  august_majesty: "Unlocks the Royal Progress: your domain counties and vassals long remember your visit."
+  fecund_line: "Each of your children adds 25 renown to your house."
+  blood_ties: "Dynasty legacies cost a quarter less while you head the house. Kin think more warmly of you."
+  wise_mentor: "Wards in your care learn half again as fast."
+  head_of_house: "Your house gains 100 renown. Unlocks Gather the Kin: rulers of your house bring gifts."
+  logistics: "Your armies lose half as many men to attrition in wild and scorched lands."
+  take_alive: "After a won battle, 35% chance to capture an enemy knight — ransom him or keep him in your dungeon."
+  military_drills: "Men-at-arms are stronger and cheaper to maintain."
+  master_strategist: "Unlocks the Grand Muster: for two years levies, regiments and command are on the rise."
+  stern_gaze: "Dread of you fades half as fast and grows faster."
+  bloody_justice: "Executions inspire 15 more dread. You enjoy executions and imprisonment — they relieve stress."
+  dungeon_dread: "Each prisoner in your dungeon inspires 1 dread a month (up to five). You hate releasing prisoners."
+  iron_fist: "Unlocks Intimidate (tribute through fear; a refusal gives you a lawful reason to imprison) and the Public Execution."
+  knightly_vow: "Refusing your duel challenge is a double disgrace. You enjoy challenging others to duels."
+  trophy_taker: "When you win a duel you take the loser's weapon (he will claim it back). A won battle has a 20% chance to bring a trophy shield."
+  sword_brotherhood: "Two more knight places, and your knights fight better."
+  paragon_of_chivalry: "Unlocks the Quest for Glory: enter the lists yourself or send your best knight — for fame and a famed weapon."
+  master_builder: "Buildings are cheaper, and each finished building raises its county's opinion by 10 (5 years)."
+  thriving_lands: "Development grows faster and control over counties recovers sooner."
+  court_splendor: "Commissions cost 40% less and craftsmen take on rarer work."
+  royal_architect: "Unlocks the Great Work: once in a lifetime — a cathedral, a keep or a market in the capital, forever."
+  efficient_rule: "You can hold one more county in your domain."
+  tax_collectors: "Taxes are higher, and embezzlers on your council are caught more often."
+  lombard_loan: "Unlocks the Lombard Loan: 300 gold at once, repaid at 2.5 a month for twelve years."
+  great_administrator: "Unlocks Bribe: gold buys favour and pulls a vassal out of a faction. The honest and the just are offended."
+  subtle_hand: "Every year you learn someone's secret in your realm."
+  prying_eyes: "Every hook brings 0.5 gold a month. You enjoy blackmail."
+  secret_trade: "Unlocks Sell a Secret: a neighbouring ruler learns a secret you know and pays in silver."
+  master_schemer: "Unlocks Compel Service: a hook spent for service — gold, an alliance or a council seat."
+  alluring: "Seduction succeeds 15% more often and goes half again as fast."
+  pillow_talk: "A conquered lover gives away their secret and their liege's."
+  heartbreaker: "Every lover you conquer is on your hook. You enjoy seduction."
+  irresistible: "Unlocks the Pact of Hearts: a ruling lover allies with you, or makes peace if you are at war."
+  avid_reader: "Every deed (a victory, a building, a duel…) brings 25 experience in your current lifestyle."
+  natural_philosophy: "Development grows faster and lifestyle experience accrues sooner."
+  polymath: "+1 to all skills, and paths (archetypes) open 2 skill points earlier."
+  renowned_scholar: "Unlocks the Magnum Opus: a book of famed rarity (illustrious at learning 20), renown for your house."
+  devout_prayer: "Pilgrimage washes away all stress and has a 35% chance to bring a reliquary. You enjoy pilgrimages and almsgiving."
+  inner_peace: "Stress grows slower, and piety levels raise coreligionists' opinion half again as much."
+  relic_keeper: "A reliquary at court yields 60 piety a year and the veneration of coreligionist vassals. You hate executions."
+  doctor_of_theology: "Unlocks the Miracle (healing yourself and your family, rejoicing counties) and the Call to Holy War."
 
 trait:
   diplomat: Diplomat
   family_patriarch: Patriarch
   strategist: Strategist
+  tyrant: Tyrant
+  paragon: Paragon of Chivalry
   overseer: Overseer
   architect: Architect
   administrator: Administrator
@@ -110,6 +170,8 @@ trait_desc:
   diplomat: An acknowledged master of negotiation.
   family_patriarch: Head of a large and close-knit house.
   strategist: A commander who knows the worth of every step on the battlefield.
+  tyrant: Feared more than loved — and content with that.
+  paragon: His deeds are sung from Normandy to Norway.
   overseer: Knows how to raise and keep an army.
   architect: Builds quickly, cheaply and to last.
   administrator: Keeps vast holdings in good order.

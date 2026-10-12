@@ -77,6 +77,8 @@ static func duel(game: Game, a: Dictionary, b: Dictionary) -> Dictionary:
 			game.message(game.loc.t("msg.duel_died" if died else "msg.duel_result", params), "good" if mine else "bad", {"type": "character", "id": fl.id})
 			break
 	game.emit("duel", {"winner": win, "loser": lose, "winner_fighter": fw, "loser_fighter": fl, "death": died})
+	# до гибели бойца: его вещи ещё при нём (трофеи рыцаря)
+	game.on_action("on_duel_won", {"type": "character", "id": win.id}, {"loser": {"type": "character", "id": lose.id}})
 	if died:
 		Succession.kill_character(game, fl, "duel", fw.id)
 	game.stat_cache.erase(win.id)

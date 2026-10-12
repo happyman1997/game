@@ -252,6 +252,8 @@ static func monthly_gain(game: Game, c: Dictionary, parts: Variant = null) -> fl
 		add.call("no_guardian", -cut)
 	else:
 		var gv := minf(Stats.skill(game, g, str(focus)), _n(game, "guardian_skill_cap", 25)) * _n(game, "per_guardian_skill", 0.035)
+		# мудрый наставник (стезя Династа) учит лучше
+		gv *= maxf(0.0, 1.0 + Stats.stat(game, g, "ward_education_mult"))
 		gain += gv
 		add.call("guardian", gv, {"name": game.scope_name({"type": "character", "id": g.id})})
 	if aptitude_matches(game, c, focus):

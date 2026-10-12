@@ -31,6 +31,18 @@ traits:
     icon: skull
     modifiers: { prowess: 4, diplomacy: -4, stewardship: -2, general_opinion: -20, dread_gain_mult: 0.5, stress_gain_mult: 0.25, monthly_piety: -0.5 }
 
+# стези основного мода: душевный покой святого крепит душу, а чудо
+# изгоняет беса из железа
+perks:
+  inner_peace: { modifiers: { soul: 15 } }
+  relic_keeper: { modifiers: { soul: 10 } }
+
+decisions:
+  miracle:
+    effect:
+      $append:
+        - remove_trait: iron_possession
+
 opinion_modifiers:
   graft_rampage: { value: -40, years: 10 }
 

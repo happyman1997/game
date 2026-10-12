@@ -32,6 +32,13 @@ static func opinion_for(game: Game, kind: String, lv: int) -> float:
 	return Data.num(arr[clampi(lv, 0, arr.size() - 1)]) if not arr.is_empty() else 0.0
 
 
+## Стезя усиливает добрую славу: <kind>_opinion_mult (Государь, Святой).
+static func boosted(game: Game, c: Dictionary, kind: String, v: float) -> float:
+	if v <= 0.0:
+		return v
+	return roundf(v * maxf(0.0, 1.0 + Stats.stat(game, c, kind + "_opinion_mult")))
+
+
 static func level_name(game: Game, kind: String, lv: int) -> String:
 	return game.loc.t("renown.%s_%d" % [kind, lv])
 
@@ -40,7 +47,7 @@ static func level_name(game: Game, kind: String, lv: int) -> String:
 static func describe(game: Game, c: Dictionary, kind: String) -> String:
 	var lv := level_of(game, c, kind)
 	var lines := [game.loc.t("ui.renown_level", {"name": level_name(game, kind, lv)})]
-	var op := opinion_for(game, kind, lv)
+	var op := boosted(game, c, kind, opinion_for(game, kind, lv))
 	if op != 0.0:
 		lines.append(game.loc.t("ui.renown_%s_effect" % kind, {"value": "%+d" % roundi(op)}))
 	var ths: Array = game.def_val("renown.%s_levels" % kind, [])
@@ -56,12 +63,12 @@ func install(engine: GameEngine) -> void:
 			return null
 		var out := []
 		var lp := Renown.level_of(game, b, "prestige")
-		var vp := Renown.opinion_for(game, "prestige", lp)
+		var vp := Renown.boosted(game, b, "prestige", Renown.opinion_for(game, "prestige", lp))
 		if vp != 0.0:
 			out.append({"label": game.loc.t("opinion.renown_prestige", {"name": Renown.level_name(game, "prestige", lp)}), "value": vp})
 		if a.faith == b.faith:
 			var lf := Renown.level_of(game, b, "piety")
-			var vf := Renown.opinion_for(game, "piety", lf)
+			var vf := Renown.boosted(game, b, "piety", Renown.opinion_for(game, "piety", lf))
 			if vf != 0.0:
 				out.append({"label": game.loc.t("opinion.renown_piety", {"name": Renown.level_name(game, "piety", lf)}), "value": vf})
 		return out if not out.is_empty() else null

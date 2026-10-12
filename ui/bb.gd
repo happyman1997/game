@@ -135,6 +135,17 @@ static func stat_value(k: String, v: float) -> String:
 	return K.signed(v, digits)
 
 
+## Характеристики, у которых меньше — лучше (цены, сроки, потери, рост стресса).
+const LOWER_BETTER := ["stress_gain_mult", "build_time_mult", "faction_discontent_mult", "build_cost_mult",
+	"army_upkeep_mult", "law_cost_mult", "legacy_cost_mult", "attrition_mult", "commission_cost_mult",
+	"dread_decay_mult", "archetype_skill_min"]
+
+
+## Хуже ли персонажу от такого значения характеристики.
+static func is_bad_value(k: String, v: float) -> bool:
+	return v > 0 if LOWER_BETTER.has(k) else v < 0
+
+
 ## Модификаторы {stat: value} → таблица.
 static func modifiers(game: Game, mods: Variant) -> String:
 	if not (mods is Dictionary) or mods.is_empty():
@@ -142,7 +153,7 @@ static func modifiers(game: Game, mods: Variant) -> String:
 	var pairs := []
 	for k in mods:
 		var v := float(mods[k])
-		var is_bad := v > 0 if (k == "stress_gain_mult" or k == "build_time_mult" or k == "faction_discontent_mult") else v < 0
+		var is_bad := is_bad_value(str(k), v)
 		var val := stat_value(k, v)
 		pairs.append([esc(game.loc.t_or("stat." + k, k)), bad(val) if is_bad else good(val)])
 	return rows(pairs)

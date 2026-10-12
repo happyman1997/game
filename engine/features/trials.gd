@@ -47,12 +47,19 @@ static func _trial(game: Game, arch: String) -> Dictionary:
 	return d.trial if d != null and d.get("trial") is Dictionary else {}
 
 
+## Порог навыков для пути у этого персонажа (archetype_skill_reduction —
+## энциклопедист, стезя Учёного).
+static func skill_min(game: Game, c: Dictionary, arch: String) -> float:
+	var d: Variant = _def(game, arch)
+	return Data.num(d.get("min") if d != null else null, 12) - maxf(0.0, Stats.stat(game, c, "archetype_skill_reduction"))
+
+
 ## Навыки дотягивают до порога связки.
 static func skills_fit(game: Game, c: Dictionary, arch: String) -> bool:
 	var d: Variant = _def(game, arch)
 	if d == null or not (d.get("skills") is Array):
 		return false
-	var mn := Data.num(d.get("min"), 12)
+	var mn := skill_min(game, c, arch)
 	for s in d.skills:
 		if Stats.skill(game, c, str(s)) < mn:
 			return false

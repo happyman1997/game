@@ -41,14 +41,15 @@ on_actions:
           liege: { trigger_event: arcana.0001 }
   on_birth:
     effect:
-      - if:
-          limit:
-            scope:mother: { culture: [irish, welsh, scottish, breton] }
-          random:
-            chance: 1.5
-            add_trait: changeling
-            save_scope_as: child
-            scope:mother: { trigger_event: arcana.0051 }
+      $append:
+        - if:
+            limit:
+              scope:mother: { culture: [irish, welsh, scottish, breton] }
+            random:
+              chance: 1.5
+              add_trait: changeling
+              save_scope_as: child
+              scope:mother: { trigger_event: arcana.0051 }
 
 events:
   # ------------------------------------------------------------ дар

@@ -31,6 +31,11 @@ static func monthly(game: Game) -> void:
 		var att := attrition_at(game, a.location)
 		if att <= 0.0 or int(a.size) <= 0:
 			continue
+		var owner: Variant = game.ch(a.owner)
+		if owner != null:
+			att *= maxf(0.0, 1.0 + Stats.stat(game, owner, "attrition_mult"))
+			if att <= 0.0:
+				continue
 		var lost := maxi(1, roundi(float(a.size) * att))
 		Military._distribute([a], lost, float(a.size))
 		game.emit("army.attrition", {"army": a, "location": a.location, "lost": lost})

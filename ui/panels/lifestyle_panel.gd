@@ -72,10 +72,22 @@ static func build(app: App) -> Control:
 	var trees_row := K.hbox([], 4, BoxContainer.ALIGNMENT_CENTER)
 	for t in trees:
 		var col := K.vbox([], 0)
-		col.custom_minimum_size.x = 140
+		col.custom_minimum_size.x = 160
 		var tname := K.label(g.loc.t_or("perk_tree." + t.tree, t.tree), "SubheaderLabel")
 		tname.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		tname.add_theme_font_size_override("font_size", 17)
+		tname.clip_text = true
+		tname.custom_minimum_size.x = 160
 		col.add_child(tname)
+		# как стезя меняет игру; одна высота у всех, чтобы перки стояли рядами
+		var tdesc: Variant = g.loc.raw("perk_tree_desc." + t.tree)
+		var dl := K.label(str(tdesc) if tdesc != null else "", "MutedLabel")
+		dl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		dl.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+		dl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		dl.custom_minimum_size = Vector2(160, 66)
+		dl.add_theme_font_size_override("font_size", 11)
+		col.add_child(dl)
 		for i in t.perks.size():
 			if i > 0:
 				var link := ColorRect.new()
@@ -130,6 +142,18 @@ static func perk_tip(app: App, p: Dictionary, perk: Dictionary, owned: bool, req
 	if perk.get("effect") != null:
 		var ctx := ScriptContext.make(g, {"type": "character", "id": p.id})
 		bb += "\n" + BB.desc_lines(Interp.describe_effect(ctx, ctx.root, perk.effect))
+	# стезя меняет характер: что теперь по душе, а что претит
+	var ps := Personality.trait_summary(g, perk)
+	if ps.good != "":
+		bb += "\n" + BB.good(app.t("ui.stress_likes", {"list": ps.good}))
+	if ps.bad != "":
+		bb += "\n" + BB.bad(app.t("ui.stress_dislikes", {"list": ps.bad}))
+	# действия, которые открывает перк
+	var acts := []
+	for u in Data.as_array(perk.get("unlocks")):
+		acts.append("«%s»" % g.name_of("decisions" if g.content.has("decisions", u) else "interactions", u))
+	if not acts.is_empty():
+		bb += "\n" + BB.gold(app.t("ui.perk_unlocks", {"list": ", ".join(acts)}))
 	if owned:
 		bb += "\n" + BB.good("✔ " + app.t("ui.perk_owned"))
 	elif not req_ok:

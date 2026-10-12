@@ -1,7 +1,12 @@
 # Образ жизни. Взрослый персонаж выбирает фокус, копит опыт своего образа
 # жизни и открывает перки. Перк открывается, когда открыты все его requires.
-# Последний перк дерева даёт черту (trait). Модификаторы — те же
-# характеристики, что у черт (diplomacy, tax_mult, scheme_power, ...).
+#
+# Деревья — стези: каждая — свой способ править. Перк стези меняет правило и
+# связывает механики (казни и страх, поединки и вещи, крюки и казна, мощи и
+# душа, стройки и род…): правила-характеристики в modifiers (их читает
+# движок), stress_reactions — что теперь персонажу по душе (как у черт; ИИ
+# поступает по ним), а правила в данных — в stezi.yaml (has_perk). Вершина
+# стези даёт черту и открывает действия (unlocks — для подсказки).
 lifestyles:
   diplomacy_lifestyle: { skill: diplomacy, icon: "🕊", color: "#6b8fb3", order: 1 }
   martial_lifestyle: { skill: martial, icon: "⚔", color: "#b35a4a", order: 2 }
@@ -79,15 +84,59 @@ focuses:
     modifiers: { learning: 1, health: 0.5 }
 
 perks:
-  # ================================================ дипломатия: Августейший
-  regal_bearing: { lifestyle: diplomacy_lifestyle, tree: august, icon: "🎖", modifiers: { monthly_prestige: 0.3 } }
-  court_etiquette: { lifestyle: diplomacy_lifestyle, tree: august, requires: regal_bearing, icon: "🎩", modifiers: { general_opinion: 5 } }
-  statesman: { lifestyle: diplomacy_lifestyle, tree: august, requires: court_etiquette, icon: "🏛", modifiers: { vassal_opinion: 5, diplomacy: 1 } }
-  august_majesty: { lifestyle: diplomacy_lifestyle, tree: august, requires: statesman, icon: "👑", trait: diplomat, modifiers: { monthly_prestige: 0.5 } }
-  # дипломатия: Семья прежде всего
-  fecund_line: { lifestyle: diplomacy_lifestyle, tree: family_first, icon: "🌱", modifiers: { fertility: 0.15 } }
-  blood_ties: { lifestyle: diplomacy_lifestyle, tree: family_first, requires: fecund_line, icon: "🩸", modifiers: { family_opinion: 10 } }
-  wise_mentor: { lifestyle: diplomacy_lifestyle, tree: family_first, requires: blood_ties, icon: "🧓", modifiers: { learning: 1, diplomacy: 1 } }
+  # ================================================ дипломатия: Государь — правит славой
+  regal_bearing:
+    lifestyle: diplomacy_lifestyle
+    tree: august
+    icon: "🎖"
+    modifiers: { prestige_opinion_mult: 0.5, monthly_prestige: 0.3 }
+    ai_will_do: { value: 10, if: { limit: { has_trait: [arrogant, ambitious, gregarious] }, add: 15 } }
+  court_etiquette:
+    lifestyle: diplomacy_lifestyle
+    tree: august
+    requires: regal_bearing
+    icon: "🎩"
+    modifiers: { general_opinion: 3 }
+    stress_reactions: { hold_feast: -10 }
+    ai_will_do: 40
+  statesman:
+    lifestyle: diplomacy_lifestyle
+    tree: august
+    requires: court_etiquette
+    icon: "🏛"
+    modifiers: { diplomacy: 1 }
+    ai_will_do: 40
+  august_majesty:
+    lifestyle: diplomacy_lifestyle
+    tree: august
+    requires: statesman
+    icon: "👑"
+    trait: diplomat
+    unlocks: [royal_progress]
+    ai_will_do: 40
+
+  # ================================================ дипломатия: Династ — род как опора
+  fecund_line:
+    lifestyle: diplomacy_lifestyle
+    tree: family_first
+    icon: "🌱"
+    modifiers: { fertility: 0.15 }
+    ai_will_do: { value: 10, if: { limit: { has_trait: [lustful, gregarious, compassionate] }, add: 10 }, add: { value: num_children, multiply: 2, max: 10 } }
+  blood_ties:
+    lifestyle: diplomacy_lifestyle
+    tree: family_first
+    requires: fecund_line
+    icon: "🩸"
+    modifiers: { legacy_cost_mult: -0.25, family_opinion: 10 }
+    ai_will_do: 40
+  wise_mentor:
+    lifestyle: diplomacy_lifestyle
+    tree: family_first
+    requires: blood_ties
+    icon: "🧓"
+    modifiers: { ward_education_mult: 0.5, learning: 1 }
+    stress_reactions: { choose_guardian: -5 }
+    ai_will_do: 40
   head_of_house:
     lifestyle: diplomacy_lifestyle
     tree: family_first
@@ -95,56 +144,301 @@ perks:
     icon: "🏰"
     trait: family_patriarch
     effect: { add_dynasty_prestige: 100 }
+    unlocks: [gather_kin]
+    ai_will_do: 40
 
-  # ================================================ воинское дело: Стратег
-  logistics: { lifestyle: martial_lifestyle, tree: strategist, icon: "🐎", modifiers: { levy_mult: 0.05 } }
-  battle_tactics: { lifestyle: martial_lifestyle, tree: strategist, requires: logistics, icon: "🗺", modifiers: { commander_advantage: 4 } }
-  military_drills: { lifestyle: martial_lifestyle, tree: strategist, requires: battle_tactics, icon: "🥁", modifiers: { levy_mult: 0.1 } }
-  master_strategist: { lifestyle: martial_lifestyle, tree: strategist, requires: military_drills, icon: "♞", trait: strategist }
-  # воинское дело: Надзиратель
-  stalwart_leader: { lifestyle: martial_lifestyle, tree: overseer, icon: "🗿", modifiers: { prowess: 3 } }
-  iron_discipline: { lifestyle: martial_lifestyle, tree: overseer, requires: stalwart_leader, icon: "⛓", modifiers: { army_upkeep_mult: -0.2 } }
-  levy_reforms: { lifestyle: martial_lifestyle, tree: overseer, requires: iron_discipline, icon: "📯", modifiers: { levy_mult: 0.1, vassal_opinion: -3 } }
-  overseer_of_men: { lifestyle: martial_lifestyle, tree: overseer, requires: levy_reforms, icon: "🏹", trait: overseer }
+  # ================================================ воинское дело: Полководец — маневр и пленные
+  logistics:
+    lifestyle: martial_lifestyle
+    tree: strategist
+    icon: "🐎"
+    modifiers: { attrition_mult: -0.5, march_speed: 0.05 }
+    ai_will_do: { value: 10, if: { limit: { has_trait: [patient, diligent, ambitious] }, add: 10 }, add: { value: martial, multiply: 0.5 } }
+  take_alive:
+    lifestyle: martial_lifestyle
+    tree: strategist
+    requires: logistics
+    icon: "⛓"
+    modifiers: { commander_advantage: 2 }
+    ai_will_do: 40
+  military_drills:
+    lifestyle: martial_lifestyle
+    tree: strategist
+    requires: take_alive
+    icon: "🥁"
+    modifiers: { regiment_power: 0.15, army_upkeep_mult: -0.15 }
+    ai_will_do: 40
+  master_strategist:
+    lifestyle: martial_lifestyle
+    tree: strategist
+    requires: military_drills
+    icon: "♞"
+    trait: strategist
+    unlocks: [grand_muster]
+    ai_will_do: 40
 
-  # ================================================ управление: Зодчий
-  master_builder: { lifestyle: stewardship_lifestyle, tree: architect, icon: "🧱", modifiers: { build_cost_mult: -0.15 } }
-  thriving_lands: { lifestyle: stewardship_lifestyle, tree: architect, requires: master_builder, icon: "🌾", modifiers: { development_growth: 0.1 } }
-  bountiful_harvests: { lifestyle: stewardship_lifestyle, tree: architect, requires: thriving_lands, icon: "🧺", modifiers: { tax_mult: 0.1 } }
-  royal_architect: { lifestyle: stewardship_lifestyle, tree: architect, requires: bountiful_harvests, icon: "🏗", trait: architect }
-  # управление: Администратор
-  efficient_rule: { lifestyle: stewardship_lifestyle, tree: administrator, icon: "📋", modifiers: { domain_limit: 1 } }
-  tax_collectors: { lifestyle: stewardship_lifestyle, tree: administrator, requires: efficient_rule, icon: "🧾", modifiers: { tax_mult: 0.1 } }
-  golden_obligations: { lifestyle: stewardship_lifestyle, tree: administrator, requires: tax_collectors, icon: "💎", modifiers: { monthly_income: 0.5 } }
-  great_administrator: { lifestyle: stewardship_lifestyle, tree: administrator, requires: golden_obligations, icon: "⚖", trait: administrator }
+  # ================================================ воинское дело: Тиран — правит страхом
+  stern_gaze:
+    lifestyle: martial_lifestyle
+    tree: tyranny
+    icon: "👁"
+    modifiers: { dread_decay_mult: -0.5, dread_gain_mult: 0.1 }
+    ai_will_do:
+      value: 4
+      if:
+        - limit: { has_trait: [wrathful, callous, arbitrary, vengeful, paranoid] }
+          add: 25
+        - limit: { has_trait: [compassionate, forgiving, just] }
+          multiply: 0
+  bloody_justice:
+    lifestyle: martial_lifestyle
+    tree: tyranny
+    requires: stern_gaze
+    icon: "🪓"
+    stress_reactions: { execute_prisoner: -15, imprison: -5 }
+    ai_will_do: 40
+  dungeon_dread:
+    lifestyle: martial_lifestyle
+    tree: tyranny
+    requires: bloody_justice
+    icon: "🗝"
+    modifiers: { dread_per_prisoner: 1 }
+    stress_reactions: { release_prisoner: 10 }
+    ai_will_do: 40
+  iron_fist:
+    lifestyle: martial_lifestyle
+    tree: tyranny
+    requires: dungeon_dread
+    icon: "⛓"
+    trait: tyrant
+    unlocks: [intimidate, public_execution]
+    ai_will_do: 40
 
-  # ================================================ интриги: Интриган
-  subtle_hand: { lifestyle: intrigue_lifestyle, tree: schemer, icon: "🤫", modifiers: { scheme_power: 5 } }
-  prying_eyes: { lifestyle: intrigue_lifestyle, tree: schemer, requires: subtle_hand, icon: "👁", modifiers: { scheme_defense: 10 } }
-  truth_is_relative: { lifestyle: intrigue_lifestyle, tree: schemer, requires: prying_eyes, icon: "🎭", modifiers: { intrigue: 2 } }
-  master_schemer: { lifestyle: intrigue_lifestyle, tree: schemer, requires: truth_is_relative, icon: "🕷", trait: schemer }
-  # интриги: Соблазнитель
-  alluring: { lifestyle: intrigue_lifestyle, tree: seducer, icon: "💋", modifiers: { attraction_opinion: 10 } }
-  sweet_words: { lifestyle: intrigue_lifestyle, tree: seducer, requires: alluring, icon: "🎶", modifiers: { diplomacy: 1, intrigue: 1 } }
-  heartbreaker: { lifestyle: intrigue_lifestyle, tree: seducer, requires: sweet_words, icon: "💔", modifiers: { general_opinion: 5 } }
-  irresistible: { lifestyle: intrigue_lifestyle, tree: seducer, requires: heartbreaker, icon: "🌹", trait: seducer }
+  # ================================================ воинское дело: Рыцарь — поединки и трофеи
+  knightly_vow:
+    lifestyle: martial_lifestyle
+    tree: chivalry
+    icon: "🛡"
+    modifiers: { prowess: 2 }
+    stress_reactions: { challenge_to_duel: -10 }
+    ai_will_do: { value: 6, if: { limit: { has_trait: [brave, arrogant, wrathful, honest] }, add: 15 }, add: { value: prowess, multiply: 0.8 } }
+  trophy_taker:
+    lifestyle: martial_lifestyle
+    tree: chivalry
+    requires: knightly_vow
+    icon: "⚔"
+    modifiers: { attraction_opinion: 5 }
+    ai_will_do: 40
+  sword_brotherhood:
+    lifestyle: martial_lifestyle
+    tree: chivalry
+    requires: trophy_taker
+    icon: "🤝"
+    modifiers: { knight_cap: 2, knight_effectiveness: 0.15 }
+    ai_will_do: 40
+  paragon_of_chivalry:
+    lifestyle: martial_lifestyle
+    tree: chivalry
+    requires: sword_brotherhood
+    icon: "🏇"
+    trait: paragon
+    unlocks: [glory_quest]
+    ai_will_do: 40
 
-  # ================================================ учёность: Учёный
-  avid_reader: { lifestyle: learning_lifestyle, tree: scholarship, icon: "📕", modifiers: { learning: 2 } }
-  natural_philosophy: { lifestyle: learning_lifestyle, tree: scholarship, requires: avid_reader, icon: "🔭", modifiers: { development_growth: 0.05, lifestyle_xp_mult: 0.1 } }
-  polymath: { lifestyle: learning_lifestyle, tree: scholarship, requires: natural_philosophy, icon: "🧠", modifiers: { diplomacy: 1, martial: 1, stewardship: 1, intrigue: 1 } }
-  renowned_scholar: { lifestyle: learning_lifestyle, tree: scholarship, requires: polymath, icon: "🎓", trait: scholar }
-  # учёность: Богослов
-  devout_prayer: { lifestyle: learning_lifestyle, tree: theology, icon: "🙏", modifiers: { monthly_piety: 0.5 } }
-  inner_peace: { lifestyle: learning_lifestyle, tree: theology, requires: devout_prayer, icon: "🕯", modifiers: { stress_gain_mult: -0.15 } }
-  healing_hands: { lifestyle: learning_lifestyle, tree: theology, requires: inner_peace, icon: "🌿", modifiers: { health: 0.5 } }
-  doctor_of_theology: { lifestyle: learning_lifestyle, tree: theology, requires: healing_hands, icon: "✝", trait: theologian }
+  # ================================================ управление: Зодчий — стройки и великолепие
+  master_builder:
+    lifestyle: stewardship_lifestyle
+    tree: architect
+    icon: "🧱"
+    modifiers: { build_cost_mult: -0.15 }
+    ai_will_do: { value: 10, if: { limit: { has_trait: [diligent, patient, ambitious] }, add: 10 } }
+  thriving_lands:
+    lifestyle: stewardship_lifestyle
+    tree: architect
+    requires: master_builder
+    icon: "🌾"
+    modifiers: { development_growth: 0.1, control_gain: 0.5 }
+    ai_will_do: 40
+  court_splendor:
+    lifestyle: stewardship_lifestyle
+    tree: architect
+    requires: thriving_lands
+    icon: "🖼"
+    modifiers: { commission_cost_mult: -0.4, commission_quality: 0.25 }
+    ai_will_do: 40
+  royal_architect:
+    lifestyle: stewardship_lifestyle
+    tree: architect
+    requires: court_splendor
+    icon: "🏗"
+    trait: architect
+    unlocks: [great_work]
+    ai_will_do: 40
 
-# Черты за завершение деревьев.
+  # ================================================ управление: Казначей — золото как оружие
+  efficient_rule:
+    lifestyle: stewardship_lifestyle
+    tree: administrator
+    icon: "📋"
+    modifiers: { domain_limit: 1 }
+    ai_will_do: { value: 10, if: { limit: { has_trait: [greedy, ambitious, diligent] }, add: 10 } }
+  tax_collectors:
+    lifestyle: stewardship_lifestyle
+    tree: administrator
+    requires: efficient_rule
+    icon: "🧾"
+    modifiers: { tax_mult: 0.1, audit_chance: 3 }
+    ai_will_do: 40
+  lombard_loan:
+    lifestyle: stewardship_lifestyle
+    tree: administrator
+    requires: tax_collectors
+    icon: "🏦"
+    modifiers: { monthly_income: 0.3 }
+    unlocks: [take_loan]
+    ai_will_do: 40
+  great_administrator:
+    lifestyle: stewardship_lifestyle
+    tree: administrator
+    requires: lombard_loan
+    icon: "⚖"
+    trait: administrator
+    unlocks: [bribe]
+    ai_will_do: 40
+
+  # ================================================ интриги: Паук — тайны и крюки
+  subtle_hand:
+    lifestyle: intrigue_lifestyle
+    tree: schemer
+    icon: "👂"
+    modifiers: { scheme_power: 5 }
+    ai_will_do: { value: 10, if: { limit: { has_trait: [deceitful, paranoid, ambitious, cynical] }, add: 15 } }
+  prying_eyes:
+    lifestyle: intrigue_lifestyle
+    tree: schemer
+    requires: subtle_hand
+    icon: "🪙"
+    modifiers: { income_per_hook: 0.5 }
+    stress_reactions: { blackmail: -10 }
+    ai_will_do: 40
+  secret_trade:
+    lifestyle: intrigue_lifestyle
+    tree: schemer
+    requires: prying_eyes
+    icon: "📜"
+    modifiers: { intrigue: 1 }
+    unlocks: [sell_secret]
+    ai_will_do: 40
+  master_schemer:
+    lifestyle: intrigue_lifestyle
+    tree: schemer
+    requires: secret_trade
+    icon: "🕷"
+    trait: schemer
+    unlocks: [compel_service]
+    ai_will_do: 40
+
+  # ================================================ интриги: Соблазнитель — любовь как оружие
+  alluring:
+    lifestyle: intrigue_lifestyle
+    tree: seducer
+    icon: "💋"
+    modifiers: { attraction_opinion: 10 }
+    ai_will_do: { value: 6, if: { limit: { has_trait: [lustful, gregarious, deceitful] }, add: 15 } }
+  pillow_talk:
+    lifestyle: intrigue_lifestyle
+    tree: seducer
+    requires: alluring
+    icon: "🕯"
+    modifiers: { intrigue: 1 }
+    ai_will_do: 40
+  heartbreaker:
+    lifestyle: intrigue_lifestyle
+    tree: seducer
+    requires: pillow_talk
+    icon: "💔"
+    modifiers: { diplomacy: 1 }
+    stress_reactions: { seduce: -10 }
+    ai_will_do: 40
+  irresistible:
+    lifestyle: intrigue_lifestyle
+    tree: seducer
+    requires: heartbreaker
+    icon: "🌹"
+    trait: seducer
+    unlocks: [heart_pact]
+    ai_will_do: 40
+
+  # ================================================ учёность: Учёный — знание ускоряет всё
+  avid_reader:
+    lifestyle: learning_lifestyle
+    tree: scholarship
+    icon: "📕"
+    modifiers: { deed_lifestyle_xp: 25, learning: 1 }
+    ai_will_do: { value: 10, if: { limit: { has_trait: [diligent, curious, shy, cynical] }, add: 10 } }
+  natural_philosophy:
+    lifestyle: learning_lifestyle
+    tree: scholarship
+    requires: avid_reader
+    icon: "🔭"
+    modifiers: { development_growth: 0.05, lifestyle_xp_mult: 0.1 }
+    ai_will_do: 40
+  polymath:
+    lifestyle: learning_lifestyle
+    tree: scholarship
+    requires: natural_philosophy
+    icon: "🧠"
+    modifiers: { archetype_skill_reduction: 2, diplomacy: 1, martial: 1, stewardship: 1, intrigue: 1 }
+    ai_will_do: 40
+  renowned_scholar:
+    lifestyle: learning_lifestyle
+    tree: scholarship
+    requires: polymath
+    icon: "🎓"
+    trait: scholar
+    unlocks: [magnum_opus]
+    ai_will_do: 40
+
+  # ================================================ учёность: Святой — благочестие, мощи, чудеса
+  devout_prayer:
+    lifestyle: learning_lifestyle
+    tree: theology
+    icon: "🙏"
+    modifiers: { monthly_piety: 0.5 }
+    stress_reactions: { go_on_pilgrimage: -20, give_alms: -5 }
+    ai_will_do: { value: 8, if: { limit: { has_trait: [zealous, humble, compassionate, chaste] }, add: 20 } }
+  inner_peace:
+    lifestyle: learning_lifestyle
+    tree: theology
+    requires: devout_prayer
+    icon: "🕯"
+    modifiers: { stress_gain_mult: -0.15, piety_opinion_mult: 0.5 }
+    ai_will_do: 40
+  relic_keeper:
+    lifestyle: learning_lifestyle
+    tree: theology
+    requires: inner_peace
+    icon: "⛪"
+    modifiers: { learning: 1 }
+    stress_reactions: { execute_prisoner: 15 }
+    ai_will_do: 40
+  doctor_of_theology:
+    lifestyle: learning_lifestyle
+    tree: theology
+    requires: relic_keeper
+    icon: "✝"
+    trait: theologian
+    unlocks: [miracle, holy_call]
+    ai_will_do: 40
+
+# Черты за пройденную стезю.
 traits:
   diplomat: { category: lifestyle, icon: "🕊", modifiers: { diplomacy: 3, general_opinion: 5 } }
   family_patriarch: { category: lifestyle, icon: "👴", modifiers: { diplomacy: 2, family_opinion: 15, fertility: 0.1 } }
   strategist: { category: lifestyle, icon: "♞", modifiers: { martial: 2, commander_advantage: 6 } }
+  tyrant: { category: lifestyle, icon: "⛓", modifiers: { martial: 2, intrigue: 1, dread_gain_mult: 0.25, general_opinion: -5 } }
+  paragon: { category: lifestyle, icon: "🏇", modifiers: { prowess: 3, attraction_opinion: 10, monthly_prestige: 0.5 } }
+  # прежняя черта стези «Надзиратель» — у тех, кто получил её раньше
   overseer: { category: lifestyle, icon: "🏹", modifiers: { martial: 2, levy_mult: 0.15, army_upkeep_mult: -0.1 } }
   architect: { category: lifestyle, icon: "🏗", modifiers: { stewardship: 2, build_cost_mult: -0.15, development_growth: 0.1 } }
   administrator: { category: lifestyle, icon: "⚖", modifiers: { stewardship: 3, domain_limit: 1 } }

@@ -130,6 +130,16 @@ stat:
   siege_speed: Скорость осад
   build_time_mult: Срок строительства
   battle_survival: Выживание в бою
+  prestige_opinion_mult: Слава в глазах подданных
+  piety_opinion_mult: Благочестие в глазах единоверцев
+  legacy_cost_mult: Цена наследий рода
+  ward_education_mult: Наставничество
+  attrition_mult: Потери от истощения
+  dread_per_prisoner: Страх от каждого пленника (в месяц)
+  deed_lifestyle_xp: Опыт образа жизни за деяние
+  archetype_skill_reduction: Пути открываются раньше (навык)
+  commission_cost_mult: Цена заказа вещей
+  commission_quality: Мастерство заказанных вещей
 mastery:
   diplomacy: Мягкотелость
   martial: Безрассудство

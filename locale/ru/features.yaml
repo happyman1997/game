@@ -17,6 +17,7 @@ ui:
   perk_need_xp: "Нужно опыта: {cost} (есть {xp})"
   perk_unlock: Открыть перк
   perk_grants_trait: "Даёт черту «{trait}»"
+  perk_unlocks: "Открывает: {list}"
   lifestyle_skill: "Навык: {skill}"
   lifestyle_all_done: Все перки этого образа жизни открыты
   council: Совет

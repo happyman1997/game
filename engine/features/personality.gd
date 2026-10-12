@@ -19,8 +19,10 @@ func _init() -> void:
 	doc = "Характер: черты отзываются стрессом на поступки, ИИ поступает по характеру"
 
 
-## Источники характера: черты и тени мастерства навыков (skills.<id>.mastery,
-## источник "mastery:<навык>"). [[источник, определение с stress_*], ...]
+## Источники характера: черты, тени мастерства навыков (skills.<id>.mastery,
+## источник "mastery:<навык>") и перки образа жизни (perks.<id>, источник
+## "perk:<id>" — стезя меняет то, что персонажу по душе).
+## [[источник, определение с stress_*], ...]
 static func _sources(game: Game) -> Array:
 	var hit: Variant = game.engine.cache.get("personality:src")
 	if hit == null:
@@ -31,6 +33,9 @@ static func _sources(game: Game) -> Array:
 		for sk in game.content.all("skills"):
 			if sk.get("mastery") is Dictionary:
 				hit.append(["mastery:" + str(sk.id), sk.mastery])
+		for pk in game.content.all("perks"):
+			if pk.get("stress_reactions") is Dictionary or pk.get("stress_monthly") is Dictionary:
+				hit.append(["perk:" + str(pk.id), pk])
 		game.engine.cache["personality:src"] = hit
 	return hit
 
@@ -65,16 +70,20 @@ static func _monthly(game: Game) -> Array:
 	return hit
 
 
-## Есть ли у персонажа источник: черта или тень мастерства.
+## Есть ли у персонажа источник: черта, тень мастерства или перк.
 static func has_source(game: Game, c: Dictionary, src: String) -> bool:
 	if src.begins_with("mastery:"):
 		return Stats.stat(game, c, src) > 0.0
+	if src.begins_with("perk:"):
+		return Lifestyles.has_perk(c, src.substr(5))
 	return c.traits.has(src)
 
 
 static func source_name(game: Game, src: String) -> String:
 	if src.begins_with("mastery:"):
 		return game.loc.t("mastery." + src.substr(8))
+	if src.begins_with("perk:"):
+		return game.name_of("perks", src.substr(5))
 	return game.name_of("traits", src)
 
 
@@ -214,6 +223,8 @@ func register_script(engine: GameEngine) -> void:
 		for sk in e.content.all("skills"):
 			if sk.get("mastery") != null:
 				defs.append(["skills/%s mastery" % sk.id, sk.mastery])
+		for pk in e.content.all("perks"):
+			defs.append(["perks/" + str(pk.id), pk])
 		for item in defs:
 			var where: String = item[0]
 			var t: Variant = item[1]

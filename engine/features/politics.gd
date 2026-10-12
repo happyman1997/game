@@ -243,6 +243,12 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 		c.vars["dread"] = d - decay
 		if dread(c) <= 0.0:
 			c.vars.erase("dread")
+	# Тиран: каждый пленник в темнице — немного страха в месяц
+	var per_prisoner := Stats.stat(game, c, "dread_per_prisoner")
+	if per_prisoner > 0.0 and game.engine.has_feature("prison"):
+		var n := Prison.prisoners_of(game, c.id).size()
+		if n > 0:
+			add_dread(game, c, minf(float(n), game.def_num("politics.dread_prisoners_cap", 5)) * per_prisoner)
 	if game.vassals_of(c.id).is_empty() or c.get("prison") != null:
 		return
 	# Прошения вассалов: игрок — с небольшим шансом каждый месяц, остальные

@@ -81,7 +81,7 @@ static func ink_modifiers(game: Game, mods: Variant, cols: int = 2) -> String:
 	var n := 0
 	for k in mods:
 		var v := float(mods[k])
-		var is_bad := v > 0 if k == "stress_gain_mult" else v < 0
+		var is_bad := BB.is_bad_value(str(k), v)
 		out += "[cell expand=1][color=#3a2614]%s[/color][/cell][cell]   [color=%s]%s[/color]      [/cell]" % [
 			BB.esc(game.loc.t_or("stat." + k, k)), "#9a1c1c" if is_bad else "#2e5a1c", BB.stat_value(k, v)]
 		n += 1

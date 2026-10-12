@@ -265,6 +265,8 @@ events:
 | `on_war_started` / `on_war_ended` | нападающий | `scope:attacker`, `scope:defender`, `scope:target` |
 | `on_battle_won` / `on_battle_lost` | владелец армии | `scope:enemy` |
 | `on_siege_won` | тот, чья армия взяла крепость | `scope:province`, `scope:war`, `scope:defender` |
+| `on_duel_won` | победившая в поединке сторона (до гибели бойца) | `scope:loser` |
+| `on_building_completed` | тот, кто заказал постройку | `scope:province` |
 | `on_war_won` | победитель войны | `scope:enemy` — побеждённый |
 | `on_scheme_discovered` | цель раскрытой враждебной интриги | `scope:plotter`, `scope:scheme` |
 | `on_councillor_pulse` | советник (раз в месяц) | `scope:liege` |
@@ -718,13 +720,43 @@ focuses:
     ai_will_do: 1                       # вес при выборе ИИ (умножается на навык)
 perks:
   master_builder: { lifestyle: stewardship_lifestyle, tree: architect, modifiers: { build_cost_mult: -0.15 } }
+  bloody_justice:
+    lifestyle: martial_lifestyle
+    tree: tyranny
+    requires: stern_gaze                # или список
+    stress_reactions: { execute_prisoner: -15 }   # отклик характера, как у черт (ИИ поступает по нему)
   royal_architect:
     lifestyle: stewardship_lifestyle
     tree: architect
-    requires: master_builder            # или список
+    requires: master_builder
     trait: architect                    # черта за завершение дерева
     effect: { add_prestige: 100 }       # эффект при открытии (необязательно)
+    unlocks: [great_work]               # какие решения/взаимодействия открывает (для подсказки)
 ```
+
+Деревья — **стези**: каждая — свой способ править, и её перки меняют правила,
+связывая механики. Правило перка — это либо характеристика в `modifiers`,
+которую читает движок, либо проверка `has_perk` в данных: в
+`data/common/stezi.yaml` основной мод дописывает правила к чужим записям
+(`$append` к `on_accept` казни, к `on_success` соблазнения, к `on_battle_won`…)
+и добавляет действия вершин (`is_shown: { has_perk: ... }`). Подпись стези под
+её названием — ключ `perk_tree_desc.<дерево>`. Характеристики-правила,
+которые понимает движок:
+
+| Характеристика | Что делает |
+|---|---|
+| `prestige_opinion_mult`, `piety_opinion_mult` | доля, на которую усиливается мнение подданных от уровня славы / единоверцев от уровня благочестия |
+| `dread_per_prisoner` | страх в месяц за каждого пленника в темнице (до `politics.dread_prisoners_cap`) |
+| `legacy_cost_mult` | цена наследий рода, пока персонаж — глава рода |
+| `ward_education_mult` | насколько лучше учатся подопечные этого опекуна |
+| `attrition_mult` | потери армий персонажа от истощения |
+| `deed_lifestyle_xp` | опыт текущего образа жизни за каждое деяние |
+| `archetype_skill_reduction` | на сколько ниже порог навыков для путей (архетипов) |
+| `commission_cost_mult`, `commission_quality` | цена заказа вещей и сдвиг шансов к редкому |
+
+Другие моды тоже могут менять стези слиянием — например, мод «Железо и плоть»
+добавляет перку «Душевный покой» крепость души (`perks: { inner_peace: { modifiers: { soul: 15 } } }`),
+а «Чуду» — изгнание одержимости.
 
 Взрослые персонажи копят опыт текущего образа жизни: `(base_xp + навык × xp_per_skill) × (1 + lifestyle_xp_mult) × xp_mult`
 в месяц (`xp_mult` — поле образа жизни, по умолчанию 1); перк стоит `perk_cost + perk_cost_growth × открытых перков`. ИИ выбирает

@@ -1,0 +1,5 @@
+# Стези основного мода в мире тайных искусств: хранитель мощей не боится
+# порчи, а энциклопедист постигает колдовство быстрее.
+perks:
+  relic_keeper: { modifiers: { curse_resistance: 25 } }
+  natural_philosophy: { modifiers: { arcane_capacity: 10 } }

@@ -17,6 +17,7 @@ ui:
   perk_need_xp: "Requires experience: {cost} (you have {xp})"
   perk_unlock: Unlock perk
   perk_grants_trait: "Grants the trait “{trait}”"
+  perk_unlocks: "Unlocks: {list}"
   lifestyle_skill: "Skill: {skill}"
   lifestyle_all_done: All perks of this lifestyle are unlocked
   council: Council

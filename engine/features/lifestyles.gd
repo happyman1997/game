@@ -7,7 +7,8 @@ extends EngineFeature
 ## Данные:
 ##   lifestyles:   { skill, secondary_skill, secondary_share, xp_mult, icon, color, order, is_shown }
 ##   focuses:      { lifestyle, icon, modifiers, is_shown, ai_will_do }
-##   perks:        { lifestyle, tree, requires, icon, modifiers, trait, effect, ai_will_do }
+##   perks:        { lifestyle, tree, requires, icon, modifiers, trait, effect, ai_will_do,
+##                   stress_reactions (отклик характера, как у черт), unlocks (действия — для подсказки) }
 ##   defines.lifestyle: { base_xp, xp_per_skill, perk_cost, perk_cost_growth, focus_change_cooldown_months }
 
 const OWNER := "core/lifestyles"
@@ -386,4 +387,7 @@ func register_script(engine: GameEngine) -> void:
 			if p.get("trait") != null:
 				v.ref("traits", p.trait, "perks/" + p.id)
 			v.effect(p.get("effect"), "perks/%s effect" % p.id)
+			for u in Data.as_array(p.get("unlocks")):
+				if not (e.content.has("decisions", u) or e.content.has("interactions", u)):
+					v.issue("perks/%s unlocks: нет решения или взаимодействия \"%s\"" % [p.id, u])
 	, OWNER)

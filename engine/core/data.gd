@@ -48,6 +48,14 @@ static func _strip_directives(v: Variant) -> Variant:
 		for x in v:
 			out.append(_strip_directives(x))
 		return out
+	# список-директива без основы (запись появилась впервые): $prepend + $append
+	if _is_array_op(v):
+		var arr := []
+		if v.has("$prepend"):
+			arr += _strip_directives(Data.as_array(v["$prepend"]))
+		if v.has("$append"):
+			arr += _strip_directives(Data.as_array(v["$append"]))
+		return arr
 	if v is Dictionary:
 		var out := {}
 		for k in v:

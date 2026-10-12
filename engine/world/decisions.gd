@@ -162,6 +162,8 @@ static func daily_construction(game: Game) -> void:
 		var t: Variant = game.state.titles.get(p.id)
 		game.message(game.loc.t("msg.building_done", {"building": game.name_of("buildings", b), "place": game.name_of("provinces", p.id)}), "good", {"type": "province", "id": p.id}, [t.holder if t != null else null])
 		game.emit("building.completed", {"province": p.id, "building": b, "by": by})
+		if by != null and game.ch(str(by)) != null:
+			game.on_action("on_building_completed", {"type": "character", "id": str(by)}, {"province": {"type": "province", "id": p.id}})
 
 
 ## [{province, def}]

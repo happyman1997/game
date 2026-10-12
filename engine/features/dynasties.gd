@@ -192,7 +192,12 @@ static func has_legacy(game: Game, dyn_id: Variant, lid: String) -> bool:
 
 
 static func legacy_cost(game: Game, dyn_id: Variant) -> float:
-	return game.def_num("dynasty.legacy_cost_base", 300) + game.def_num("dynasty.legacy_cost_step", 250) * owned(game, dyn_id).size()
+	var cost := game.def_num("dynasty.legacy_cost_base", 300) + game.def_num("dynasty.legacy_cost_step", 250) * owned(game, dyn_id).size()
+	# Династ во главе рода: legacy_cost_mult
+	var h: Variant = head_of(game, dyn_id)
+	if h != null:
+		cost *= maxf(0.1, 1.0 + Stats.stat(game, h, "legacy_cost_mult"))
+	return roundf(cost)
 
 
 ## Причины, по которым персонаж не может открыть наследие (пусто — может).
