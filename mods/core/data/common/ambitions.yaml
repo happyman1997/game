@@ -164,6 +164,7 @@ ambitions:
       OR:
         - martial: ">= 8"
         - prowess: ">= 10"
+      AND: [ { OR: [ { has_trait: brave }, { ai_boldness: "> 0" } ] } ]
     weight:
       value: 0.5
       add: { value: ai_boldness, multiply: 2 }
