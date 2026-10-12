@@ -141,13 +141,13 @@ static func _synth(sound: String) -> PackedFloat32Array:
 		"error": return _level(_warm(_seq([[0.0, _thock(0.12, 230.0, 190.0, 0.035, 0.006)], [0.09, _thock(0.12, 195.0, 160.0, 0.035, 0.006)]]), 1800.0), 0.07)
 		"pause": return _level(_warm(_seq([[0.0, _thock(0.07, 300.0, 260.0, 0.02)], [0.07, _thock(0.08, 230.0, 200.0, 0.025)]]), 2000.0), 0.045)
 		"unpause": return _level(_warm(_seq([[0.0, _thock(0.07, 230.0, 200.0, 0.02)], [0.07, _thock(0.08, 300.0, 260.0, 0.025)]]), 2000.0), 0.045)
-		# событие: тихий перебор арфы в нижнем регистре (ре — соль — си) с
-		# лёгким эхом зала — не звонок, а «к вам пришли»
+		# событие: тихий перебор арфы в низком регистре (ре — соль — си малой
+		# октавы) с лёгким эхом зала — не звонок, а «к вам пришли»
 		"event": return _level(_warm(_hall(_seq([
-			[0.0, _harp(1.3, 293.66, 0.55)],
-			[0.075, _harp(1.25, 392.0, 0.5)],
-			[0.15, _harp(1.2, 493.88, 0.45)],
-		]), 0.28), 1700.0), 0.04)
+			[0.0, _harp(1.4, 146.83, 0.7, 0.28)],
+			[0.08, _harp(1.35, 196.0, 0.65, 0.26)],
+			[0.16, _harp(1.3, 246.94, 0.6, 0.24)],
+		]), 0.28), 1200.0), 0.045)
 		"notify": return _level(_warm(_pluck(0.55, 440.0, 0.995), 2200.0), 0.04)
 		"notify_good": return _level(_warm(_seq([[0.0, _pluck(0.5, 523.25, 0.995)], [0.1, _pluck(0.6, 783.99, 0.995)]]), 2200.0), 0.045)
 		"notify_bad": return _level(_warm(_seq([[0.0, _pluck(0.55, 329.63, 0.994)], [0.13, _pluck(0.7, 261.63, 0.994)]]), 1800.0), 0.045)
@@ -315,9 +315,10 @@ static func _bell(dur: float, f: float, ratios: Array, taus: Array, amps: Array,
 	return out
 
 
-## Мягкая струна арфы: почти чистый тон с тёплой второй гармоникой, едва
+## Мягкая струна арфы: почти чистый тон с тёплой второй гармоникой (h2;
+## у низких струн она нужна, чтобы их было слышно и на маленьких динамиках), едва
 ## расстроенный двойник (медленные биения — «живой» звук) и плавная атака.
-static func _harp(dur: float, f: float, tau: float) -> PackedFloat32Array:
+static func _harp(dur: float, f: float, tau: float, h2: float = 0.12) -> PackedFloat32Array:
 	var n := _n(dur)
 	var out := PackedFloat32Array()
 	out.resize(n)
@@ -327,7 +328,7 @@ static func _harp(dur: float, f: float, tau: float) -> PackedFloat32Array:
 	for i in n:
 		var t := float(i) / RATE
 		var env := minf(1.0, t / 0.018) * exp(-t / tau)
-		out[i] = (sin(w1 * i) + 0.35 * sin(wd * i) + 0.12 * sin(w2 * i) * exp(-t / (tau * 0.35))) * env
+		out[i] = (sin(w1 * i) + 0.35 * sin(wd * i) + h2 * sin(w2 * i) * exp(-t / (tau * 0.5))) * env
 	return out
 
 
