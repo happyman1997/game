@@ -108,12 +108,15 @@ static func cell(app: App, it: Variant, slot_icon: Variant = null, on_click: Cal
 	return b
 
 
-## Ячейки слотов группы (personal / court) с подписями.
-static func _slot_row(app: App, c: Dictionary, group: String) -> Control:
+## Ячейки слотов группы (personal / court) с подписями; skip — слоты,
+## уже показанные на фигуре или в зале (остаются слоты из модов).
+static func _slot_row(app: App, c: Dictionary, group: String, skip: Array = []) -> Control:
 	var g := app.game
 	var row := K.flow([], 8)
 	for sd in Artifacts.slots(g, group):
 		var sid: String = sd.id
+		if skip.has(sid):
+			continue
 		var cap := Artifacts.slot_capacity(g, c, sid)
 		var items := Artifacts.in_slot(g, c, sid)
 		for i in cap:
@@ -133,6 +136,155 @@ static func _slot_row(app: App, c: Dictionary, group: String) -> Control:
 	return row
 
 
+# ------------------------------------------------------------ на человеке
+
+const DOLL_W := 560
+const DOLL_H := 400
+const FIG_W := 240
+const FIG_POS := Vector2(160, 8)
+## Ячейки вокруг фигуры (левый верхний угол): слева — шлем, доспех, оружие;
+## справа — регалия и безделушки.
+const DOLL_SPOTS := {
+	"helmet": [Vector2(36, 12)], "armor": [Vector2(36, 140)], "weapon": [Vector2(36, 268)],
+	"regalia": [Vector2(448, 12)], "trinket": [Vector2(448, 112), Vector2(448, 212), Vector2(448, 312)],
+}
+
+
+## Линии от ячеек к частям тела.
+class Connectors extends Control:
+	var segs: Array = []
+
+	func _draw() -> void:
+		for sg in segs:
+			var a: Vector2 = sg[0]
+			var b: Vector2 = sg[1]
+			var col: Color = sg[2]
+			var mid := Vector2(lerpf(a.x, b.x, 0.45), a.y)
+			draw_polyline(PackedVector2Array([a, mid, b]), col, 1.6, true)
+			draw_circle(b, 3.2, col)
+			draw_circle(b, 1.4, Color(1, 1, 1, col.a))
+
+
+static func _centered(child: Control) -> Control:
+	var cc := CenterContainer.new()
+	cc.add_child(child)
+	return cc
+
+
+static func _anchor_for(g: Game, slot: String, it: Variant) -> Vector2:
+	var key := slot
+	if it != null:
+		var t := str(it.get("type", ""))
+		if slot == "regalia" and t == "scepter":
+			key = "scepter"
+		elif slot == "trinket" and PaperDoll.ANCHORS.has(t):
+			key = t
+	var a: Vector2 = PaperDoll.ANCHORS.get(key, PaperDoll.ANCHORS.trinket)
+	var k := FIG_W / float(PaperDoll.W)
+	return FIG_POS + a * k
+
+
+## Фигура персонажа в полный рост с надетыми вещами и ячейки вокруг.
+static func _doll(app: App, c: Dictionary) -> Control:
+	var g := app.game
+	var root := Control.new()
+	root.custom_minimum_size = Vector2(DOLL_W, DOLL_H)
+	root.mouse_filter = Control.MOUSE_FILTER_PASS
+	var fig := K.tex(PaperDoll.figure_texture(g, c, FIG_W), Vector2(FIG_W, FIG_W * PaperDoll.H / float(PaperDoll.W)))
+	fig.position = FIG_POS
+	fig.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(fig)
+	var frame := Panel.new()
+	frame.position = FIG_POS - Vector2(3, 3)
+	frame.size = fig.custom_minimum_size + Vector2(6, 6)
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	frame.add_theme_stylebox_override("panel", UiArt.flat(Color(0, 0, 0, 0), Color(UiArt.BRONZE, 0.9), 2, 4))
+	root.add_child(frame)
+	var lines := Connectors.new()
+	lines.set_anchors_preset(Control.PRESET_FULL_RECT)
+	lines.size = root.custom_minimum_size
+	lines.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(lines)
+	for sid in DOLL_SPOTS:
+		var sd: Variant = Artifacts.slot_def(g, sid)
+		if sd == null:
+			continue
+		var cap := Artifacts.slot_capacity(g, c, sid)
+		var items := Artifacts.in_slot(g, c, sid)
+		var spots: Array = DOLL_SPOTS[sid]
+		for i in mini(cap, spots.size()):
+			var it: Variant = items[i] if i < items.size() else null
+			var pos: Vector2 = spots[i]
+			var cb := Callable()
+			if it != null:
+				var iid: String = it.id
+				cb = func(): open_detail(app, iid)
+			var cl := cell(app, it, sd.get("icon", "star"), cb)
+			cl.position = pos
+			if it == null:
+				K.tip(cl, BB.muted(app.t("ui.inv_empty_slot", {"slot": g.name_of("artifact_slots", sid)})))
+			root.add_child(cl)
+			if it != null:
+				var left := pos.x < FIG_POS.x
+				var from := Vector2(pos.x + CELL if left else pos.x, pos.y + CELL / 2.0)
+				var col := _color(g, it)
+				col.a = 0.8
+				lines.segs.append([from, _anchor_for(g, sid, it), col])
+	lines.queue_redraw()
+	return root
+
+
+## Тронный зал: трон, стены, постаменты — вещи на своих местах.
+const HALL_HOT := {
+	"throne": [Rect2(214, 36, 92, 120)],
+	"wall": [Rect2(46, 20, 92, 108), Rect2(382, 20, 92, 108)],
+	"pedestal": [Rect2(146, 132, 52, 56), Rect2(322, 132, 52, 56)],
+}
+
+
+static func _hall(app: App, c: Dictionary) -> Control:
+	var g := app.game
+	var root := Control.new()
+	root.custom_minimum_size = Vector2(PaperDoll.HALL_W, PaperDoll.HALL_H)
+	root.mouse_filter = Control.MOUSE_FILTER_PASS
+	var bg := K.tex(PaperDoll.hall_texture(g, c, PaperDoll.HALL_W), root.custom_minimum_size)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	root.add_child(bg)
+	for sid in HALL_HOT:
+		var sd: Variant = Artifacts.slot_def(g, sid)
+		if sd == null:
+			continue
+		var items := Artifacts.in_slot(g, c, sid)
+		var rects: Array = HALL_HOT[sid]
+		for i in mini(Artifacts.slot_capacity(g, c, sid), rects.size()):
+			var it: Variant = items[i] if i < items.size() else null
+			var r: Rect2 = rects[i]
+			var b := Button.new()
+			b.position = r.position
+			b.custom_minimum_size = r.size
+			b.size = r.size
+			b.focus_mode = Control.FOCUS_NONE
+			var col := _color(g, it)
+			b.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+			b.add_theme_stylebox_override("hover", UiArt.flat(Color(1, 0.9, 0.6, 0.08), col, 2, 6))
+			b.add_theme_stylebox_override("pressed", UiArt.flat(Color(1, 0.9, 0.6, 0.12), col, 2, 6))
+			if it != null:
+				var iid: String = it.id
+				b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+				b.pressed.connect(func(): open_detail(app, iid))
+				K.tip(b, func(): return item_tip(app, iid))
+				# на постаменте вещь стоит сама — рисуем её иконку
+				if sid == "pedestal":
+					var ic := Icons.node(Artifacts.icon_of(g, it), 42)
+					ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+					ic.position = Vector2((r.size.x - 42) / 2.0, r.size.y - 46)
+					b.add_child(ic)
+			else:
+				K.tip(b, BB.muted(app.t("ui.inv_empty_slot", {"slot": g.name_of("artifact_slots", sid)})))
+			root.add_child(b)
+	return root
+
+
 static func build(app: App, c: Dictionary) -> Control:
 	var g := app.game
 	var p: Variant = g.player
@@ -141,11 +293,19 @@ static func build(app: App, c: Dictionary) -> Control:
 	if not g.engine.has_feature("artifacts"):
 		return root
 	var items := Artifacts.items_of(g, c)
-	# снаряжение
-	root.add_child(K.section(app.t("ui.inv_equipment"), [_slot_row(app, c, "personal")], "helm"))
-	# убранство двора
+	# снаряжение — на самом человеке
+	var eq_children: Array = [_centered(_doll(app, c))]
+	var extra := _slot_row(app, c, "personal", DOLL_SPOTS.keys())
+	if extra.get_child_count() > 0:
+		eq_children.append(extra)
+	root.add_child(K.section(app.t("ui.inv_equipment"), eq_children, "helm"))
+	# убранство двора — тронный зал
 	if not c.titles.is_empty():
-		var court := K.section(app.t("ui.inv_court"), [_slot_row(app, c, "court")], "throne")
+		var court_children: Array = [_centered(_hall(app, c))]
+		var cextra := _slot_row(app, c, "court", PaperDoll.HALL_SPOTS.keys())
+		if cextra.get_child_count() > 0:
+			court_children.append(cextra)
+		var court := K.section(app.t("ui.inv_court"), court_children, "throne")
 		K.tip(court.get_child(0), BB.title(app.t("ui.inv_court")) + "\n" + BB.i(app.t("ui.inv_court_tip")))
 		root.add_child(court)
 	if not items.is_empty():

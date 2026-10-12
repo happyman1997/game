@@ -72,7 +72,10 @@ static func looks(game: Game, c: Dictionary) -> Dictionary:
 	return out
 
 
-static func svg(game: Game, c: Dictionary) -> String:
+## opts: inner — только голова (без фона, плеч, рамки и обёртки <svg>, для
+## фигуры в полный рост); no_crown — без короны по рангу.
+static func svg(game: Game, c: Dictionary, opts: Dictionary = {}) -> String:
+	var inner: bool = opts.get("inner", false)
 	var lk := looks(game, c)
 	var age := Chars.age_of(game, c)
 	if lk.get("ageless") != null:
@@ -115,7 +118,8 @@ static func svg(game: Game, c: Dictionary) -> String:
 	if lk.get("aura") is String:
 		p.append('<radialGradient id="aura" cx="50%%" cy="50%%" r="50%%"><stop offset="0.45" stop-color="%s" stop-opacity="0.85"/><stop offset="0.75" stop-color="%s" stop-opacity="0.35"/><stop offset="1" stop-color="%s" stop-opacity="0"/></radialGradient>' % [lk.aura, lk.aura, lk.aura])
 	p.append('</defs>')
-	p.append('<rect width="100" height="120" fill="url(#bg)"/>')
+	if not inner:
+		p.append('<rect width="100" height="120" fill="url(#bg)"/>')
 	# сияние за головой (чары, проклятие)
 	if lk.get("aura") is String:
 		p.append('<ellipse cx="50" cy="%s" rx="44" ry="46" fill="url(#aura)"/>' % _f(head_y - 4))
@@ -128,20 +132,8 @@ static func svg(game: Game, c: Dictionary) -> String:
 
 	# плечи и одежда
 	var sh := 90.0 + dy
-	p.append('<path d="M6 120 Q10 %s 50 %s Q90 %s 94 120 Z" fill="url(#cloth)" stroke="#000" stroke-opacity="0.35"/>' % [_f(sh + 4), _f(sh), _f(sh + 4)])
-	if tier >= 3:
-		# горностаевый воротник
-		p.append('<path d="M22 %s Q50 %s 78 %s L82 %s Q50 %s 18 %s Z" fill="#f1ede2" stroke="#00000044"/>' % [_f(sh + 6), _f(sh + 16), _f(sh + 6), _f(sh + 14), _f(sh + 26), _f(sh + 14)])
-		for i in 7:
-			var x := 26.0 + i * 8.0
-			var y := sh + 12.0 + 4.0 * (1.0 - absf(i - 3) / 3.0)
-			p.append('<path d="M%s %s l1.2 2.6 l-1.2 -0.6 l-1.2 0.6 Z" fill="#1a1a1a"/>' % [_f(x), _f(y)])
-	elif tier >= 1:
-		p.append('<path d="M30 %s Q50 %s 70 %s" fill="none" stroke="url(#gold)" stroke-width="3"/>' % [_f(sh + 3), _f(sh + 16), _f(sh + 3)])
-	else:
-		p.append('<path d="M38 %s L50 %s L62 %s" fill="none" stroke="%s" stroke-width="2"/>' % [_f(sh + 1), _f(sh + 14), _f(sh + 1), mix(clothes, "#fff", 0.35)])
-	if tier >= 2:
-		p.append('<circle cx="50" cy="%s" r="3" fill="url(#gold)" stroke="#5a3a08" stroke-width="0.6"/>' % _f(sh + 16 if tier >= 3 else sh + 14))
+	if not inner:
+		_shoulders(p, sh, tier, clothes)
 
 	# шея и голова
 	p.append('<path d="M%s %s h%s v%s q%s 4 %s 0 Z" fill="%s"/>' % [_f(50 - 7 * s), _f(head_y + 12 * s), _f(14 * s), _f(16 * s), _f(-7 * s), _f(-14 * s), mix(skin, "#000", 0.18)])
@@ -246,6 +238,8 @@ static func svg(game: Game, c: Dictionary) -> String:
 		# светлая кромка по краю капюшона
 		p.append('<path d="M%s %s Q%s %s 50 %s Q%s %s %s %s" stroke="%s" stroke-width="1.2" fill="none" stroke-opacity="0.8"/>' % [
 			_f(50 - fw - 1), _f(head_y + 30), _f(50 - fw - 3), _f(top + 1), _f(top - 2), _f(50 + fw + 3), _f(top + 1), _f(50 + fw + 1), _f(head_y + 30), mix(hc, "#ffffff", 0.3)])
+	if inner:
+		return "".join(p)
 	# корона по рангу
 	var ct := top - 6.0
 	var gem := '<circle cx="%s" cy="%s" r="%s" fill="%s" stroke="#00000066" stroke-width="0.4"/>'
@@ -274,3 +268,20 @@ static func svg(game: Game, c: Dictionary) -> String:
 	# мягкая виньетка поверх
 	p.append('<rect width="100" height="120" fill="none" stroke="#000" stroke-opacity="0.35" stroke-width="3"/>')
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="120" viewBox="0 0 100 120">' + "".join(p) + '</svg>'
+
+
+static func _shoulders(p: PackedStringArray, sh: float, tier: int, clothes: String) -> void:
+	p.append('<path d="M6 120 Q10 %s 50 %s Q90 %s 94 120 Z" fill="url(#cloth)" stroke="#000" stroke-opacity="0.35"/>' % [_f(sh + 4), _f(sh), _f(sh + 4)])
+	if tier >= 3:
+		# горностаевый воротник
+		p.append('<path d="M22 %s Q50 %s 78 %s L82 %s Q50 %s 18 %s Z" fill="#f1ede2" stroke="#00000044"/>' % [_f(sh + 6), _f(sh + 16), _f(sh + 6), _f(sh + 14), _f(sh + 26), _f(sh + 14)])
+		for i in 7:
+			var x := 26.0 + i * 8.0
+			var y := sh + 12.0 + 4.0 * (1.0 - absf(i - 3) / 3.0)
+			p.append('<path d="M%s %s l1.2 2.6 l-1.2 -0.6 l-1.2 0.6 Z" fill="#1a1a1a"/>' % [_f(x), _f(y)])
+	elif tier >= 1:
+		p.append('<path d="M30 %s Q50 %s 70 %s" fill="none" stroke="url(#gold)" stroke-width="3"/>' % [_f(sh + 3), _f(sh + 16), _f(sh + 3)])
+	else:
+		p.append('<path d="M38 %s L50 %s L62 %s" fill="none" stroke="%s" stroke-width="2"/>' % [_f(sh + 1), _f(sh + 14), _f(sh + 1), mix(clothes, "#fff", 0.35)])
+	if tier >= 2:
+		p.append('<circle cx="50" cy="%s" r="3" fill="url(#gold)" stroke="#5a3a08" stroke-width="0.6"/>' % _f(sh + 16 if tier >= 3 else sh + 14))
