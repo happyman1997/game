@@ -154,6 +154,15 @@ static func builtin_cb_targets() -> Dictionary:
 				for defender in by_defender:
 					out.append({"defender": defender, "title": d, "counties": by_defender[defender]})
 			return out},
+		# любой другой независимый правитель (повод сужает условием is_valid)
+		"independent_ruler": {"targets": func(game: Game, attacker: Dictionary) -> Array:
+			if attacker.liege != null:
+				return []
+			var out := []
+			for r in game.rulers():
+				if r.liege == null and r.id != attacker.id and not r.titles.is_empty():
+					out.append({"defender": r.id, "title": r.titles[0], "counties": Titles.domain_counties(game, r)})
+			return out},
 		"independence": {"targets": func(game: Game, attacker: Dictionary) -> Array:
 			if attacker.liege == null or attacker.titles.is_empty():
 				return []

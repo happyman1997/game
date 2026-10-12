@@ -1,0 +1,17 @@
+ui:
+  artifacts: Artifacts
+msg:
+  artifact_gained: "The artifact is yours: {value}."
+  artifact_taken: "{who} takes your artifact: {value}."
+  artifact_lost: "The artifact is lost: {value}."
+  attrition: "Ash storm: the army loses {n} soldiers ({place})."
+tr:
+  has_artifact: "Holds the artifact: {value}"
+  realm_has_artifact: "The realm keeps the artifact: {value}"
+  artifact_is_held: "Someone holds «{value}»"
+fx:
+  gain_artifact: "{who} gains the artifact: {value}"
+  lose_artifact: "{who} loses the artifact: {value}"
+  seize_realm_artifacts: "{who} seizes the contested artifacts of {from}"
+stat:
+  attrition: Army losses per month

@@ -148,3 +148,51 @@ regiment_types:
     terrain: { mountains: 0.3, hills: 0.2 }
     can_recruit: { culture: zwerg }
     ai_will_do: 60
+
+modifiers:
+  # торговля с Подгорьем: железо, серебро и мастера
+  zwerg_trade: { icon: "⚒", good: true, modifiers: { monthly_income: 1.0, build_cost_mult: -0.1 } }
+  # цверги закрыли ворота горы: никто не войдёт, но и торга нет
+  closed_gates: { icon: "🚪", modifiers: { domain_fort: 2, monthly_income: -0.5 } }
+
+decisions:
+  # Пригласить мастера-цверга: цверги служат при дворах людей.
+  invite_zwerg_master:
+    icon: "⛏"
+    is_shown:
+      is_ruler: yes
+      NOT: { culture: zwerg }
+      any_neighboring_ruler: { culture: zwerg }
+    cost: { gold: 120 }
+    cooldown: { years: 10 }
+    effect:
+      - trigger_event: marches.0010
+    ai_check_months: 24
+    ai_will_do:
+      value: 5
+      if:
+        - limit: { stewardship: "< 10" }
+          add: 15
+        - limit: { gold: ">= 300" }
+          add: 10
+
+  # Торговый договор с Подгорьем: десять лет доходов обеим сторонам.
+  trade_with_underhill:
+    icon: "⚒"
+    is_shown:
+      is_ruler: yes
+      NOT: { culture: zwerg }
+      any_neighboring_ruler: { culture: zwerg }
+    is_valid:
+      NOT: { has_modifier: zwerg_trade }
+      is_at_war: no
+    cost: { prestige: 50 }
+    cooldown: { years: 10 }
+    effect:
+      - add_modifier: { id: zwerg_trade, years: 10 }
+      - random_neighboring_ruler:
+          limit: { culture: zwerg }
+          add_gold: 100
+          add_opinion: { target: root, modifier: grateful }
+    ai_check_months: 24
+    ai_will_do: 30

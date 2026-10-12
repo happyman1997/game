@@ -1,0 +1,357 @@
+# Пепелище и Солнечный венец. Сердце империи — четыре графства без
+# владельцев под пепельной порчей: там ничего не растёт, а пепельные бури
+# губят войска. Правители у края пепелища снаряжают походы: находят
+# сокровища, реликвии Отгара и след венца. Кто найдёт венец, отстроит
+# Зонненштадт и соберёт довольно земель — возродит Солнечную империю, и
+# пепел отступит. Орден Стражей Пепла считает венец проклятым и воюет со
+# всяким, кто его ищет.
+event_themes:
+  ash: { icon: "🔥", color: "#6a5a50" }
+
+modifiers:
+  # мёртвая земля: налога и людей почти нет, бури губят войска
+  ash_blight: { icon: "🌫", modifiers: { tax_mult: -0.8, levy_mult: -0.8, development_growth: -0.3, attrition: 0.12 } }
+  # поселенцы на пепелище
+  ash_settlers: { icon: "⛺", modifiers: { development_growth: 0.15, county_opinion: 10 } }
+  # пепел отступил: земля, удобренная огнём, родит щедро
+  ash_healed: { icon: "🌱", modifiers: { development_growth: 0.3, tax_mult: 0.1 } }
+  # след венца: правитель знает, где искать
+  crown_trail: { icon: "🧭", modifiers: { monthly_prestige: 0.3 } }
+  # орден покарал искателя венца
+  ash_penance: { icon: "⚱", modifiers: { monthly_prestige: -0.5, vassal_opinion: -5 } }
+
+opinion_modifiers:
+  restored_the_empire: { value: 40, years: 20 }
+  seeks_the_cursed_crown: { value: -40, years: 10 }
+  gave_crown_to_order: { value: 60, years: 20 }
+
+artifacts:
+  # Солнечный венец: корона империи. Слава и верность вассалов — и жар,
+  # от которого нет покоя.
+  sun_crown:
+    requires_feature: artifacts
+    icon: "👑"
+    contested: yes
+    modifiers: { monthly_prestige: 3, vassal_opinion: 15, diplomacy: 2, stress_gain_mult: 0.25 }
+  # Меч Отгара: им император сражался до последнего дня.
+  otgar_sword:
+    requires_feature: artifacts
+    icon: "⚔"
+    modifiers: { prowess: 4, martial: 2, commander_advantage: 3 }
+  # Печать империи: ею скреплялись указы и договоры.
+  imperial_seal:
+    requires_feature: artifacts
+    icon: "📜"
+    modifiers: { diplomacy: 2, stewardship: 2, monthly_prestige: 0.5 }
+  # Солнечное знамя: под ним ходили имперские рыцари.
+  sun_banner:
+    requires_feature: artifacts
+    icon: "🚩"
+    modifiers: { commander_advantage: 2, knight_effectiveness: 0.15, monthly_prestige: 0.5 }
+
+decisions:
+  # Поход в пепелище: найти сокровища, реликвии и след венца.
+  ash_expedition:
+    requires_feature: [wilds, artifacts]
+    icon: "🔥"
+    major: true
+    is_shown:
+      is_ruler: yes
+      NOT: { government: order }
+      OR:
+        - any_wild_county: { terrain: ash }
+        - any_domain_province: { terrain: ash }
+    is_valid:
+      is_at_war: no
+      is_adult: yes
+    cost: { gold: 80 }
+    cooldown: { years: 2 }
+    effect:
+      - set_flag: { name: crown_seeker, years: 5 }
+      - trigger_event: ash.0001
+    ai_check_months: 12
+    ai_will_do:
+      value: 4
+      if:
+        - limit: { has_claim_on: title:e_sun_empire }
+          add: 20
+        - limit: { has_trait: ambitious }
+          add: 10
+        - limit: { gold: ">= 250" }
+          add: 8
+        - limit: { var: { name: crown_trail, value: ">= 1" } }
+          add: 15
+
+  # Заселить пепелище: ничейное графство у границы становится вашим.
+  settle_ashlands:
+    requires_feature: wilds
+    icon: "⛺"
+    is_shown:
+      is_ruler: yes
+      any_wild_county: { always: yes }
+    is_valid:
+      is_at_war: no
+    cost: { gold: 150, prestige: 100 }
+    cooldown: { years: 2 }
+    effect:
+      - random_wild_county:
+          weight:
+            value: 1
+            if:
+              - limit: { has_building: burnt_palace }
+                add: 10
+          save_scope_as: settled
+      - gain_title: scope:settled
+      - scope:settled: { add_province_modifier: { id: ash_settlers, years: 15 } }
+    ai_check_months: 12
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { gold: ">= 400" }
+          add: 15
+        - limit: { has_artifact: sun_crown }
+          add: 60
+        - limit: { government: order }
+          add: 10
+
+  # Возродить Солнечную империю: венец на голове, Зонненштадт отстроен.
+  restore_sun_empire:
+    requires_feature: artifacts
+    icon: "☀"
+    major: true
+    is_shown:
+      has_artifact: sun_crown
+      NOT: { has_global_flag: sun_empire_restored }
+    is_valid:
+      holds_title: c_sonnenstadt
+      tier: ">= kingdom"
+      realm_size: ">= 20"
+    cost: { prestige: 1000, gold: 300 }
+    effect:
+      - gain_title: title:e_sun_empire
+      - set_global_flag: sun_empire_restored
+      - add_prestige: 500
+      - title:d_ash_heart:
+          every_de_jure_county:
+            province:
+              remove_province_modifier: ash_blight
+              add_province_modifier: { id: ash_healed, years: 30 }
+      - every_vassal: { add_opinion: { target: root, modifier: restored_the_empire } }
+      - trigger_event: ash.0020
+    ai_check_months: 3
+    ai_will_do: 100
+
+  # Отдать венец ордену: братья вернут его пеплу.
+  give_crown_to_order:
+    requires_feature: artifacts
+    icon: "⚱"
+    is_shown:
+      has_artifact: sun_crown
+      NOT: { government: order }
+    effect:
+      - lose_artifact: sun_crown
+      - add_piety: 300
+      - remove_flag: crown_seeker
+      - title:k_ash_order:
+          holder:
+            add_opinion: { target: root, modifier: gave_crown_to_order }
+    ai_check_months: 12
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { has_trait: zealous }
+          add: 10
+        - limit: { is_at_war: yes }
+          add: 5
+
+casus_belli:
+  # Война за венец: отнять Солнечный венец у того, кто его держит.
+  crown_war:
+    requires_feature: artifacts
+    icon: "👑"
+    targets: artifact_holder
+    is_valid:
+      scope:defender: { realm_has_artifact: sun_crown }
+      scope:attacker:
+        OR:
+          - has_claim_on: title:e_sun_empire
+          - culture: marcher
+    cost:
+      prestige: 150
+    on_victory:
+      - scope:attacker:
+          seize_realm_artifacts: scope:defender
+          add_prestige: 200
+      - scope:defender: { add_prestige: -150 }
+    on_white_peace:
+      - scope:attacker: { add_prestige: -50 }
+    on_defeat:
+      - scope:attacker: { add_prestige: -150 }
+    ai_will_do: 80
+    truce_years: 10
+    war_name: cb.crown_war.war_name
+
+  # Кара Стражей Пепла: орден идёт на всякого, кто ищет проклятый венец.
+  ash_crusade:
+    requires_feature: [artifacts, governments]
+    icon: "⚱"
+    targets: independent_ruler
+    is_valid:
+      scope:attacker: { government: order }
+      scope:defender:
+        OR:
+          - realm_has_artifact: sun_crown
+          - has_flag: crown_seeker
+    cost:
+      piety: 100
+    on_victory:
+      - scope:attacker:
+          seize_realm_artifacts: scope:defender
+          lose_artifact: sun_crown
+          add_piety: 250
+          add_prestige: 100
+      - scope:defender:
+          remove_flag: crown_seeker
+          add_modifier: { id: ash_penance, years: 10 }
+          pay_gold: { target: scope:attacker, value: { value: "scope:defender.gold", multiply: 0.3, min: 0 } }
+    on_white_peace:
+      - scope:attacker: { add_piety: -50 }
+    on_defeat:
+      - scope:attacker: { add_piety: -150, add_prestige: -100 }
+    ai_will_do: 90
+    truce_years: 5
+    war_name: cb.ash_crusade.war_name
+
+events:
+  # Поход снаряжён: кто его поведёт?
+  ash.0001:
+    requires_feature: [wilds, artifacts]
+    theme: ash
+    icon: "🔥"
+    triggered_only: true
+    options:
+      # повести самому: больше найдёшь — больше рискуешь
+      - skill: { skill: martial, check: 12 }
+        success:
+          set_flag: { name: led_ash_expedition, months: 6 }
+          trigger_event: { id: ash.0002, months: 4 }
+        failure:
+          add_trait: wounded
+          add_stress: 15
+          trigger_event: { id: ash.0002, months: 4 }
+        ai_chance: { value: 10, add: { value: ai_boldness, multiply: 15 } }
+      - effect:
+          trigger_event: { id: ash.0002, months: 4 }
+        ai_chance: 30
+
+  # Поход вернулся.
+  ash.0002:
+    requires_feature: [wilds, artifacts]
+    theme: ash
+    icon: "🌫"
+    triggered_only: true
+    options:
+      - effect:
+          random_list:
+            # пепел забрал проводников
+            - weight: 25
+              add_prestige: -20
+              add_stress: 10
+            # сокровища сгоревших дворцов
+            - weight: 25
+              add_gold: 120
+              add_prestige: 20
+            # реликвия Отгара
+            - weight: 15
+              trigger_event: ash.0003
+            # след венца
+            - weight:
+                value: 35
+                if:
+                  - limit: { has_flag: led_ash_expedition }
+                    add: 25
+              trigger_event: ash.0004
+
+  # Реликвия в пепле.
+  ash.0003:
+    requires_feature: [wilds, artifacts]
+    theme: ash
+    icon: "⚔"
+    triggered_only: true
+    options:
+      - effect:
+          random_list:
+            - weight: 10
+              trigger: { NOT: { artifact_is_held: otgar_sword } }
+              gain_artifact: otgar_sword
+              add_prestige: 100
+            - weight: 10
+              trigger: { NOT: { artifact_is_held: imperial_seal } }
+              gain_artifact: imperial_seal
+              add_prestige: 100
+            - weight: 10
+              trigger: { NOT: { artifact_is_held: sun_banner } }
+              gain_artifact: sun_banner
+              add_prestige: 100
+            # всё уже найдено — только золото
+            - weight: 1
+              add_gold: 150
+
+  # След венца: после трёх следов венец найден.
+  ash.0004:
+    requires_feature: [wilds, artifacts]
+    theme: ash
+    icon: "🧭"
+    triggered_only: true
+    options:
+      - effect:
+          change_var: { name: crown_trail, add: 1 }
+          add_modifier: { id: crown_trail, years: 10 }
+          if:
+            limit:
+              var: { name: crown_trail, value: ">= 3" }
+              NOR: [ { artifact_is_held: sun_crown }, { has_global_flag: sun_empire_restored } ]
+            then:
+              trigger_event: { id: ash.0005, days: 3 }
+
+  # Венец найден!
+  ash.0005:
+    requires_feature: [wilds, artifacts]
+    theme: ash
+    icon: "👑"
+    triggered_only: true
+    options:
+      # сохранить венец и возродить империю
+      - effect:
+          gain_artifact: sun_crown
+          add_prestige: 300
+          set_var: { name: crown_trail, value: 0 }
+          every_neighboring_ruler: { add_opinion: { target: root, modifier: seeks_the_cursed_crown, value: -15 } }
+        ai_chance: { value: 80, add: { value: ai_greed, multiply: 10 } }
+      # вернуть венец пеплу: проклятию конец — на время
+      - effect:
+          add_piety: 400
+          add_prestige: -100
+          set_var: { name: crown_trail, value: 0 }
+          remove_flag: crown_seeker
+        ai_chance: { value: 10, add: { value: ai_zeal, multiply: 10 } }
+
+  # Империя возрождена.
+  ash.0020:
+    requires_feature: artifacts
+    theme: realm
+    icon: "☀"
+    triggered_only: true
+    options:
+      - effect:
+          add_stress: -30
+
+# Каждый год венец жжёт того, кто его держит.
+on_actions:
+  on_yearly_pulse:
+    effect:
+      $append:
+        - if:
+            limit: { has_artifact: sun_crown }
+            then:
+              add_stress: 15

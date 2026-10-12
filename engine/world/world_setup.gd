@@ -61,6 +61,9 @@ static func setup_new_game(engine: GameEngine, bookmark_id: String, seed: int = 
 		if d.get("impassable", false):
 			continue
 		state.provinces[d.id] = new_province_record(d.id, str(d.get("culture", "")), str(d.get("faith", "")), int(Data.num(d.get("development"), 5)), Data.as_array(d.get("buildings")).duplicate())
+		# стартовые модификаторы провинции (без срока): modifiers: [ash_blight]
+		for m in Data.as_array(d.get("modifiers")):
+			state.provinces[d.id].modifiers.append({"id": str(m), "expires": null})
 	for t in content.all("titles"):
 		state.titles[t.id] = {"id": t.id, "holder": null, "history": []}
 	for d in content.all("dynasties"):

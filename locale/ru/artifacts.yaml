@@ -1,0 +1,17 @@
+ui:
+  artifacts: Реликвии
+msg:
+  artifact_gained: "В ваших руках реликвия: {value}."
+  artifact_taken: "{who} забирает у вас реликвию: {value}."
+  artifact_lost: "Реликвия утеряна: {value}."
+  attrition: "Пепельная буря: армия теряет {n} воинов ({place})."
+tr:
+  has_artifact: "Держит реликвию: {value}"
+  realm_has_artifact: "В державе хранится реликвия: {value}"
+  artifact_is_held: "Реликвия «{value}» у кого-то есть"
+fx:
+  gain_artifact: "{who} получает реликвию: {value}"
+  lose_artifact: "{who} утрачивает реликвию: {value}"
+  seize_realm_artifacts: "{who} забирает спорные реликвии державы {from}"
+stat:
+  attrition: Потери армий в месяц

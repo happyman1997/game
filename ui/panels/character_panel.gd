@@ -103,6 +103,11 @@ static func build(app: App, id: String) -> Control:
 			mods.add_child(chip)
 		root.add_child(mods)
 
+	# реликвии: венец, меч, печать…
+	var arts: Variant = FeatureSections.artifacts(app, c)
+	if arts != null:
+		root.add_child(arts)
+
 	# правление (не феодальное): выборы, обеты, члены
 	var gov: Variant = FeatureSections.government(app, c)
 	if gov != null:

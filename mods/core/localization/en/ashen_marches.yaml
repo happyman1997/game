@@ -221,3 +221,57 @@ nick:
 
 name:
   Kremen: Kremen
+
+modifier:
+  zwerg_trade: Trade with Underhill
+  closed_gates: The Mountain Gates Are Shut
+
+decision:
+  invite_zwerg_master: Invite a Zwerg Master
+  trade_with_underhill: Trade Pact with Underhill
+decision_desc:
+  invite_zwerg_master: "The zwerge do not conquer, but they gladly serve: a master from the Ore Mountains will run your treasury and building — and will outlive you at court."
+  trade_with_underhill: "Iron, silver and gems of Underhill — for grain, wine and cloth. Ten years of income for you, silver and friendship for the zwerge."
+
+ev:
+  marches.0001:
+    t: Regalia without a Crown
+    desc: "In the treasury of Kronhafen, on red velvet, lie the sceptre, orb and sword of the Sun Empire. The place in the middle is empty — the crown should lie there. Your mother was Otgar's eldest daughter, and you believe the empire is yours by right. Your brother Ruprecht thinks even the march went to the wrong man. And the youngest, Anselm, joined the Ash Wardens — who swear the crown is cursed."
+    a: Proclaim myself heir to the empire
+    b: Make peace with Ruprecht
+    c: "Regalia are for show, the treasury is for use"
+  marches.0002:
+    t: Swords Before Crowns
+    desc: "The northern heaths breed warriors, not merchants. In the Wolf Hall your knights drink to the day you ride into Sonnenstadt. The crown? It will go to whoever has more swords. Your wife is of the Frisian house of Attena, and through her you can come to terms with the free marshes at your back."
+    a: Forge weapons
+    b: Alliance with Free Frisia
+  marches.0003:
+    t: Silver of the Mountains
+    desc: "The mountain companies of the South March serve anyone who pays: on the Rhine, in France, over the sea. Silver flows into Soldburg, and Soldburg overflows with silver. This spring the captains ask: whom to serve this year — foreign lords or you?"
+    a: The companies stay with me
+    b: Hire the companies out
+  marches.0004:
+    t: The Old Margrave
+    desc: "You are fifty-four, and your knees ache before rain. For half a century you have built fortresses from Grenzburg to the mountains — and traded with the zwerge whom the other margraves fear. Your eldest, Dietrich, is bold and ambitious — too ambitious. You do not like the way he looks at your seal."
+    a: Trust my heir
+    b: Keep him on a short leash
+    c: Make a pact with Underhill
+  marches.0005:
+    t: The Wardens' Vow
+    desc: "Fifty years ago Otgar's confessor saw the fire of the crown burn the emperor and his city. He founded the order at the edge of the ashes: the crown is cursed, and whoever puts it on will light the fire again. You are the grand master. The margraves send expeditions into the ash, and the brothers await your word."
+    a: Keep watch over the ashes
+    b: Call volunteers from over the sea
+  marches.0006:
+    t: The Assembly on the Terp
+    desc: "Frisia has no lords: every county holds an assembly, and the leader is elected for ten years from the heads of the leading houses. Your term ends in five years. Edzard Attena, brother-in-law of the northern margrave, already treats the village elders. If the assembly chooses him, you remain head of the house of Ukkena and fight on."
+    a: Speak at the assembly
+    b: Mend the dikes together
+  marches.0007:
+    t: The Council of Masters
+    desc: "In Underhill neither the son nor the eldest rules, but the best master. You have been eldest master for sixty years; your forges in the Copper Mountain have not gone out for a thousand years. The men above are at war over the crown again. They need iron and silver — and masters."
+    a: Open trade with men
+    b: Shut the mountain gates
+  marches.0010:
+    t: A Master from the Ore Mountains
+    desc: "A zwerg has come to your court: short, broad-shouldered, his beard braided with copper rings. Silently he lays on the table a letter of recommendation from the council of masters — and a pouch of ore samples from your own lands."
+    a: Welcome

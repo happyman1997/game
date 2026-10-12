@@ -1,0 +1,69 @@
+# The Ashes and the Sun Crown.
+modifier:
+  ash_blight: Ash Blight
+  ash_settlers: Settlers in the Ashes
+  ash_healed: The Ash Recedes
+  crown_trail: Trail of the Crown
+  ash_penance: Penance before the Wardens
+opinion_modifier:
+  restored_the_empire: Restored the empire
+  seeks_the_cursed_crown: Seeks the cursed crown
+  gave_crown_to_order: Gave the crown to the Wardens
+artifact:
+  sun_crown: The Sun Crown
+  otgar_sword: Sword of Otgar
+  imperial_seal: Imperial Seal
+  sun_banner: Sun Banner
+artifact_desc:
+  sun_crown: "The crown of the Sun Empire, lost in the ashes of Sonnenstadt. Vassals are loyal to its wearer and glory follows him. But the crown burns — its keeper knows no peace."
+  otgar_sword: "The sword Otgar fought with to his last day. The fire did not touch the blade."
+  imperial_seal: "The seal that sealed the edicts of the empire. Its imprint still opens doors."
+  sun_banner: "The imperial knights rode under this banner. The gold has faded, but the sun is seen from afar."
+decision:
+  ash_expedition: Expedition into the Ashes
+  settle_ashlands: Settle the Ashes
+  restore_sun_empire: Restore the Sun Empire
+  give_crown_to_order: Give the Crown to the Ash Wardens
+decision_desc:
+  ash_expedition: "Send a party into the dead heart of the empire. Ash storms kill men, but the ruins hold treasure, Otgar's relics — and somewhere the Sun Crown. Three true trails lead to the crown. For five years the Ash Wardens will count you a seeker of the crown."
+  settle_ashlands: "Send settlers to an ownerless land on your border. The county becomes yours, but while the ash blight lies on it, it gives little. The Burnt Palace of Sonnenstadt brings glory to whoever holds it."
+  restore_sun_empire: "Put on the Sun Crown in rebuilt Sonnenstadt and proclaim the empire. The ash recedes from the heart of the empire, and the lands of the marches become yours by right."
+  give_crown_to_order: "Hand the crown to the Ash Wardens: the brothers will return it to the ashes. An end to the curse — piety and the order's friendship for you."
+casus_belli:
+  crown_war: War for the Crown
+  ash_crusade: Judgement of the Ash Wardens
+casus_belli_desc:
+  crown_war: Take the Sun Crown from whoever holds it. Victory gives you the crown.
+  ash_crusade: "The order punishes the seekers of the cursed crown: victory returns the crown to the ashes, and the defeated pays for penance."
+cb:
+  crown_war:
+    war_name: "War of [scope:attacker] for the Sun Crown"
+  ash_crusade:
+    war_name: "Judgement of the Ash Wardens upon [scope:defender]"
+ev:
+  ash.0001:
+    t: Into the Ashes
+    desc: "The party is ready: guides, pack mules, carts of water — there is no stream or grass in the ash. One question remains: who will lead the men where the empire burned fifty years ago?"
+    a: I will lead them
+    b: Send my best knight
+  ash.0002:
+    t: The Expedition Returns
+    desc: "Four months later the party returns — thinner, grey with ash from head to toe. The men keep silent until they have had wine; then they begin to talk."
+    a: What did you find?
+  ash.0003:
+    t: A Relic of Otgar
+    desc: "Beneath the fallen vaults of the burnt palace, in a layer of baked ash, the men found something that belonged to the last emperor."
+    a: It is ours now
+  ash.0004:
+    t: Trail of the Crown
+    desc: "An old man who lived at the edge of the ashes in Otgar's day told your men where the crown was carried on the night of the fire. It is not the crown itself — but it is a trail."
+    a: We are on the right path
+  ash.0005:
+    t: The Sun Crown!
+    desc: "In a vault beneath the throne hall of Sonnenstadt, in a chest melted by fire, it lay — the Sun Crown. The gold is cold to the touch, but the hands that hold it burn. The news will cross the marches within a week. The Ash Wardens will come for it."
+    a: The crown is mine. The empire will rise again
+    b: Return it to the ashes. An end to the curse
+  ash.0020:
+    t: Sun over Sonnenstadt
+    desc: "For fifty years ash lay on the heart of the empire. Today, in the rebuilt cathedral of Sonnenstadt, you put on the Sun Crown — and they say that rain fell over the ashes that very day. The marches are one again — by right. It remains to make them one in deed."
+    a: Long live the empire!

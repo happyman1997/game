@@ -520,6 +520,29 @@ static func knights(app: App, p: Dictionary) -> Variant:
 
 ## Раздел правления в окне персонажа: правитель не феодального правления или
 ## член его державы (выборы схода, братья ордена). null — показывать нечего.
+## Реликвии персонажа — плашки с модификаторами.
+static func artifacts(app: App, c: Dictionary) -> Variant:
+	var g := app.game
+	if not g.engine.has_feature("artifacts"):
+		return null
+	var held := Artifacts.held_by(g, c)
+	if held.is_empty():
+		return null
+	var flow := K.flow([], 4)
+	for aid in held:
+		var d: Variant = g.content.get_def("artifacts", aid)
+		var chip := K.panel(K.hbox([K.icon(d.get("icon", "crown") if d != null else "crown", 18), K.label(g.name_of("artifacts", aid), "SmallLabel")], 4))
+		chip.add_theme_stylebox_override("panel", UiArt.flat(Color("#4a3a1a"), Color(UiArt.GOLD, 0.8), 1, 3, 3))
+		var tip := BB.title(g.name_of("artifacts", aid))
+		var desc := g.desc_of("artifacts", aid)
+		if desc != "":
+			tip += "\n" + BB.i(desc)
+		tip += "\n" + BB.modifiers(g, d.get("modifiers") if d != null else null)
+		K.tip(chip, tip)
+		flow.add_child(chip)
+	return K.section(app.t("ui.artifacts"), [flow], "crown")
+
+
 static func government(app: App, c: Dictionary) -> Variant:
 	var g := app.game
 	if not g.engine.has_feature("governments"):

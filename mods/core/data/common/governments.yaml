@@ -16,8 +16,9 @@ governments:
     order: 2
     succession: order_election
     celibate: yes
-    # орден не завоёвывает — он стережёт пепелище
-    ai_war_mult: 0.3
+    # орден не завоёвывает — он карает искателей проклятого венца
+    # (и иноверцев у своих границ)
+    war_cbs: [ash_crusade, holy_war]
     ruler_modifiers: { domain_limit: 6, knight_cap: 2, knight_effectiveness: 0.15, monthly_piety: 1 }
     county_modifiers: { levy_mult: 0.15, tax_mult: -0.25 }
     members:

@@ -41,9 +41,9 @@ titles:
 
   # ---------------------------------------------------------- Орден Стражей Пепла
   # Крепости-монастыри у края пепелища.
-  k_ash_order: { tier: kingdom, liege: e_sun_empire, government: order, color: "#d8d4c8", capital: c_aschenwacht }
-  d_ashwatch: { tier: duchy, liege: k_ash_order, color: "#e0dccf", capital: c_aschenwacht }
-  d_bussland: { tier: duchy, liege: k_ash_order, color: "#cdc8b8", capital: c_bussfeld }
+  k_ash_order: { tier: kingdom, liege: e_sun_empire, government: order, color: "#4a2a2e", capital: c_aschenwacht }
+  d_ashwatch: { tier: duchy, liege: k_ash_order, color: "#563236", capital: c_aschenwacht }
+  d_bussland: { tier: duchy, liege: k_ash_order, color: "#422428", capital: c_bussfeld }
 
   # ---------------------------------------------------------- Пепелище
   d_ash_heart: { tier: duchy, liege: e_sun_empire, color: "#5e5a56", capital: c_sonnenstadt, no_generate: yes }
@@ -121,10 +121,10 @@ provinces:
   c_flammerschein: { lat: 50.1, lon: 9.0,  duchy: d_bussland, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 10, holdings: [castle, city, temple] }
 
   # ---------------------------------------------------------- Пепелище (без владельцев)
-  c_sonnenstadt:  { lat: 50.95, lon: 11.05, duchy: d_ash_heart, terrain: ash, culture: marcher, faith: ash_penitence, development: 2, holdings: [city], no_generate: yes, buildings: [burnt_palace] }
-  c_ash_waste:    { lat: 51.4,  lon: 11.25, duchy: d_ash_heart, terrain: ash, culture: marcher, faith: ash_penitence, development: 1, holdings: [castle], no_generate: yes }
-  c_charred_forest: { lat: 50.55, lon: 10.65, duchy: d_ash_heart, terrain: ash, culture: marcher, faith: ash_penitence, development: 1, holdings: [castle], no_generate: yes }
-  c_sun_road:     { lat: 50.85, lon: 11.8, duchy: d_ash_heart, terrain: ash, culture: marcher, faith: ash_penitence, development: 1, holdings: [castle], no_generate: yes }
+  c_sonnenstadt:  { lat: 50.95, lon: 11.05, duchy: d_ash_heart, terrain: ash, culture: marcher, faith: ash_penitence, development: 2, holdings: [city], no_generate: yes, buildings: [burnt_palace], modifiers: [ash_blight] }
+  c_ash_waste:    { lat: 51.4,  lon: 11.25, duchy: d_ash_heart, terrain: ash, culture: marcher, faith: ash_penitence, development: 1, holdings: [castle], no_generate: yes, modifiers: [ash_blight] }
+  c_charred_forest: { lat: 50.55, lon: 10.65, duchy: d_ash_heart, terrain: ash, culture: marcher, faith: ash_penitence, development: 1, holdings: [castle], no_generate: yes, modifiers: [ash_blight] }
+  c_sun_road:     { lat: 50.85, lon: 11.8, duchy: d_ash_heart, terrain: ash, culture: marcher, faith: ash_penitence, development: 1, holdings: [castle], no_generate: yes, modifiers: [ash_blight] }
 
   # ---------------------------------------------------------- Вольная Фрисия
   # Ни одного замка: города на терпах и церкви.

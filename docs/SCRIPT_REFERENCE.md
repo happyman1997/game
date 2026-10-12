@@ -7,6 +7,7 @@
 
 | Имя | Скоупы | Описание | Источник |
 |---|---|---|---|
+| `artifact_is_held` | любой | Реликвия у кого-то есть (не утеряна): artifact_is_held: <id> | core/artifacts |
 | `assembly_supports_war` | character | Сход одобряет наступательную войну (или правление его не требует) | core/governments |
 | `can_begin_trial` | character | Может встать на путь связки навыков (испытание): can_begin_trial: <архетип> или yes (хоть на один) | core/trials |
 | `can_marry` | character | Может вступить в брак с персонажем | core |
@@ -22,6 +23,7 @@
 | `has_active_trial` | character | Проходит испытание (yes/no, id архетипа или список) | core/trials |
 | `has_any_claim` | character | Есть претензии | core |
 | `has_archetype` | character | Есть архетип — связка высоких навыков (skill_archetypes): has_archetype: <id> или yes | core |
+| `has_artifact` | character | Персонаж держит реликвию: has_artifact: <id> | core/artifacts |
 | `has_building` | province | Есть постройка | core |
 | `has_champion` | character | За персонажа в поединке бьётся поборник | core/duels |
 | `has_claim_on` | character | Есть претензия на титул | core |
@@ -107,6 +109,7 @@
 | `province_has_disease` | province | В провинции эпидемия. Аргумент: yes или id болезни. | plague |
 | `province_restless` | province | В провинции бродят мертвецы | arcana |
 | `random_chance` | любой | Случайный шанс в процентах (используйте осторожно в триггерах) | core |
+| `realm_has_artifact` | character | Реликвия хранится в державе персонажа (у него, вассалов или двора) | core/artifacts |
 | `realm_has_barrow` | character | В державе персонажа есть древний курган | arcana |
 | `realm_has_fey_hills` | character | В державе персонажа есть холмы фей | arcana |
 | `realm_has_restless_dead` | character | В державе персонажа восстали мертвецы | arcana |
@@ -189,6 +192,7 @@
 | `faction_start_war` | Фракция поднимает мятеж | core/factions |
 | `feed_on_blood` | Вампир утоляет жажду (жертва — пленник или придворный) | arcana |
 | `firestorm` | Огненная буря на крупнейшее вражеское войско у границ | arcana |
+| `gain_artifact` | Получить реликвию (у прежнего владельца она пропадает): gain_artifact: <id> | core/artifacts |
 | `gain_title` | Получить титул | core |
 | `give_title` | Пожаловать титул: { title, to } — получатель становится вассалом | core |
 | `grant_archetype` | Дать архетип без испытания: grant_archetype: <архетип> | core/trials |
@@ -200,6 +204,7 @@
 | `learn_secret` | Узнать тайну персонажа (тип — необязателен): learn_secret: { owner: scope:x, type: secret_embezzler } | core/secrets |
 | `leave_faction` | Выйти из фракции | core/factions |
 | `lose_all_titles` | Потерять все титулы | core |
+| `lose_artifact` | Утратить реликвию — она пропадает, и её можно найти снова: lose_artifact: <id> | core/artifacts |
 | `lose_title` | Потерять титул (переходит к сюзерену) | core |
 | `make_pregnant` | Беременность: { father } | core |
 | `make_white_peace` | Белый мир во всех войнах, где персонаж — вождь стороны | core |
@@ -227,6 +232,7 @@
 | `reverse_add_opinion` | Мнение target об этом персонаже: { target, modifier, value? } | core |
 | `seat_in_council` | Дать персонажу место в своём совете (на должность по его лучшему навыку) | core/politics |
 | `seize_primary_title` | Забрать основной титул персонажа (претендент): прежний владелец становится вассалом | core/factions |
+| `seize_realm_artifacts` | Забрать спорные реликвии из державы персонажа from: seize_realm_artifacts: scope:defender | core/artifacts |
 | `send_message` | Сообщение игроку (если этот персонаж — игрок) | core |
 | `set_flag` | Установить флаг: name или { name, days/months/years } | core |
 | `set_focus` | Сменить фокус образа жизни (без перерыва) | core/lifestyles |
@@ -264,6 +270,7 @@
 | `ai_zeal` | character | Личность ИИ: zeal | core |
 | `arcane_power` | character | Колдовская сила персонажа | arcana |
 | `attraction` | character | Привлекательность | core |
+| `attrition` | province | Доля воинов, которую армия теряет здесь за месяц | core/wilds |
 | `audit_chance` | character | Характеристика: audit_chance | core |
 | `beast_control` | character | Власть оборотня над зверем: −100 (одичал) … 100 (вожак стаи) | arcana |
 | `blood_potency` | character | Сила крови вампира (растёт с годами и кормлением) | arcana |
@@ -328,6 +335,7 @@
 | `monthly_piety` | character | Характеристика: monthly_piety | core |
 | `monthly_prestige` | character | Характеристика: monthly_prestige | core |
 | `num_archetypes` | character | Сколько архетипов заслужено | core/trials |
+| `num_artifacts` | character | Число реликвий у персонажа | core/artifacts |
 | `num_buildings` | province | Число построек | core |
 | `num_children` | character | Число живых детей | core |
 | `num_claims` | character | Число претензий | core |
@@ -353,6 +361,7 @@
 | `num_unhappy_counties` | character | Графств домена, недовольных владельцем (мнение не выше defines.populace.unhappy_opinion) | core/populace |
 | `num_vassals` | character | Число прямых вассалов | core |
 | `num_wars` | character | Число войн | core |
+| `num_wild_counties` | character | Число ничейных графств у границ державы | core/wilds |
 | `opinion` | character | Мнение о персонаже: opinion(scope:x) | core |
 | `personal_example` | character | Характеристика: personal_example | core |
 | `piety` | character | Благочестие | core |
@@ -467,6 +476,7 @@
 | `war_attacker` | war | Участники войны на стороне нападения | core/factions |
 | `war_defender` | war | Участники войны на стороне защиты | core/factions |
 | `war_enemy` | character | Враги по войнам | core |
+| `wild_county` | character | Ничейные графства у границ державы | core/wilds |
 
 ## Константы
 
@@ -495,6 +505,8 @@
 | `lands` | Вера и культура земель: чужие графства дают меньше, их можно обратить | да |
 | `populace` | Народ графств: мнение о владельце, контроль, крестьянские и народные мятежи | да |
 | `governments` | Типы правления: феодалы, рыцарский орден, народная республика, совет мастеров | да |
+| `artifacts` | Реликвии: уникальные предметы, переходят по наследству и добываются войной | да |
+| `wilds` | Дикие земли без владельцев и истощение армий | да |
 | `momentum` | Удачи и неудачи: успех снимает стресс, провал добавляет | да |
 | `duels` | Поединки: вызов на бой один на один, поборники из рыцарей | да |
 | `deeds` | Деяния: летопись поступков персонажа и прозвища, которые из неё растут | да |
@@ -506,12 +518,12 @@
 ## Реестры движка
 
 - **succession_algorithms**: `primogeniture`, `partition`, `seniority`, `elected_member`, `best_master`, `republic_election`, `elective`
-- **cb_targets**: `claim`, `de_jure`, `independence`, `adjacent_county`, `holy_war`, `faction`, `monster_hunt`
+- **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `faction`, `artifact_holder`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
 - **interaction_deciders**: `payer`
-- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `governments`, `spirit`, `plague_fear`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `governments`, `artifacts`, `spirit`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `arcana_faith`
 - **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `populace`, `governments`, `deeds`, `trials`, `spirit`
-- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
+- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

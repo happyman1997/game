@@ -160,15 +160,15 @@ defines:
 | `skills` | `core/data/common/skills.yaml` | Навыки. Новый навык автоматически становится значением в скриптах. `mean`/`spread` — среднее и разброс при рождении (по умолчанию 6 и 5; историческим персонажам без указанного навыка — на 1 выше), `inherit_spread` — разброс вокруг среднего родителей, `hide_if_zero` — не показывать нулевой навык (редкий дар вроде чародейства). `per_point` / `ruler_per_point` — что даёт каждое очко (всем / только правителям), `mastery` — тень мастерства (см. «Навыки: очки, тени и связки»). |
 | `skill_archetypes` | `core/data/common/archetypes.yaml` | Связки навыков: `{ skills: [..], min, icon, modifiers }`. |
 | `traits` | `core/data/common/traits.yaml` | Черты: `category`, `icon`, `modifiers`, `opposites`, `compatibility`, `genetic`/`birth_chance`/`inherit_chance`, `education`, `ai`, `monthly_death_chance`, `monthly_cure_chance`, `duration_days`, `group`, `color` (цвет плашки), `concealed` (скрытая черта — см. «Крюки и секреты»), `portrait` (как черта меняет портрет — см. ниже). |
-| `cultures` | `core/data/common/cultures.yaml` | `color`, `male_names`, `female_names`, `dynasty_pattern` (`name`/`place`), `succession_law`, `skin`/`hair`, `modifiers`. |
+| `cultures` | `core/data/common/cultures.yaml` | `color`, `male_names`, `female_names`, `dynasty_pattern` (`name`/`place`), `succession_law`, `skin`/`hair`, `modifiers`, `traits` (врождённые черты всех людей этой культуры — например, раса `dwarf`), `government` (правление по умолчанию). |
 | `faiths` | там же | `religion`, `color`, `icon`, `doctrines` (`polygamy`), `virtues`, `sins`, `modifiers`. |
-| `terrain`, `holdings`, `buildings` | `core/data/common/economy.yaml` | Местность (оборона, скорость, высота рельефа), владения (налог, ополчение, крепость), постройки (`holding`, `requires`, `cost`, `days`, `modifiers`, `owner_modifiers`, `trigger`). |
+| `terrain`, `holdings`, `buildings` | `core/data/common/economy.yaml` | Местность (оборона, скорость, высота рельефа, `attrition` — потери армий в месяц), владения (налог, ополчение, крепость), постройки (`holding`, `requires`, `cost`, `days`, `modifiers`, `owner_modifiers`, `trigger`; `special: yes` — особая постройка: не строится и не занимает места, её дают графству данные карты или эффект `add_building`, а действует она на того, кто держит графство). |
 | `map`, `landmasses`, `provinces`, `map_links` | `core/data/map/` | Карта — см. раздел 7. |
 | `titles` | `core/data/map/titles.yaml` | Иерархия де-юре: `tier`, `liege`, `color`, `capital`, `coa` (герб), `no_create`. Графства создаются из провинций автоматически. |
 | `dynasties`, `characters`, `bookmarks` | `core/data/history/` | Исторические персонажи и стартовые даты. |
 | `succession_laws` | `core/data/common/laws_and_modifiers.yaml` | `algorithm` (`partition`, `primogeniture`, `seniority` или свой из скрипта мода), `gender`, `change_cost`, `can_change`. |
 | `opinion_modifiers`, `modifiers` | там же | Модификаторы мнения (`value`, `decay`, `years`, `stacking`) и временные модификаторы персонажей/провинций. |
-| `casus_belli` | `core/data/common/war.yaml` | Поводы к войне: `targets` (поставщик целей), `is_valid`, `cost`, `on_victory`, `on_white_peace`, `on_defeat`, `ai_will_do`, `truce_years`, `war_name`, `manual` (не предлагать игроку и ИИ — только для скриптов, например мятежей). |
+| `casus_belli` | `core/data/common/war.yaml` | Поводы к войне: `targets` (поставщик целей: `claim`, `de_jure`, `independence`, `adjacent_county`, `holy_war` — против чужой религии, не ереси своей, `independent_ruler` — любой независимый правитель, сужайте условием `is_valid`, `artifact_holder` — держава со спорной реликвией), `is_valid`, `cost`, `on_victory`, `on_white_peace`, `on_defeat`, `ai_will_do`, `truce_years`, `war_name`, `manual` (не предлагать игроку и ИИ — только для скриптов, например мятежей). |
 | `interactions` | `core/data/common/interactions.yaml` | Взаимодействия персонажей (см. раздел 6). |
 | `schemes` | `core/data/common/schemes.yaml` | Интриги: `progress`, `success_chance`, `discovery_chance`, `on_success`, `on_failure`, `on_discovered`. |
 | `decisions` | `core/data/common/decisions.yaml` | `is_shown`, `is_valid`, `cost`, `effect`, `cooldown`, `major`, `ai_will_do`, `ai_check_months`, `ai_potential` (условие для ИИ до всех проверок; у группы — первого решения), `ai_group` (решения одной группы ИИ обдумывает вместе — одна проверка, выбор по весу). |
@@ -179,6 +179,8 @@ defines:
 | `council_positions`, `council_tasks` | `core/data/common/council.yaml` | Совет: должности и задачи — раздел 10. |
 | `factions` | `core/data/common/factions.yaml` | Фракции вассалов и их мятежи — раздел 10. |
 | `regiment_types` | `core/data/common/regiments.yaml` | Профессиональные войска — раздел 10. |
+| `governments` | `core/data/common/governments.yaml` | Правления — раздел 10. |
+| `artifacts` | `core/data/common/ash_crown.yaml` | Реликвии — раздел 10. |
 | **любой свой тип** | `plague/data/plague.yaml` (`diseases`) | Движок сохранит его; читайте из скрипта: `api.content.all("diseases")`. |
 
 Подробные комментарии есть прямо в файлах мода `core` — это лучший справочник по полям.
@@ -440,6 +442,9 @@ provinces:
     faith: catholic
     development: 5
     holdings: [castle, temple]
+    buildings: [walls]                        # стартовые постройки (и особые — см. ниже)
+    modifiers: [ash_blight]                   # стартовые модификаторы провинции без срока
+  c_wild_land: { lat: 51, lon: 11, duchy: d_wilds, no_generate: yes }  # ничья земля
   w_far_lands: { lat: 45, lon: 6, impassable: true }  # непроходимая окраина
 
 map_links:                                    # морские переправы
@@ -450,11 +455,20 @@ map_links:                                    # морские переправ�
 провинцию**, достаточно одной строки. Графство-титул создаётся автоматически
 (название — ключ локализации с id провинции).
 
-Регион удобно описывать отдельным файлом — так устроена Скандинавия в
+Графство с `no_generate: yes` (и герцогство с тем же полем) на старте остаётся
+**без владельца**, если закладка его никому не отдала: это дикая земля. Её не
+берут войной — её заселяют (механика `wilds`, раздел 10).
+
+Регион удобно описывать отдельным файлом — так устроены Скандинавия в
 `core/data/map/scandinavia.yaml`: контуры суши, графства, титулы, переправы,
 непроходимые земли и даже решение «Норвежское вторжение» в одном файле, а
 персонажи и владельцы — в `core/data/history/scandinavia_1066.yaml` (закладка
-дополняется слиянием: `playable: { $append: [...] }`, `holders: {...}`).
+дополняется слиянием: `playable: { $append: [...] }`, `holders: {...}`), и
+вымышленные Пепельные марки — `core/data/map/ashen_marches.yaml` (графства,
+титулы с правлениями `government`), `core/data/common/ashen_marches.yaml`
+(народы, веры, особые постройки, отряды) и `core/data/history/marches_1066.yaml`.
+Файлы истории читаются по алфавиту, поэтому дополнение закладки должно идти
+после файла, который её задаёт (`marches_1066` после `characters_1066`).
 Если область карты расширяется (`bounds`), заселите новые земли зёрнами
 провинций или непроходимыми окраинами (`impassable: true`), иначе их
 захватят ближайшие провинции.
@@ -633,7 +647,7 @@ func init(api: ModApi) -> void:
 
 ---
 
-## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари, политика, характер, слава, вера земель, народ, правления
+## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари, политика, характер, слава, вера земель, народ, правления, реликвии, дикие земли
 
 Крупные подсистемы в стиле CK3 устроены как **механики** (`engine/features`).
 Механика — модуль, который при запуске регистрирует свои системы, триггеры,
@@ -651,7 +665,7 @@ func init(api: ModApi) -> void:
 
   (доступны `lifestyles`, `council`, `prison`, `factions`, `regiments`,
   `secrets`, `laws`, `knights`, `politics`, `personality`, `renown`, `lands`,
-  `populace`, `governments`, `momentum`, `duels`, `deeds`, `trials`, `spirit`;
+  `populace`, `governments`, `artifacts`, `wilds`, `momentum`, `duels`, `deeds`, `trials`, `spirit`;
   интерфейс скрывает вкладки и разделы выключенных механик). Словарь скриптов
   механики (её триггеры, эффекты, значения) остаётся зарегистрированным, так что
   чужие данные, которые его упоминают, не ломаются — на пустом состоянии
@@ -1277,6 +1291,7 @@ governments:
     play_family: yes                # игрок продолжает за свой род, если не избран
     war_assembly: 0.5               # наступательная война — если довольна половина графств
     ai_war_mult: 0.5                # ИИ воюет вдвое реже
+    war_cbs: [holy_war]             # наступательные войны — только по этим поводам
     celibate: no                    # правитель не женится (орден)
     ruler_modifiers: { domain_limit: 8, knight_cap: -20 }
     county_modifiers: { tax_mult: -0.15, levy_mult: 0.35 }   # графствам домена
@@ -1306,6 +1321,53 @@ governments:
 `years_in_office`; эффекты `set_government`, `add_campaign`. Крюки
 `succession.law`, `marriage.allowed`, `war.allowed`, `player.next_character`
 доступны и модам.
+
+### Реликвии
+
+Механика `artifacts`: единственные в мире предметы. Реликвию держит один
+персонаж, её `modifiers` действуют на владельца (раздел «Реликвии» в окне
+персонажа). После смерти владельца реликвия переходит к основному наследнику,
+а без наследника (или с `inherit: no`) теряется — её можно найти снова.
+
+```yaml
+artifacts:
+  sun_crown:
+    icon: "👑"
+    contested: yes          # за неё воюют: повод с targets: artifact_holder
+    modifiers: { monthly_prestige: 3, vassal_opinion: 15, stress_gain_mult: 0.25 }
+
+casus_belli:
+  crown_war:
+    targets: artifact_holder
+    is_valid: { scope:defender: { realm_has_artifact: sun_crown } }
+    on_victory:
+      - scope:attacker: { seize_realm_artifacts: scope:defender }
+```
+
+Скрипт: условия `has_artifact`, `realm_has_artifact` (у правителя, вассалов
+или двора), `artifact_is_held` (реликвия у кого-то есть); значение
+`num_artifacts`; эффекты `gain_artifact` (у прежнего владельца пропадает),
+`lose_artifact` (теряется), `seize_realm_artifacts: <скоуп>` (забрать спорные
+реликвии чужой державы). Хуки `artifact.gained`, `artifact.lost`.
+
+### Дикие земли и пепелище
+
+Механика `wilds`. Графство без владельца (`no_generate`, раздел 7) — дикая
+земля: список `wild_county` у правителя — ничейные графства у его границ, а
+заселяют их эффектом `gain_title` из решения. Армия в провинции с
+модификатором `attrition` (модификатор провинции или поле местности) каждый
+месяц теряет эту долю воинов; значение провинции `attrition`, хук
+`army.attrition`.
+
+Пример — Пепелище в `core/data/common/ash_crown.yaml`: четыре ничейных
+графства под модификатором `ash_blight` (налог и ополчение −80%, бури −12%
+войска в месяц). Решение «Поход в пепелище» отправляет отряд (событие с
+отложенным исходом через `trigger_event: { id, months }`): сокровища, реликвии
+Отгара или след венца — три следа (`change_var: crown_trail`) дают Солнечный
+венец. С венцом, Зонненштадтом в домене и державой от 20 графств решение
+«Возродить Солнечную империю» создаёт империю и снимает порчу. Орден Стражей
+Пепла (правление с `war_cbs: [ash_crusade, holy_war]`) воюет только с
+искателями венца и иноверцами.
 
 ### Связи между механиками
 

@@ -167,6 +167,11 @@ decisions:
     is_shown:
       tier: ">= kingdom"
       NOT: { exists: title:e_britannia.holder }
+      OR:
+        - holds_title: title:k_england
+        - holds_title: title:k_scotland
+        - holds_title: title:k_ireland
+        - holds_title: title:k_wales
     is_valid:
       custom_tooltip:
         text: ui.need_two_british_kingdoms
