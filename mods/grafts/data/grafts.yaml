@@ -40,16 +40,16 @@ event_themes:
 # ---------------------------------------------------------------- части тела
 # side — колонка на листе, zone — точка на рисунке (SVG 220×400)
 body_parts:
-  head:   { order: 1,  slots: 3, side: left,  zone: [110, 28],  icon: skull }
-  eyes:   { order: 2,  slots: 1, side: left,  zone: [102, 46],  icon: eye }
-  heart:  { order: 4,  slots: 1, side: left,  zone: [122, 128], icon: heart }
-  skin:   { order: 7,  slots: 2, side: left,  zone: [84, 146],  icon: rune }
-  arms:   { order: 9,  slots: 1, side: left,  zone: [46, 222],  icon: gauntlet }
-  mouth:  { order: 3,  slots: 2, side: right, zone: [110, 62],  icon: tooth }
-  blood:  { order: 5,  slots: 2, side: right, zone: [160, 168], icon: drop }
-  sinews: { order: 6,  slots: 2, side: right, zone: [138, 200], icon: spine }
-  bones:  { order: 8,  slots: 2, side: right, zone: [110, 214], icon: bone }
-  legs:   { order: 10, slots: 1, side: right, zone: [128, 330], icon: pegleg }
+  head:   { order: 1,  slots: 3, side: left,  zone: [110, 16],  icon: skull }
+  eyes:   { order: 2,  slots: 1, side: left,  zone: [102, 40],  icon: eye }
+  heart:  { order: 4,  slots: 1, side: left,  zone: [122, 126], icon: heart }
+  skin:   { order: 7,  slots: 2, side: left,  zone: [62, 140],  icon: rune }
+  arms:   { order: 9,  slots: 1, side: left,  zone: [46, 212],  icon: gauntlet }
+  mouth:  { order: 3,  slots: 2, side: right, zone: [110, 60],  icon: tooth }
+  blood:  { order: 5,  slots: 2, side: right, zone: [164, 140], icon: drop }
+  sinews: { order: 6,  slots: 2, side: right, zone: [174, 212], icon: spine }
+  bones:  { order: 8,  slots: 2, side: right, zone: [132, 260], icon: bone }
+  legs:   { order: 10, slots: 1, side: right, zone: [132, 350], icon: pegleg }
 
 # ---------------------------------------------------------------- работа
 graft_tiers:

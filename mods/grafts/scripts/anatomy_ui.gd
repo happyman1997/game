@@ -16,11 +16,11 @@ const OCHRE := Color("#b8801c")
 const PARCH := Color("#eadcb4")
 const PARCH_LIGHT := Color("#f4ead0")
 
-const AREA := Vector2(580, 470)
+const AREA := Vector2(580, 500)
 const FIG_W := 220
 const FIG_H := 400
-const FIG_SCALE := 1.1
-const FIG_POS := Vector2(169, 12)
+const FIG_SCALE := 1.2
+const FIG_POS := Vector2(158, 8)
 const CELL := 50
 const GROUP_W := 200
 
@@ -74,15 +74,20 @@ static func _rich(bb: String) -> RichTextLabel:
 
 
 ## Свойства тушью: подпись — чернила, польза — зелёная, вред — красная киноварь.
-static func ink_modifiers(game: Game, mods: Variant) -> String:
+static func ink_modifiers(game: Game, mods: Variant, cols: int = 2) -> String:
 	if not (mods is Dictionary) or mods.is_empty():
 		return ""
-	var out := "[table=2]"
+	var out := "[table=%d]" % (cols * 2)
+	var n := 0
 	for k in mods:
 		var v := float(mods[k])
 		var is_bad := v > 0 if k == "stress_gain_mult" else v < 0
-		out += "[cell expand=1][color=#3a2614]%s[/color][/cell][cell]   [color=%s]%s[/color][/cell]" % [
+		out += "[cell expand=1][color=#3a2614]%s[/color][/cell][cell]   [color=%s]%s[/color]      [/cell]" % [
 			BB.esc(game.loc.t_or("stat." + k, k)), "#9a1c1c" if is_bad else "#2e5a1c", BB.stat_value(k, v)]
+		n += 1
+	while n % cols != 0:
+		out += "[cell][/cell][cell][/cell]"
+		n += 1
 	return out + "[/table]"
 
 
@@ -130,143 +135,377 @@ static func parchment_texture() -> Texture2D:
 	return tex
 
 
+## Буквица: лазурь в золотой рамке, белая вязь по углам.
+static func initial_texture() -> Texture2D:
+	if _tex.has("initial"):
+		return _tex.initial
+	var svg := '<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56">'
+	svg += '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6dc8a"/><stop offset="1" stop-color="#a87418"/></linearGradient></defs>'
+	svg += '<rect x="1" y="1" width="54" height="54" fill="url(#g)"/><rect x="4" y="4" width="48" height="48" fill="#2a4a8a"/>'
+	svg += '<rect x="6" y="6" width="44" height="44" fill="none" stroke="#f4ead0" stroke-opacity="0.55" stroke-width="0.8"/>'
+	for q in [[9, 9, 1, 1], [47, 9, -1, 1], [9, 47, 1, -1], [47, 47, -1, -1]]:
+		svg += '<path d="M%d %d q%d 0 %d %d q0 %d %d %d" fill="none" stroke="#f4ead0" stroke-opacity="0.8" stroke-width="0.9"/>' % [q[0], q[1], 6 * q[2], 6 * q[2], 6 * q[3], 4 * q[3], -3 * q[2], 2 * q[3]]
+		svg += '<circle cx="%d" cy="%d" r="1.1" fill="#f4ead0" fill-opacity="0.8"/>' % [q[0] + 2 * q[2], q[1] + 2 * q[3]]
+	svg += '</svg>'
+	var img := Image.new()
+	img.load_svg_from_string(svg, 1.0)
+	_tex["initial"] = ImageTexture.create_from_image(img)
+	return _tex.initial
+
+
+## Весы души: в левой чаше — душа, в правой — железо; коромысло клонится
+## к железу, когда вживления тяжелее оставшейся души.
+static func scales_texture(tilt: int) -> Texture2D:
+	var key := "scales%d" % tilt
+	if _tex.has(key):
+		return _tex[key]
+	var a := deg_to_rad(float(tilt))
+	var pv := Vector2(42, 16)
+	var r := pv + Vector2(cos(a), sin(a)) * 30.0
+	var l := pv - Vector2(cos(a), sin(a)) * 30.0
+	var ink := "#3a2614"
+	var svg := '<svg xmlns="http://www.w3.org/2000/svg" width="84" height="66" viewBox="0 0 84 66">'
+	svg += '<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6dc8a"/><stop offset="1" stop-color="#9a6a14"/></linearGradient></defs>'
+	svg += '<path d="M42 16 V60 M31 61 H53" stroke="%s" stroke-width="2" stroke-linecap="round"/>' % ink
+	svg += '<path d="M%s %s L%s %s" stroke="%s" stroke-width="2.2" stroke-linecap="round"/><circle cx="42" cy="16" r="2.4" fill="url(#g)" stroke="%s" stroke-width="0.8"/>' % [_f(l.x), _f(l.y), _f(r.x), _f(r.y), ink, ink]
+	for e in [[l, true], [r, false]]:
+		var pt: Vector2 = e[0]
+		var py := pt.y + 24.0
+		svg += '<path d="M%s %s L%s %s M%s %s L%s %s" stroke="%s" stroke-width="0.7"/>' % [_f(pt.x), _f(pt.y), _f(pt.x - 9), _f(py), _f(pt.x), _f(pt.y), _f(pt.x + 9), _f(py), ink]
+		if e[1]:
+			# душа — маленькая белая фигурка
+			svg += '<circle cx="%s" cy="%s" r="2.2" fill="#fbf6ea" stroke="%s" stroke-width="0.6"/><path d="M%s %s q3 0 3 6 h-6 q0 -6 3 -6 Z" fill="#fbf6ea" stroke="%s" stroke-width="0.6"/>' % [_f(pt.x), _f(py - 9), ink, _f(pt.x), _f(py - 6.5), ink]
+		else:
+			# железо — гиря
+			svg += '<path d="M%s %s h6 l2 7 h-10 Z" fill="#4a4e54" stroke="%s" stroke-width="0.6"/><circle cx="%s" cy="%s" r="1.4" fill="none" stroke="#4a4e54" stroke-width="1"/>' % [_f(pt.x - 3), _f(py - 7), ink, _f(pt.x), _f(py - 8.4)]
+		svg += '<path d="M%s %s Q%s %s %s %s Z" fill="url(#g)" stroke="%s" stroke-width="0.8"/>' % [_f(pt.x - 11), _f(py), _f(pt.x), _f(py + 9), _f(pt.x + 11), _f(py), ink]
+	svg += '</svg>'
+	var img := Image.new()
+	img.load_svg_from_string(svg, 1.0)
+	var tex := ImageTexture.create_from_image(img)
+	_tex[key] = tex
+	return tex
+
+
 static func _f(x: float) -> String:
 	return str(snappedf(x, 0.1))
 
 
-## Фигура тушью (SVG 220×400): контур, черты лица, рёбра, сердце, жилы;
-## вживления — прямо на теле; одержимость — тёмный дым и красные глаза.
+## Фигура в духе лекарских трактатов (SVG 220×400): контур тушью,
+## телесная заливка, штриховка тени, мышцы, волосы и борода. Вживления —
+## прямо на теле; протез заменяет кисть, предплечье или голень (контур
+## закрывается культёй). Одержимость — тёмный венец и бес, выходящий из уст.
+const INK_HEX := "#3a2614"
+
+# Левая половина силуэта (правая сторона персонажа) по частям: шея → плечо →
+# рука → бок → нога → промежность. Правая половина — зеркальное отражение.
+const HALF := [
+	["neck", [["L", 100, 76]]],
+	["shoulder", [["C", 92, 80, 74, 80, 64, 88], ["C", 54, 94, 50, 104, 50, 118]]],
+	["upperarm_out", [["C", 48, 136, 44, 152, 42, 170]]],
+	["forearm_out", [["C", 40, 196, 38, 218, 37, 238]]],
+	["hand", [["C", 32, 243, 28, 249, 27, 255], ["C", 26, 259, 30, 261, 33, 257], ["C", 33, 265, 34, 273, 37, 279],
+		["C", 40, 284, 47, 283, 48, 275], ["C", 50, 265, 51, 250, 50, 240]]],
+	["forearm_in", [["C", 52, 222, 56, 196, 58, 176]]],
+	["upperarm_in", [["C", 60, 158, 64, 140, 68, 122]]],
+	["torso", [["C", 72, 140, 75, 160, 76, 178], ["C", 77, 192, 73, 204, 72, 214]]],
+	["thigh_out", [["C", 71, 240, 76, 270, 78, 300]]],
+	["calf_out", [["C", 78, 316, 76, 334, 80, 356], ["C", 82, 366, 84, 372, 84, 378]]],
+	["foot", [["C", 80, 383, 72, 387, 70, 391], ["C", 70, 394, 74, 395, 78, 395], ["L", 98, 395], ["C", 101, 393, 101, 386, 100, 378]]],
+	["calf_in", [["C", 100, 350, 102, 326, 100, 304]]],
+	["thigh_in", [["C", 100, 280, 104, 256, 108, 238], ["L", 110, 235]]],
+]
+const HALF_START := [100, 62]
+# культи: вместо кисти, предплечья с кистью, голени со стопой
+const STUMPS := {
+	"wrist": {"skip": ["hand"], "after": "forearm_out", "seg": ["C", 38, 246, 49, 248, 50, 240]},
+	"elbow": {"skip": ["forearm_out", "hand", "forearm_in"], "after": "upperarm_out", "seg": ["C", 42, 182, 56, 186, 58, 176]},
+	"knee": {"skip": ["calf_out", "foot", "calf_in"], "after": "thigh_out", "seg": ["C", 80, 314, 98, 316, 100, 304]},
+}
+
+
+## Сегменты левой половины с культями: [[start, seg], ...].
+static func _half(stumps: Array) -> Array:
+	var out := []
+	var cur := Vector2(HALF_START[0], HALF_START[1])
+	var skip := {}
+	var extra := {}
+	for s in stumps:
+		var st: Dictionary = STUMPS[s]
+		for k in st.skip:
+			skip[k] = true
+		extra[st.after] = st.seg
+	for part in HALF:
+		if not skip.has(part[0]):
+			for seg in part[1]:
+				out.append([cur, seg])
+				cur = Vector2(seg[seg.size() - 2], seg[seg.size() - 1])
+		if extra.has(part[0]):
+			var seg: Array = extra[part[0]]
+			out.append([cur, seg])
+			cur = Vector2(seg[seg.size() - 2], seg[seg.size() - 1])
+	return out
+
+
+static func _seg_str(seg: Array, mirror: bool, start: Vector2) -> String:
+	# зеркальная половина идёт в обратном порядке: конец сегмента — его начало
+	var m := func(x: float) -> float: return 220.0 - x if mirror else x
+	match str(seg[0]):
+		"L":
+			return "L%s %s " % [_f(m.call(start.x if mirror else float(seg[1]))), _f(start.y if mirror else float(seg[2]))]
+		"C":
+			if mirror:
+				return "C%s %s %s %s %s %s " % [_f(m.call(float(seg[3]))), _f(seg[4]), _f(m.call(float(seg[1]))), _f(seg[2]), _f(m.call(start.x)), _f(start.y)]
+			return "C%s %s %s %s %s %s " % [_f(seg[1]), _f(seg[2]), _f(seg[3]), _f(seg[4]), _f(seg[5]), _f(seg[6])]
+	return ""
+
+
+## Силуэт: левая половина (рука может быть культёй) и зеркальная правая
+## (нога может быть культёй).
+static func body_path(arm_stump: String, leg_stump: String) -> String:
+	var left := _half([arm_stump] if arm_stump != "" else [])
+	var right := _half([leg_stump] if leg_stump != "" else [])
+	var d := "M%s %s " % [_f(HALF_START[0]), _f(HALF_START[1])]
+	for it in left:
+		d += _seg_str(it[1], false, it[0])
+	for i in range(right.size() - 1, -1, -1):
+		d += _seg_str(right[i][1], true, right[i][0])
+	return d + "Z"
+
+
+## Штриховка тени: короткие косые штрихи вдоль ломаной края, внутрь на dx.
+static func _hatch(p: PackedStringArray, pts: Array, step: float, dx: float, op: float = 0.4) -> void:
+	for i in pts.size() - 1:
+		var a := Vector2(pts[i][0], pts[i][1])
+		var b := Vector2(pts[i + 1][0], pts[i + 1][1])
+		var n := maxi(1, int(a.distance_to(b) / step))
+		for k in n:
+			var q := a.lerp(b, (k + 0.5) / n)
+			p.append('<path d="M%s %s l%s -5" stroke="%s" stroke-opacity="%s" stroke-width="0.7"/>' % [_f(q.x + dx), _f(q.y + 2.5), _f(-dx * 0.6), INK_HEX, op])
+
+
 static func figure_svg(game: Game, c: Dictionary) -> String:
 	var have := {}
 	for x in Main.grafts_of(game, c):
-		var d: Variant = Main.def_of(game, x.id)
-		if d != null:
-			have[str(x.id)] = "#" + tier_color(game, d.get("tier")).to_html(false)
+		if Main.def_of(game, x.id) != null:
+			have[str(x.id)] = true
 	var possessed: bool = c.traits.has("iron_possession")
-	var ink := "#3a2614"
+	var female: bool = bool(c.get("female", false))
+	var adult := Chars.is_adult(game, c)
+	var ink := INK_HEX
+	var arm_stump := ""
+	if have.has("blade_arm") or have.has("clockwork_arm"):
+		arm_stump = "elbow"
+	elif have.has("hook_hand") or have.has("iron_hand"):
+		arm_stump = "wrist"
+	var leg_stump := "knee" if have.has("peg_leg") or have.has("iron_leg") or have.has("stag_legs") else ""
 	var p := PackedStringArray()
-	p.append('<defs><linearGradient id="steel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4a4e54"/><stop offset="0.5" stop-color="#b8bec6"/><stop offset="1" stop-color="#3e4248"/></linearGradient>')
-	p.append('<linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6dc8a"/><stop offset="1" stop-color="#9a6a14"/></linearGradient>')
-	p.append('<linearGradient id="wood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a3a1c"/><stop offset="0.5" stop-color="#9a6a3a"/><stop offset="1" stop-color="#4a2e14"/></linearGradient></defs>')
-	var body := "M100 74 L100 84 Q72 86 62 96 L44 170 L36 240 Q38 256 47 250 L56 182 L70 122 L74 230 L82 388 L104 388 L108 252 L112 252 L116 388 L138 388 L146 230 L150 122 L164 182 L173 250 Q182 256 184 240 L176 170 L158 96 Q148 86 120 84 L120 74 Z"
+	p.append('<defs><linearGradient id="flesh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f0d8b4"/><stop offset="0.55" stop-color="#e6c49a"/><stop offset="1" stop-color="#cfa274"/></linearGradient>')
+	p.append('<linearGradient id="steel" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4a4e54"/><stop offset="0.5" stop-color="#c4cad2"/><stop offset="1" stop-color="#3e4248"/></linearGradient>')
+	p.append('<linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6dc8a"/><stop offset="1" stop-color="#9a6a14"/></linearGradient>')
+	p.append('<linearGradient id="wood" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a3a1c"/><stop offset="0.5" stop-color="#a8743e"/><stop offset="1" stop-color="#4a2e14"/></linearGradient></defs>')
+	# одержимость: тёмный венец лучей вокруг головы
 	if possessed:
-		# тёмное марево по контуру и струйки дыма, поднимающиеся от тела
-		p.append('<path d="%s" fill="none" stroke="#1e1018" stroke-opacity="0.16" stroke-width="16" stroke-linejoin="round"/>' % body)
-		for w in ["M62 100 C46 84 64 70 48 54 C38 44 50 30 40 18", "M158 100 C174 84 156 68 172 52 C182 42 170 28 180 16",
-				"M44 176 C26 164 40 146 24 132", "M176 176 C194 162 180 146 196 130", "M100 70 C92 56 104 46 96 32 C92 24 98 14 94 6",
-				"M120 70 C128 56 116 46 124 32 C128 24 122 14 126 6", "M78 300 C60 290 70 272 56 260", "M142 300 C160 288 150 272 164 258"]:
-			p.append('<path d="%s" fill="none" stroke="#2a1426" stroke-opacity="0.38" stroke-width="2.6" stroke-linecap="round"/>' % w)
-			p.append('<path d="%s" fill="none" stroke="#2a1426" stroke-opacity="0.14" stroke-width="7" stroke-linecap="round"/>' % w)
-	p.append('<path d="%s" fill="#e3c299" fill-opacity="0.55" stroke="%s" stroke-width="1.6" stroke-linejoin="round"/>' % [body, ink])
-	# штриховка тени справа
-	for i in 14:
-		var y := 104 + i * 9
-		p.append('<path d="M%d %d l6 -5" stroke="%s" stroke-opacity="0.35" stroke-width="0.8"/>' % [140 + (2 if i % 2 == 0 else 0), y, ink])
+		for i in 17:
+			var a := deg_to_rad(-200.0 + i * 13.0)
+			var r1 := 31.0 + (3.0 if i % 2 == 0 else 0.0)
+			var r2 := r1 + (12.0 if i % 2 == 0 else 7.0)
+			p.append('<path d="M%s %s L%s %s" stroke="#1e1018" stroke-opacity="0.75" stroke-width="%s" stroke-linecap="round"/>' % [_f(110 + cos(a) * r1), _f(38 + sin(a) * r1), _f(110 + cos(a) * r2), _f(38 + sin(a) * r2), "2.2" if i % 2 == 0 else "1.3"])
+	# тело
+	var body := body_path(arm_stump, leg_stump)
+	p.append('<path d="%s" fill="url(#flesh)" stroke="%s" stroke-width="1.7" stroke-linejoin="round"/>' % [body, ink])
+	# штриховка тени: правый бок, внутренняя сторона руки, внешняя сторона ноги
+	_hatch(p, [[152, 124], [146, 160], [144, 178], [147, 210]], 5.5, -3.0)
+	_hatch(p, [[170, 120], [176, 160], [178, 170]], 6.0, -2.5)
+	if leg_stump == "":
+		_hatch(p, [[148, 216], [146, 260], [142, 300], [143, 340], [136, 376]], 6.0, -3.0)
+	else:
+		_hatch(p, [[148, 216], [146, 260], [142, 298]], 6.0, -3.0)
+	_hatch(p, [[106, 100], [106, 200]], 9.0, -2.0, 0.18)
+	# мышцы и кости — тонкой тушью
+	var lines := ["M100 84 Q86 84 70 90", "M120 84 Q134 84 150 90", "M110 100 L110 200", "M97 148 Q110 151 123 148", "M98 166 Q110 169 122 166",
+		"M80 192 Q88 202 96 208", "M140 192 Q132 202 124 208", "M56 118 Q62 110 66 102", "M164 118 Q158 110 154 102",
+		"M82 292 Q89 300 96 292", "M102 68 Q106 76 108 82", "M118 68 Q114 76 112 82"]
+	if arm_stump == "":
+		lines.append("M44 172 Q48 178 54 176")
+	lines.append("M176 172 Q172 178 166 176")
+	if leg_stump == "":
+		lines.append_array(["M138 292 Q131 300 124 292", "M128 316 Q126 340 128 366"])
+	lines.append("M92 316 Q94 340 92 366")
+	if not female:
+		lines.append_array(["M72 118 Q90 130 108 120", "M148 118 Q130 130 112 120"])
+	for ln in lines:
+		p.append('<path d="%s" fill="none" stroke="%s" stroke-opacity="0.5" stroke-width="0.9" stroke-linecap="round"/>' % [ln, ink])
+	p.append('<ellipse cx="110" cy="186" rx="1.6" ry="2.3" fill="none" stroke="%s" stroke-opacity="0.7" stroke-width="0.9"/>' % ink)
+	if not female:
+		p.append('<circle cx="90" cy="123" r="1.2" fill="%s" fill-opacity="0.55"/><circle cx="130" cy="123" r="1.2" fill="%s" fill-opacity="0.55"/>' % [ink, ink])
+	# пальцы и стопы
+	if arm_stump == "":
+		p.append('<path d="M38 266 L40 279 M42 266 L44 282 M46 265 L47 278" fill="none" stroke="%s" stroke-opacity="0.6" stroke-width="0.8"/>' % ink)
+	p.append('<path d="M182 266 L180 279 M178 266 L176 282 M174 265 L173 278" fill="none" stroke="%s" stroke-opacity="0.6" stroke-width="0.8"/>' % ink)
+	p.append('<path d="M76 391 v4 M81 392 v3 M86 392 v3 M91 392 v3" stroke="%s" stroke-opacity="0.6" stroke-width="0.8"/>' % ink)
+	if leg_stump == "":
+		p.append('<path d="M144 391 v4 M139 392 v3 M134 392 v3 M129 392 v3" stroke="%s" stroke-opacity="0.6" stroke-width="0.8"/>' % ink)
+	# повязка на бёдрах (и на груди у женщин)
+	p.append('<path d="M72 206 C92 212 128 212 148 206 L147 218 C136 230 124 240 116 252 C113 248 111 246 110 246 C109 246 107 248 104 252 C96 240 84 230 73 218 Z" fill="#f2ead6" stroke="%s" stroke-width="1"/>' % ink)
+	p.append('<path d="M84 216 Q92 228 100 240 M136 216 Q128 228 120 240 M110 213 L110 244" fill="none" stroke="%s" stroke-opacity="0.4" stroke-width="0.7"/>' % ink)
+	p.append('<path d="M72 206 C92 212 128 212 148 206" fill="none" stroke="%s" stroke-width="1.8"/><path d="M78 209 q-5 6 -2 12 M80 209 q2 7 -1 13" fill="none" stroke="%s" stroke-width="1"/>' % [ink, ink])
+	if female:
+		p.append('<path d="M74 110 C92 116 128 116 146 110 L147 128 C128 134 92 134 73 128 Z" fill="#f2ead6" stroke="%s" stroke-width="1"/>' % ink)
+		p.append('<path d="M86 116 Q90 122 88 130 M134 116 Q130 122 132 130" fill="none" stroke="%s" stroke-opacity="0.4" stroke-width="0.7"/>' % ink)
 	# голова
-	p.append('<ellipse cx="110" cy="48" rx="20" ry="25" fill="#e3c299" fill-opacity="0.6" stroke="%s" stroke-width="1.6"/>' % ink)
-	p.append('<path d="M90 48 q-4 4 0 8 M130 48 q4 4 0 8" fill="none" stroke="%s" stroke-width="1.2"/>' % ink)
-	p.append('<path d="M92 30 Q110 14 128 30" fill="none" stroke="%s" stroke-width="2.2" stroke-opacity="0.7"/>' % ink)
+	if female:
+		p.append('<path d="M89 40 C86 20 97 8 110 8 C123 8 134 20 131 40 C133 56 134 72 138 88 C130 90 126 84 126 74 C126 60 128 44 126 34 C121 26 116 24 110 24 C104 24 99 26 94 34 C92 44 94 60 94 74 C94 84 90 90 82 88 C86 72 87 56 89 40 Z" fill="#6a3e1c" stroke="%s" stroke-width="1"/>' % ink)
+	p.append('<path d="M91 38 C91 22 99 13 110 13 C121 13 129 22 129 38 C129 51 125 59 119 64 C116 67 113 68 110 68 C107 68 104 67 101 64 C95 59 91 51 91 38 Z" fill="url(#flesh)" stroke="%s" stroke-width="1.6"/>' % ink)
+	p.append('<path d="M91 36 C87 35 86 41 87 45 C88 49 91 49 92 47 M129 36 C133 35 134 41 133 45 C132 49 129 49 128 47" fill="url(#flesh)" stroke="%s" stroke-width="1.1"/>' % ink)
+	var hair := "#6a3e1c" if female else "#4a2e18"
+	p.append('<path d="M89 40 C86 22 97 9 110 9 C123 9 134 22 131 40 C129 32 126 26 121 23 C116 22 104 22 99 23 C94 26 91 32 89 40 Z" fill="%s" stroke="%s" stroke-width="1"/>' % [hair, ink])
+	p.append('<path d="M93 32 q2 -4 5 -4 M100 24 q3 -3 6 -2 M114 23 q3 -1 6 1 M123 27 q3 0 5 4" fill="none" stroke="#8a5a30" stroke-width="0.9"/>')
+	if female:
+		p.append('<path d="M92 22 Q110 14 128 22" fill="none" stroke="#b8901c" stroke-width="1.4"/>')
+	elif adult:
+		p.append('<path d="M92 50 C93 60 99 71 110 73 C121 71 127 60 128 50 C125 56 120 60 117 60 C114 57 106 57 103 60 C100 60 95 56 92 50 Z" fill="%s" fill-opacity="0.92" stroke="%s" stroke-width="0.8"/>' % [hair, ink])
+		p.append('<path d="M100 64 q2 4 1 7 M110 66 v6 M120 64 q-2 4 -1 7" fill="none" stroke="#8a5a30" stroke-width="0.7"/>')
 	# лицо
-	var eye_l: String = ink
-	var eye_r: String = ink
+	p.append('<path d="M97 34 Q102 31 107 33 M113 33 Q118 31 123 34" fill="none" stroke="%s" stroke-width="1.1"/>' % ink)
+	var iris_l := ink
+	var iris_r := ink
+	var eye_graft := ""
 	for gid in ["glass_eye", "crystal_eye", "ruby_eye", "raven_eye"]:
 		if have.has(gid):
-			eye_l = {"glass_eye": "#6a9ac8", "crystal_eye": "#e8f0f4", "ruby_eye": "#b01c2a", "raven_eye": "#141014"}[gid]
+			eye_graft = gid
+	if eye_graft != "":
+		iris_l = {"glass_eye": "#5a8ac0", "crystal_eye": "#dce8f0", "ruby_eye": "#b01c2a", "raven_eye": "#141014"}[eye_graft]
 	if possessed:
-		eye_l = "#d01c1c"
-		eye_r = "#d01c1c"
-	p.append('<circle cx="102" cy="46" r="2.6" fill="%s" stroke="%s" stroke-width="0.8"/><circle cx="118" cy="46" r="2" fill="%s"/>' % [eye_l, ink, eye_r])
-	if eye_l != ink and not possessed:
-		p.append('<circle cx="102" cy="46" r="4.2" fill="none" stroke="#b8901c" stroke-width="1"/>')
-	p.append('<path d="M110 48 v8 h-3 M104 62 q6 3 12 0" fill="none" stroke="%s" stroke-width="1.2"/>' % ink)
+		iris_l = "#d01c1c"
+		iris_r = "#d01c1c"
+	for e in [[102, iris_l], [118, iris_r]]:
+		p.append('<path d="M%d 40 Q%d 36.6 %d 40 Q%d 42.6 %d 40 Z" fill="#f6eede" stroke="%s" stroke-width="0.8"/>' % [e[0] - 5, e[0], e[0] + 5, e[0], e[0] - 5, ink])
+		p.append('<circle cx="%d" cy="40" r="1.7" fill="%s"/>' % [e[0], e[1]])
+	if eye_graft != "" and not possessed:
+		p.append('<circle cx="102" cy="40" r="4.4" fill="none" stroke="#b8901c" stroke-width="1"/><circle cx="102.8" cy="39.3" r="0.5" fill="#ffffff"/>')
+	p.append('<path d="M110 38 C109 44 107 48 107 50 Q110 52 113 50" fill="none" stroke="%s" stroke-width="0.9"/>' % ink)
+	p.append('<path d="M105 59 Q110 61 115 59" fill="none" stroke="#5a1a14" stroke-width="1.1"/>')
 	# уста
 	if have.has("gold_teeth"):
-		p.append('<path d="M105 62 h10" stroke="url(#gold)" stroke-width="2.4"/>')
+		p.append('<path d="M106 59.6 h8" stroke="url(#gold)" stroke-width="2.2"/>')
 	if have.has("silver_tongue"):
-		p.append('<circle cx="110" cy="63" r="1.6" fill="#d0d6dc"/>')
+		p.append('<ellipse cx="110" cy="60" rx="2.6" ry="1" fill="#d8dee4" stroke="%s" stroke-width="0.4"/>' % ink)
 	if have.has("iron_jaw"):
-		p.append('<path d="M94 58 Q110 80 126 58 L124 66 Q110 82 96 66 Z" fill="url(#steel)" stroke="%s" stroke-width="0.8"/>' % ink)
+		p.append('<path d="M97 56 Q110 74 123 56 L122 63 Q110 80 98 63 Z" fill="url(#steel)" stroke="%s" stroke-width="0.8"/>' % ink)
+		p.append('<circle cx="100" cy="61" r="0.8" fill="%s"/><circle cx="120" cy="61" r="0.8" fill="%s"/>' % [ink, ink])
 	# голова: пластина, печать, руны, камень
 	if have.has("trepan_plate"):
-		p.append('<path d="M96 27 Q110 18 124 27 L121 31 Q110 24 99 31 Z" fill="url(#steel)" stroke="%s" stroke-width="0.8"/>' % ink)
-		for x in [101, 110, 119]:
-			p.append('<circle cx="%d" cy="%d" r="0.9" fill="%s"/>' % [x, 26 if x == 110 else 28, ink])
+		p.append('<path d="M99 14 Q110 8 121 14 L119 19 Q110 14 101 19 Z" fill="url(#steel)" stroke="%s" stroke-width="0.8"/>' % ink)
+		for q in [[102.5, 15.6], [110, 12.5], [117.5, 15.6]]:
+			p.append('<circle cx="%s" cy="%s" r="0.8" fill="%s"/>' % [q[0], q[1], ink])
 	if have.has("lead_seal"):
-		p.append('<circle cx="92" cy="40" r="3.6" fill="#5a5e64" stroke="%s" stroke-width="0.8"/>' % ink)
-	if have.has("skull_runes") or have.has("rune_of_tyr"):
-		p.append('<path d="M110 30 v8 M106 33 l4 -3 l4 3" fill="none" stroke="#9a1c1c" stroke-width="1.5"/>')
+		p.append('<circle cx="93.5" cy="31" r="3.4" fill="#5a5e64" stroke="%s" stroke-width="0.8"/><path d="M92 31 h3 M93.5 29.5 v3" stroke="#c8ccd0" stroke-width="0.7"/>' % ink)
+	if have.has("rune_of_tyr"):
+		p.append('<path d="M100 31 V24 M97.2 26.8 L100 24 L102.8 26.8" fill="none" stroke="#9a1c1c" stroke-width="1.3"/>')
+	if have.has("skull_runes"):
+		p.append('<path d="M119 24 V31 M119 24 L122.5 26 L119 28 L122.5 31" fill="none" stroke="#2a3e7a" stroke-width="1.2"/>')
 	if have.has("wisdom_stone"):
-		p.append('<path d="M110 33 l3 3 l-3 4 l-3 -4 Z" fill="#3a6ab8" stroke="#b8901c" stroke-width="0.8"/>')
-	# рёбра, сердце, пупок, колени
-	var ribs := "#c0c6cc" if have.has("silver_ribs") else ink
-	var ro := "0.9" if have.has("silver_ribs") else "0.3"
-	for i in 4:
-		var y := 112 + i * 11
-		p.append('<path d="M110 %d Q90 %d 82 %d M110 %d Q130 %d 138 %d" fill="none" stroke="%s" stroke-opacity="%s" stroke-width="1.1"/>' % [y, y - 2, y + 8, y, y - 2, y + 8, ribs, ro])
-	var heart_fill := "#8a2420"
+		p.append('<path d="M110 23.5 l3.4 4 l-3.4 4.6 l-3.4 -4.6 Z" fill="#3a6ab8" stroke="#b8901c" stroke-width="0.9"/>')
+	# сердце, мощевик, швы
+	var heart_fill := "#9a2a22"
 	if have.has("lion_heart"):
 		heart_fill = "url(#gold)"
 	if have.has("star_iron_heart"):
 		heart_fill = "url(#steel)"
-	p.append('<path d="M122 136 C114 130 112 124 116 120 C119 117 122 119 122 122 C122 119 125 117 128 120 C132 124 130 130 122 136 Z" fill="%s" stroke="%s" stroke-width="0.8"/>' % [heart_fill, ink])
+	p.append('<path d="M120 117 Q118 112 116 109 M124 117 Q126 112 130 110" fill="none" stroke="#8a2420" stroke-width="0.9"/>')
+	p.append('<path d="M122 134 C114 128 112 122 116 118 C119 115 122 117 122 120 C122 117 125 115 128 118 C132 122 130 128 122 134 Z" fill="%s" stroke="%s" stroke-width="0.8"/>' % [heart_fill, ink])
+	if have.has("star_iron_heart"):
+		p.append('<circle cx="119" cy="122" r="0.7" fill="%s"/><circle cx="125" cy="122" r="0.7" fill="%s"/>' % [ink, ink])
 	if have.has("relic_heart"):
-		p.append('<path d="M127 112 h7 v7 h-7 Z M127 112 l3.5 -3 l3.5 3" fill="url(#gold)" stroke="%s" stroke-width="0.6"/>' % ink)
-	p.append('<circle cx="110" cy="190" r="1.4" fill="%s" fill-opacity="0.6"/>' % ink)
-	p.append('<path d="M86 312 q6 -5 12 0 M118 312 q6 -5 12 0" fill="none" stroke="%s" stroke-opacity="0.5" stroke-width="1"/>' % ink)
-	# кровь — жилы на руках
+		p.append('<path d="M131 103 h7 v7 h-7 Z M131 103 l3.5 -3 l3.5 3" fill="url(#gold)" stroke="%s" stroke-width="0.6"/><path d="M134.5 104.5 v4 M133 106 h3" stroke="%s" stroke-width="0.6"/>' % [ink, ink])
+	if have.has("lion_heart") or have.has("star_iron_heart") or have.has("relic_heart"):
+		p.append('<path d="M113 140 h18 M115 138 v4 M119 138 v4 M123 138 v4 M127 138 v4" fill="none" stroke="#5a1a14" stroke-width="0.8"/>')
+	# рёбра
+	if have.has("silver_ribs"):
+		for i in 4:
+			var y := 132 + i * 8
+			p.append('<path d="M78 %d Q88 %d 98 %d M142 %d Q132 %d 122 %d" fill="none" stroke="#c4cad2" stroke-width="1.4"/>' % [y, y + 5, y + 3, y, y + 5, y + 3])
+	else:
+		for i in 2:
+			var y := 136 + i * 10
+			p.append('<path d="M79 %d Q87 %d 93 %d M141 %d Q133 %d 127 %d" fill="none" stroke="%s" stroke-opacity="0.3" stroke-width="0.8"/>' % [y, y + 4, y + 2, y, y + 4, y + 2, ink])
+	# кровь — жила на левой руке
 	var vein := "#a8302a"
-	var vo := "0.35"
+	var vo := "0.3"
 	for gid in ["galen_humors", "theriac", "quicksilver", "dragon_blood"]:
 		if have.has(gid):
 			vein = {"galen_humors": "#b8302a", "theriac": "#c08a1c", "quicksilver": "#a8b0b8", "dragon_blood": "#2a7a3a"}[gid]
 			vo = "0.95"
-	p.append('<path d="M158 112 L166 170 L172 236 M62 112 L54 170" fill="none" stroke="%s" stroke-opacity="%s" stroke-width="1.4"/>' % [vein, vo])
-	# жилы — струны вдоль рук и ног
+	p.append('<path d="M160 116 C164 140 168 156 170 174 C172 196 174 216 176 238" fill="none" stroke="%s" stroke-opacity="%s" stroke-width="1.5"/>' % [vein, vo])
+	if vo != "0.3":
+		p.append('<path d="M170 174 l5 4 M172 200 l-4 5 M163 140 l5 -2" fill="none" stroke="%s" stroke-width="1"/>' % vein)
+	# жилы — струны вдоль левого предплечья и бёдер
 	for gid in ["gut_tendons", "wire_sinews", "stag_sinews"]:
 		if have.has(gid):
-			var sc: String = {"gut_tendons": "#b89a6a", "wire_sinews": "#9aa2aa", "stag_sinews": "#7a4a2a"}[gid]
-			p.append('<path d="M150 130 L160 182 L168 240 M78 236 L86 380 M134 236 L128 380" fill="none" stroke="%s" stroke-width="1.6" stroke-dasharray="6 3"/>' % sc)
-	# кожа: руны, мощи, тушь теней, чешуя
+			var sc: String = {"gut_tendons": "#b89a6a", "wire_sinews": "#8a929a", "stag_sinews": "#7a4a2a"}[gid]
+			p.append('<path d="M166 178 C170 200 172 220 173 236 M172 174 C176 196 178 216 180 236 M83 238 C84 258 86 278 88 294 M137 238 C136 258 134 278 132 294" fill="none" stroke="%s" stroke-width="1.5" stroke-dasharray="5 2.5"/>' % sc)
+	# кожа (правая сторона персонажа): руны, мощи, тушь теней, чешуя
 	if have.has("rune_tattoos"):
-		p.append('<path d="M78 104 l6 8 l6 -8 M80 118 h8 M72 140 l4 6 l4 -6 l4 6" fill="none" stroke="#2a3e7a" stroke-width="1.4"/>')
+		# футарк: альгиз, тейваз, отал и узорная лента
+		p.append('<path d="M50 118 Q57 122 65 118 M50 121 Q57 125 65 121 M57 128 v10 M53 130 l4 4 l4 -4 M57 144 v10 M54 147 l3 -3 l3 3 M57 160 l-4 4.5 l4 4.5 l4 -4.5 Z M53 172 l4 -3.5 M61 172 l-4 -3.5" fill="none" stroke="#2a3e7a" stroke-width="1.3"/>')
 	if have.has("saint_relic"):
-		p.append('<path d="M96 150 v14 M90 156 h12" stroke="%s" stroke-width="1.6"/><path d="M92 148 l1 2 M100 148 l1 2 M92 165 l1 2 M100 165 l1 2" stroke="%s" stroke-width="0.9"/>' % [ink, ink])
+		p.append('<path d="M92 140 v14 M86 146 h12" stroke="#b8901c" stroke-width="2"/><path d="M84 139 l2 2 M84 153 l2 2 M100 139 l-2 2 M100 153 l-2 2" stroke="%s" stroke-width="0.8"/>' % ink)
 	if have.has("shadow_ink"):
-		p.append('<ellipse cx="132" cy="160" rx="9" ry="14" fill="#1a1418" fill-opacity="0.35"/>')
+		# тушь теней: полумесяц и звёзды на боку
+		p.append('<path d="M90 156 C78 158 76 178 90 182 C82 176 82 162 90 156 Z" fill="#1a1418" fill-opacity="0.85"/>')
+		p.append('<path d="M94 160 l1 2 l2 0.4 l-2 0.6 l-1 2 l-1 -2 l-2 -0.6 l2 -0.4 Z M93 180 l0.8 1.6 l1.6 0.3 l-1.6 0.5 l-0.8 1.6 l-0.8 -1.6 l-1.6 -0.5 l1.6 -0.3 Z" fill="#1a1418"/>')
 	if have.has("dragon_scales"):
 		for i in 3:
 			for j in 3:
-				p.append('<path d="M%s %s q4 -4 8 0" fill="none" stroke="#3a6a3a" stroke-width="1.4"/>' % [_f(64.0 + j * 7.0 + (3.5 if i % 2 == 1 else 0.0)), _f(104.0 + i * 7.0)])
-	# кости: железные скобы
-	if have.has("iron_splints"):
-		p.append('<path d="M120 300 h20 M120 340 h20 M44 196 h14" stroke="url(#steel)" stroke-width="3.2"/>')
+				p.append('<path d="M%s %s q3.5 -4 7 0" fill="none" stroke="#2e6a3a" stroke-width="1.4"/>' % [_f(57.0 + j * 6.5 + (3.2 if i % 2 == 1 else 0.0)), _f(98.0 + i * 6.5)])
+	# кости: скобы на бедре, кости великана
 	if have.has("giant_bones"):
-		p.append('<path d="M84 240 L90 380 M136 240 L128 380" fill="none" stroke="#e8e0cc" stroke-width="2.4" stroke-opacity="0.9"/>')
-	# руки (правая рука персонажа — слева от зрителя)
-	if have.has("hook_hand"):
-		p.append('<path d="M38 236 h14 v8 h-14 Z" fill="url(#steel)" stroke="%s"/><path d="M44 244 v8 q0 8 -6 8 q-6 0 -6 -6" fill="none" stroke="url(#steel)" stroke-width="3.2"/>' % ink)
-	elif have.has("iron_hand"):
-		p.append('<path d="M37 234 h16 l2 10 l-3 16 h-3 l-1 -10 l-2 11 h-3 l-1 -11 l-2 9 h-3 l-1 -14 Z" fill="url(#steel)" stroke="%s" stroke-width="0.9"/>' % ink)
-		p.append('<circle cx="41" cy="239" r="1" fill="%s"/><circle cx="49" cy="239" r="1" fill="%s"/>' % [ink, ink])
+		for q in [[89, 240, 92, 290], [131, 240, 128, 290]]:
+			p.append('<path d="M%d %d L%d %d" stroke="#f4ecd8" stroke-width="3" stroke-linecap="round"/><circle cx="%d" cy="%d" r="2.6" fill="#f4ecd8"/><circle cx="%d" cy="%d" r="2.6" fill="#f4ecd8"/>' % [q[0], q[1], q[2], q[3], q[0], q[1], q[2], q[3]])
+	if have.has("iron_splints"):
+		p.append('<path d="M117 258 L146 256 M118 282 L144 280" stroke="url(#steel)" stroke-width="3.4"/>')
+		for q in [[120, 258], [143, 256], [121, 282], [141, 280]]:
+			p.append('<circle cx="%d" cy="%d" r="0.9" fill="%s"/>' % [q[0], q[1], ink])
+	# правая рука персонажа (слева от зрителя)
+	if have.has("hook_hand") or have.has("iron_hand"):
+		p.append('<path d="M35 232 L52 234 L51 249 L37 248 Z" fill="url(#steel)" stroke="%s" stroke-width="0.9"/><path d="M36 238 L52 240 M36 244 L51 246" stroke="#5a3a1c" stroke-width="1.2"/>' % ink)
+		if have.has("hook_hand"):
+			p.append('<path d="M44 248 V262 C44 273 33 275 31 266" fill="none" stroke="url(#steel)" stroke-width="3.4" stroke-linecap="round"/><path d="M44 248 V262 C44 273 33 275 31 266" fill="none" stroke="%s" stroke-width="0.6"/>' % ink)
+		else:
+			p.append('<path d="M38 249 C33 252 28 255 27 259 C26 263 30 264 33 261 C33 268 34 275 37 280 C40 285 47 284 48 276 C50 267 51 257 50 249 Z" fill="url(#steel)" stroke="%s" stroke-width="0.9"/>' % ink)
+			p.append('<path d="M38 266 L40 280 M42 266 L44 283 M46 265 L47 278 M36 258 h13" fill="none" stroke="%s" stroke-width="0.7"/>' % ink)
 	elif have.has("blade_arm"):
-		p.append('<path d="M38 234 h14 v8 h-14 Z" fill="url(#steel)" stroke="%s"/><path d="M42 242 L46 242 L45 300 L44 306 L43 300 Z" fill="url(#steel)" stroke="%s" stroke-width="0.8"/>' % [ink, ink])
+		p.append('<path d="M40 166 L60 172 L56 210 L42 208 Z" fill="url(#steel)" stroke="%s" stroke-width="0.9"/><path d="M41 180 L59 185 M42 196 L57 199" stroke="#5a3a1c" stroke-width="1.4"/>' % ink)
+		p.append('<path d="M38 208 L60 211" stroke="%s" stroke-width="2.4" stroke-linecap="round"/><path d="M46 211 L52 212 L50 296 L48 304 L46 296 Z" fill="url(#steel)" stroke="%s" stroke-width="0.8"/><path d="M49 214 L48.6 294" stroke="%s" stroke-opacity="0.5" stroke-width="0.6"/>' % [ink, ink, ink])
 	elif have.has("clockwork_arm"):
-		p.append('<path d="M36 200 L54 200 L52 244 L38 244 Z" fill="url(#gold)" stroke="%s" stroke-width="0.9"/>' % ink)
-		p.append('<circle cx="45" cy="214" r="5" fill="none" stroke="%s" stroke-width="1.4" stroke-dasharray="2 1.5"/><circle cx="45" cy="214" r="1.6" fill="%s"/>' % [ink, ink])
-		p.append('<path d="M38 244 h14 l1 12 h-16 Z" fill="url(#gold)" stroke="%s" stroke-width="0.9"/>' % ink)
-	# ноги (левая нога персонажа — справа от зрителя): ниже колена
+		p.append('<path d="M41 168 L59 175 L51 240 L37 238 Z" fill="url(#gold)" stroke="%s" stroke-width="0.9"/>' % ink)
+		p.append('<circle cx="49" cy="194" r="6" fill="none" stroke="%s" stroke-width="1.6" stroke-dasharray="2 1.4"/><circle cx="49" cy="194" r="1.8" fill="%s"/><circle cx="45" cy="220" r="4" fill="none" stroke="%s" stroke-width="1.3" stroke-dasharray="1.6 1.2"/>' % [ink, ink, ink])
+		p.append('<path d="M38 240 C33 244 28 249 27 255 C26 259 30 261 33 257 C33 265 34 273 37 279 C40 284 47 283 48 275 C50 265 51 250 50 241 Z" fill="url(#gold)" stroke="%s" stroke-width="0.9"/><path d="M38 266 L40 279 M42 266 L44 282 M46 265 L47 278" fill="none" stroke="%s" stroke-width="0.7"/>' % [ink, ink])
+	# левая нога персонажа (справа от зрителя): ниже колена
 	if have.has("peg_leg"):
-		p.append('<path d="M114 320 h26 l-4 8 h-18 Z" fill="url(#wood)" stroke="%s"/><path d="M123 328 h8 l-1 60 h-6 Z" fill="url(#wood)" stroke="%s"/>' % [ink, ink])
+		p.append('<path d="M126 318 L134 318 L132 390 L128 390 Z" fill="url(#wood)" stroke="%s" stroke-width="0.9"/><path d="M126.5 389 h7 v5 h-7 Z" fill="#4a4e54" stroke="%s" stroke-width="0.7"/>' % [ink, ink])
+		p.append('<path d="M117 292 L145 290 L141 316 C134 324 126 324 120 316 Z" fill="#7a4e28" stroke="%s" stroke-width="0.9"/><path d="M118 299 L144 297 M119 308 L142 306" stroke="#3a2210" stroke-width="1.3"/>' % ink)
 	elif have.has("iron_leg"):
-		p.append('<path d="M115 318 h24 l-2 70 h-20 Z" fill="url(#steel)" stroke="%s" stroke-width="0.9"/><circle cx="127" cy="320" r="3.4" fill="url(#steel)" stroke="%s"/>' % [ink, ink])
-		p.append('<path d="M116 350 h22 M117 370 h20" stroke="%s" stroke-width="0.8"/>' % ink)
+		p.append('<path d="M121 310 L141 308 L137 376 L123 376 Z" fill="url(#steel)" stroke="%s" stroke-width="0.9"/><path d="M122 330 L140 329 M123 352 L138 351" stroke="%s" stroke-width="0.7"/>' % [ink, ink])
+		p.append('<path d="M122 376 L138 376 C142 382 148 388 150 393 L121 394 Z" fill="url(#steel)" stroke="%s" stroke-width="0.9"/><circle cx="131" cy="306" r="4.6" fill="url(#steel)" stroke="%s" stroke-width="0.9"/>' % [ink, ink])
 	elif have.has("stag_legs"):
-		p.append('<path d="M120 320 L118 386 M134 320 L136 386" fill="none" stroke="#7a4a2a" stroke-width="2"/>')
+		p.append('<path d="M124 310 L137 310 L143 344 L133 386 L127 386 L134 346 Z" fill="#8a5a32" stroke="%s" stroke-width="0.9"/><path d="M130 312 L138 344 L130 384" fill="none" stroke="#c8a070" stroke-width="0.8" stroke-dasharray="3 2"/>' % ink)
+		p.append('<path d="M126 386 L134 386 L137 394 L123 394 Z" fill="#2a1a0a"/><path d="M130 387 V394" stroke="#8a5a32" stroke-width="0.8"/><circle cx="131" cy="306" r="4.6" fill="url(#steel)" stroke="%s" stroke-width="0.9"/>' % ink)
+	# одержимость: бес выходит из уст
+	if possessed:
+		p.append('<path d="M115 60 C126 64 132 54 140 56 C148 58 152 50 158 52" fill="none" stroke="#2a1426" stroke-opacity="0.55" stroke-width="2" stroke-linecap="round"/>')
+		var imp := "#1a1012"
+		p.append('<path d="M161 44 C154 36 150 40 145 35 C147 44 151 47 154 49 C156 47 158 49 161 49 Z M171 44 C178 36 182 40 187 35 C185 44 181 47 178 49 C176 47 174 49 171 49 Z" fill="%s"/>' % imp)
+		p.append('<ellipse cx="166" cy="47" rx="5" ry="7" fill="%s"/><circle cx="166" cy="37" r="4.6" fill="%s"/>' % [imp, imp])
+		p.append('<path d="M163 34 L160.5 28 L164.8 32.4 Z M169 34 L171.5 28 L167.2 32.4 Z" fill="%s"/>' % imp)
+		p.append('<path d="M166 53 C168 60 174 60 172 66 M162 53 L160 58 M170 53 L172 58" fill="none" stroke="%s" stroke-width="1.3" stroke-linecap="round"/><path d="M170.5 64.5 L175 66 L171.5 69 Z" fill="%s"/>' % [imp, imp])
+		p.append('<circle cx="164.4" cy="36.6" r="0.9" fill="#e02020"/><circle cx="167.6" cy="36.6" r="0.9" fill="#e02020"/>')
 	return '<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" viewBox="0 0 %d %d">' % [FIG_W, FIG_H, FIG_W, FIG_H] + "".join(p) + '</svg>'
 
 
 static func figure_texture(game: Game, c: Dictionary) -> Texture2D:
-	var key := "%s|%s|%s" % [c.id, str(Main.grafts_of(game, c).map(func(x): return x.id)), c.traits.has("iron_possession")]
+	var key := "%s|%s|%s|%s" % [c.id, str(Main.grafts_of(game, c).map(func(x): return x.id)), c.traits.has("iron_possession"), Chars.is_adult(game, c)]
 	if _tex.has(key):
 		return _tex[key]
 	var img := Image.new()
@@ -294,8 +533,8 @@ class InkLines extends Control:
 			draw_dashed_line(a, mid, col, 1.3, 5.0)
 			draw_dashed_line(mid, b, col, 1.3, 5.0)
 			if filled:
-				draw_circle(b, 3.4, Color("#9a1c1c"))
-				draw_circle(b, 1.3, Color("#f4ead0"))
+				# киноварное колечко — не закрывает само вживление
+				draw_arc(b, 4.2, 0.0, TAU, 20, Color("#9a1c1c"), 1.6, true)
 
 
 ## «Душа»: ромбы-лазуриты, пороги смятения и одержимости — крестиками.
@@ -347,12 +586,28 @@ static func build(game: Game, cid: String, app: Object) -> Control:
 		root.add_child(_label("—", INK))
 		return outer
 	var is_me: bool = game.is_player(cid)
-	# заглавие с красной буквицей
+	# заглавие с буквицей: золото по лазури
 	var title := game.loc.t("grafts.ui_title")
-	var head := _rich("[font_size=34][color=#9a1c1c]%s[/color][/font_size][font_size=24][color=#3a2614]%s[/color][/font_size]" % [BB.esc(title.substr(0, 1)), BB.esc(title.substr(1))])
-	head.fit_content = true
-	root.add_child(head)
-	root.add_child(_rich("[i][color=#6b4e2e]%s[/color][/i]" % BB.esc(game.loc.t("grafts.ui_subtitle", {"name": Chars.full_name(game, c, true)}))))
+	var ini := TextureRect.new()
+	ini.texture = initial_texture()
+	ini.custom_minimum_size = Vector2(56, 56)
+	var il := _label(title.substr(0, 1), Color("#f6dc8a"), 34)
+	il.add_theme_color_override("font_outline_color", Color("#1a2a4a"))
+	il.add_theme_constant_override("outline_size", 4)
+	il.set_anchors_preset(Control.PRESET_FULL_RECT)
+	il.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	il.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	ini.add_child(il)
+	var tb := VBoxContainer.new()
+	tb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tb.add_theme_constant_override("separation", 2)
+	tb.add_child(_label(title.substr(1), INK, 26))
+	tb.add_child(_rich("[i][color=#6b4e2e]%s[/color][/i]" % BB.esc(game.loc.t("grafts.ui_subtitle", {"name": Chars.full_name(game, c, true)}))))
+	var th := HBoxContainer.new()
+	th.add_theme_constant_override("separation", 4)
+	th.add_child(ini)
+	th.add_child(tb)
+	root.add_child(th)
 	# фигура и части тела
 	var cc := CenterContainer.new()
 	cc.add_child(_body(game, c, app, is_me))
@@ -499,6 +754,10 @@ static func _soul_block(game: Game, c: Dictionary) -> Control:
 	var h := Main.soul(game, c)
 	var mx := Main.soul_max(game, c)
 	var st := Main.status(game, c)
+	var used := Main.soul_used(game, c)
+	var scales := TextureRect.new()
+	scales.texture = scales_texture(roundi(clampf((used - h) / maxf(1.0, mx) * 25.0, -25.0, 25.0)))
+	scales.custom_minimum_size = Vector2(84, 66)
 	var row := HBoxContainer.new()
 	row.add_child(_label(game.loc.t("grafts.ui_soul"), INK, 17))
 	row.add_child(_label("  %d / %d" % [roundi(h), roundi(mx)], INK_SOFT, 16))
@@ -513,10 +772,18 @@ static func _soul_block(game: Game, c: Dictionary) -> Control:
 	bar.max_value = mx
 	bar.troubled = Main._n(game, "troubled_below", 40)
 	bar.possession = Main._n(game, "possession_below", 20)
-	K.tip(bar, BB.title(game.loc.t("grafts.ui_soul")) + "\n" + BB.i(game.loc.t("grafts.ui_soul_tip", {"t": roundi(bar.troubled), "p": roundi(bar.possession)})) +
-		"\n" + BB.muted(game.loc.t("grafts.ui_soul_parts", {"base": roundi(Main._n(game, "soul_base", 100)), "traits": K.signed(roundi(mx - Main._n(game, "soul_base", 100))), "used": roundi(Main.soul_used(game, c))})))
+	var tip := BB.title(game.loc.t("grafts.ui_soul")) + "\n" + BB.i(game.loc.t("grafts.ui_soul_tip", {"t": roundi(bar.troubled), "p": roundi(bar.possession)})) + \
+		"\n" + BB.muted(game.loc.t("grafts.ui_soul_parts", {"base": roundi(Main._n(game, "soul_base", 100)), "traits": K.signed(roundi(mx - Main._n(game, "soul_base", 100))), "used": roundi(used)}))
+	K.tip(bar, tip)
+	K.tip(scales, tip)
 	box.add_child(bar)
-	return box
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	var hb := HBoxContainer.new()
+	hb.add_theme_constant_override("separation", 12)
+	hb.add_child(scales)
+	hb.add_child(box)
+	return hb
 
 
 # ------------------------------------------------------------ окна (обычное оформление игры)
