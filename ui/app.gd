@@ -422,6 +422,13 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	locked(_handle_key.bind(event))
 
 
+## Горячие клавиши разделов (WASD двигают карту).
+const TAB_KEYS := {
+	KEY_L: "lifestyle", KEY_R: "realm", KEY_Y: "dynasty", KEY_M: "military",
+	KEY_X: "wars", KEY_I: "intrigue", KEY_N: "decisions", KEY_J: "log",
+}
+
+
 func _handle_key(event: InputEvent) -> void:
 	var k := event as InputEventKey
 	if k == null or not k.pressed or k.echo:
@@ -459,7 +466,11 @@ func _handle_key(event: InputEvent) -> void:
 			if game.player != null:
 				open_character(game.player.id)
 		_:
-			return
+			# разделы — как в CK3: окно открывается поверх и без полосы внизу
+			var tab: Variant = TAB_KEYS.get(k.keycode)
+			if tab == null or game.player == null or hud.tab_name(str(tab)) == "":
+				return
+			open_tab(str(tab))
 	get_viewport().set_input_as_handled()
 
 

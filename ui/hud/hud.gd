@@ -172,7 +172,8 @@ func build() -> void:
 	window.offset_left = 8
 	window.offset_top = 52
 	window.offset_right = 8 + WINDOW_W
-	window.offset_bottom = -166
+	# как в CK3: окно во всю высоту, поверх медальона и полосы разделов
+	window.offset_bottom = -10
 	window.visible = false
 	var head := K.hbox([], 6)
 	window_back = K.button("", func(): app.back(), {"icon": "back", "variation": "CloseButton", "min_w": 34, "min_h": 34, "tip": t("ui.back")})
@@ -332,6 +333,14 @@ func _tabs() -> Array:
 	return list
 
 
+func _tab_tip(tb: Dictionary) -> String:
+	var key := "C" if tb.id == "me" else ""
+	for k in App.TAB_KEYS:
+		if App.TAB_KEYS[k] == tb.id:
+			key = OS.get_keycode_string(k)
+	return tb.name + (" " + BB.muted("(%s)" % key) if key != "" else "")
+
+
 func tab_name(id: String) -> String:
 	for tb in _tabs():
 		if tb.id == id:
@@ -369,7 +378,7 @@ func _refresh_cluster(p: Variant) -> void:
 			if id == "me":
 				app.open_character(app.game.player.id)
 			else:
-				app.open_tab(id), tb.name, 44, is_active))
+				app.open_tab(id), _tab_tip(tb), 44, is_active))
 	# медальон и герб
 	var med := W.portrait(app, p, 140, {"round": true})
 	med.position = Vector2(8, 10)
@@ -633,6 +642,16 @@ func _refresh_messages() -> void:
 				UiSound.play("war", 1.0, -4.0)
 
 
+## Медальон и полоса разделов внизу слева прячутся под открытым окном и
+## проявляются, когда окно закрыто.
+func _show_cluster(on: bool) -> void:
+	if on:
+		cluster.visible = true
+		UiFx.fade_in(cluster, 0.0, 0.18)
+	else:
+		cluster.visible = false
+
+
 func _refresh_window(full: bool = true) -> void:
 	var ref: Variant = app.panel_ref
 	if ref == null:
@@ -642,7 +661,8 @@ func _refresh_window(full: bool = true) -> void:
 			UiSound.follow("close")
 			UiFx.slide_out(window, func():
 				window.visible = false
-				_window_closing = false)
+				_window_closing = false
+				_show_cluster(true))
 		_window_key = ""
 		return
 	# вкладки окна — часть ключа: другая вкладка прокручивается с начала
@@ -650,6 +670,7 @@ func _refresh_window(full: bool = true) -> void:
 	if not window.visible or _window_closing:
 		_window_closing = false
 		window.visible = true
+		_show_cluster(false)
 		UiSound.follow("open")
 		UiFx.slide_in(window)
 	elif key != _window_key and _window_key != "":
