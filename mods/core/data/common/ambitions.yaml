@@ -1,0 +1,369 @@
+# Желания персонажей (механика ambitions, engine/features/ambitions.gd).
+# У правителей, вассалов и знатных придворных — одно видимое желание из
+# характера и положения. Исполненное — благодарность сюзерену, давно
+# неисполненное — обида, брошенное — долгая обида. Игрок выбирает своё
+# желание из трёх предложенных; исполненное приносит награду.
+defines:
+  ambitions:
+    monthly_chance: 0.08      # шанс в месяц завести желание (после перерыва)
+    cooldown_years: 2         # перерыв после исполнения или отказа
+    offers: 3                 # сколько желаний предлагать игроку
+    frustration_per_year: 5   # обида на сюзерена за каждый год сверх терпения
+    frustration_max: 25
+    abandon_stress: 10        # стресс игрока за отказ от своего желания
+
+opinion_modifiers:
+  ambition_fulfilled: { value: 30, years: 20 }
+  ambition_ignored: { value: -20, years: 10 }
+  passed_over: { value: -25, years: 10 }
+
+ambitions:
+  # ---------------------------------------------------------------- от сюзерена
+  # земли: пожалуйте графство или герцогство
+  land:
+    icon: "🏰"
+    order: 1
+    is_valid:
+      exists: liege
+      liege: { is_ruler: yes }
+      tier: "<= county"
+    weight:
+      value: 2
+      add: [ { value: ai_greed, multiply: 2 }, { value: ai_energy, multiply: 2 } ]
+      if:
+        - limit: { has_trait: ambitious }
+          add: 8
+        - limit: { has_trait: content }
+          multiply: 0.3
+    target: { from: liege, list: grantable_title }
+    fulfilled: { holds_title: scope:target }
+    failed:
+      scope:target:
+        holder: { NOR: [ { is_same_as: scope:owner }, { is_same_as: scope:patron } ] }
+    patience: 3
+    expire: 8
+    credit: liege
+    on_fulfilled: { add_stress: -20 }
+    on_failed:
+      if:
+        limit: { exists: scope:patron }
+        add_opinion: { target: scope:patron, modifier: passed_over }
+
+  # место в совете: назначьте в совет
+  council:
+    icon: "⚖"
+    order: 2
+    is_valid:
+      exists: liege
+      liege: { is_ruler: yes }
+      is_councillor: no
+      OR:
+        - diplomacy: ">= 10"
+        - martial: ">= 10"
+        - stewardship: ">= 10"
+        - intrigue: ">= 10"
+        - learning: ">= 10"
+    weight:
+      value: 2
+      add: { value: ai_energy, multiply: 2 }
+      if:
+        - limit: { has_trait: ambitious }
+          add: 6
+        - limit: { has_trait: diligent }
+          add: 4
+        - limit: { has_trait: arrogant }
+          add: 3
+    fulfilled: { is_councillor: yes }
+    council_bonus: 6
+    patience: 2
+    expire: 6
+    credit: liege
+    on_fulfilled: { add_stress: -15 }
+
+  # брак: устройте свадьбу
+  marriage:
+    icon: "💍"
+    order: 3
+    is_valid:
+      is_married: no
+      is_celibate: no
+      age: { gte: 17, lt: 45 }
+    weight:
+      value: 3
+      add: { value: ai_sociability, multiply: 2 }
+      if:
+        - limit: { has_trait: lustful }
+          add: 6
+        - limit: { has_trait: gregarious }
+          add: 2
+        - limit: { has_trait: chaste }
+          multiply: 0.3
+    fulfilled: { is_married: yes }
+    patience: 3
+    expire: 9
+    credit: liege
+    on_fulfilled: { add_stress: -20 }
+
+  # богатство: пожалуйте золото
+  wealth:
+    icon: "💰"
+    order: 4
+    is_valid: { is_ruler: yes, gold: "< 400" }
+    weight:
+      value: 1
+      add: { value: ai_greed, multiply: 4 }
+      if:
+        - limit: { has_trait: greedy }
+          add: 8
+        - limit: { has_trait: generous }
+          multiply: 0.2
+    progress:
+      value: gold
+      need: { value: 50, add: { value: income, multiply: 8, max: 200 } }
+    grant:
+      gold: ambition_remaining
+      effect: { add_gold: ambition_remaining }
+    patience: 4
+    expire: 8
+    credit: liege
+    on_fulfilled: { add_stress: -15 }
+
+  # признание: почести и слава
+  renown:
+    icon: "⭐"
+    order: 5
+    is_valid: { is_ruler: yes }
+    weight:
+      value: 1
+      add: { value: ai_energy, multiply: 1 }
+      if:
+        - limit: { has_trait: arrogant }
+          add: 6
+        - limit: { has_trait: ambitious }
+          add: 4
+        - limit: { has_trait: humble }
+          multiply: 0.2
+    progress:
+      value: prestige
+      need: { value: 80, add: { value: income, multiply: 6, max: 120 } }
+    grant:
+      prestige: { value: ambition_remaining, multiply: 0.6 }
+      effect: { add_prestige: ambition_remaining }
+    patience: 4
+    expire: 9
+    credit: liege
+    on_fulfilled: { add_stress: -15 }
+
+  # слава в битвах: ведите войны под своим знаменем
+  glory:
+    icon: "⚔"
+    order: 6
+    is_valid:
+      exists: liege
+      liege: { is_ruler: yes }
+      OR:
+        - martial: ">= 8"
+        - prowess: ">= 10"
+    weight:
+      value: 1
+      add: { value: ai_boldness, multiply: 3 }
+      if:
+        - limit: { has_trait: brave }
+          add: 6
+        - limit: { has_trait: wrathful }
+          add: 3
+        - limit: { has_trait: craven }
+          multiply: 0
+    progress: { value: "liege.deeds_battles_won", need: 3 }
+    patience: 4
+    expire: 10
+    credit: liege
+    on_fulfilled: { add_prestige: 50, add_stress: -20 }
+
+  # благочестие двора: паломничество, исповедь, обращение земель
+  devotion:
+    icon: "✝"
+    order: 7
+    is_valid:
+      exists: liege
+      liege: { is_ruler: yes, piety_level: "< 3" }
+      same_faith_as: liege
+      OR: [ { has_trait: zealous }, { ai_zeal: "> 0" } ]
+    weight:
+      value: 0.5
+      add: { value: ai_zeal, multiply: 3 }
+      if:
+        - limit: { has_trait: zealous }
+          add: 6
+        - limit: { has_trait: cynical }
+          multiply: 0
+    progress: { value: "liege.deeds_devotions", need: 1 }
+    fulfilled: { liege: { piety_level: ">= 3" } }
+    patience: 4
+    expire: 9
+    credit: liege
+    on_fulfilled: { add_piety: 50, add_stress: -15 }
+
+  # месть сопернику: бросьте его в темницу (или дождитесь его смерти)
+  revenge:
+    icon: "🗡"
+    order: 8
+    weight:
+      value: 2
+      add: { value: ai_vengefulness, multiply: 4 }
+      if:
+        - limit: { has_trait: vengeful }
+          add: 8
+        - limit: { has_trait: wrathful }
+          add: 4
+        - limit: { has_trait: forgiving }
+          multiply: 0.1
+    target: { list: rival, trigger: { is_alive: yes } }
+    fulfilled:
+      scope:target:
+        OR: [ { is_alive: no }, { is_imprisoned: yes } ]
+    patience: 4
+    expire: 10
+    credit: liege
+    credit_if:
+      scope:target: { is_imprisoned_by: scope:patron }
+    on_fulfilled: { add_stress: -30, add_prestige: 20 }
+
+  # свобода: освободите от вассальной клятвы
+  independence:
+    icon: "🚩"
+    order: 9
+    is_valid:
+      is_vassal: yes
+      tier: ">= duchy"
+      opinion: { target: liege, value: "< 10" }
+    weight:
+      value: 1
+      add: { value: ai_energy, multiply: 1 }
+      if:
+        - limit: { has_trait: ambitious }
+          add: 6
+        - limit: { has_trait: arrogant }
+          add: 4
+        - limit: { has_trait: content }
+          multiply: 0
+    fulfilled: { is_independent: yes }
+    patience: 4
+    expire: 10
+    credit: liege
+    on_fulfilled: { add_prestige: 100 }
+
+  # ---------------------------------------------------------------- свои
+  # наследник
+  heir:
+    icon: "👶"
+    order: 10
+    is_valid:
+      is_ruler: yes
+      is_married: yes
+      num_children: "< 1"
+      age: { lt: 50 }
+    weight: 6
+    progress: { value: num_children, need: 1 }
+    patience: 5
+    expire: 12
+    on_fulfilled: { add_stress: -30, add_prestige: 50 }
+
+  # достойный наследник: ребёнок с высоким образованием
+  educated_heir:
+    icon: "📖"
+    order: 11
+    is_valid:
+      is_ruler: yes
+      any_child: { in_education: yes }
+    weight:
+      value: 3
+      if:
+        - limit: { has_trait: diligent }
+          add: 3
+    progress: { value: num_well_educated_children, need: 1 }
+    patience: 6
+    expire: 12
+    on_fulfilled: { add_prestige: 75, add_stress: -25 }
+
+  # расширить державу
+  expansion:
+    icon: "🗺"
+    order: 12
+    is_valid: { is_ruler: yes, is_independent: yes }
+    weight:
+      value: 2
+      add: { value: ai_aggression, multiply: 3 }
+      if:
+        - limit: { has_trait: ambitious }
+          add: 6
+        - limit: { has_trait: content }
+          multiply: 0.2
+    progress: { value: realm_size, need: 3 }
+    patience: 5
+    expire: 10
+    on_fulfilled: { add_prestige: 150, add_stress: -30 }
+
+  # строитель
+  builder:
+    icon: "🗼"
+    order: 13
+    is_valid: { is_ruler: yes }
+    weight:
+      value: 2
+      if:
+        - limit: { has_trait: diligent }
+          add: 4
+        - limit: { stewardship: ">= 12" }
+          add: 3
+    progress: { value: deeds_buildings, need: 2 }
+    patience: 5
+    expire: 10
+    on_fulfilled: { add_prestige: 60, add_stress: -20 }
+
+  # слава рода: новое наследие
+  dynasty_glory:
+    icon: "🌳"
+    order: 14
+    is_valid: { is_dynasty_head: yes, dynasty_renown: ">= 100" }
+    weight:
+      value: 1
+      if:
+        - limit: { has_trait: ambitious }
+          add: 3
+    progress: { value: num_dynasty_legacies, need: 1 }
+    patience: 6
+    expire: 12
+    on_fulfilled: { add_prestige: 100, add_stress: -20 }
+
+interactions:
+  # сюзерен исполняет желание вассала или придворного сам (золото, почести)
+  fulfill_ambition:
+    icon: "✨"
+    category: realm
+    is_shown:
+      scope:recipient: { ambition_grantable_by: scope:actor }
+    cost:
+      gold: "scope:recipient.ambition_grant_gold"
+      prestige: "scope:recipient.ambition_grant_prestige"
+    auto_accept: yes
+    on_accept:
+      - scope:recipient: { fulfill_ambition: scope:actor }
+    ai_targets: [vassal, courtier]
+    ai_frequency_months: 6
+    ai_will_do:
+      value: 0
+      if:
+        - limit:
+            gold: 250
+            scope:recipient: { ambition_frustrated: yes }
+          add: 40
+        - limit:
+            gold: 500
+            scope:recipient: { is_ruler: yes }
+          add: 25
+        - limit: { has_trait: generous }
+          multiply: 1.5
+        - limit: { has_trait: greedy }
+          multiply: 0.4
+

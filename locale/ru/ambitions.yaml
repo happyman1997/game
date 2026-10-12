@@ -1,0 +1,59 @@
+# Желания персонажей: строки движка и интерфейса.
+ui:
+  years_short: "{n} г."
+  months_short: "{n} мес."
+  ambition: Желание
+  ambitions: Желания
+  ambition_none: Желания пока нет
+  ambition_none_ruler: "Пока ни к чему не стремится"
+  ambition_cooldown: "Новое желание — не раньше {date}"
+  ambition_progress: "{done} из {need}"
+  ambition_since: "Желает уже {n}"
+  ambition_patience: "Терпение: {n}"
+  ambition_patience_over: "Терпение кончилось"
+  ambition_patience_tip: "Пока не кончилось терпение ({p}), персонаж ждёт. Потом обида на сюзерена растёт каждый год (до {max}), а через {expire} желание бросают — и обида остаётся надолго."
+  ambition_frustration: "Обида на сюзерена: {n}"
+  ambition_how: Как исполнить
+  ambition_reward: Награда
+  ambition_reward_none: Только удовлетворение
+  ambition_credit: "Исполнение — благодарность сюзерену ({n} к мнению на {years})"
+  ambition_credit_own: "Исполните сами — и получите награду"
+  ambition_choose: Выберите своё желание
+  ambition_choose_tip: "Исполненное желание приносит награду и снимает стресс. Отказ от уже выбранного — стресс."
+  ambition_pick: Выбрать
+  ambition_decline: Ни к чему не стремиться
+  ambition_decline_tip: "Отложить выбор на год"
+  ambition_abandon: Оставить желание
+  ambition_abandon_tip: "+{n} стресса; новое желание — через год"
+  ambition_grant: Исполнить
+  ambition_grant_tip: "Исполнить желание своими силами — благодарность достанется вам"
+  ambition_expire: "Бросит через {n}"
+  ambition_offers_n: "Желаний на выбор: {n}"
+  ol:
+    ambitions: Желания двора
+alert:
+  ambitions_frustrated: "Неисполненные желания: {list}"
+  choose_ambition: "Выберите своё желание"
+msg:
+  ambition_fulfilled: "{who}: желание исполнено — «{name}»."
+  ambition_failed: "{who}: желание «{name}» стало невозможным."
+  ambition_expired: "{who} больше не ждёт: «{name}». Обида останется надолго."
+  ambition_fulfilled_own: "Ваше желание исполнилось: «{name}»."
+  ambition_failed_own: "Ваше желание стало невозможным: «{name}»."
+  ambition_expired_own: "Вы оставили надежду: «{name}»."
+opinion:
+  ambition_frustrated: "Неисполненное желание: {name}"
+stress_src:
+  ambition: Брошенное желание
+tr:
+  has_any_ambition: Есть желание
+  has_any_ambition.not: Нет желания
+  has_ambition: "Желание: {value}"
+  ambition_target_is: "Цель желания — {value}"
+  ambition_frustrated: Давно ждёт исполнения желания
+  ambition_frustrated.not: Не обижен неисполненным желанием
+  ambition_grantable_by: Желание можно исполнить своими силами
+fx:
+  start_ambition: "Заводит желание: {value}"
+  fulfill_ambition: "Желание персонажа {who} исполнено"
+  clear_ambition: "{who} забывает о своём желании"

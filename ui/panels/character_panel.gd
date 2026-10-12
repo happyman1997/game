@@ -159,6 +159,11 @@ static func _overview_tab(app: App, c: Dictionary) -> Control:
 		if reg != null:
 			root.add_child(reg)
 
+	# желание (и выбор своего из предложенных) — сразу на виду
+	var amb: Variant = AmbitionPanel.section(app, c) if alive else null
+	if amb != null:
+		root.add_child(amb)
+
 	# действия — первыми: ради них окно и открывают
 	# взаимодействия — по категориям, как в CK3
 	if p != null and alive and not app.pick_mode and g.state.game_over == null:

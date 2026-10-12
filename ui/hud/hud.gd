@@ -566,6 +566,43 @@ func _outliner_sections(p: Dictionary) -> Array:
 				{"tip": func(): return app.character_tooltip(vid)}))
 			sig += "%s:%d," % [v.id, item[0]]
 		out.append({"id": "unhappy", "name": t("ui.ol.unhappy_vassals"), "icon": "warning", "rows": rows, "sig": sig})
+	# желания: своё и двора (обиженные — первыми)
+	if g.engine.has_feature("ambitions"):
+		var amb_rows := []
+		var amb_sig := ""
+		var own: Variant = Ambitions.current(p)
+		if own != null or not Ambitions.offers(p).is_empty():
+			var od: Variant = Ambitions.def_of(g, own.id) if own != null else null
+			var txt: String = Ambitions.describe_name(g, p, own) if own != null else t("ui.ambition_choose")
+			var pr: Variant = Ambitions.progress_of(g, p) if own != null else null
+			if pr != null:
+				txt += "  %s/%s" % [K.fmt(minf(float(pr.done), float(pr.need))), K.fmt(float(pr.need))]
+			var pid: String = p.id
+			amb_rows.append(row.call(txt, od.get("icon", "star") if od != null else "star", func(): app.open_character(pid),
+				{"variation": "FlatButton" if own != null else "GoldButton"}))
+			amb_sig += "own:%s:%s," % [str(own.id) if own != null else "?", txt]
+		var court := []
+		for x in g.vassals_of(p.id) + g.courtiers_of(p.id):
+			var xa: Variant = Ambitions.current(x)
+			var xd: Variant = Ambitions.def_of(g, xa.id) if xa != null else null
+			if xd != null and xd.get("credit") == "liege":
+				court.append([-Ambitions.frustration(g, x), -Ambitions.years_of(g, x), x, xa, xd])
+		court.sort_custom(func(a, b): return a[0] < b[0] if a[0] != b[0] else a[1] < b[1])
+		for item in court.slice(0, 6):
+			var x: Dictionary = item[2]
+			var xid: String = x.id
+			var fr: float = -item[0]
+			var txt := "%s — %s" % [Chars.char_name(g, x), g.loc.t_or("ambition_short." + str(item[3].id), str(item[3].id))]
+			if fr > 0.0:
+				txt += "  " + K.signed(-fr)
+			var r: Control = row.call(txt, item[4].get("icon", "star"), func(): app.open_character(xid),
+				{"tip": func(): return app.character_tooltip(xid)})
+			if fr > 0.0:
+				r.add_theme_color_override("font_color", Color("#e08070"))
+			amb_rows.append(r)
+			amb_sig += "%s:%s:%d," % [xid, item[3].id, int(fr)]
+		if not amb_rows.is_empty():
+			out.append({"id": "ambitions", "name": t("ui.ol.ambitions"), "icon": "star", "rows": amb_rows, "sig": amb_sig})
 	# стройки в домене
 	var builds := []
 	for cid in Titles.domain_counties(g, p):

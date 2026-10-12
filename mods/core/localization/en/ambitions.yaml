@@ -1,0 +1,71 @@
+# Character ambitions.
+ambition:
+  land: "Grant of {target}"
+  council: A Seat on the Council
+  marriage: Marriage
+  wealth: Grow Rich
+  renown: Honors and Fame
+  glory: Glory in Battle
+  devotion: A Devout Court
+  revenge: "Revenge: {target}"
+  independence: Freedom from the Oath
+  heir: An Heir
+  educated_heir: A Worthy Heir
+  expansion: Expand the Realm
+  builder: Builder
+  dynasty_glory: Glory of the Dynasty
+ambition_short:
+  land: Lands
+  council: Council Seat
+  marriage: Marriage
+  wealth: Wealth
+  renown: Honors
+  glory: Glory in Battle
+  devotion: Devout Court
+  revenge: Revenge
+  independence: Freedom
+  heir: Heir
+  educated_heir: Worthy Heir
+  expansion: Expansion
+  builder: Builder
+  dynasty_glory: Dynasty Glory
+ambition_desc:
+  land: "Service without land is bread without salt. Dreams of a fief of their own and expects the liege to grant one."
+  council: "Believes they deserve a seat by the throne — and cannot understand why they have not been called yet."
+  marriage: "Tired of being alone, and expects the liege to find a worthy match."
+  wealth: "The ring of coin is sweeter than any music. Wants full coffers — by their own work or the liege's generosity."
+  renown: "Longs for their name to be spoken with respect, and for a seat closer to the throne."
+  glory: "The sword rusts in its sheath. Wants war and victories under the liege's banner."
+  devotion: "The court is mired in worldly things. Wants to see the liege on their knees before the altar — or at least on the road to the holy places."
+  revenge: "The wrong is not forgotten. Wants to see the enemy in chains — or in the grave."
+  independence: "The oath of fealty weighs heavy. Dreams of being their own master."
+  heir: "Without an heir, all that was gained will pass to strangers. A child is needed."
+  educated_heir: "The heir must be more than a son or daughter — a person worthy of power."
+  expansion: "The realm is too small. Wants new lands — by sword, marriage or grant."
+  builder: "Wants to leave stone behind: walls, temples, markets."
+  dynasty_glory: "The dynasty must be more than a name. A new legacy is needed."
+ambition_hint:
+  land: "Hold the title: {target}. The liege fulfills it with a grant; granting it to someone else breeds a grudge."
+  council: "Take a seat on the liege's council."
+  marriage: "Marry. The liege can arrange the wedding."
+  wealth: "Save {left} more gold. The liege can grant the rest."
+  renown: "Gain {left} more prestige. The liege can shower them with honors."
+  glory: "Battles won by the liege: {need}."
+  devotion: "The liege performs a pious deed (pilgrimage, converting lands, a gift to the church) or becomes righteous."
+  revenge: "{target} is in prison or in the grave. The liege earns gratitude if the enemy is in their prison."
+  independence: "Become an independent ruler."
+  heir: "Have a child."
+  educated_heir: "Raise a child with an education of level 3 or higher."
+  expansion: "New counties in the realm: {need}."
+  builder: "Buildings to build: {need}."
+  dynasty_glory: "Unlock a new dynasty legacy."
+
+opinion_modifier:
+  ambition_fulfilled: Fulfilled My Ambition
+  ambition_ignored: Ignored My Ambition
+  passed_over: Passed Me Over
+
+interaction:
+  fulfill_ambition: Fulfill Ambition
+interaction_desc:
+  fulfill_ambition: "Fulfill a vassal's or courtier's ambition by your own means — gold or honors. The gratitude will be yours, and the resentment from the long wait will pass."

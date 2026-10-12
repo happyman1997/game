@@ -660,7 +660,7 @@ func init(api: ModApi) -> void:
 
 ---
 
-## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари, политика, характер, слава, вера земель, народ, правления, реликвии, дикие земли, воспитание, династия
+## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари, политика, характер, слава, вера земель, народ, правления, реликвии, дикие земли, воспитание, династия, желания
 
 Крупные подсистемы в стиле CK3 устроены как **механики** (`engine/features`).
 Механика — модуль, который при запуске регистрирует свои системы, триггеры,
@@ -1474,6 +1474,59 @@ dynasty_legacies:
 `unlock_dynasty_legacy`; ссылки `dynasty_head`, `house_head`. Хуки
 `dynasty.legacy_unlocked`, `dynasty.head_changed`, `dynasty.house_founded`.
 
+### Желания
+
+Механика `ambitions` (`core/data/common/ambitions.yaml`). У каждого
+заметного персонажа (правителя или знатного взрослого придворного) — одно
+видимое **желание**, выведенное из характера и положения: получить землю,
+место в совете, брак, разбогатеть, отомстить сопернику, увидеть двор
+благочестивым… ИИ заводит желание с шансом `defines.ambitions.monthly_chance`
+в месяц (после перерыва `cooldown_years`), выбирая по весам. Игроку
+предлагается `offers` желаний на выбор; отказ от выбранного стоит
+`abandon_stress` стресса.
+
+```yaml
+ambitions:
+  land:
+    icon: "🏰"
+    is_valid: { exists: liege, tier: "<= county" }      # может ли этого хотеть
+    weight: { value: 2, add: { value: ai_greed, multiply: 2 } }
+    target: { from: liege, list: grantable_title }      # scope:target
+    fulfilled: { holds_title: scope:target }            # исполнено
+    failed:                                             # стало невозможным
+      scope:target: { holder: { NOR: [ { is_same_as: scope:owner }, { is_same_as: scope:patron } ] } }
+    patience: 3          # лет терпения; потом — обида на сюзерена
+    expire: 8            # через сколько лет желание бросают
+    credit: liege        # благодарность и обида — сюзерену
+    on_fulfilled: { add_stress: -20 }
+    on_failed: { add_opinion: { target: scope:patron, modifier: passed_over } }
+  wealth:
+    progress: { value: gold, need: 120 }    # исполнено, когда value выросло на need
+    grant:                                  # сюзерен может исполнить сам
+      gold: ambition_remaining
+      effect: { add_gold: ambition_remaining }
+```
+
+С `credit: liege` исполненное желание даёт мнение `ambition_fulfilled` о
+сюзерене (или о том, кто исполнил его взаимодействием `fulfill_ambition`;
+`credit_if` — условие благодарности), а брошенное — `ambition_ignored`. Пока
+желание ждёт дольше `patience`, сюзерен получает растущую обиду
+(`frustration_per_year` за год, до `frustration_max`) — она уходит, как только
+желание исполнено или брошено. `council_bonus` — насколько охотнее ИИ даёт
+место в совете тому, кто о нём мечтает; `player: no` — не предлагать игроку.
+Названия — `ambition.<id>` (с `{target}`), `ambition_short.<id>`,
+`ambition_desc.<id>`, `ambition_hint.<id>` (с `{target}`, `{need}`, `{left}`).
+
+Скрипт: условия `has_ambition` (yes/no или id), `ambition_target_is`,
+`ambition_frustrated`, `ambition_grantable_by`; значения
+`ambition_frustration`, `ambition_remaining`, `ambition_grant_gold`,
+`ambition_grant_prestige`, `num_well_educated_children`; эффекты
+`start_ambition`, `fulfill_ambition`, `clear_ambition`; списки `rival` и
+`grantable_title`. Хуки `ambition.started`, `ambition.fulfilled`,
+`ambition.failed`, `ambition.expired`. Пожалование титула ИИ охотнее отдаёт
+тому, кто о нём мечтает (`ambition_target_is: scope:target` в
+`grant_title.ai_will_do`).
+
 ### Связи между механиками
 
 Механики задуманы так, чтобы влиять друг на друга:
@@ -1510,6 +1563,11 @@ dynasty_legacies:
   даёт кураж доблести;
 - **деяния ↔ испытания ↔ ИИ**: путь (архетип) заслуживают делами — битвами,
   постройками, пирами, шантажом; ИИ на испытании сам ищет нужные дела;
+- **желания ↔ мнение ↔ совет и пожалования**: вассал ждёт земли, места в
+  совете или побед сюзерена — исполненное желание даёт благодарность,
+  затянувшееся копит обиду (а с ней и фракции), пожалованная другому земля
+  оставляет «обойдённого»; ИИ охотнее сажает в совет и наделяет землёй тех,
+  кто об этом мечтает;
 - **учёность ↔ магия** (мод `arcana`): учёность помогает постигать колдовство,
   защищает от порчи и выдаёт чудовищ при дворе.
 

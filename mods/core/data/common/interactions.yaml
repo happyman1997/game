@@ -143,6 +143,9 @@ interactions:
       if:
         - limit: { num_counties: "> domain_limit" }
           add: 70
+        # тому, кто мечтает именно об этом титуле (желания)
+        - limit: { scope:recipient: { ambition_target_is: scope:target } }
+          add: 40
         - limit: { scope:recipient: { is_child_of: scope:actor } }
           multiply: 1.5
 

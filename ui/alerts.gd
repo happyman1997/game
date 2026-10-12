@@ -65,6 +65,21 @@ static func register_builtin(engine: GameEngine) -> void:
 			return null
 		var first: String = kids[0].id
 		return {"icon": "baby", "kind": "bad", "text": g.loc.t("alert.child_no_guardian", {"list": ", ".join(kids.map(func(k): return Chars.char_name(g, k)))}), "action": {"character": first, "subtab": ["character", "family"]}})
+	reg.call("choose_ambition", 16, func(g: Game):
+		var p: Dictionary = g.player
+		if not g.engine.has_feature("ambitions") or Ambitions.offers(p).is_empty():
+			return null
+		return {"icon": "star", "kind": "info", "text": g.loc.t("alert.choose_ambition"), "action": {"character": p.id}})
+	reg.call("ambitions_frustrated", 21, func(g: Game):
+		var p: Dictionary = g.player
+		if not g.engine.has_feature("ambitions"):
+			return null
+		var list := Ambitions.frustrated_of(g, p)
+		if list.is_empty():
+			return null
+		var first: String = list[0].id
+		return {"icon": "star", "kind": "bad", "text": g.loc.t("alert.ambitions_frustrated", {"list": ", ".join(list.slice(0, 4).map(func(x): return Chars.char_name(g, x)))}),
+			"action": {"character": first}})
 	reg.call("powerful_snubbed", 22, func(g: Game):
 		var p: Dictionary = g.player
 		if not g.engine.has_feature("politics") or p.titles.is_empty():

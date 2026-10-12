@@ -1,0 +1,59 @@
+# Character ambitions: engine and interface strings.
+ui:
+  years_short: "{n} yr"
+  months_short: "{n} mo"
+  ambition: Ambition
+  ambitions: Ambitions
+  ambition_none: No ambition yet
+  ambition_none_ruler: "Strives for nothing for now"
+  ambition_cooldown: "A new ambition no sooner than {date}"
+  ambition_progress: "{done} of {need}"
+  ambition_since: "Wanted for {n}"
+  ambition_patience: "Patience: {n}"
+  ambition_patience_over: "Patience has run out"
+  ambition_patience_tip: "Until patience runs out ({p}), the character waits. Then their resentment toward the liege grows every year (down to {max}), and after {expire} the ambition is given up — and the grudge lasts a long time."
+  ambition_frustration: "Resentment toward the liege: {n}"
+  ambition_how: How to fulfill
+  ambition_reward: Reward
+  ambition_reward_none: Satisfaction alone
+  ambition_credit: "Fulfilling it earns the liege gratitude ({n} opinion for {years})"
+  ambition_credit_own: "Fulfill it yourself to earn the reward"
+  ambition_choose: Choose your ambition
+  ambition_choose_tip: "A fulfilled ambition brings a reward and relieves stress. Giving up a chosen one causes stress."
+  ambition_pick: Choose
+  ambition_decline: Strive for nothing
+  ambition_decline_tip: "Postpone the choice for a year"
+  ambition_abandon: Give up the ambition
+  ambition_abandon_tip: "+{n} stress; a new ambition in a year"
+  ambition_grant: Fulfill
+  ambition_grant_tip: "Fulfill the ambition yourself — the gratitude will be yours"
+  ambition_expire: "Gives up in {n}"
+  ambition_offers_n: "Ambitions to choose from: {n}"
+  ol:
+    ambitions: Ambitions at Court
+alert:
+  ambitions_frustrated: "Unfulfilled ambitions: {list}"
+  choose_ambition: "Choose your ambition"
+msg:
+  ambition_fulfilled: "{who}: ambition fulfilled — “{name}”. They are grateful."
+  ambition_failed: "{who}: the ambition “{name}” has become impossible."
+  ambition_expired: "{who} no longer waits: “{name}”. The grudge will last."
+  ambition_fulfilled_own: "Your ambition is fulfilled: “{name}”."
+  ambition_failed_own: "Your ambition has become impossible: “{name}”."
+  ambition_expired_own: "You have given up hope: “{name}”."
+opinion:
+  ambition_frustrated: "Unfulfilled ambition: {name}"
+stress_src:
+  ambition: Abandoned ambition
+tr:
+  has_any_ambition: Has an ambition
+  has_any_ambition.not: Has no ambition
+  has_ambition: "Ambition: {value}"
+  ambition_target_is: "The ambition's target is {value}"
+  ambition_frustrated: Has long awaited their ambition
+  ambition_frustrated.not: Not resentful over an ambition
+  ambition_grantable_by: The ambition can be fulfilled by your own means
+fx:
+  start_ambition: "Takes up an ambition: {value}"
+  fulfill_ambition: "{who}'s ambition is fulfilled"
+  clear_ambition: "{who} forgets their ambition"

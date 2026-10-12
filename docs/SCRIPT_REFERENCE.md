@@ -7,6 +7,9 @@
 
 | Имя | Скоупы | Описание | Источник |
 |---|---|---|---|
+| `ambition_frustrated` | character | Желание давно не исполняется — копится обида | core/ambitions |
+| `ambition_grantable_by` | character | Сюзерен может исполнить желание сам: ambition_grantable_by: scope:actor | core/ambitions |
+| `ambition_target_is` | character | Цель желания — этот скоуп: ambition_target_is: scope:target | core/ambitions |
 | `artifact_is_held` | любой | Реликвия у кого-то есть (не утеряна): artifact_is_held: <id> | core/artifacts |
 | `assembly_supports_war` | character | Сход одобряет наступательную войну (или правление его не требует) | core/governments |
 | `can_be_guardian_of` | character | Может стать опекуном ребёнка: can_be_guardian_of: scope:recipient | core/upbringing |
@@ -25,6 +28,7 @@
 | `global_var` | любой | Сравнение глобальной переменной | core |
 | `government` | character | Правление персонажа (id из governments или список) | core/governments |
 | `has_active_trial` | character | Проходит испытание (yes/no, id архетипа или список) | core/trials |
+| `has_ambition` | character | Есть желание (yes/no) или именно это: has_ambition: land | core/ambitions |
 | `has_any_claim` | character | Есть претензии | core |
 | `has_archetype` | character | Есть архетип — связка высоких навыков (skill_archetypes): has_archetype: <id> или yes | core |
 | `has_artifact` | character | Персонаж держит реликвию: has_artifact: <id> | core/artifacts |
@@ -190,6 +194,7 @@
 | `change_culture` | Сменить культуру | core |
 | `change_faith` | Сменить веру | core |
 | `change_var` | Изменить переменную: { name, add } | core |
+| `clear_ambition` | Снять желание без последствий: clear_ambition: yes | core/ambitions |
 | `command_restless_dead` | Некромант подчиняет восставших мёртвых своей державы | arcana |
 | `consecrate_against_dead` | Освятить земли державы против нежити | arcana |
 | `convert_to_holder_culture` | Привить графству культуру владельца | core/lands |
@@ -210,6 +215,7 @@
 | `feed_on_blood` | Вампир утоляет жажду (жертва — пленник или придворный) | arcana |
 | `firestorm` | Огненная буря на крупнейшее вражеское войско у границ | arcana |
 | `found_cadet_house` | Основать младшую ветвь рода: found_cadet_house: yes | core/dynasties |
+| `fulfill_ambition` | Исполнить желание персонажа (благодарность — patron): fulfill_ambition: scope:actor | core/ambitions |
 | `gain_artifact` | Получить реликвию (у прежнего владельца она пропадает): gain_artifact: <id> | core/artifacts |
 | `gain_title` | Получить титул | core |
 | `give_title` | Пожаловать титул: { title, to } — получатель становится вассалом | core |
@@ -270,6 +276,7 @@
 | `shift_realm_law` | Сдвинуть закон группы на ступени: shift_realm_law: { group: crown_authority, by: -1 } (без цены) | core/laws |
 | `sow_discord` | Посеять раздор между вассалом и его ближайшим союзником: sow_discord: scope:recipient | core/politics |
 | `spend_dynasty_renown` | Потратить известность рода: spend_dynasty_renown: 100 | core/dynasties |
+| `start_ambition` | Завести желание: start_ambition: land (цель — случайная подходящая) | core/ambitions |
 | `start_disease` | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
 | `start_scheme` | Начать интригу: { type, target } | core |
 | `take_faction_counties` | Вожак народной фракции (scope:faction) забирает её графства и правит сам: yes или { create_titles: yes } | core/populace |
@@ -292,6 +299,10 @@
 | `ai_sociability` | character | Личность ИИ: sociability | core |
 | `ai_vengefulness` | character | Личность ИИ: vengefulness | core |
 | `ai_zeal` | character | Личность ИИ: zeal | core |
+| `ambition_frustration` | character | Обида за неисполненное желание (0 — терпит) | core/ambitions |
+| `ambition_grant_gold` | character | Цена исполнения желания сюзереном: золото | core/ambitions |
+| `ambition_grant_prestige` | character | Цена исполнения желания сюзереном: престиж | core/ambitions |
+| `ambition_remaining` | character | Сколько осталось до исполнения желания (по progress) | core/ambitions |
 | `arcane_power` | character | Колдовская сила персонажа | arcana |
 | `attraction` | character | Привлекательность | core |
 | `attrition` | province | Доля воинов, которую армия теряет здесь за месяц | core/wilds |
@@ -390,6 +401,7 @@
 | `num_unhappy_counties` | character | Графств домена, недовольных владельцем (мнение не выше defines.populace.unhappy_opinion) | core/populace |
 | `num_vassals` | character | Число прямых вассалов | core |
 | `num_wars` | character | Число войн | core |
+| `num_well_educated_children` | character | Детей с образованием не ниже 3-го уровня | core/ambitions |
 | `num_wild_counties` | character | Число ничейных графств у границ державы | core/wilds |
 | `opinion` | character | Мнение о персонаже: opinion(scope:x) | core |
 | `personal_example` | character | Характеристика: personal_example | core |
@@ -484,6 +496,7 @@
 | `faction_county` | faction | Графства народной фракции | core/populace |
 | `faction_member` | faction | Члены фракции | core/factions |
 | `grandchild` | character | Внуки | core |
+| `grantable_title` | character | Титулы, которые персонаж может пожаловать (графства домена кроме столицы, лишние герцогства) | core/ambitions |
 | `held_title` | character | Титулы | core |
 | `independent_ruler` | любой | Независимые правители | core |
 | `knight` | character | Рыцари правителя | core/knights |
@@ -499,6 +512,7 @@
 | `province` | любой | Все провинции | core |
 | `realm_province` | character | Провинции державы | core |
 | `realm_vassal` | character | Все вассалы державы | core |
+| `rival` | character | Соперники и кровные враги персонажа | core/ambitions |
 | `ruler` | любой | Все правители (глобально) | core |
 | `self` | любой | Сам этот объект (удобно для списков кандидатов) | core |
 | `sibling` | character | Братья и сёстры | core |
@@ -549,6 +563,7 @@
 | `spirit` | Состояние духа: безмятежность, порывы по характеру, надлом и закалка | да |
 | `upbringing` | Детство, опекуны и воспитание, регентство при малолетнем правителе | да |
 | `dynasties` | Династия: известность рода, наследия, глава рода и младшие ветви | да |
+| `ambitions` | Желания персонажей: цели из характера, благодарность и обида сюзерену | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -560,7 +575,7 @@
 - **interaction_deciders**: `payer`
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `upbringing`, `dynasty`, `arcana_faith`
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `upbringing`, `dynasty`, `ambitions`, `arcana_faith`
 - **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `populace`, `governments`, `deeds`, `trials`, `spirit`
-- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
+- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

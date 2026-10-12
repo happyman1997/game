@@ -287,7 +287,8 @@ static func bar(value: float, max_value: float, color: Color = Color("#b8913f"),
 	p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	p.add_theme_stylebox_override("fill", UiArt.bar_fill(color))
 	if text != "":
-		p.show_percentage = false
+		# подпись читается только на полосе не ниже строки мелкого текста
+		p.custom_minimum_size.y = maxf(height, 20)
 		var l := label(text, "SmallLabel")
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.set_anchors_preset(Control.PRESET_FULL_RECT)
