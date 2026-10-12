@@ -103,6 +103,10 @@ static func build(app: App, id: String) -> Control:
 			mods.add_child(chip)
 		root.add_child(mods)
 
+	# правление (не феодальное): выборы, обеты, члены
+	var gov: Variant = FeatureSections.government(app, c)
+	if gov != null:
+		root.add_child(K.section(app.t("ui.government"), [gov], "scales"))
 	var ls: Variant = LifestylePanel.summary(app, c)
 	if ls != null:
 		root.add_child(K.section(app.t("ui.lifestyle"), [ls], "leaf"))

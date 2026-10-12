@@ -109,10 +109,13 @@ static func realm(app: App) -> Control:
 	if heirs.is_empty():
 		succ.add_child(K.label(app.t("ui.no_heir"), "BadLabel"))
 	succ.add_child(heir_row)
-	if not p.titles.is_empty():
+	var forced: bool = g.engine.has_feature("governments") and Governments.rule(g, p, "succession") != null
+	if forced:
+		succ.add_child(K.label(app.t("ui.law_by_government", {"gov": g.name_of("governments", Governments.of(g, p))}), "SmallLabel"))
+	if not p.titles.is_empty() and not forced:
 		var btns := K.flow([], 4)
 		for l in g.content.all("succession_laws"):
-			if law != null and l.id == law.id:
+			if (law != null and l.id == law.id) or l.get("government_only", false):
 				continue
 			var ctx := ScriptContext.make(g, {"type": "character", "id": p.id})
 			var cc: Variant = l.get("change_cost")

@@ -1,0 +1,16 @@
+ui:
+  gov_county_mods: "Графствам домена:"
+  next_election: "Выборы схода — через {years} г."
+  votes_n: "голосов: {n}"
+  campaign_n: "агитация {n}"
+  assembly_war: "Сход за наступательную войну, если довольны не меньше {need}% графств (сейчас {n}%)."
+  order_members: "Братьев при дворе: {n}"
+  law_by_government: "Закон наследования задан правлением: {gov}."
+  government: Правление
+msg:
+  elected: "Сход избрал нового вожака: {who} сменяет {prev}."
+  reelected: "Сход снова избрал {who}."
+tr:
+  government: "Правление: {value}"
+fx:
+  set_government: "{who}: правление — {value}"

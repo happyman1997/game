@@ -514,3 +514,53 @@ static func knights(app: App, p: Dictionary) -> Variant:
 	else:
 		rows.append(flow)
 	return K.section("%s — %d / %d" % [app.t("ui.knights"), ks.size(), cap], rows, "helm")
+
+
+# ------------------------------------------------------------ правление
+
+## Раздел правления в окне персонажа: правитель не феодального правления или
+## член его державы (выборы схода, братья ордена). null — показывать нечего.
+static func government(app: App, c: Dictionary) -> Variant:
+	var g := app.game
+	if not g.engine.has_feature("governments"):
+		return null
+	var ruler: Variant = c if not c.titles.is_empty() else g.ch(c.liege)
+	if ruler == null or ruler.titles.is_empty():
+		return null
+	var gd: Dictionary = Governments.def_of(g, ruler)
+	if gd.is_empty() or gd.get("default", false):
+		return null
+	var gid: String = gd.id
+	var box := K.vbox([], 4)
+	var head := K.hbox([K.icon(gd.get("icon", "crown"), 20), K.label(g.name_of("governments", gid), "SubheaderLabel")], 6)
+	var tip := BB.title(g.name_of("governments", gid)) + "\n" + BB.i(g.desc_of("governments", gid))
+	if gd.get("ruler_modifiers") is Dictionary:
+		tip += "\n" + BB.modifiers(g, gd.ruler_modifiers)
+	if gd.get("county_modifiers") is Dictionary:
+		tip += "\n" + BB.muted(app.t("ui.gov_county_mods")) + "\n" + BB.modifiers(g, gd.county_modifiers)
+	K.tip(head, tip)
+	box.add_child(head)
+	if gd.get("term_years") != null:
+		var start := int(ruler.vars.get("term_start", g.date))
+		var left := maxf(0.0, (start + Data.num(gd.term_years) * GameDate.DAYS_PER_YEAR - g.date) / float(GameDate.DAYS_PER_YEAR))
+		box.add_child(K.label(app.t("ui.next_election", {"years": K.fmt(left, 1)}), "MutedLabel"))
+		var cands := Governments.republic_candidates(g, ruler)
+		var votes := Governments.republic_votes(g, ruler, cands, false)
+		Data.sort_by(cands, func(x): return float(votes.get(x.id, 0)), true)
+		for cand in cands.slice(0, 6):
+			var row := K.hbox([W.portrait(app, cand, 34), W.char_link(app, cand.id, true)], 6)
+			row.add_child(K.expand())
+			var camp := Data.num(cand.vars.get("campaign"))
+			row.add_child(K.label(app.t("ui.votes_n", {"n": int(votes.get(cand.id, 0))}) + ("  · " + app.t("ui.campaign_n", {"n": K.fmt(camp)}) if camp > 0 else ""),
+				"GoodLabel" if g.is_player(cand.id) else "SmallLabel"))
+			box.add_child(row)
+		var need: Variant = gd.get("war_assembly")
+		if need != null:
+			var sup := Governments.assembly_support(g, ruler)
+			box.add_child(K.label(app.t("ui.assembly_war", {"n": roundi(sup * 100.0), "need": roundi(Data.num(need) * 100.0)}),
+				"GoodLabel" if sup >= Data.num(need) else "BadLabel"))
+	if gd.get("members") is Dictionary:
+		var tr := str(gd.members.get("trait", ""))
+		var n := Data.count(g.courtiers_of(ruler.id), func(x): return Chars.is_alive(x) and (tr == "" or x.traits.has(tr)))
+		box.add_child(K.label(app.t("ui.order_members", {"n": n}), "MutedLabel"))
+	return box

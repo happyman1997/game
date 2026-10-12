@@ -113,6 +113,9 @@ static func _consider_war(game: Game, c: Dictionary) -> void:
 	# испытание пути требует побед
 	if c.vars.has("trial") and Trials.ai_wants_war(game, c):
 		chance += game.def_num("trials.ai_war_chance", 0.1)
+	# правление: республика воюет неохотно
+	if game.engine.has_feature("governments"):
+		chance *= Data.num(Governments.rule(game, c, "ai_war_mult", 1.0), 1.0)
 	if game.rng.chance(chance):
 		Wars.declare_war(game, c, best)
 

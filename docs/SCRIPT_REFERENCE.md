@@ -7,6 +7,7 @@
 
 | Имя | Скоупы | Описание | Источник |
 |---|---|---|---|
+| `assembly_supports_war` | character | Сход одобряет наступательную войну (или правление его не требует) | core/governments |
 | `can_begin_trial` | character | Может встать на путь связки навыков (испытание): can_begin_trial: <архетип> или yes (хоть на один) | core/trials |
 | `can_marry` | character | Может вступить в брак с персонажем | core |
 | `can_use_hook_on` | character | Крюк на персонажа можно использовать сейчас | core |
@@ -17,6 +18,7 @@
 | `faction_type` | faction | Тип фракции | core/factions |
 | `faith` | character, province | Вера равна | core |
 | `global_var` | любой | Сравнение глобальной переменной | core |
+| `government` | character | Правление персонажа (id из governments или список) | core/governments |
 | `has_active_trial` | character | Проходит испытание (yes/no, id архетипа или список) | core/trials |
 | `has_any_claim` | character | Есть претензии | core |
 | `has_archetype` | character | Есть архетип — связка высоких навыков (skill_archetypes): has_archetype: <id> или yes | core |
@@ -61,6 +63,7 @@
 | `is_arcanist` | character | Владеет колдовством (дар или навык ≥ 6) | arcana |
 | `is_at_war` | character | Ведёт войну | core |
 | `is_at_war_with` | character | Воюет с персонажем | core |
+| `is_celibate` | character | Не может вступать в брак (обет или правление) | core/governments |
 | `is_child` | character | Ребёнок | core |
 | `is_child_of` | character | Ребёнок персонажа | core |
 | `is_close_family_of` | character | Близкая семья | core |
@@ -127,6 +130,7 @@
 | `add_blood_potency` | Изменить силу крови вампира | arcana |
 | `add_blood_thirst` | Изменить жажду крови | arcana |
 | `add_building` | Добавить постройку | core |
+| `add_campaign` | Агитация перед выборами: add_campaign: N (голосов сходу прибавится по N на графство) | core/governments |
 | `add_claim` | Претензия на титул | core |
 | `add_control` | Изменить контроль над графством: add_control: 20 | core/populace |
 | `add_county_opinion` | Модификатор мнения графства о владельце: add_county_opinion: <id из opinion_modifiers> или { modifier, value } | core/populace |
@@ -228,6 +232,7 @@
 | `set_focus` | Сменить фокус образа жизни (без перерыва) | core/lifestyles |
 | `set_global_flag` | Глобальный флаг | core |
 | `set_global_var` | Глобальная переменная | core |
+| `set_government` | Сменить правление персонажа: set_government: <id> | core/governments |
 | `set_nickname` | Прозвище (ключ локализации или текст) | core |
 | `set_province_flag` | Флаг провинции | core |
 | `set_realm_law` | Установить закон державы (без цены и перерыва) | core/laws |
@@ -377,6 +382,7 @@
 | `vassal_opinion` | character | Характеристика: vassal_opinion | core |
 | `war_duration_days` | war | Длительность войны | core |
 | `world_vampires` | любой | Сколько вампиров живёт в мире (считается раз в месяц) | arcana |
+| `years_in_office` | character | Лет у власти по сроку (для правлений с term_years) | core/governments |
 
 ## Ссылки на скоупы
 
@@ -488,6 +494,7 @@
 | `renown` | Слава и благочестие: уровни престижа и благочестия меняют мнение подданных | да |
 | `lands` | Вера и культура земель: чужие графства дают меньше, их можно обратить | да |
 | `populace` | Народ графств: мнение о владельце, контроль, крестьянские и народные мятежи | да |
+| `governments` | Типы правления: феодалы, рыцарский орден, народная республика, совет мастеров | да |
 | `momentum` | Удачи и неудачи: успех снимает стресс, провал добавляет | да |
 | `duels` | Поединки: вызов на бой один на один, поборники из рыцарей | да |
 | `deeds` | Деяния: летопись поступков персонажа и прозвища, которые из неё растут | да |
@@ -498,13 +505,13 @@
 
 ## Реестры движка
 
-- **succession_algorithms**: `primogeniture`, `partition`, `seniority`, `elective`
+- **succession_algorithms**: `primogeniture`, `partition`, `seniority`, `elected_member`, `best_master`, `republic_election`, `elective`
 - **cb_targets**: `claim`, `de_jure`, `independence`, `adjacent_county`, `holy_war`, `faction`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
 - **interaction_deciders**: `payer`
-- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `spirit`, `plague_fear`
-- **province_modifier_providers**: `lands`, `populace`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `governments`, `spirit`, `plague_fear`
+- **province_modifier_providers**: `lands`, `populace`, `governments`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `arcana_faith`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `populace`, `deeds`, `trials`, `spirit`
-- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `populace`, `governments`, `deeds`, `trials`, `spirit`
+- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

@@ -633,7 +633,7 @@ func init(api: ModApi) -> void:
 
 ---
 
-## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари, политика, характер, слава, вера земель, народ
+## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари, политика, характер, слава, вера земель, народ, правления
 
 Крупные подсистемы в стиле CK3 устроены как **механики** (`engine/features`).
 Механика — модуль, который при запуске регистрирует свои системы, триггеры,
@@ -651,7 +651,7 @@ func init(api: ModApi) -> void:
 
   (доступны `lifestyles`, `council`, `prison`, `factions`, `regiments`,
   `secrets`, `laws`, `knights`, `politics`, `personality`, `renown`, `lands`,
-  `populace`, `momentum`, `duels`, `deeds`, `trials`, `spirit`;
+  `populace`, `governments`, `momentum`, `duels`, `deeds`, `trials`, `spirit`;
   интерфейс скрывает вкладки и разделы выключенных механик). Словарь скриптов
   механики (её триггеры, эффекты, значения) остаётся зарегистрированным, так что
   чужие данные, которые его упоминают, не ломаются — на пустом состоянии
@@ -1256,6 +1256,56 @@ factions:
 `num_low_control_counties`; у фракции — значение `num_faction_counties`, список
 `faction_county`; эффект `take_faction_counties`. Режимы карты
 `county_opinion` и `control`.
+
+### Правления: орден, народная республика, совет мастеров
+
+Механика `governments` (данные — `core/data/common/governments.yaml`). Правление
+правителя берётся из поля `government` его основного титула, затем его
+культуры, без них — правление с `default: yes` (`feudal`). Эффект
+`set_government` закрепляет правление за персонажем (`vars.government`) — так
+победившие крестьяне становятся народной республикой.
+
+```yaml
+titles:
+  k_frisia: { tier: kingdom, government: people_republic, ... }
+
+governments:
+  people_republic:
+    icon: "⚖"
+    succession: republic_election   # закон наследования; правитель его не меняет
+    term_years: 10                  # выборы по сроку, а не только по смерти
+    play_family: yes                # игрок продолжает за свой род, если не избран
+    war_assembly: 0.5               # наступательная война — если довольна половина графств
+    ai_war_mult: 0.5                # ИИ воюет вдвое реже
+    celibate: no                    # правитель не женится (орден)
+    ruler_modifiers: { domain_limit: 8, knight_cap: -20 }
+    county_modifiers: { tax_mult: -0.15, levy_mult: 0.35 }   # графствам домена
+    members:                        # братья ордена: добровольцы каждый год
+      trait: order_brother
+      per_year: [1, 2]
+      age: [18, 32]
+      max: 12
+      skills: { martial: [6, 14] }
+      cultures: [marcher, frisian]  # откуда приходят (по умолчанию — культура правителя)
+```
+
+Законы с `government_only: yes` не выбираются в законах державы — их ставит
+правление. Алгоритмы наследования механики: `elected_member` (лучший из
+персонажей с чертой `members.trait`: воинское ×2, личная доблесть, учёность,
+престиж), `best_master` (лучший по `master_skill` и половине `second_skill`
+закона среди своей культуры при дворе и детей) и `republic_election` (кандидаты —
+старший взрослый мужчина каждого рода при дворе и в вассалах; каждое графство
+домена голосует по престижу, дипломатии, агитации `add_campaign`, мнению о
+действующем вожаке и случаю). Проигравший вожак остаётся при дворе.
+
+Черта с `celibate: yes` запрещает брак; черта с полем `race` (например,
+`race: dwarf`) запрещает браки с другими расами, а модификатор `lifespan_mult`
+растягивает старение после совершеннолетия (1 — живёт вдвое дольше).
+
+Скрипт: условия `government`, `assembly_supports_war`, `is_celibate`; значение
+`years_in_office`; эффекты `set_government`, `add_campaign`. Крюки
+`succession.law`, `marriage.allowed`, `war.allowed`, `player.next_character`
+доступны и модам.
 
 ### Связи между механиками
 

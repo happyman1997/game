@@ -1,0 +1,26 @@
+government:
+  feudal: Feudal Rule
+  order: Knightly Order
+  people_republic: People's Republic
+  master_council: Council of Masters
+government_desc:
+  feudal: "Vassals hold the land in exchange for service; power passes by the law of succession."
+  order: "The brethren elect a grand master from their own ranks; brothers take a vow of celibacy, and new volunteers arrive every year. The order holds its lands itself."
+  people_republic: "The assembly elects a leader for ten years from the heads of the leading families. The assembly must approve offensive wars, and there are no knights — the whole free militia fights. You play for your family: if you are not elected, fight for votes."
+  master_council: "The best master of the people rules, not an heir. The mountain fortresses are impregnable and the mines are rich."
+succession_law:
+  order_election: Elected by the Brethren
+  republic_election: Elected by the Assembly
+  master_council_law: The Best Master
+succession_law_desc:
+  order_election: "The brethren elect the worthiest warrior among them as the new grand master."
+  republic_election: "Every county votes at the assembly for one of the heads of the leading families: renown, eloquence and campaigning count."
+  master_council_law: "Power passes to the best master of their people in the realm — by stewardship and learning."
+trait:
+  order_brother: Brother of the Order
+trait_desc:
+  order_brother: "Has taken a vow of celibacy and serves the order with sword and prayer."
+decision:
+  campaign_for_assembly: Campaign at the Assembly
+decision_desc:
+  campaign_for_assembly: "Feasts, gifts to the village elders and speeches in the squares: more counties will vote for your family at the next assembly election."

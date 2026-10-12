@@ -89,9 +89,11 @@ casus_belli:
     icon: "🔥"
     targets: faction
     manual: yes
-    # Победа крестьян: вожак правит отвоёванными графствами.
+    # Победа крестьян: вожак правит отвоёванными графствами — без господ,
+    # народной республикой (механика governments).
     on_victory:
       - take_faction_counties: yes
+      - set_government: people_republic
       - add_gold: 50
       - scope:defender: { add_prestige: -100 }
     on_defeat:

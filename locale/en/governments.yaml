@@ -1,0 +1,16 @@
+ui:
+  gov_county_mods: "Domain counties:"
+  next_election: "Assembly election in {years} yr."
+  votes_n: "votes: {n}"
+  campaign_n: "campaign {n}"
+  assembly_war: "The assembly backs an offensive war if at least {need}% of counties are content (now {n}%)."
+  order_members: "Brothers at court: {n}"
+  law_by_government: "The law of succession is set by the government: {gov}."
+  government: Government
+msg:
+  elected: "The assembly has elected a new leader: {who} replaces {prev}."
+  reelected: "The assembly has re-elected {who}."
+tr:
+  government: "Government: {value}"
+fx:
+  set_government: "{who}: government becomes {value}"

@@ -233,6 +233,8 @@ static func cb_context(game: Game, attacker: String, t: Dictionary, war_id: Vari
 static func available_war_targets(game: Game, attacker: Dictionary, defender: Variant = null) -> Array:
 	if attacker.titles.is_empty():
 		return []
+	# правление может запретить наступательную войну (сход республики): хук war.allowed
+	var allowed := game.engine.hooks.veto("war.allowed", {"game": game, "attacker": attacker})
 	var out := []
 	for cb in game.content.all("casus_belli"):
 		if cb.get("manual", false):
@@ -247,6 +249,8 @@ static func available_war_targets(game: Game, attacker: Dictionary, defender: Va
 			if t.defender == attacker.id:
 				continue
 			if has_truce(game, attacker.id, t.defender) or is_at_war_with(game, attacker.id, t.defender):
+				continue
+			if not allowed:
 				continue
 			if game.state.wars.values().any(func(w): return w.attacker == attacker.id and w.defender == t.defender):
 				continue

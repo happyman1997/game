@@ -1,0 +1,105 @@
+# Типы правления (механика governments). Правление правителя берётся из
+# поля government основного титула, затем культуры; без них — феодальное.
+# Правление задаёт закон наследования (правитель его не меняет),
+# модификаторы правителю и графствам его домена и особые правила.
+governments:
+  feudal:
+    icon: "🏰"
+    order: 1
+    default: yes
+
+  # Рыцарский орден: магистра избирают братья, братья дают обет безбрачия,
+  # каждый год приходят добровольцы со всего света. Земли держит сам орден.
+  order:
+    requires_feature: governments
+    icon: "🛡"
+    order: 2
+    succession: order_election
+    celibate: yes
+    ruler_modifiers: { domain_limit: 6, knight_cap: 4, knight_effectiveness: 0.25, monthly_piety: 1 }
+    county_modifiers: { levy_mult: 0.25, tax_mult: -0.25 }
+    members:
+      trait: order_brother
+      per_year: [1, 2]
+      age: [18, 32]
+      max: 12
+      skills: { martial: [6, 14], prowess: [8, 16] }
+
+  # Народная республика: вожака выбирает сход на десять лет из глав видных
+  # родов; игрок играет за свой род. Наступательную войну одобряет сход.
+  # Рыцарей нет — воюет всё вольное ополчение.
+  people_republic:
+    requires_feature: governments
+    icon: "⚖"
+    order: 3
+    succession: republic_election
+    term_years: 10
+    play_family: yes
+    war_assembly: 0.5
+    ai_war_mult: 0.5
+    ruler_modifiers: { domain_limit: 8, knight_cap: -20 }
+    county_modifiers: { tax_mult: -0.15, levy_mult: 0.35, development_growth: 0.1 }
+
+  # Совет мастеров (цверги): правит лучший мастер народа, а не наследник.
+  # Подгорные крепости неприступны, рудники богаты.
+  master_council:
+    requires_feature: governments
+    icon: "🏛"
+    order: 4
+    succession: master_council_law
+    ruler_modifiers: { domain_limit: 5, build_cost_mult: -0.3, domain_fort: 2 }
+    county_modifiers: { tax_mult: 0.2 }
+
+succession_laws:
+  order_election:
+    requires_feature: governments
+    algorithm: elected_member
+    gender: male_only
+    government_only: yes
+  republic_election:
+    requires_feature: governments
+    algorithm: republic_election
+    gender: male_only
+    government_only: yes
+  master_council_law:
+    requires_feature: governments
+    algorithm: best_master
+    master_skill: stewardship
+    second_skill: learning
+    gender: equal
+    government_only: yes
+
+traits:
+  # Брат рыцарского ордена: обет безбрачия, служба мечом и молитвой.
+  order_brother:
+    requires_feature: governments
+    category: lifestyle
+    icon: "🛡"
+    celibate: yes
+    modifiers: { martial: 1, prowess: 2, monthly_piety: 0.2 }
+
+decisions:
+  # Агитация перед выборами схода: глава рода тратит серебро на угощения,
+  # подарки старостам и речи — на выборах за него проголосует больше графств.
+  campaign_for_assembly:
+    requires_feature: governments
+    icon: "⚖"
+    is_shown:
+      is_adult: yes
+      is_male: yes
+      OR:
+        - government: people_republic
+        - liege: { government: people_republic }
+    cost: { gold: 50 }
+    cooldown: { years: 1 }
+    effect:
+      - add_campaign: 3
+      - add_prestige: 10
+    ai_check_months: 12
+    ai_will_do:
+      value: 10
+      if:
+        - limit: { gold: ">= 150" }
+          add: 20
+        - limit: { has_trait: ambitious }
+          add: 20

@@ -111,10 +111,21 @@ static func _mortality_at(game: Game, age: int) -> float:
 
 
 static func monthly_death_chance(game: Game, c: Dictionary) -> float:
-	var age := Chars.age_of(game, c)
+	var age := effective_age(game, c)
 	var health := Stats.stat(game, c, "health")
 	var y = _yearly_mortality(game, age) * exp(-game.def_num("character.health_mortality_factor", 0.35) * (health - game.def_num("character.base_health", 5)))
 	return 1.0 - pow(1.0 - minf(0.95, y), 1.0 / 12.0)
+
+
+## Возраст для смертности и плодовитости: после совершеннолетия годы идут
+## медленнее у долгоживущих (lifespan_mult: 1 — вдвое дольше).
+static func effective_age(game: Game, c: Dictionary) -> int:
+	var age := Chars.age_of(game, c)
+	var adult := int(game.def_num("character.adult_age", 16))
+	if age <= adult:
+		return age
+	var m := Stats.cheap_stat(game, c, "lifespan_mult")
+	return age if m <= 0.0 else adult + floori((age - adult) / (1.0 + m))
 
 
 ## Помесячно для персонажа (в его день): болезни, смерть, совершеннолетие, дети.
@@ -162,7 +173,7 @@ static func _monthly_fertility(game: Game, mother: Dictionary) -> void:
 		if mother.pregnancy.due <= game.date:
 			_give_birth(game, mother)
 		return
-	var age := Chars.age_of(game, mother)
+	var age := effective_age(game, mother)
 	if age < game.def_num("character.min_fertile_age", 16) or age > game.def_num("character.max_fertile_age", 45):
 		return
 	var husband: Variant = null

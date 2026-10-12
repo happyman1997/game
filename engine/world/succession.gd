@@ -11,6 +11,11 @@ extends RefCounted
 
 
 static func law_of(game: Game, c: Dictionary) -> Variant:
+	# правление (или мод) может навязать закон: хук succession.law
+	for forced in game.engine.hooks.collect("succession.law", {"game": game, "character": c}):
+		var fl: Variant = game.content.get_def("succession_laws", str(forced))
+		if fl != null:
+			return fl
 	var id: Variant = c.succession_law
 	if id == null:
 		var cul: Variant = game.content.get_def("cultures", c.culture)
@@ -183,6 +188,12 @@ static func kill_character(game: Game, c: Dictionary, reason: String = "natural"
 	game.message(game.loc.t_or("death." + reason, game.loc.t("death.generic", {"who": nm}), {"who": nm}), "death", {"type": "character", "id": c.id}, [c.id, c.liege])
 	game.emit("character.death", {"character": c, "reason": reason, "killer": killer, "heir": heir.id if heir != null else null})
 
+	# правление (народная республика) может оставить игрока в его роду
+	if was_player:
+		for nxt in game.engine.hooks.collect("player.next_character", {"game": game, "character": c, "heir": heir}):
+			if game.is_alive(nxt):
+				heir = game.ch(nxt)
+				break
 	if was_player:
 		if heir != null:
 			game.state.player = heir.id

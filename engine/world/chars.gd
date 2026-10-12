@@ -240,7 +240,10 @@ static func can_marry(game: Game, a: Dictionary, b: Dictionary) -> bool:
 	var min_age = game.def_num("character.marriage_age", 16)
 	if age_of(game, a) < min_age or age_of(game, b) < min_age:
 		return false
-	return not is_too_close_to_marry(game, a, b)
+	if is_too_close_to_marry(game, a, b):
+		return false
+	# обеты, расы и прочие запреты механик и модов
+	return game.engine.hooks.veto("marriage.allowed", {"game": game, "a": a, "b": b})
 
 
 static func marry(game: Game, a: Dictionary, b: Dictionary) -> void:
