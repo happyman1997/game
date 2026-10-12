@@ -698,7 +698,7 @@ func modal(content: Control, opts: Dictionary = {}) -> Callable:
 	center.add_child(content)
 	modal_layer.add_child(root)
 	UiFx.pop_in(root, content)
-	UiSound.play(str(opts.get("sound", "open")))
+	UiSound.follow(str(opts.get("sound", "open")))
 	var entry := {"node": root, "closable": opts.get("closable", true), "on_close": opts.get("on_close", Callable())}
 	_modals.append(entry)
 	if entry.closable:
@@ -714,7 +714,7 @@ func _close_entry(entry: Dictionary) -> void:
 		return
 	_modals.erase(entry)
 	var node: Control = entry.node
-	UiSound.play("close")
+	UiSound.follow("close")
 	UiFx.pop_out(node, node.queue_free)
 	if entry.on_close is Callable and entry.on_close.is_valid():
 		entry.on_close.call()

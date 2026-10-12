@@ -65,7 +65,7 @@ static func open(app: App, on_close: Callable = Callable()) -> void:
 	vol.min_value = 0
 	vol.max_value = 100
 	vol.step = 5
-	vol.value = roundf(float(Platform.setting("ui_volume", 0.7)) * 100.0)
+	vol.value = roundf(float(Platform.setting("ui_volume", UiSound.DEFAULT_VOLUME)) * 100.0)
 	vol.custom_minimum_size = Vector2(220, 24)
 	vol.focus_mode = Control.FOCUS_NONE
 	vol.value_changed.connect(func(v):

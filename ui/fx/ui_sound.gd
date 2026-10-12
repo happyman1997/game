@@ -12,6 +12,7 @@ extends RefCounted
 const RATE := 44100
 const BUS := "UI"
 const POOL := 10
+const DEFAULT_VOLUME := 0.6
 
 static var _cache := {}
 static var _players: Array = []
@@ -20,7 +21,7 @@ static var _last_played := {}
 static var _last_any := -100000
 static var _rng := RandomNumberGenerator.new()
 ## Не чаще (мс) для одного и того же звука.
-const MIN_GAP := {"hover": 45, "war": 1500, "event": 400, "notify": 250, "notify_good": 250, "notify_bad": 250}
+const MIN_GAP := {"hover": 80, "war": 1500, "event": 400, "notify": 250, "notify_good": 250, "notify_bad": 250}
 
 
 ## Создать плееры и шину (вызывается один раз приложением).
@@ -31,7 +32,7 @@ static func setup(host: Node) -> void:
 		AudioServer.add_bus()
 		AudioServer.set_bus_name(AudioServer.bus_count - 1, BUS)
 		AudioServer.set_bus_send(AudioServer.bus_count - 1, "Master")
-	set_volume(float(Platform.setting("ui_volume", 0.7)))
+	set_volume(float(Platform.setting("ui_volume", DEFAULT_VOLUME)))
 	for i in POOL:
 		var p := AudioStreamPlayer.new()
 		p.bus = BUS
@@ -63,7 +64,7 @@ static func play(sound: String, pitch: float = 1.0, volume_db: float = 0.0) -> v
 	var p: AudioStreamPlayer = _players[_next]
 	_next = (_next + 1) % _players.size()
 	p.stream = stream
-	p.pitch_scale = pitch * _rng.randf_range(0.97, 1.03)
+	p.pitch_scale = pitch * _rng.randf_range(0.985, 1.015)
 	p.volume_db = volume_db
 	p.play()
 
@@ -72,6 +73,12 @@ static func play(sound: String, pitch: float = 1.0, volume_db: float = 0.0) -> v
 ## одного действия: щелчок по ссылке уже прозвучал — шелест окна не нужен).
 static func quiet_for(ms: int) -> bool:
 	return Time.get_ticks_msec() - _last_any >= ms
+
+
+## Звук-следствие (окно открылось, закрылось): если его вызвал щелчок,
+## прозвучавший только что, он идёт заметно тише и не спорит со щелчком.
+static func follow(sound: String) -> void:
+	play(sound, 1.0, 0.0 if quiet_for(150) else -7.0)
 
 
 ## Подготовить все звуки заранее (чтобы первый щелчок не запинался).
@@ -116,31 +123,33 @@ static func _to_wav(samples: PackedFloat32Array) -> AudioStreamWAV:
 
 static func _synth(sound: String) -> PackedFloat32Array:
 	_rng.seed = hash(sound)
+	# Всё приглушено и тепло (выше 2–3 кГц почти ничего нет), атаки мягкие,
+	# громкость задана «на слух» (_level): звук чувствуется, но не отвлекает.
 	match sound:
-		"hover": return _norm(_noise_burst(0.03, 2600.0, 6500.0, 0.002, 0.006), 0.10)
-		"click": return _norm(_mix([_thock(0.08, 260.0, 165.0, 0.018), _scale(_noise_burst(0.03, 1200.0, 4200.0, 0.001, 0.006), 0.45)]), 0.42)
-		"click_soft": return _norm(_mix([_thock(0.06, 430.0, 300.0, 0.012), _scale(_noise_burst(0.025, 2000.0, 6000.0, 0.001, 0.004), 0.35)]), 0.26)
-		"select": return _norm(_mix([_thock(0.07, 340.0, 250.0, 0.015), _scale(_paper(0.09, 900.0, 3000.0, 0.008, 0.025), 0.6)]), 0.28)
-		"click_gold": return _norm(_mix([_thock(0.09, 240.0, 160.0, 0.02), _scale(_noise_burst(0.03, 1200.0, 4200.0, 0.001, 0.006), 0.4),
-			_scale(_bell(0.25, 1760.0, [1.0, 1.5, 2.24], [0.07, 0.05, 0.03], [1.0, 0.5, 0.3]), 0.35)]), 0.45)
-		"tab": return _norm(_paper(0.13, 1200.0, 4500.0, 0.012, 0.035), 0.30)
-		"open": return _norm(_mix([_paper(0.28, 500.0, 3600.0, 0.05, 0.08), _scale(_thock(0.2, 110.0, 90.0, 0.08), 0.35)]), 0.32)
-		"close": return _norm(_paper(0.2, 3200.0, 500.0, 0.01, 0.06), 0.26)
-		"error": return _norm(_mix([_thock(0.15, 150.0, 105.0, 0.05), _scale(_thock(0.15, 450.0, 315.0, 0.03), 0.25)]), 0.38)
-		"pause": return _norm(_seq([[0.0, _thock(0.07, 330.0, 280.0, 0.02)], [0.06, _thock(0.08, 250.0, 210.0, 0.025)]]), 0.3)
-		"unpause": return _norm(_seq([[0.0, _thock(0.07, 250.0, 210.0, 0.02)], [0.06, _thock(0.08, 330.0, 280.0, 0.025)]]), 0.3)
-		"event": return _norm(_lowpass(_seq([
-			[0.0, _bell(1.7, 523.25, [1.0, 2.0, 2.76, 4.07], [1.3, 0.8, 0.5, 0.3], [1.0, 0.45, 0.3, 0.12])],
-			[0.16, _bell(1.5, 783.99, [1.0, 2.0, 2.76, 4.07], [1.1, 0.7, 0.45, 0.25], [0.8, 0.35, 0.22, 0.08])],
-		]), 5200.0), 0.36)
-		"notify": return _norm(_pluck(0.6, 587.33, 0.996), 0.26)
-		"notify_good": return _norm(_seq([[0.0, _pluck(0.5, 659.25, 0.996)], [0.09, _pluck(0.6, 987.77, 0.996)]]), 0.3)
-		"notify_bad": return _norm(_seq([[0.0, _pluck(0.55, 293.66, 0.995)], [0.12, _pluck(0.7, 233.08, 0.995)]]), 0.32)
-		"coin": return _norm(_seq([
-			[0.0, _bell(0.3, 2093.0, [1.0, 1.5, 2.0, 2.52], [0.12, 0.09, 0.07, 0.05], [1.0, 0.6, 0.4, 0.3])],
-			[0.07, _bell(0.3, 2349.0, [1.0, 1.5, 2.0, 2.52], [0.1, 0.08, 0.06, 0.04], [0.8, 0.5, 0.35, 0.25])],
-		]), 0.3)
-		"war": return _norm(_seq([[0.0, _drum(0.6, 1.0)], [0.24, _drum(0.6, 0.75)], [0.48, _drum(0.7, 1.0)]]), 0.55)
+		"hover": return _level(_warm(_noise_burst(0.025, 900.0, 2400.0, 0.004, 0.006), 2600.0), 0.007)
+		"click": return _level(_warm(_mix([_thock(0.07, 340.0, 250.0, 0.015), _scale(_noise_burst(0.025, 500.0, 2200.0, 0.003, 0.006), 0.35)]), 3000.0), 0.065)
+		"click_soft": return _level(_warm(_mix([_thock(0.05, 460.0, 360.0, 0.01), _scale(_noise_burst(0.02, 700.0, 2600.0, 0.003, 0.004), 0.3)]), 3200.0), 0.04)
+		"select": return _level(_warm(_mix([_thock(0.07, 380.0, 290.0, 0.013), _scale(_paper(0.08, 600.0, 1800.0, 0.01, 0.025), 0.45)]), 2800.0), 0.05)
+		"click_gold": return _level(_warm(_mix([_thock(0.08, 300.0, 220.0, 0.017), _scale(_noise_burst(0.025, 500.0, 2200.0, 0.003, 0.006), 0.3),
+			_scale(_bell(0.45, 1046.5, [1.0, 2.0, 3.0], [0.13, 0.07, 0.04], [1.0, 0.22, 0.06], 0.006), 0.22)]), 3200.0), 0.075)
+		"tab": return _level(_warm(_paper(0.12, 700.0, 2000.0, 0.02, 0.035), 2400.0), 0.035)
+		"open": return _level(_warm(_mix([_paper(0.26, 350.0, 1800.0, 0.06, 0.08), _scale(_thock(0.2, 180.0, 150.0, 0.06, 0.02), 0.3)]), 2200.0), 0.055)
+		"close": return _level(_warm(_paper(0.2, 1800.0, 350.0, 0.015, 0.06), 2000.0), 0.035)
+		"error": return _level(_warm(_seq([[0.0, _thock(0.12, 230.0, 190.0, 0.035, 0.006)], [0.09, _thock(0.12, 195.0, 160.0, 0.035, 0.006)]]), 1800.0), 0.07)
+		"pause": return _level(_warm(_seq([[0.0, _thock(0.07, 300.0, 260.0, 0.02)], [0.07, _thock(0.08, 230.0, 200.0, 0.025)]]), 2000.0), 0.045)
+		"unpause": return _level(_warm(_seq([[0.0, _thock(0.07, 230.0, 200.0, 0.02)], [0.07, _thock(0.08, 300.0, 260.0, 0.025)]]), 2000.0), 0.045)
+		"event": return _level(_warm(_seq([
+			[0.0, _bell(1.6, 523.25, [1.0, 2.0, 3.0], [1.0, 0.5, 0.25], [1.0, 0.22, 0.06], 0.012)],
+			[0.18, _bell(1.4, 783.99, [1.0, 2.0, 3.0], [0.9, 0.45, 0.2], [0.7, 0.15, 0.04], 0.012)],
+		]), 2400.0), 0.07)
+		"notify": return _level(_warm(_pluck(0.55, 440.0, 0.995), 2200.0), 0.04)
+		"notify_good": return _level(_warm(_seq([[0.0, _pluck(0.5, 523.25, 0.995)], [0.1, _pluck(0.6, 783.99, 0.995)]]), 2200.0), 0.045)
+		"notify_bad": return _level(_warm(_seq([[0.0, _pluck(0.55, 329.63, 0.994)], [0.13, _pluck(0.7, 261.63, 0.994)]]), 1800.0), 0.045)
+		"coin": return _level(_warm(_seq([
+			[0.0, _bell(0.35, 1318.5, [1.0, 2.0, 2.52], [0.14, 0.08, 0.05], [1.0, 0.3, 0.15], 0.004)],
+			[0.08, _bell(0.35, 1568.0, [1.0, 2.0, 2.52], [0.12, 0.07, 0.04], [0.8, 0.25, 0.12], 0.004)],
+		]), 3500.0), 0.04)
+		"war": return _level(_warm(_seq([[0.0, _drum(0.6, 1.0)], [0.26, _drum(0.6, 0.7)], [0.52, _drum(0.7, 0.9)]]), 1400.0), 0.1)
 	return PackedFloat32Array()
 
 
@@ -148,20 +157,37 @@ static func _n(dur: float) -> int:
 	return int(dur * RATE)
 
 
-static func _norm(s: PackedFloat32Array, peak: float) -> PackedFloat32Array:
+## Громкость «на слух»: наибольшая rms в окне 20 мс равна loud.
+static func _level(s: PackedFloat32Array, loud: float) -> PackedFloat32Array:
+	var win := RATE / 50
 	var m := 0.0
-	for x in s:
-		m = maxf(m, absf(x))
+	var i0 := 0
+	while i0 < s.size():
+		var e := 0.0
+		for i in range(i0, mini(i0 + win, s.size())):
+			e += s[i] * s[i]
+		m = maxf(m, sqrt(e / win))
+		i0 += win / 2
 	if m <= 0.0:
 		return s
-	var k := peak / m
+	var k := loud / m
 	for i in s.size():
 		s[i] *= k
-	# мягкие края — без щелчков в начале и конце
+	return _norm_edges(s)
+
+
+## Мягкие края — без щелчков в начале и конце.
+static func _norm_edges(s: PackedFloat32Array) -> PackedFloat32Array:
 	var fade := mini(64, s.size() / 4)
 	for i in fade:
+		s[i] *= float(i) / fade
 		s[s.size() - 1 - i] *= float(i) / fade
 	return s
+
+
+## Тёплый тембр: двойной фильтр нижних частот (12 дБ на октаву).
+static func _warm(s: PackedFloat32Array, fc: float) -> PackedFloat32Array:
+	return _lowpass(_lowpass(s, fc), fc)
 
 
 static func _scale(s: PackedFloat32Array, k: float) -> PackedFloat32Array:
@@ -253,7 +279,7 @@ static func _paper(dur: float, f_from: float, f_to: float, attack: float, tau: f
 
 
 ## Глухой удар дерева: синус с падающей высотой и быстрым затуханием.
-static func _thock(dur: float, f_from: float, f_to: float, tau: float) -> PackedFloat32Array:
+static func _thock(dur: float, f_from: float, f_to: float, tau: float, attack: float = 0.004) -> PackedFloat32Array:
 	var n := _n(dur)
 	var out := PackedFloat32Array()
 	out.resize(n)
@@ -262,13 +288,13 @@ static func _thock(dur: float, f_from: float, f_to: float, tau: float) -> Packed
 		var t := float(i) / RATE
 		var f := f_to + (f_from - f_to) * exp(-t / (tau * 0.7))
 		ph += TAU * f / RATE
-		var env := minf(1.0, t / 0.0015) * exp(-t / tau)
-		out[i] = (sin(ph) + 0.18 * sin(ph * 2.0)) * env
+		var env := minf(1.0, t / attack) * exp(-t / tau)
+		out[i] = (sin(ph) + 0.12 * sin(ph * 2.0)) * env
 	return out
 
 
 ## Колокол: набор частичных тонов, у каждого своё затухание.
-static func _bell(dur: float, f: float, ratios: Array, taus: Array, amps: Array) -> PackedFloat32Array:
+static func _bell(dur: float, f: float, ratios: Array, taus: Array, amps: Array, attack: float = 0.003) -> PackedFloat32Array:
 	var n := _n(dur)
 	var out := PackedFloat32Array()
 	out.resize(n)
@@ -279,7 +305,7 @@ static func _bell(dur: float, f: float, ratios: Array, taus: Array, amps: Array)
 		var w := TAU * fk / RATE
 		for i in n:
 			var t := float(i) / RATE
-			out[i] += sin(w * i) * amp * exp(-t / tau) * minf(1.0, t / 0.003)
+			out[i] += sin(w * i) * amp * exp(-t / tau) * minf(1.0, t / attack)
 	return out
 
 
@@ -292,7 +318,7 @@ static func _pluck(dur: float, f: float, damp: float) -> PackedFloat32Array:
 	# мягкий начальный шум — тёплый тембр
 	var y := 0.0
 	for i in period:
-		y += 0.5 * (_rng.randf_range(-1.0, 1.0) - y)
+		y += 0.3 * (_rng.randf_range(-1.0, 1.0) - y)
 		buf[i] = y
 	var out := PackedFloat32Array()
 	out.resize(n)
@@ -306,6 +332,6 @@ static func _pluck(dur: float, f: float, damp: float) -> PackedFloat32Array:
 
 ## Удар барабана: низкий тон с падающей высотой и шум кожи.
 static func _drum(dur: float, amp: float) -> PackedFloat32Array:
-	var body := _thock(dur, 95.0, 52.0, 0.2)
-	var skin := _lowpass(_noise_burst(dur, 40.0, 900.0, 0.001, 0.04), 600.0)
-	return _scale(_mix([body, _scale(skin, 0.6)]), amp)
+	var body := _thock(dur, 90.0, 52.0, 0.2, 0.008)
+	var skin := _lowpass(_noise_burst(dur, 120.0, 1400.0, 0.002, 0.035), 1000.0)
+	return _scale(_mix([body, _scale(skin, 0.9)]), amp)

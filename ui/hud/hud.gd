@@ -605,7 +605,7 @@ func _refresh_window(full: bool = true) -> void:
 		# окно уезжает влево и гаснет
 		if window.visible and not _window_closing:
 			_window_closing = true
-			UiSound.play("close")
+			UiSound.follow("close")
 			UiFx.slide_out(window, func():
 				window.visible = false
 				_window_closing = false)
@@ -616,7 +616,7 @@ func _refresh_window(full: bool = true) -> void:
 	if not window.visible or _window_closing:
 		_window_closing = false
 		window.visible = true
-		UiSound.play("open")
+		UiSound.follow("open")
 		UiFx.slide_in(window)
 	elif key != _window_key and _window_key != "":
 		# другое окно или вкладка — шелест страницы (если щелчок не прозвучал

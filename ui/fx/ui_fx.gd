@@ -77,7 +77,8 @@ static func _hover(b: BaseButton, on: bool) -> void:
 	if _round(b):
 		b.pivot_offset = b.size / 2.0
 		tw.tween_property(b, "scale", Vector2(1.08, 1.08) if on else Vector2.ONE, 0.14 if on else 0.2)
-	if on and Time.get_ticks_msec() - _last_motion < 150:
+	# ссылки в тексте наведением не звучат — их слишком много в списках
+	if on and Time.get_ticks_msec() - _last_motion < 150 and b.theme_type_variation != &"LinkText":
 		UiSound.play("hover")
 
 
