@@ -1,0 +1,172 @@
+# Iron and Flesh.
+body_part:
+  head: Head
+  eyes: Eyes
+  heart: Heart
+  skin: Skin
+  arms: Arms
+  mouth: Mouth
+  blood: Blood
+  sinews: Sinews
+  bones: Bones
+  legs: Legs
+
+graft:
+  trepan_plate: Skull Plate
+  lead_seal: Lead Seal
+  skull_runes: Skull Runes
+  rune_of_tyr: Rune of Tyr
+  wisdom_stone: Stone of Wisdom
+  glass_eye: Glass Eye
+  crystal_eye: Crystal Eye
+  ruby_eye: Ruby Eye
+  raven_eye: Raven's Eye
+  gold_teeth: Gold Teeth
+  iron_jaw: Iron Jaw
+  silver_tongue: Silver Tongue
+  relic_heart: Reliquary by the Heart
+  lion_heart: Lion's Heart
+  star_iron_heart: Star-Iron Heart
+  galen_humors: Humours after Galen
+  theriac: Theriac
+  quicksilver: Quicksilver Veins
+  dragon_blood: Dragon's Blood
+  gut_tendons: Gut-String Tendons
+  wire_sinews: Wire Sinews
+  stag_sinews: Stag Sinews
+  rune_tattoos: Rune Tattoos
+  saint_relic: Relic beneath the Skin
+  shadow_ink: Shadow Ink
+  dragon_scales: Dragon Scales
+  iron_splints: Iron Splints
+  silver_ribs: Silver Ribs
+  giant_bones: Giant's Bones
+  hook_hand: Hook Hand
+  iron_hand: Iron Hand
+  blade_arm: Blade Arm
+  clockwork_arm: Clockwork Arm
+  peg_leg: Peg Leg
+  iron_leg: Iron Leg
+  stag_legs: Stag Legs
+graft_desc:
+  trepan_plate: "The barber opened the skull, let out the foul vapours and closed the hole with a silver plate. A clearer head, a sounder sleep."
+  lead_seal: "A lead seal beneath the skin of the brow. They say with it you never lose count of a tithe."
+  skull_runes: "A northern master burned signs into the bone that hide thoughts from prying eyes."
+  rune_of_tyr: "The war god's sign on the crown of the head. Hosts heed its bearer like a trumpet."
+  wisdom_stone: "A stone from the heart of a fallen star beneath the brow. Its bearer thinks for three — and sleeps ever worse."
+  glass_eye: "Venetian glass in place of a lost eye. From afar no one can tell."
+  crystal_eye: "Rock crystal that sees a liar's hand tremble."
+  ruby_eye: "A crimson eye that catches the candlelight. The court cannot look away — and is afraid."
+  raven_eye: "A raven's black eye, set by a cunning woman. It sees through smoke, and through smiles."
+  gold_teeth: "Teeth of red gold. A smile like a treasury on display."
+  iron_jaw: "A jaw forged by a smith. An iron grin no enemy enjoys."
+  silver_tongue: "A silver leaf beneath the tongue: words flow like honey."
+  relic_heart: "A tiny reliquary sewn by the heart. Prayer comes easier, worry recedes."
+  lion_heart: "A lion's heart stitched to your own. In battle it beats twice as fast."
+  star_iron_heart: "A heart bound in star-iron. It cannot be pierced at the first blow — nor warmed."
+  galen_humors: "Bloodletting and herbs after Galen: the humours in balance."
+  theriac: "Theriac of seventy herbs and viper flesh. Poison in the cup is far less frightening."
+  quicksilver: "Quicksilver in the blood: a quicker hand, a lighter step. Not for long, the alchemists say."
+  dragon_blood: "Dark blood in a phial from the East. Wounds close by morning."
+  gut_tendons: "Tendons strengthened with lute strings. Harder blows, longer runs."
+  wire_sinews: "Fine wire woven into the sinews. The hand grips a sword like pincers."
+  stag_sinews: "A stag's sinews. A marching pace that outstrips the baggage train."
+  rune_tattoos: "Blue runes woven across the shoulders. Arrows, they say, turn aside."
+  saint_relic: "A fragment of a saint beneath the skin of the chest. Prayers are louder, slanders quieter."
+  shadow_ink: "Ink of cuttlefish and ash, driven in with a needle. In shadow its bearer cannot be seen."
+  dragon_scales: "Scales sewn beneath the skin of the shoulders. A sword glances off as from armour."
+  iron_splints: "Broken bones clasped with iron splints. They knit stronger than before."
+  silver_ribs: "Silver plates along the ribs. No spear reaches the heart."
+  giant_bones: "Bones from a giants' barrow woven into yours. Taller, heavier, more fearsome."
+  hook_hand: "A plain iron hook for a lost hand. Crude but reliable."
+  iron_hand: "A gauntleted hand on straps and rivets. It grips the hilt and never tires."
+  blade_arm: "A blade in place of a forearm. The court flinches when you gesture."
+  clockwork_arm: "An arm of gears and springs by a Nuremberg master. Fingers finer than a quill."
+  peg_leg: "An oaken leg. It knocks on the flagstones, but it holds."
+  iron_leg: "A forged leg on a hinge. In the saddle no worse than the old one."
+  stag_legs: "Legs of stag sinew and iron hinges. A stride that outpaces a horse."
+
+trait:
+  iron_possession: Possession
+trait_desc:
+  iron_possession: "There is more iron than soul now. At night a whisper rises from the metal, rage comes without cause and pity leaves — the court crosses itself and whispers of demons."
+
+opinion_modifier:
+  graft_rampage: Harmed by the possessed
+
+stat:
+  soul: Soul
+stress_src:
+  grafts: Iron in the flesh
+
+grafts:
+  ui_title: Anatomy of Grafts
+  ui_subtitle: "A leaf from a physician's treatise. Patient: {name}"
+  ui_work: "{part} · {work}"
+  tier_1: crude work
+  tier_2: sound work
+  tier_3: skilled work
+  tier_4: masterwork
+  tier_5: wondrous work
+  ui_cures: "Replaces a lost arm or leg (cures maimed)"
+  ui_soul_cost: "Burdens the soul: −{n}"
+  ui_effects: "Effects of grafts ({n})"
+  ui_no_grafts: The flesh is whole — not a drop of iron
+  ui_workshop: Barber-Surgeon's Workshop
+  ui_workshop_info: "Risk of complications: {risk}% (learning lowers it) · soul: {soul} · gold: {gold}"
+  ui_empty: "Free place: {part}"
+  ui_click_install: Click to call the barber-surgeon
+  ui_soul: Soul
+  ui_soul_tip: "Every graft burdens the soul. Below {t} — torment and stress each month, below {p} — risk of possession. The calm, compassionate and zealous endure more, the wrathful and callous less."
+  ui_soul_parts: "Base {base}, traits {traits}, burdened by grafts {used}"
+  ui_installed_on: "Grafted: {date}"
+  ui_remove: "Remove ({n} gold)"
+  ui_all: Whole body
+  ui_install: Graft
+  ui_exorcism: "Call an exorcist ({n} gold)"
+  ui_exorcism_tip: "A priest prays over the possessed for three days and three nights. The possession leaves and piety grows — but so does stress. If much iron remains in the body, the demons will return."
+  status_whole: Soul whole
+  status_troubled: Troubled
+  status_brink: On the brink
+  status_possessed: Possessed
+  err_unknown: No such graft
+  err_have: Already grafted
+  err_full: "No free place: {part}"
+  err_gold: "Needs {n} gold"
+  err_soul: The soul would not bear it
+  err_child: Too young for surgery
+  msg_installed: "The barber-surgeon is done: “{name}” is in place."
+  msg_installed_bad: "“{name}” is in place, but the surgery went hard — you are wounded."
+  msg_recovered: "The whisper of iron fell silent: the possession has receded."
+  msg_possessed: "{who}: possessed! There is more iron than soul."
+  msg_possessed_own: "Possession. You are no longer sure where the iron ends and you begin."
+  opinion_iron: Iron in the flesh
+  tr_has_any: Has grafts
+  tr_has_any.not: Has no grafts
+  tr_has: "Grafted: {value}"
+  fx_install: "{who}: grafted “{value}”"
+  fx_remove: "{who}: removed “{value}”"
+  fx_remove_random: "{who} loses one of their grafts"
+  alert_troubled: "Soul {n}: the iron weighs heavy"
+  alert_brink: "Soul {n}: on the brink of possession!"
+  alert_possessed: "Possessed! Soul {n}"
+
+ev:
+  graft.0001:
+    t: A Barber at the Gates
+    desc: "The guards bring a wandering barber-surgeon. Tongs, saws and phials clink in his chest, and a string of gold teeth hangs at his belt. “From the star that fell in the year of the comet, my lord,” he whispers. “Let your smile shine like a king's. Almost for nothing.”"
+    a: Let him set gold teeth (−30 gold)
+    b: Send him away
+    c: Burn the sorcerer
+  graft.0002:
+    t: The Whisper of Iron
+    desc: "The candles gutter, the voices of the court sound like grinding. The iron in your body whispers and demands action — any action. [scope:victim] stands too close."
+    a: Lock myself in the chapel till dawn
+    b: Give the rage free rein
+    c: Tear the iron from the flesh
+  graft.0003:
+    t: The Church Condemns Iron Men
+    desc: "From the pulpit the bishop curses the “iron men”, and the faithful glance at your hands. Star-iron, they say, is of the Evil One, and whoever grafts it into himself has sold a piece of his soul."
+    a: Repent and pay the Church (−80 gold)
+    b: Call an exorcist (−100 gold)
+    c: Let them grumble

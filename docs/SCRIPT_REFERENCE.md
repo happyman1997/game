@@ -45,12 +45,12 @@
 | `has_flag` | character | Есть флаг | core |
 | `has_focus` | character | Выбран фокус образа жизни | core/lifestyles |
 | `has_global_flag` | любой | Есть глобальный флаг | core |
+| `has_graft` | character | Есть вживление (yes/no или id): has_graft: iron_hand | grafts |
 | `has_guardian` | character | У ребёнка есть опекун | core/upbringing |
 | `has_holder_culture` | province | Графство одной культуры с владельцем | core/lands |
 | `has_holder_faith` | province | Графство одной веры с владельцем | core/lands |
 | `has_holding` | province | Есть владение типа | core |
 | `has_hook_on` | character | Есть крюк на персонажа | core |
-| `has_implant` | character | Есть имплант (yes/no или id): has_implant: cyberdeck | cyberware |
 | `has_imprisonment_reason` | character | Есть законный повод заключить персонажа (преступление против этого персонажа) | core/prison |
 | `has_known_trait` | character | Есть черта, известная всем (не скрытая или разоблачённая) | core |
 | `has_lifestyle` | character | Текущий фокус принадлежит образу жизни | core/lifestyles |
@@ -233,7 +233,7 @@
 | `hunt_dragon` | Выйти на бой с ближайшим драконом | arcana |
 | `hunt_monsters` | Выследить чудовище в державе: найденная тайна раскрывается | arcana |
 | `imprison` | Заключить персонажа в свою темницу: imprison: scope:x или { target, reason } | core/prison |
-| `install_implant` | Вживить имплант бесплатно: install_implant: hawk_optics | cyberware |
+| `install_graft` | Вживить бесплатно: install_graft: glass_eye | grafts |
 | `join_faction` | Вступить во фракцию против сюзерена (или создать): join_faction: <тип> | core/factions |
 | `learn_secret` | Узнать тайну персонажа (тип — необязателен): learn_secret: { owner: scope:x, type: secret_embezzler } | core/secrets |
 | `leave_faction` | Выйти из фракции | core/factions |
@@ -255,9 +255,9 @@
 | `remove_flag` | Убрать флаг | core |
 | `remove_from_council` | Советник лишается места в совете сюзерена | core/politics |
 | `remove_global_flag` | Убрать глобальный флаг | core |
+| `remove_graft` | Извлечь вживление: remove_graft: <id> \| random | grafts |
 | `remove_guardian` | Отстранить опекуна ребёнка: remove_guardian: yes | core/upbringing |
 | `remove_hook` | Убрать крюк | core |
-| `remove_implant` | Извлечь имплант: remove_implant: <id> \| random | cyberware |
 | `remove_modifier` | Убрать модификатор | core |
 | `remove_opinion` | Убрать модификатор мнения: { target, modifier } | core |
 | `remove_perk` | Убрать перк | core/lifestyles |
@@ -373,7 +373,6 @@
 | `gold` | character | Золото | core |
 | `guardian_skill` | character | Навык персонажа в направлении воспитания ребёнка: guardian_skill(scope:recipient) | core/upbringing |
 | `health` | character | Здоровье | core |
-| `humanity` | character | Оставшаяся человечность | cyberware |
 | `income` | character | Ежемесячный доход | core |
 | `infected_provinces` | любой | Число заражённых провинций в мире. | plague |
 | `intrigue` | character | Навык: intrigue | core |
@@ -403,9 +402,9 @@
 | `num_faction_members` | faction | Число членов фракции | core/factions |
 | `num_foreign_culture_counties` | character | Графств домена чужой культуры | core/lands |
 | `num_foreign_faith_counties` | character | Графств домена чужой веры | core/lands |
+| `num_grafts` | character | Число вживлений | grafts |
 | `num_holdings` | province | Число владений | core |
 | `num_hooks` | character | Число крюков персонажа на других | core |
-| `num_implants` | character | Число имплантов | cyberware |
 | `num_knights` | character | Число рыцарей | core/knights |
 | `num_known_secrets` | character | Сколько чужих секретов знает персонаж | core/secrets |
 | `num_low_control_counties` | character | Графств домена с низким контролем (ниже defines.populace.low_control) | core/populace |
@@ -441,6 +440,7 @@
 | `scheme_progress` | scheme | Прогресс интриги | core |
 | `secret_passages` | character | Характеристика: secret_passages | core |
 | `sorcery` | character | Навык: sorcery | core |
+| `soul` | character | Сколько души осталось (вживления её отягощают) | grafts |
 | `stewardship` | character | Навык: stewardship | core |
 | `stress` | character | Стресс | core |
 | `stress_level` | character | Уровень стресса (стресс / 100) | core |
@@ -595,9 +595,9 @@
 - **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `faction`, `artifact_holder`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`, `own_artifacts`, `claimed_artifacts`
 - **interaction_deciders**: `payer`
-- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `cyberware`, `plague_fear`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `grafts`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `arcana_faith`, `cyberware`
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `arcana_faith`, `grafts`
 - **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`
-- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `cyberware` (66), `ai` (70), `development` (80), `laws` (85)
+- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

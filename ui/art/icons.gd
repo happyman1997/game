@@ -132,7 +132,6 @@ static func texture(name: String, size: int = 24, tint: String = "gold") -> Text
 	var cols: Array = {
 		"gold": ["#f6dea0", "#b0843a"], "silver": ["#f2f2ee", "#9a9a94"], "red": ["#f08a7a", "#9a2a20"],
 		"green": ["#bfe8a0", "#4a8a30"], "blue": ["#a8c8f0", "#3a5a9a"], "ink": ["#5a4020", "#2a1a08"],
-		"neon": ["#d8fdff", "#22b8d6"], "neon_red": ["#ffc0d0", "#e0285a"], "neon_dim": ["#3a6a78", "#1a3a48"],
 	}.get(tint, ["#f6dea0", "#b0843a"])
 	var img := Image.new()
 	# Рисуем вдвое крупнее и уменьшаем — так мелкие иконки чётче.

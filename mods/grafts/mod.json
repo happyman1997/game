@@ -1,0 +1,13 @@
+{
+  "id": "grafts",
+  "name": { "ru": "Железо и плоть", "en": "Iron and Flesh" },
+  "version": "1.0.0",
+  "author": "Корона и Династия",
+  "description": {
+    "ru": "Хвостатая звезда 1066 года рассыпала по земле звёздное железо, и цирюльники-хирурги научились вживлять его в людей. Железная рука взамен отрубленной, деревянная нога, серебряная пластина в черепе, стеклянный глаз, золотые зубы, руны на коже, драконья кровь и терьяк в жилах. Каждое вживление отягощает душу: кто зайдёт слишком далеко — станет одержимым, и звать придётся уже экзорциста. Церковь косится на железных людей. Свой экран — анатомический лист из лекарского трактата.",
+    "en": "The comet of 1066 scattered star-iron across the land, and barber-surgeons learned to graft it into people. An iron hand for a severed one, a wooden leg, a silver plate in the skull, a glass eye, gold teeth, runes on the skin, dragon's blood and theriac in the veins. Every graft weighs on the soul: go too far and you become possessed — and then it is an exorcist you must send for. The Church eyes iron men warily. Comes with its own screen — an anatomical leaf from a physician's treatise."
+  },
+  "dependencies": ["core"],
+  "scripts": ["scripts/main.gd"],
+  "tags": ["mechanics", "ui", "events", "fantasy"]
+}
