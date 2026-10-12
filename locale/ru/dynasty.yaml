@@ -1,0 +1,131 @@
+# Воспитание, регентство и династия: строки движка и интерфейса.
+ui:
+  tab:
+    dynasty: Династия
+  dtab:
+    legacies: Наследия
+    members: Род и дома
+  upbringing: Воспитание
+  childhood_trait: Детская черта
+  childhood_none: "Детская черта появится к {n} годам"
+  education_focus: Направление воспитания
+  education_focus_tip: "Чему учить ребёнка. Склонность детской черты ускоряет учение."
+  aptitude: склонность
+  guardian: Опекун
+  no_guardian: Опекуна нет — учение идёт вдвое медленнее
+  choose_guardian: Выберите опекуна (навык в направлении воспитания)
+  pick_guardian: Назначить опекуна
+  change_guardian: Сменить опекуна
+  expected_education: Ожидаемое образование
+  education_progress: "Очки воспитания: {n} (+{gain} в месяц)"
+  education_levels: "Пороги уровней: {list}"
+  too_young_for_education: "Воспитание начнётся в {n} лет"
+  wards: Воспитанники
+  regent: Регент
+  regency: Регентство
+  no_regent: Регента нет — вассалы недовольны
+  appoint_regent: Назначить регента
+  regent_ambition: Честолюбие регента
+  regent_ambitious: "Честолюбив — может запустить руку в казну"
+  regent_loyal: "Верен правителю"
+  regent_tip: "Пока правитель не вырос, державой правит регент. Его дипломатия, управление и воинское дело дают мнение вассалов, налог и ополчение."
+  dynasty_renown: Известность
+  dynasty_renown_tip: "Известность рода копится от престижа его членов, их титулов и деяний. Глава рода тратит её на наследия и родовые дела."
+  dynasty_renown_n: "Известность: {n}"
+  dynasty_total_n: "Накоплено за всё время: {n}"
+  dynasty_level: Слава рода
+  dynasty_next_level: "До уровня «{name}»: ещё {n}"
+  dynasty_head: Глава рода
+  house_head: Глава дома
+  house_n: "Дом {name}"
+  cadet_of: "Младшая ветвь рода {name}"
+  dynasty_houses: Дома рода
+  dynasty_members_title: Члены рода
+  dynasty_rulers: Правители рода
+  open_dynasty: Открыть окно рода
+  legacies: Наследия
+  legacy_cost: "Цена: {n} известности"
+  legacy_unlock: Открыть
+  legacy_owned: Уже открыто
+  legacy_only_head: Наследия открывает только глава рода
+  legacy_needs: "Сначала откройте «{name}»"
+  legacy_need_renown: "Нужно {n} известности"
+  legacy_unknown: Нет такого наследия
+  legacy_effects: Что даёт
+  need_renown_100: Нужно 100 известности рода
+  need_renown_50: Нужно 50 известности рода
+  disinherited: Лишён наследства
+  lowborn_no_dynasty: Безродный — у него нет династии
+alert:
+  legacy_available: "Род может открыть наследие (известность: {n})"
+  child_no_guardian: "Детям нужен опекун: {list}"
+msg:
+  became_guardian: "Вам доверили воспитание: {who}."
+  guardian_lost: "{who} лишился опекуна ({guardian})."
+  came_of_age: "{who} вырос: {trait}."
+  regent_appointed: "Регентом державы стал {who}."
+  became_dynasty_head: "Вы — глава рода {name}."
+  legacy_unlocked: "Род открыл наследие: {name}."
+modsrc:
+  regency: "Регент: {name}"
+  no_regent: Нет регента
+  dynasty_level: "Слава рода: {name}"
+  dynasty_legacies: Наследия рода
+  dynasty_head: Глава рода
+opinion:
+  my_guardian_now: Опекун
+  my_ward_now: Воспитанник
+  dynasty_head: Глава рода
+  dynasty_kin: Родная кровь
+stat:
+  education_gain_mult: Скорость воспитания
+upbringing:
+  gain:
+    base: Основа
+    no_guardian: Нет опекуна
+    guardian: "Опекун: {name}"
+    aptitude: Склонность
+    own: Собственный навык
+    mult: Наследия и черты
+dynasty_level:
+  "0": Безвестный род
+  "1": Известный род
+  "2": Знатный род
+  "3": Славный род
+  "4": Великий род
+  "5": Легендарный род
+tr:
+  has_guardian: Есть опекун
+  has_guardian.not: Нет опекуна
+  is_guardian_of: "Опекун: {who}"
+  can_be_guardian_of: Может стать опекуном
+  in_education: Учится у опекуна (детство)
+  in_education.not: Не в возрасте воспитания
+  education_focus: "Направление воспитания: {value}"
+  can_manage_upbringing: Распоряжается воспитанием ребёнка
+  has_regent: Правит регент
+  has_regent.not: Регента нет
+  is_regent: Регент
+  is_regent.not: Не регент
+  can_be_regent_of: Может стать регентом
+  is_dynasty_head: Глава рода
+  is_dynasty_head.not: Не глава рода
+  is_house_head: Глава своего дома
+  is_house_head.not: Не глава своего дома
+  is_dynasty_head_of: "Глава рода, к которому принадлежит {who}"
+  is_disinherited: Лишён наследства
+  is_disinherited.not: Не лишён наследства
+  has_dynasty_legacy: "Род открыл наследие «{value}»"
+  is_cadet_house: Из младшей ветви рода
+  is_cadet_house.not: Из старшей линии рода
+fx:
+  set_guardian: "{who} — опекун ({child})"
+  remove_guardian: "{child} лишается опекуна"
+  set_education_focus: "Направление воспитания: {value}"
+  add_education_points: "{child}: очки воспитания {value}"
+  set_regent: "{who} становится регентом"
+  spend_dynasty_renown: "−{value} известности рода"
+  disinherit: "{who} лишается наследства"
+  disinherit.not: "{who} восстановлен в правах наследника"
+  found_cadet_house: "{who} основывает младшую ветвь рода — свой дом и герб"
+  unlock_dynasty_legacy: "Род открывает наследие «{value}»"

@@ -59,7 +59,7 @@ static func rich(bbcode: String, wrap: bool = true, variation: String = "") -> R
 	return r
 
 
-## Ссылки в BBCode: [url=char:ID], [url=title:ID], [url=prov:ID], [url=tab:ID].
+## Ссылки в BBCode: [url=char:ID], [url=title:ID], [url=prov:ID], [url=tab:ID], [url=dyn:ID].
 static func _on_meta(meta: Variant) -> void:
 	var s := str(meta)
 	var app: Variant = App.instance
@@ -75,6 +75,7 @@ static func _on_meta(meta: Variant) -> void:
 		"title": app.open_title(id)
 		"prov": app.open_province(id, true)
 		"tab": app.open_tab(id)
+		"dyn": app.open_panel({"kind": "dynasty", "id": id})
 
 
 static func hbox(children: Array = [], sep: int = -1, align: int = BoxContainer.ALIGNMENT_BEGIN) -> HBoxContainer:

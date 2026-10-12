@@ -32,6 +32,8 @@ static func open(app: App, def: Dictionary, actor_id: String, recipient_id: Stri
 			for c in cands:
 				var acc := Interactions.acceptance(g, def, actor, recipient, {"secondary": c.id, "target": st.target})
 				var right: Array = []
+				if sa is Dictionary and sa.get("value") != null:
+					right.append(W.stat(str(sa.get("value_icon", "star")), K.fmt(Interactions.secondary_value(g, def, actor, recipient, c))))
 				if not acc.auto:
 					right.append(K.rich(BB.signed(acc.total), false))
 				var cid: String = c.id

@@ -20,6 +20,9 @@ static func build(app: App, ref: Dictionary) -> Dictionary:
 		"army":
 			title = app.t("ui.army")
 			body = MilitaryPanel.build_army(app, ref.id)
+		"dynasty":
+			title = app.t("ui.tab.dynasty")
+			body = DynastyPanel.build(app, ref.id)
 		"tab":
 			title = app.hud.tab_name(ref.id) if app.hud != null else ""
 			if g.player == null and ref.id != "pick":
@@ -31,6 +34,7 @@ static func build(app: App, ref: Dictionary) -> Dictionary:
 						body = TabPanels.pick(app)
 					"lifestyle": body = LifestylePanel.build(app)
 					"realm": body = TabPanels.realm(app)
+					"dynasty": body = DynastyPanel.build(app, g.player.dynasty)
 					"military": body = MilitaryPanel.build(app)
 					"wars": body = WarsPanel.build(app)
 					"intrigue": body = TabPanels.intrigue(app)

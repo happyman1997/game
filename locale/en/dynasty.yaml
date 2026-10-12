@@ -1,0 +1,131 @@
+# Upbringing, regency and dynasty: engine and interface strings.
+ui:
+  tab:
+    dynasty: Dynasty
+  dtab:
+    legacies: Legacies
+    members: Kin and Houses
+  upbringing: Upbringing
+  childhood_trait: Childhood Trait
+  childhood_none: "The childhood trait appears by age {n}"
+  education_focus: Education Focus
+  education_focus_tip: "What the child is taught. A matching childhood aptitude speeds up learning."
+  aptitude: aptitude
+  guardian: Guardian
+  no_guardian: No guardian — learning goes twice as slowly
+  choose_guardian: Choose a guardian (skill in the education focus)
+  pick_guardian: Assign Guardian
+  change_guardian: Change Guardian
+  expected_education: Expected Education
+  education_progress: "Education points: {n} (+{gain} per month)"
+  education_levels: "Level thresholds: {list}"
+  too_young_for_education: "Education starts at age {n}"
+  wards: Wards
+  regent: Regent
+  regency: Regency
+  no_regent: No regent — the vassals are uneasy
+  appoint_regent: Appoint Regent
+  regent_ambition: Regent's Ambition
+  regent_ambitious: "Ambitious — may dip into the treasury"
+  regent_loyal: "Loyal to the ruler"
+  regent_tip: "Until the ruler comes of age, a regent governs the realm. The regent's diplomacy, stewardship and martial skill shape vassal opinion, taxes and levies."
+  dynasty_renown: Renown
+  dynasty_renown_tip: "Dynasty renown grows from the prestige of its members, their titles and their deeds. The dynasty head spends it on legacies and family matters."
+  dynasty_renown_n: "Renown: {n}"
+  dynasty_total_n: "Earned in total: {n}"
+  dynasty_level: Dynasty Splendor
+  dynasty_next_level: "To «{name}»: {n} more"
+  dynasty_head: Dynasty Head
+  house_head: House Head
+  house_n: "House {name}"
+  cadet_of: "Cadet branch of the {name} dynasty"
+  dynasty_houses: Houses of the Dynasty
+  dynasty_members_title: Members
+  dynasty_rulers: Rulers of the Dynasty
+  open_dynasty: Open Dynasty
+  legacies: Legacies
+  legacy_cost: "Cost: {n} renown"
+  legacy_unlock: Unlock
+  legacy_owned: Already unlocked
+  legacy_only_head: Only the dynasty head can unlock legacies
+  legacy_needs: "Unlock «{name}» first"
+  legacy_need_renown: "Requires {n} renown"
+  legacy_unknown: No such legacy
+  legacy_effects: Effects
+  need_renown_100: Requires 100 dynasty renown
+  need_renown_50: Requires 50 dynasty renown
+  disinherited: Disinherited
+  lowborn_no_dynasty: Lowborn — no dynasty
+alert:
+  legacy_available: "Your dynasty can unlock a legacy (renown: {n})"
+  child_no_guardian: "Children need a guardian: {list}"
+msg:
+  became_guardian: "You have been entrusted with raising {who}."
+  guardian_lost: "{who} has lost their guardian ({guardian})."
+  came_of_age: "{who} has come of age: {trait}."
+  regent_appointed: "{who} is now regent of the realm."
+  became_dynasty_head: "You are the head of the {name} dynasty."
+  legacy_unlocked: "The dynasty has unlocked a legacy: {name}."
+modsrc:
+  regency: "Regent: {name}"
+  no_regent: No regent
+  dynasty_level: "Dynasty splendor: {name}"
+  dynasty_legacies: Dynasty Legacies
+  dynasty_head: Dynasty Head
+opinion:
+  my_guardian_now: Guardian
+  my_ward_now: Ward
+  dynasty_head: Dynasty Head
+  dynasty_kin: Blood Ties
+stat:
+  education_gain_mult: Education speed
+upbringing:
+  gain:
+    base: Base
+    no_guardian: No guardian
+    guardian: "Guardian: {name}"
+    aptitude: Aptitude
+    own: Own skill
+    mult: Legacies and traits
+dynasty_level:
+  "0": Obscure Dynasty
+  "1": Known Dynasty
+  "2": Noble Dynasty
+  "3": Illustrious Dynasty
+  "4": Great Dynasty
+  "5": Legendary Dynasty
+tr:
+  has_guardian: Has a guardian
+  has_guardian.not: Has no guardian
+  is_guardian_of: "Guardian of {who}"
+  can_be_guardian_of: Can become the guardian
+  in_education: Being educated (childhood)
+  in_education.not: Not of education age
+  education_focus: "Education focus: {value}"
+  can_manage_upbringing: Manages the child's upbringing
+  has_regent: Ruled by a regent
+  has_regent.not: Has no regent
+  is_regent: Is a regent
+  is_regent.not: Is not a regent
+  can_be_regent_of: Can become regent
+  is_dynasty_head: Head of the dynasty
+  is_dynasty_head.not: Not the head of the dynasty
+  is_house_head: Head of their house
+  is_house_head.not: Not the head of their house
+  is_dynasty_head_of: "Head of the dynasty of {who}"
+  is_disinherited: Disinherited
+  is_disinherited.not: Not disinherited
+  has_dynasty_legacy: "The dynasty has the legacy «{value}»"
+  is_cadet_house: From a cadet branch
+  is_cadet_house.not: From the senior line
+fx:
+  set_guardian: "{who} becomes the guardian of {child}"
+  remove_guardian: "{child} loses their guardian"
+  set_education_focus: "Education focus: {value}"
+  add_education_points: "{child}: education points {value}"
+  set_regent: "{who} becomes regent"
+  spend_dynasty_renown: "−{value} dynasty renown"
+  disinherit: "{who} is disinherited"
+  disinherit.not: "{who} is restored as an heir"
+  found_cadet_house: "{who} founds a cadet branch — a house and coat of arms of their own"
+  unlock_dynasty_legacy: "The dynasty unlocks the legacy «{value}»"

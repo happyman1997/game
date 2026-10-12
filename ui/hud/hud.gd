@@ -299,8 +299,10 @@ func _tabs() -> Array:
 	]
 	if g.engine.has_feature("lifestyles") and not g.content.all("lifestyles").is_empty():
 		list.append({"id": "lifestyle", "icon": "leaf", "name": t("ui.tab.lifestyle")})
+	list.append({"id": "realm", "icon": "castle", "name": t("ui.tab.realm")})
+	if g.engine.has_feature("dynasties") and g.player != null and g.player.dynasty != null:
+		list.append({"id": "dynasty", "icon": "dynasty", "name": t("ui.tab.dynasty")})
 	list.append_array([
-		{"id": "realm", "icon": "castle", "name": t("ui.tab.realm")},
 		{"id": "military", "icon": "swords", "name": t("ui.tab.military")},
 		{"id": "wars", "icon": "fire", "name": t("ui.tab.wars")},
 		{"id": "intrigue", "icon": "dagger", "name": t("ui.tab.intrigue")},

@@ -291,6 +291,37 @@ static func set_liege(game: Game, c: Dictionary, liege: Variant) -> void:
 	game.emit("character.liege_changed", {"character": c, "old": old, "liege": liege})
 
 
+# ------------------------------------------------------------ династии
+
+## Корень династии: младшая ветвь (дом, поле parent) ведёт к исходному роду.
+static func dynasty_root(game: Game, dyn_id: Variant) -> Variant:
+	var id: Variant = dyn_id
+	for _i in 8:
+		var d: Variant = game.state.dynasties.get(id) if id != null else null
+		if d == null or d.get("parent") == null:
+			return id
+		id = d.parent
+	return id
+
+
+## Одного рода (с учётом младших ветвей).
+static func same_dynasty(game: Game, a: Dictionary, b: Dictionary) -> bool:
+	if a.dynasty == null or b.dynasty == null:
+		return false
+	return a.dynasty == b.dynasty or dynasty_root(game, a.dynasty) == dynasty_root(game, b.dynasty)
+
+
+## Известность рода (престиж династии) копится у корня; renown_total — всего накоплено.
+static func add_dynasty_renown(game: Game, dyn_id: Variant, v: float) -> void:
+	var d: Variant = game.state.dynasties.get(dynasty_root(game, dyn_id)) if dyn_id != null else null
+	if d == null or v == 0.0:
+		return
+	var before := float(d.prestige)
+	d.prestige = before + v
+	if v > 0.0:
+		d["renown_total"] = Data.num(d.get("renown_total"), maxf(0.0, before)) + v
+
+
 # ------------------------------------------------------------ создание
 
 static func create_dynasty(game: Game, culture: String, founder: Variant = null, dname: Variant = null) -> Dictionary:
@@ -314,7 +345,7 @@ static func create_dynasty(game: Game, culture: String, founder: Variant = null,
 		if not used.has(cand) or i == 7:
 			n = cand
 		i += 1
-	var d := {"id": game.new_id("dyn"), "name": n, "culture": culture, "prestige": 0.0, "founder": founder, "coa": null}
+	var d := {"id": game.new_id("dyn"), "name": n, "culture": culture, "prestige": 0.0, "renown_total": 0.0, "founder": founder, "coa": null}
 	game.state.dynasties[d.id] = d
 	return d
 
@@ -424,9 +455,13 @@ static func create_character(game: Game, o: Dictionary) -> Dictionary:
 	add_culture_traits(game, c)
 	if not o.get("bare", false):
 		assign_congenital(game, c, father, mother)
-		assign_personality(game, c)
+		if is_adult(game, c) or not personality_at_adulthood(game):
+			assign_personality(game, c)
 		if is_adult(game, c):
 			assign_education(game, c)
+	# взрослый с рождения в мире — совершеннолетия у него уже не будет
+	if is_adult(game, c):
+		c.flags["adult"] = 0
 	game.mark_people_dirty()
 	return c
 
@@ -455,6 +490,12 @@ static func new_character_record() -> Dictionary:
 		"succession_law": null, "levy_ratio": 1.0,
 		"lifestyle": null, "council": null, "prison": null, "regiments": null, "secrets": null, "laws": null,
 	}
+
+
+## Характер складывается к совершеннолетию (defines.character.personality_at_adulthood):
+## у детей нет черт характера, их дают воспитание и случай в 16 лет.
+static func personality_at_adulthood(game: Game) -> bool:
+	return ScriptContext.is_yes(game.def_val("character.personality_at_adulthood", false))
 
 
 static func assign_congenital(game: Game, c: Dictionary, father: Variant = null, mother: Variant = null) -> void:

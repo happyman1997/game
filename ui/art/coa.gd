@@ -136,15 +136,53 @@ static func of_title(game: Game, title_id: Variant, width: int = 40) -> Texture2
 static func of_dynasty(game: Game, dynasty_id: Variant, width: int = 40) -> Texture2D:
 	if dynasty_id == null:
 		return texture(null, "lowborn", width)
+	return texture(dynasty_spec(game, dynasty_id), "dyn:" + str(dynasty_id), width)
+
+
+## Как герб выглядит на деле: случайная основа по seed плюс заданное в данных
+## (как в svg()).
+static func effective(spec: Variant, seed: String) -> Dictionary:
+	var s := random_spec(seed)
+	if spec is Dictionary:
+		for k in spec:
+			s[k] = spec[k]
+		for k in ["division", "ordinary", "charge"]:
+			if not spec.has(k) or spec[k] == null:
+				s.erase(k)
+	return s
+
+
+## Герб династии из данных (или null — случайный). У младшей ветви (дома)
+## без своего герба — герб старшей линии с отличием (каймой, другой фигурой
+## или цветом фигуры), выбранным по id дома.
+static func dynasty_spec(game: Game, dynasty_id: Variant, depth: int = 0) -> Variant:
 	var d: Variant = game.state.dynasties.get(dynasty_id)
-	var spec: Variant = null
-	if d is Dictionary:
-		spec = d.get("coa")
+	var spec: Variant = d.get("coa") if d is Dictionary else null
 	if spec == null:
 		var def: Variant = game.content.get_def("dynasties", dynasty_id)
 		if def != null:
 			spec = def.get("coa")
-	return texture(spec, "dyn:" + str(dynasty_id), width)
+	if spec != null or not (d is Dictionary) or d.get("parent") == null or depth > 6:
+		return spec
+	var s := effective(dynasty_spec(game, d.parent, depth + 1), "dyn:" + str(d.parent))
+	var rng := Rng.new({"s": Rng.hash_string("cadet:" + str(dynasty_id)) & 0xFFFFFFFF})
+	var field: String = str(s.get("field", "argent"))
+	var r := rng.next()
+	if not s.has("ordinary") and not s.has("division") and r < 0.5:
+		s.ordinary = "bordure"
+		s.ordinary_tincture = _contrast(field, rng)
+	elif s.has("charge") and r < 0.75:
+		var tinct: String = str(s.get("charge_tincture"))
+		var opts := (METALS + COLOURS).filter(func(t): return t != tinct and t != field)
+		s.charge_tincture = rng.pick(opts)
+	else:
+		var charges := CHARGES.keys()
+		charges.sort()
+		charges.erase(s.get("charge"))
+		s.charge = rng.pick(charges)
+		s.charge_tincture = _contrast(field, rng)
+		s.count = 1
+	return s
 
 
 ## Герб персонажа: его главного титула, иначе — династии.

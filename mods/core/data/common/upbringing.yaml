@@ -1,0 +1,107 @@
+# Детство, воспитание и регентство (механика upbringing, engine/features/upbringing.gd).
+# Дети в 3 года получают детскую черту, с 6 лет у них есть направление
+# воспитания и опекун; к 16 годам очки воспитания дают уровень черты
+# образования, а детская черта и опекун — характер. Правителем-ребёнком
+# правит регент.
+defines:
+  character:
+    # характер складывается к совершеннолетию (у детей нет черт характера)
+    personality_at_adulthood: yes
+  upbringing:
+    childhood_age: 3
+    education_age: 6
+    # очки воспитания в месяц: база + навык опекуна × per_guardian_skill +
+    # склонность + собственный навык × own_skill_share (× 1 + education_gain_mult);
+    # без опекуна база × no_guardian_mult
+    base_points: 0.45
+    no_guardian_mult: 0.5
+    per_guardian_skill: 0.035
+    # навык опекуна сверх этого не помогает
+    guardian_skill_cap: 25
+    aptitude_bonus: 0.15
+    own_skill_share: 0.02
+    # дети, которые учились ещё до начала партии
+    initial_monthly: 0.85
+    # пороги очков для 2, 3 и 4 уровня образования; разброс итога
+    level_thresholds: [70, 140, 195]
+    final_spread: 18
+    max_wards: 3
+    # шанс перенять каждую черту характера опекуна (не больше одной)
+    adopt_guardian_trait: 0.2
+    # шанс, что детская черта обернётся одной из своих черт характера
+    childhood_bias: 0.6
+    ward_opinion: 15
+    guardian_opinion: 10
+    # регентство: мнение вассалов о правителе-ребёнке и вклад навыков регента
+    child_ruler_opinion: -5
+    no_regent_opinion: -10
+    regent_skill_mid: 8
+    regent_opinion_per_skill: 0.8
+    regent_tax_per_skill: 0.015
+    regent_levy_per_skill: 0.015
+    regent_council_position: chancellor
+    # честолюбие регента: черты (+ опасен, − верен) и мнение о правителе
+    regent_ambition_traits:
+      ambitious: 1.5
+      greedy: 1
+      deceitful: 1
+      callous: 0.5
+      arbitrary: 0.5
+      honest: -1.5
+      just: -1
+      compassionate: -1
+      content: -1
+      humble: -0.5
+    regent_embezzle_chance: 0.015
+    regent_embezzle_share: 0.15
+    regent_embezzle_max: 60
+    regent_murder_chance: 0.004
+    regent_murder_min_intrigue: 8
+    regency_end_event: regency.0001
+
+# Детские черты: склонность (воспитание в этом навыке идёт быстрее) и черты
+# характера, в которые она скорее всего вырастет. В 16 лет черта уходит.
+traits:
+  rowdy:    { category: childhood, icon: "🤸", childhood: { aptitude: martial, personality: [brave, wrathful, gregarious, impatient, arbitrary] } }
+  charming: { category: childhood, icon: "😊", childhood: { aptitude: diplomacy, personality: [gregarious, generous, trusting, forgiving, lustful] } }
+  curious:  { category: childhood, icon: "🔎", childhood: { aptitude: learning, personality: [diligent, cynical, fickle, humble, patient] } }
+  pensive:  { category: childhood, icon: "🤔", childhood: { aptitude: intrigue, personality: [shy, paranoid, calm, deceitful, vengeful] } }
+  bossy:    { category: childhood, icon: "👑", childhood: { aptitude: stewardship, personality: [arrogant, ambitious, stubborn, just, greedy] } }
+
+opinion_modifiers:
+  my_guardian: { value: 20, years: 30 }
+  my_ward: { value: 15, years: 30 }
+  removed_as_guardian: { value: -15, years: 5 }
+  dismissed_regent: { value: -20, years: 5 }
+  regent_thanked: { value: 25, years: 10 }
+  regent_shamed: { value: -25, years: 10 }
+
+interactions:
+  # опекуна выбирает тот, при чьём дворе живёт ребёнок (или родитель-правитель)
+  choose_guardian:
+    icon: "👶"
+    category: family
+    is_shown:
+      scope:recipient: { in_education: yes }
+      scope:actor: { can_manage_upbringing: scope:recipient }
+    secondary_actor:
+      list: [self, spouse, courtier, vassal]
+      title: ui.choose_guardian
+      # в списке видно и по нему сортируется — навык кандидата в направлении воспитания
+      value: "guardian_skill(scope:recipient)"
+      value_icon: star
+      trigger: { can_be_guardian_of: scope:recipient }
+    auto_accept: yes
+    on_accept:
+      - scope:recipient: { set_guardian: scope:secondary_actor }
+
+  # правитель-ребёнок (игрок) сам выбирает регента
+  appoint_regent:
+    icon: "⚖"
+    category: realm
+    is_shown:
+      scope:actor: { is_ruler: yes, is_adult: no }
+      scope:recipient: { can_be_regent_of: scope:actor }
+    auto_accept: yes
+    on_accept:
+      - scope:actor: { set_regent: scope:recipient }

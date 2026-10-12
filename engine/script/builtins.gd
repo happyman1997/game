@@ -249,11 +249,12 @@ static func register(engine: GameEngine) -> void:
 		return _chars(Titles.realm_members(ctx.game, c).filter(func(x): return x.id != c.id)) if c != null else []
 	)
 	lst.call("courtier", CHAR, "Придворные", func(ctx, s): return _chars(ctx.game.courtiers_of(s.id)))
-	lst.call("dynasty_member", CHAR, "Живые члены династии", func(ctx, s):
+	lst.call("dynasty_member", CHAR, "Живые члены династии (со всеми ветвями)", func(ctx, s):
 		var c: Variant = _ch(ctx, s)
 		if c == null or c.dynasty == null:
 			return []
-		return _chars(ctx.game.living().filter(func(x): return x.dynasty == c.dynasty and x.id != c.id))
+		var g: Game = ctx.game
+		return _chars(g.living().filter(func(x): return x.id != c.id and Chars.same_dynasty(g, x, c)))
 	)
 	lst.call("ally", CHAR, "Союзники", func(ctx, s): return _ids_to_chars(ctx.game, Wars.allies_of(ctx.game, s.id)))
 	lst.call("war_enemy", CHAR, "Враги по войнам", func(ctx, s): return _ids_to_chars(ctx.game, Wars.enemies_of(ctx.game, s.id)))
@@ -343,8 +344,8 @@ static func register(engine: GameEngine) -> void:
 	cv.call("num_claims", "Число претензий", func(_g, c, _a): return c.claims.size())
 	cv.call("num_wars", "Число войн", func(g, c, _a): return Wars.wars_of(g, c.id).size())
 	cv.call("num_traits", "Число черт", func(_g, c, _a): return c.traits.size())
-	cv.call("dynasty_prestige", "Престиж династии", func(g, c, _a):
-		var d: Variant = g.state.dynasties.get(c.dynasty) if c.dynasty != null else null
+	cv.call("dynasty_prestige", "Известность (престиж) династии", func(g, c, _a):
+		var d: Variant = g.state.dynasties.get(Chars.dynasty_root(g, c.dynasty)) if c.dynasty != null else null
 		return Data.num(d.prestige) if d != null else 0.0
 	)
 	cv.call("opinion", "Мнение о персонаже: opinion(scope:x)", func(g, c, arg):
@@ -509,10 +510,10 @@ static func register(engine: GameEngine) -> void:
 		var f: Variant = ctx.game.content.get_def("faiths", c.faith) if c != null else null
 		return f != null and f.get("religion") == arg
 	)
-	ct.call("dynasty", "Династия равна", func(_g, c, arg, _ctx, _s): return c.dynasty == arg)
+	ct.call("dynasty", "Из этой династии (или её младшей ветви)", func(g, c, arg, _ctx, _s): return c.dynasty != null and (c.dynasty == arg or Chars.dynasty_root(g, c.dynasty) == arg))
 	rel.call("same_culture_as", "Та же культура", func(_g, c, o): return o.culture == c.culture)
 	rel.call("same_faith_as", "Та же вера", func(_g, c, o): return o.faith == c.faith, "tr.same_faith_as")
-	rel.call("same_dynasty_as", "Та же династия", func(_g, c, o): return c.dynasty != null and o.dynasty == c.dynasty)
+	rel.call("same_dynasty_as", "Та же династия (с младшими ветвями)", func(g, c, o): return Chars.same_dynasty(g, c, o))
 	rel.call("is_spouse_of", "Супруг(а) персонажа", func(_g, c, o): return c.spouses.has(o.id))
 	rel.call("is_parent_of", "Родитель персонажа", func(_g, c, o): return Chars.is_parent_of(c, o))
 	rel.call("is_child_of", "Ребёнок персонажа", func(_g, c, o): return Chars.is_parent_of(o, c))
@@ -652,9 +653,7 @@ static func _register_effects(engine: GameEngine) -> void:
 			var v := _num(ctx, s, arg)
 			c[field] = float(c[field]) + v
 			if field == "prestige" and c.dynasty != null and v > 0:
-				var d: Variant = g.state.dynasties.get(c.dynasty)
-				if d != null:
-					d.prestige = float(d.prestige) + v * g.def_num(share_key, 0.1)
+				Chars.add_dynasty_renown(g, c.dynasty, v * g.def_num(share_key, 0.1))
 		, func(ctx, s, arg): return _t(ctx.game, "fx." + ename, {"value": signed(_num(ctx, s, arg))}))
 	ce.call("add_stress", "Изменить стресс", func(g, c, arg, ctx, s):
 		Chars.change_stress(g, c, _num(ctx, s, arg), str(ctx.values.get("__src", "")))
@@ -663,10 +662,8 @@ static func _register_effects(engine: GameEngine) -> void:
 		c.health = float(c.health) + _num(ctx, s, arg)
 		g.stat_cache.erase(c.id)
 	, func(ctx, s, arg): return _t(ctx.game, "fx.add_health", {"value": signed(_num(ctx, s, arg))}))
-	ce.call("add_dynasty_prestige", "Престиж династии", func(g, c, arg, ctx, s):
-		var d: Variant = g.state.dynasties.get(c.dynasty) if c.dynasty != null else null
-		if d != null:
-			d.prestige = float(d.prestige) + _num(ctx, s, arg)
+	ce.call("add_dynasty_prestige", "Известность (престиж) династии", func(g, c, arg, ctx, s):
+		Chars.add_dynasty_renown(g, c.dynasty, _num(ctx, s, arg))
 	, func(ctx, s, arg): return _t(ctx.game, "fx.add_dynasty_prestige", {"value": signed(_num(ctx, s, arg))}))
 	ce.call("add_skill", "Навсегда изменить навык: { skill, value }", func(g, c, arg, ctx, s):
 		var sk: String = arg.skill

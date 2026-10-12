@@ -1,0 +1,123 @@
+# События детства, воспитания и регентства.
+on_actions:
+  on_monthly_pulse:
+    random_events:
+      events:
+        upbringing.0001: 6
+        upbringing.0002: 4
+        upbringing.0003: 4
+
+events:
+  # Успехи ребёнка у опекуна
+  upbringing.0001:
+    theme: family
+    icon: "📖"
+    trigger:
+      any_child: { in_education: yes }
+    cooldown: { years: 3 }
+    immediate:
+      random_child:
+        limit: { in_education: yes }
+        save_scope_as: child
+    options:
+      # похвалить
+      - effect:
+          scope:child:
+            add_education_points: 8
+            add_opinion: { target: root, modifier: grateful }
+        ai_chance: 30
+      # нанять наставников
+      - trigger: { gold: 40 }
+        effect:
+          add_gold: -40
+          scope:child: { add_education_points: 20 }
+        ai_chance: { value: 20, add: { value: ai_greed, multiply: -8 } }
+      # заниматься с ребёнком самому
+      - skill: { skill: learning, min: 12 }
+        effect:
+          add_stress: 5
+          scope:child:
+            add_education_points: 25
+            add_opinion: { target: root, modifier: grateful }
+        ai_chance: { value: 10, add: { value: learning, multiply: 1 } }
+
+  # Суровый опекун
+  upbringing.0002:
+    theme: family
+    icon: "😠"
+    trigger:
+      any_child:
+        in_education: yes
+        guardian: { has_trait: [wrathful, callous, arbitrary] }
+    cooldown: { years: 4 }
+    immediate:
+      random_child:
+        limit:
+          in_education: yes
+          guardian: { has_trait: [wrathful, callous, arbitrary] }
+        save_scope_as: child
+      scope:child:
+        guardian: { save_scope_as: guardian }
+    options:
+      # сменить опекуна
+      - effect:
+          scope:child:
+            remove_guardian: yes
+            add_opinion: { target: root, modifier: grateful }
+        ai_chance: { value: 20, add: { value: ai_compassion, multiply: 10 } }
+      # строгость закаляет
+      - effect:
+          scope:child: { add_education_points: 10 }
+        ai_chance: 30
+
+  # Детская проказа
+  upbringing.0003:
+    theme: family
+    icon: "🤸"
+    trigger:
+      any_child:
+        age: { gte: 4, lt: 13 }
+        has_trait: [rowdy, bossy]
+    cooldown: { years: 4 }
+    immediate:
+      random_child:
+        limit:
+          age: { gte: 4, lt: 13 }
+          has_trait: [rowdy, bossy]
+        save_scope_as: child
+    options:
+      # наказать
+      - effect:
+          scope:child:
+            add_education_points: 5
+            add_opinion: { target: root, modifier: insulted }
+        ai_chance: { value: 20, add: { value: ai_compassion, multiply: -8 } }
+      # посмеяться
+      - effect:
+          add_prestige: -5
+          add_stress: -5
+          scope:child: { add_opinion: { target: root, modifier: grateful } }
+        ai_chance: { value: 20, add: { value: ai_compassion, multiply: 8 } }
+
+  # Конец регентства: правитель вырос
+  regency.0001:
+    theme: realm
+    icon: "⚖"
+    triggered_only: true
+    trigger: { exists: scope:regent }
+    options:
+      # поблагодарить регента
+      - trigger: { gold: 50 }
+        effect:
+          pay_gold: { target: scope:regent, value: 50 }
+          scope:regent: { add_opinion: { target: root, modifier: regent_thanked } }
+        ai_chance: { value: 30, add: { value: ai_compassion, multiply: 10 } }
+      # потребовать отчёт о казне
+      - effect:
+          add_prestige: 25
+          scope:regent: { add_opinion: { target: root, modifier: regent_shamed } }
+        ai_chance: { value: 15, add: { value: ai_greed, multiply: 10 } }
+      # проститься с почестями
+      - effect:
+          add_prestige: 10
+        ai_chance: 20

@@ -158,7 +158,7 @@ static func builtin_providers() -> Dictionary:
 				parts.append({"label": game.loc.t("opinion.child"), "value": game.def_num("opinion.child", 20)})
 			if Chars.is_sibling(a, b):
 				parts.append({"label": game.loc.t("opinion.sibling"), "value": game.def_num("opinion.sibling", 10)})
-			elif a.dynasty != null and a.dynasty == b.dynasty and not Chars.is_parent_of(a, b) and not Chars.is_parent_of(b, a):
+			elif a.dynasty != null and Chars.same_dynasty(game, a, b) and not Chars.is_parent_of(a, b) and not Chars.is_parent_of(b, a):
 				parts.append({"label": game.loc.t("opinion.same_dynasty"), "value": game.def_num("opinion.same_dynasty", 5)})
 			if not parts.is_empty():
 				var fam := roundi(Stats.stat(game, b, "family_opinion"))

@@ -189,7 +189,9 @@ static func _realm_overview(app: App, p: Dictionary, root: VBoxContainer) -> voi
 		cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		cf.add_child(K.vbox([W.portrait(app, c, 48), cap], 0))
 	root.add_child(K.section("%s (%d)" % [app.t("ui.court"), court.size()], [cf], "castle"))
-	if p.dynasty != null:
+	if p.dynasty != null and g.engine.has_feature("dynasties"):
+		root.add_child(K.section(app.t("ui.dynasty"), [DynastyPanel.summary(app, p)], "dynasty"))
+	elif p.dynasty != null:
 		var d: Variant = g.state.dynasties.get(p.dynasty)
 		var members := g.living().filter(func(x): return x.dynasty == p.dynasty)
 		root.add_child(K.section(app.t("ui.dynasty"), [K.hbox([

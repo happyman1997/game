@@ -128,7 +128,19 @@ static func secondary_candidates(game: Game, def: Dictionary, actor: Dictionary,
 			var sctx = context(game, def, actor, recipient, {"secondary": c.id})
 			if Interp.eval_trigger(sctx, {"type": "character", "id": c.id}, sa.get("trigger")):
 				out.append(c)
+	# secondary_actor.value — показатель кандидата (в его скоупе): по нему
+	# список сортируется, окно показывает его рядом с кандидатом
+	if sa.get("value") != null:
+		Data.sort_by(out, func(c): return secondary_value(game, def, actor, recipient, c), true)
 	return out
+
+
+static func secondary_value(game: Game, def: Dictionary, actor: Dictionary, recipient: Dictionary, c: Dictionary) -> float:
+	var sa: Variant = def.get("secondary_actor")
+	if not (sa is Dictionary) or sa.get("value") == null:
+		return 0.0
+	var sctx := context(game, def, actor, recipient, {"secondary": c.id})
+	return Interp.eval_value(sctx, {"type": "character", "id": c.id}, sa.value)
 
 
 static func target_options(game: Game, def: Dictionary, actor: Dictionary, recipient: Dictionary) -> Array:

@@ -74,10 +74,15 @@ static func blood_line(game: Game, c: Dictionary, gender: Variant) -> Array:
 		nephews.append_array(alive_children(game, s))
 	push.call(nephews)
 	if c.dynasty != null:
-		var dyn = game.living().filter(func(x): return x.dynasty == c.dynasty and x.id != c.id)
+		var dyn = game.living().filter(func(x): return x.id != c.id and Chars.same_dynasty(game, x, c))
 		push.call(dyn.filter(func(x): return Chars.is_adult(game, x)))
 		push.call(dyn)
-	return out
+	return out.filter(func(id): return Succession.can_inherit(game.ch(id)))
+
+
+## Может ли персонаж наследовать (не лишён наследства главой рода).
+static func can_inherit(c: Variant) -> bool:
+	return c != null and c.death == null and not c.flags.has("disinherited")
 
 
 static func builtin_algorithms() -> Dictionary:
@@ -93,7 +98,7 @@ static func builtin_algorithms() -> Dictionary:
 			"heirs": func(game: Game, c: Dictionary, law: Dictionary) -> Array:
 				var dyn := []
 				if c.dynasty != null:
-					dyn = game.living().filter(func(x): return x.dynasty == c.dynasty and x.id != c.id and Chars.is_adult(game, x))
+					dyn = game.living().filter(func(x): return x.id != c.id and Chars.same_dynasty(game, x, c) and Chars.is_adult(game, x) and Succession.can_inherit(x))
 				var sorted := gender_sort(game, dyn, law.get("gender"))
 				Data.sort_by(sorted, func(x): return x.birth)
 				var ids = sorted.map(func(x): return x.id)
@@ -109,7 +114,7 @@ static func _partition(game: Game, c: Dictionary, law: Dictionary, heirs: Array)
 	var out := {}
 	if heirs.is_empty():
 		return out
-	var children = gender_sort(game, alive_children(game, c), law.get("gender")).map(func(x): return x.id)
+	var children = gender_sort(game, alive_children(game, c).filter(func(x): return Succession.can_inherit(x)), law.get("gender")).map(func(x): return x.id)
 	var sharers: Array = children.slice(0, int(game.def_num("succession.max_partition_heirs", 4))) if not children.is_empty() else [heirs[0]]
 	var primary: String = c.titles[0]
 	out[primary] = sharers[0]
@@ -141,7 +146,7 @@ static func heirs_of(game: Game, c: Dictionary) -> Array:
 	if algo == null:
 		game.script_error("Нет алгоритма наследования \"%s\"" % law.get("algorithm"))
 		return blood_line(game, c, law.get("gender"))
-	return algo.heirs.call(game, c, law)
+	return algo.heirs.call(game, c, law).filter(func(id): return Succession.can_inherit(game.ch(id)))
 
 
 static func primary_heir(game: Game, c: Dictionary) -> Variant:
@@ -210,7 +215,7 @@ static func inherit(game: Game, c: Dictionary) -> Variant:
 	var law: Variant = law_of(game, c)
 	var algo: Variant = game.engine.succession_algorithms.get_item(str(law.get("algorithm"))) if law != null else null
 	var heirs: Array = algo.heirs.call(game, c, law) if (law != null and algo != null) else blood_line(game, c, "male_preference")
-	heirs = heirs.filter(func(id): return Chars.is_alive(game.ch(id)))
+	heirs = heirs.filter(func(id): return Succession.can_inherit(game.ch(id)))
 	var old_liege: Variant = game.ch(c.liege)
 	var vassals = game.vassals_of(c.id)
 	var courtiers = game.courtiers_of(c.id)

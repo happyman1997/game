@@ -9,13 +9,17 @@
 |---|---|---|---|
 | `artifact_is_held` | любой | Реликвия у кого-то есть (не утеряна): artifact_is_held: <id> | core/artifacts |
 | `assembly_supports_war` | character | Сход одобряет наступательную войну (или правление его не требует) | core/governments |
+| `can_be_guardian_of` | character | Может стать опекуном ребёнка: can_be_guardian_of: scope:recipient | core/upbringing |
+| `can_be_regent_of` | character | Может стать регентом: can_be_regent_of: scope:actor | core/upbringing |
 | `can_begin_trial` | character | Может встать на путь связки навыков (испытание): can_begin_trial: <архетип> или yes (хоть на один) | core/trials |
+| `can_manage_upbringing` | character | Распоряжается воспитанием ребёнка: can_manage_upbringing: scope:recipient | core/upbringing |
 | `can_marry` | character | Может вступить в брак с персонажем | core |
 | `can_use_hook_on` | character | Крюк на персонажа можно использовать сейчас | core |
 | `capital_has_disease` | character | В столице персонажа (или его сюзерена) эпидемия. | plague |
 | `culture` | character, province | Культура равна | core |
 | `dragon_wary` | character | Ближайший дракон настороже после недавней охоты | arcana |
-| `dynasty` | character | Династия равна | core |
+| `dynasty` | character | Из этой династии (или её младшей ветви) | core |
+| `education_focus` | character | Направление воспитания: education_focus: martial | core/upbringing |
 | `faction_type` | faction | Тип фракции | core/factions |
 | `faith` | character, province | Вера равна | core |
 | `global_var` | любой | Сравнение глобальной переменной | core |
@@ -28,9 +32,11 @@
 | `has_champion` | character | За персонажа в поединке бьётся поборник | core/duels |
 | `has_claim_on` | character | Есть претензия на титул | core |
 | `has_council_task` | character | Сюзерен: на какой-то должности выбрана задача (или одна из списка) | core/council |
+| `has_dynasty_legacy` | character | Род персонажа открыл наследие: has_dynasty_legacy: <id> | core/dynasties |
 | `has_flag` | character | Есть флаг | core |
 | `has_focus` | character | Выбран фокус образа жизни | core/lifestyles |
 | `has_global_flag` | любой | Есть глобальный флаг | core |
+| `has_guardian` | character | У ребёнка есть опекун | core/upbringing |
 | `has_holder_culture` | province | Графство одной культуры с владельцем | core/lands |
 | `has_holder_faith` | province | Графство одной веры с владельцем | core/lands |
 | `has_holding` | province | Есть владение типа | core |
@@ -46,6 +52,7 @@
 | `has_province_flag` | province | Есть флаг провинции | core |
 | `has_province_modifier` | province | Есть модификатор провинции | core |
 | `has_realm_law` | character | Действует закон державы | core/laws |
+| `has_regent` | character | Правителем-ребёнком правит регент | core/upbringing |
 | `has_regiment` | character | Есть отряд этого типа (или любой: yes) | core/regiments |
 | `has_scheme` | character | Ведёт интригу: has_scheme: murder или { type, target } | core |
 | `has_secret` | character | Есть секрет (yes или тип) | core/secrets |
@@ -57,6 +64,7 @@
 | `has_truce_with` | character | Перемирие с персонажем | core |
 | `has_var` | character | Есть переменная | core |
 | `holds_title` | character | Владеет титулом | core |
+| `in_education` | character | Ребёнок в возрасте воспитания | core/upbringing |
 | `in_popular_faction` | province | Графство во народной фракции (yes/no или тип фракции) | core/populace |
 | `is_adult` | character | Совершеннолетний | core |
 | `is_ai` | character | Персонаж ИИ | core |
@@ -65,6 +73,7 @@
 | `is_arcanist` | character | Владеет колдовством (дар или навык ≥ 6) | arcana |
 | `is_at_war` | character | Ведёт войну | core |
 | `is_at_war_with` | character | Воюет с персонажем | core |
+| `is_cadet_house` | character | Персонаж из младшей ветви рода | core/dynasties |
 | `is_celibate` | character | Не может вступать в брак (обет или правление) | core/governments |
 | `is_child` | character | Ребёнок | core |
 | `is_child_of` | character | Ребёнок персонажа | core |
@@ -74,10 +83,15 @@
 | `is_councillor` | character | Заседает в совете (yes) или на должности: is_councillor: marshal | core/council |
 | `is_courtier` | character | Придворный | core |
 | `is_courtier_of` | character | Придворный персонажа | core |
+| `is_disinherited` | character | Лишён наследства главой рода | core/dynasties |
+| `is_dynasty_head` | character | Глава своего рода | core/dynasties |
+| `is_dynasty_head_of` | character | Глава рода этого персонажа: is_dynasty_head_of: scope:recipient | core/dynasties |
 | `is_faction_leader` | character | Возглавляет фракцию | core/factions |
 | `is_female` | character | Женщина | core |
+| `is_guardian_of` | character | Опекун этого ребёнка: is_guardian_of: scope:child | core/upbringing |
 | `is_heir_of` | character | Основной наследник персонажа | core |
 | `is_held` | title | У титула есть владелец | core |
+| `is_house_head` | character | Глава своего дома (ветви или рода) | core/dynasties |
 | `is_imprisoned` | character | В темнице | core/prison |
 | `is_imprisoned_by` | character | В темнице у персонажа | core/prison |
 | `is_in_faction` | character | Состоит во фракции (yes/no или тип) | core/factions |
@@ -97,6 +111,7 @@
 | `is_powerful_vassal` | character | Один из влиятельных вассалов своего сюзерена | core/politics |
 | `is_pregnant` | character | Беременна | core |
 | `is_primary_heir` | character | Основной наследник своего сюзерена/отца | core |
+| `is_regent` | character | Регент при правителе-ребёнке | core/upbringing |
 | `is_ruler` | character | Владеет землями | core |
 | `is_same_as` | любой | Тот же объект, что и путь | core |
 | `is_scheme_target` | character | Является целью интриги | core |
@@ -115,7 +130,7 @@
 | `realm_has_restless_dead` | character | В державе персонажа восстали мертвецы | arcana |
 | `religion` | character | Религия равна | core |
 | `same_culture_as` | character | Та же культура | core |
-| `same_dynasty_as` | character | Та же династия | core |
+| `same_dynasty_as` | character | Та же династия (с младшими ветвями) | core |
 | `same_faith_as` | character | Та же вера | core |
 | `spirit_state` | character | Состояние духа (id из spirit_states, список или yes/no) | core/spirit |
 | `terrain` | province | Местность | core |
@@ -141,7 +156,8 @@
 | `add_deed` | Записать деяние: add_deed: <id> или { id, value } | core/deeds |
 | `add_development` | Изменить развитие | core |
 | `add_dread` | Изменить страх, который внушает правитель | core/politics |
-| `add_dynasty_prestige` | Престиж династии | core |
+| `add_dynasty_prestige` | Известность (престиж) династии | core |
+| `add_education_points` | Изменить очки воспитания ребёнка | core/upbringing |
 | `add_faction_discontent` | Изменить недовольство фракции | core/factions |
 | `add_gold` | Изменить gold | core |
 | `add_health` | Изменить базовое здоровье | core |
@@ -183,6 +199,7 @@
 | `death` | Смерть: yes, причина или { reason, killer } | core |
 | `discover_scheme_against` | Раскрыть случайную враждебную интригу против персонажа или его семьи | core/council |
 | `discover_secret` | Узнать случайный секрет кого-то из своей державы | core/secrets |
+| `disinherit` | Лишить наследства (yes) или восстановить в правах (no) | core/dynasties |
 | `divorce` | Развод | core |
 | `duel` | Поединок с персонажем: duel: scope:x (за правителей могут биться поборники) | core/duels |
 | `end_war` | Завершить войну: victory/white_peace/defeat | core |
@@ -192,6 +209,7 @@
 | `faction_start_war` | Фракция поднимает мятеж | core/factions |
 | `feed_on_blood` | Вампир утоляет жажду (жертва — пленник или придворный) | arcana |
 | `firestorm` | Огненная буря на крупнейшее вражеское войско у границ | arcana |
+| `found_cadet_house` | Основать младшую ветвь рода: found_cadet_house: yes | core/dynasties |
 | `gain_artifact` | Получить реликвию (у прежнего владельца она пропадает): gain_artifact: <id> | core/artifacts |
 | `gain_title` | Получить титул | core |
 | `give_title` | Пожаловать титул: { title, to } — получатель становится вассалом | core |
@@ -221,6 +239,7 @@
 | `remove_flag` | Убрать флаг | core |
 | `remove_from_council` | Советник лишается места в совете сюзерена | core/politics |
 | `remove_global_flag` | Убрать глобальный флаг | core |
+| `remove_guardian` | Отстранить опекуна ребёнка: remove_guardian: yes | core/upbringing |
 | `remove_hook` | Убрать крюк | core |
 | `remove_modifier` | Убрать модификатор | core |
 | `remove_opinion` | Убрать модификатор мнения: { target, modifier } | core |
@@ -234,23 +253,28 @@
 | `seize_primary_title` | Забрать основной титул персонажа (претендент): прежний владелец становится вассалом | core/factions |
 | `seize_realm_artifacts` | Забрать спорные реликвии из державы персонажа from: seize_realm_artifacts: scope:defender | core/artifacts |
 | `send_message` | Сообщение игроку (если этот персонаж — игрок) | core |
+| `set_education_focus` | Направление воспитания: set_education_focus: martial | core/upbringing |
 | `set_flag` | Установить флаг: name или { name, days/months/years } | core |
 | `set_focus` | Сменить фокус образа жизни (без перерыва) | core/lifestyles |
 | `set_global_flag` | Глобальный флаг | core |
 | `set_global_var` | Глобальная переменная | core |
 | `set_government` | Сменить правление персонажа: set_government: <id> | core/governments |
+| `set_guardian` | Назначить ребёнку опекуна: set_guardian: scope:x | core/upbringing |
 | `set_nickname` | Прозвище (ключ локализации или текст) | core |
 | `set_province_flag` | Флаг провинции | core |
 | `set_realm_law` | Установить закон державы (без цены и перерыва) | core/laws |
+| `set_regent` | Назначить регента правителю-ребёнку: set_regent: scope:x | core/upbringing |
 | `set_succession_law` | Закон наследования | core |
 | `set_var` | Переменная: { name, value } | core |
 | `set_vassal_obligation` | Установить вассалу условия службы: set_vassal_obligation: privileged | core/politics |
 | `shift_realm_law` | Сдвинуть закон группы на ступени: shift_realm_law: { group: crown_authority, by: -1 } (без цены) | core/laws |
 | `sow_discord` | Посеять раздор между вассалом и его ближайшим союзником: sow_discord: scope:recipient | core/politics |
+| `spend_dynasty_renown` | Потратить известность рода: spend_dynasty_renown: 100 | core/dynasties |
 | `start_disease` | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
 | `start_scheme` | Начать интригу: { type, target } | core |
 | `take_faction_counties` | Вожак народной фракции (scope:faction) забирает её графства и правит сам: yes или { create_titles: yes } | core/populace |
 | `take_title` | Отобрать титул себе: { title, from? } | core |
+| `unlock_dynasty_legacy` | Открыть наследие рода (если можно): unlock_dynasty_legacy: <id> | core/dynasties |
 | `witch_hunt` | Охота на ведьм в державе | arcana |
 
 ## Значения
@@ -310,7 +334,10 @@
 | `domain_limit` | character | Лимит домена | core |
 | `dread` | character | Страх, который внушает правитель (0–100) | core/politics |
 | `duel_odds` | character | Шанс победить персонажа в поединке, %: duel_odds(scope:x) | core/duels |
-| `dynasty_prestige` | character | Престиж династии | core |
+| `dynasty_level` | character | Уровень славы рода (0 — безвестный) | core/dynasties |
+| `dynasty_prestige` | character | Известность (престиж) династии | core |
+| `dynasty_renown` | character | Известность рода (можно тратить) | core/dynasties |
+| `education_points` | character | Очки воспитания ребёнка | core/upbringing |
 | `faction_discontent` | faction | Недовольство фракции (0–100) | core/factions |
 | `faction_power` | faction | Сила фракции в % от силы сюзерена | core/factions |
 | `fear_of_liege` | character | Страх перед сюзереном (0 у храбрых и гневливых) | core/politics |
@@ -318,6 +345,7 @@
 | `fort_level` | province | Уровень укреплений | core |
 | `general_opinion` | character | Характеристика: general_opinion | core |
 | `gold` | character | Золото | core |
+| `guardian_skill` | character | Навык персонажа в направлении воспитания ребёнка: guardian_skill(scope:recipient) | core/upbringing |
 | `health` | character | Здоровье | core |
 | `income` | character | Ежемесячный доход | core |
 | `infected_provinces` | любой | Число заражённых провинций в мире. | plague |
@@ -342,6 +370,7 @@
 | `num_counties` | character | Графств в домене | core |
 | `num_courtiers` | character | Число придворных | core |
 | `num_de_jure_counties` | title | Де-юре графств в титуле | core |
+| `num_dynasty_legacies` | character | Открыто наследий у рода | core/dynasties |
 | `num_faction_counties` | faction | Графств в народной фракции | core/populace |
 | `num_faction_members` | faction | Число членов фракции | core/factions |
 | `num_foreign_culture_counties` | character | Графств домена чужой культуры | core/lands |
@@ -372,6 +401,7 @@
 | `prowess` | character | Навык: prowess | core |
 | `ransom_cost` | character | Размер выкупа за пленника | core/prison |
 | `realm_size` | character | Графств в державе | core |
+| `regent_score` | character | Пригодность в регенты (дипломатия + управление + ½ воинского дела) | core/upbringing |
 | `regiment_cap` | character | Предел отрядов | core/regiments |
 | `regiment_power` | character | Сила отрядов, не поднятых в армию (в ополченцах) | core/regiments |
 | `reverse_opinion` | character | Мнение персонажа-аргумента об этом персонаже | core |
@@ -408,13 +438,16 @@
 | `de_jure_liege` | title | Де-юре сюзеренный титул | core |
 | `defender` | war | Защитник | core |
 | `dynasty` | character | Династия | core |
+| `dynasty_head` | character | Глава рода персонажа | core/dynasties |
 | `employer` | character | Синоним liege | core |
 | `faction_claimant` | faction | Претендент фракции | core/factions |
 | `faction_leader` | faction | Лидер фракции | core/factions |
 | `faction_target` | faction | Сюзерен, против которого фракция | core/factions |
 | `father` | character | Отец | core |
 | `founder` | dynasty | Основатель династии | core |
+| `guardian` | character | Опекун ребёнка | core/upbringing |
 | `holder` | title, province | Владелец титула/графства | core |
+| `house_head` | character | Глава дома персонажа | core/dynasties |
 | `joined_faction` | character | Фракция, в которой состоит персонаж | core/factions |
 | `killer` | character | Убийца | core |
 | `liege` | character | Сюзерен (или владелец двора для придворных) | core |
@@ -425,6 +458,7 @@
 | `primary_heir` | character | Основной наследник | core |
 | `primary_title` | character | Основной титул | core |
 | `province` | title | Провинция графства | core |
+| `regent` | character | Регент правителя-ребёнка | core/upbringing |
 | `spouse` | character | Супруг(а) (первый) | core |
 | `spymaster` | character | Советник на должности spymaster | core/council |
 | `steward` | character | Советник на должности steward | core/council |
@@ -445,7 +479,7 @@
 | `de_jure_county` | title | Де-юре графства | core |
 | `de_jure_vassal_title` | title | Де-юре вассальные титулы | core |
 | `domain_province` | character | Провинции домена | core |
-| `dynasty_member` | character | Живые члены династии | core |
+| `dynasty_member` | character | Живые члены династии (со всеми ветвями) | core |
 | `faction_against` | character | Фракции против персонажа | core/factions |
 | `faction_county` | faction | Графства народной фракции | core/populace |
 | `faction_member` | faction | Члены фракции | core/factions |
@@ -476,6 +510,7 @@
 | `war_attacker` | war | Участники войны на стороне нападения | core/factions |
 | `war_defender` | war | Участники войны на стороне защиты | core/factions |
 | `war_enemy` | character | Враги по войнам | core |
+| `ward` | character | Воспитанники персонажа | core/upbringing |
 | `wild_county` | character | Ничейные графства у границ державы | core/wilds |
 
 ## Константы
@@ -512,6 +547,8 @@
 | `deeds` | Деяния: летопись поступков персонажа и прозвища, которые из неё растут | да |
 | `trials` | Испытания архетипов: связку навыков нужно заслужить делами | да |
 | `spirit` | Состояние духа: безмятежность, порывы по характеру, надлом и закалка | да |
+| `upbringing` | Детство, опекуны и воспитание, регентство при малолетнем правителе | да |
+| `dynasties` | Династия: известность рода, наследия, глава рода и младшие ветви | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -521,9 +558,9 @@
 - **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `faction`, `artifact_holder`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
 - **interaction_deciders**: `payer`
-- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `governments`, `artifacts`, `spirit`, `plague_fear`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `arcana_faith`
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `upbringing`, `dynasty`, `arcana_faith`
 - **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `populace`, `governments`, `deeds`, `trials`, `spirit`
-- **systems**: `upkeep` (0), `economy` (10), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `demography` (20), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
+- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

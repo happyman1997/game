@@ -113,12 +113,19 @@ static func _header(app: App, c: Dictionary) -> Control:
 		return bb)
 	info.add_child(K.hbox([faith_l, K.label("·", "MutedLabel"), cul_l], 6))
 	if c.dynasty != null:
-		var d: Variant = g.state.dynasties.get(c.dynasty)
-		var dl := K.hbox([W.dynasty_coa(app, c.dynasty, 20), K.label(app.t("ui.dynasty_n", {"name": g.name_of("dynasties", c.dynasty)}))], 6)
-		K.tip(dl, app.t("ui.dynasty_prestige", {"n": K.fmt(d.prestige if d != null else 0)}))
+		var house: bool = g.engine.has_feature("dynasties") and Dynasties.is_house(g, c.dynasty)
+		var dname := app.t("ui.house_n" if house else "ui.dynasty_n", {"name": g.name_of("dynasties", c.dynasty)})
+		var dl := K.hbox([W.dynasty_coa(app, c.dynasty, 20), K.rich(BB.link("dyn", c.dynasty, dname, "#e8dcc0"), false)], 6)
+		var root_id: Variant = Chars.dynasty_root(g, c.dynasty)
+		K.tip(dl, func(): return BB.title(dname) + "\n" + (DynastyPanel.renown_tip(app, root_id) if g.engine.has_feature("dynasties") else ""))
 		info.add_child(dl)
 	else:
 		info.add_child(K.label(app.t("ui.lowborn"), "MutedLabel"))
+	if g.engine.has_feature("upbringing") and Upbringing.needs_regent(g, c):
+		var rg: Variant = Upbringing.regent_of(g, c)
+		info.add_child(K.rich(BB.icon("scales") + " " + BB.muted(app.t("ui.regent") + ": ") + (BB.char_link(g, rg.id, true) if rg != null else BB.bad(app.t("ui.no_regent"))), false))
+	elif g.engine.has_feature("upbringing") and Upbringing.is_child(g, c) and Upbringing.guardian_of(g, c) != null:
+		info.add_child(K.rich(BB.icon("baby") + " " + BB.muted(app.t("ui.guardian") + ": ") + BB.char_link(g, Upbringing.guardian_of(g, c).id, true), false))
 	var badge: Variant = FeatureSections.council_badge(app, c)
 	if badge != null:
 		info.add_child(badge)
@@ -146,6 +153,11 @@ static func _overview_tab(app: App, c: Dictionary) -> Control:
 	var is_me: bool = p != null and p.id == c.id
 	var alive: bool = c.death == null
 	var root := K.vbox([], 10)
+
+	if g.engine.has_feature("upbringing") and alive:
+		var reg: Variant = UpbringingPanel.regency_section(app, c)
+		if reg != null:
+			root.add_child(reg)
 
 	# действия — первыми: ради них окно и открывают
 	# взаимодействия — по категориям, как в CK3
@@ -223,6 +235,12 @@ static func _family_tab(app: App, c: Dictionary) -> Control:
 	var g := app.game
 	var alive: bool = c.death == null
 	var root := K.vbox([], 10)
+	if g.engine.has_feature("upbringing") and alive:
+		if Upbringing.is_child(g, c):
+			root.add_child(UpbringingPanel.section(app, c))
+		var wards: Variant = UpbringingPanel.wards_section(app, c)
+		if wards != null:
+			root.add_child(wards)
 	var fam := K.flow([], 8)
 	var add_people := func(label: String, ids: Array) -> void:
 		for x in ids:
@@ -283,7 +301,9 @@ static func _family_tab(app: App, c: Dictionary) -> Control:
 	root.add_child(K.section(app.t("ui.relations"), rel_rows, "heart"))
 
 	# династия
-	if c.dynasty != null:
+	if c.dynasty != null and g.engine.has_feature("dynasties"):
+		root.add_child(K.section(app.t("ui.dynasty"), [DynastyPanel.summary(app, c)], "dynasty"))
+	elif c.dynasty != null:
 		var d: Variant = g.state.dynasties.get(c.dynasty)
 		var members := g.living().filter(func(x): return x.dynasty == c.dynasty)
 		var rulers := members.filter(func(x): return not x.titles.is_empty())

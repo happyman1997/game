@@ -67,7 +67,7 @@ static func setup_new_game(engine: GameEngine, bookmark_id: String, seed: int = 
 	for t in content.all("titles"):
 		state.titles[t.id] = {"id": t.id, "holder": null, "history": []}
 	for d in content.all("dynasties"):
-		state.dynasties[d.id] = {"id": d.id, "name": "", "culture": d.get("culture"), "prestige": Data.num(d.get("prestige")), "founder": null, "coa": d.get("coa")}
+		state.dynasties[d.id] = {"id": d.id, "name": "", "culture": d.get("culture"), "prestige": Data.num(d.get("prestige")), "renown_total": Data.num(d.get("prestige")), "founder": null, "coa": d.get("coa")}
 
 	# Исторические персонажи
 	var born = content.all("characters").filter(func(d): return GameDate.parse(d.birth) <= date)
@@ -141,10 +141,13 @@ static func setup_new_game(engine: GameEngine, bookmark_id: String, seed: int = 
 			if not s[key].has(c.id):
 				s[key].append(c.id)
 	game.mark_dirty()
+	var late := Chars.personality_at_adulthood(game)
 	for c in game.living():
-		Chars.assign_personality(game, c)
+		if Chars.is_adult(game, c) or not late:
+			Chars.assign_personality(game, c)
 		if Chars.is_adult(game, c):
 			Chars.assign_education(game, c)
+			c.flags["adult"] = 0
 
 	# Владельцы титулов
 	var holders: Dictionary = bm.get("holders", {}) if bm.get("holders") is Dictionary else {}

@@ -277,7 +277,7 @@ static func traits(app: App, c: Dictionary) -> Control:
 		var col: Color = {
 			"personality": Color("#2e3a40"), "education": Color("#24384e"), "congenital": Color("#3e2e48"),
 			"health": Color("#4a2a2a"), "lifestyle": Color("#2e4230"), "fame": Color("#4a3c20"),
-			"supernatural": Color("#3a2448"),
+			"supernatural": Color("#3a2448"), "childhood": Color("#4a3e22"),
 		}.get(d.get("category", ""), Color("#2e3a40"))
 		if d.get("color") is String:
 			col = Color(d.color).darkened(0.45)

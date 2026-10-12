@@ -1,0 +1,190 @@
+# Династия (механика dynasties, engine/features/dynasties.gd): известность
+# рода, уровни славы, наследия, глава рода и младшие ветви (дома).
+defines:
+  dynasty:
+    # известность в месяц от каждого правителя рода по рангу (нет, граф,
+    # герцог, король, император); плюс доля престижа — economy.dynasty_prestige_share
+    renown_by_tier: [0, 0.3, 0.8, 2, 4]
+    # деяния членов рода (deeds.yaml) приносят известность
+    renown_from_deeds:
+      wars_won: 40
+      battles_won: 5
+      sieges_won: 4
+      duels_won: 6
+      buildings: 4
+      conversions: 6
+      feasts: 4
+      laws: 8
+      judgments: 3
+    # уровни славы рода по накопленной известности; названия — dynasty_level.<n>
+    levels: [250, 1000, 2500, 5000, 10000]
+    # ежемесячный престиж правителей рода по уровню славы
+    level_prestige: [0, 0.1, 0.2, 0.35, 0.5, 0.75]
+    # цена наследия: база + шаг × уже открытых
+    legacy_cost_base: 300
+    legacy_cost_step: 250
+    # мнение членов рода о его главе
+    head_opinion: 5
+
+legacy_tracks:
+  blood:     { icon: heart, order: 1 }
+  warfare:   { icon: swords, order: 2 }
+  law:       { icon: castle, order: 3 }
+  guile:     { icon: dagger, order: 4 }
+  erudition: { icon: book, order: 5 }
+  kin:       { icon: dynasty, order: 6 }
+
+# Наследия: modifiers — всем членам рода, head_modifiers — главе,
+# kin_opinion — мнение членов рода друг о друге, head_opinion — о главе.
+# ai_skill — ИИ охотнее берёт ветвь своего сильного навыка.
+dynasty_legacies:
+  blood_1:     { track: blood, level: 1, modifiers: { health: 0.5, fertility: 0.1 }, ai_weight: 12 }
+  blood_2:     { track: blood, level: 2, modifiers: { prowess: 2, attraction_opinion: 5 }, ai_skill: prowess }
+  blood_3:     { track: blood, level: 3, modifiers: { lifespan_mult: 0.1, health: 0.5 } }
+  warfare_1:   { track: warfare, level: 1, modifiers: { martial: 1, prowess: 1 }, ai_skill: martial }
+  warfare_2:   { track: warfare, level: 2, modifiers: { commander_advantage: 3, knight_effectiveness: 0.1 }, ai_skill: martial }
+  warfare_3:   { track: warfare, level: 3, modifiers: { levy_mult: 0.1 }, head_modifiers: { commander_advantage: 5 }, ai_skill: martial }
+  law_1:       { track: law, level: 1, modifiers: { stewardship: 1, vassal_opinion: 3 }, ai_skill: stewardship }
+  law_2:       { track: law, level: 2, modifiers: { domain_limit: 1 }, ai_skill: stewardship }
+  law_3:       { track: law, level: 3, modifiers: { monthly_prestige: 0.5, vassal_opinion: 5 }, ai_skill: stewardship }
+  guile_1:     { track: guile, level: 1, modifiers: { intrigue: 1, scheme_defense: 5 }, ai_skill: intrigue }
+  guile_2:     { track: guile, level: 2, modifiers: { scheme_power: 5 }, ai_skill: intrigue }
+  guile_3:     { track: guile, level: 3, modifiers: { scheme_defense: 10, scheme_power: 5 }, head_modifiers: { intrigue: 2 }, ai_skill: intrigue }
+  erudition_1: { track: erudition, level: 1, modifiers: { learning: 1, lifestyle_xp_mult: 0.1 }, ai_skill: learning }
+  # дети рода воспитываются лучше
+  erudition_2: { track: erudition, level: 2, modifiers: { education_gain_mult: 0.25 }, ai_weight: 14 }
+  erudition_3: { track: erudition, level: 3, modifiers: { monthly_piety: 0.3, development_growth: 0.05 }, ai_skill: learning }
+  kin_1:       { track: kin, level: 1, kin_opinion: 10, ai_weight: 12 }
+  kin_2:       { track: kin, level: 2, head_opinion: 15, head_modifiers: { monthly_prestige: 1 }, ai_skill: diplomacy }
+  kin_3:       { track: kin, level: 3, kin_opinion: 10, modifiers: { diplomacy: 1, general_opinion: 3 }, ai_skill: diplomacy }
+
+opinion_modifiers:
+  disinherited_me: { value: -60, years: 30 }
+  restored_my_rights: { value: 20, years: 10 }
+  demanded_tribute: { value: -20, years: 5 }
+  honored_by_head: { value: 30, years: 10 }
+
+ui_categories:
+  interactions:
+    dynasty: { order: 3.5, icon: dynasty }
+  decisions:
+    dynasty: { order: 3.5, icon: dynasty }
+
+interactions:
+  # глава рода лишает родича наследства
+  disinherit:
+    icon: "✂"
+    category: dynasty
+    is_shown:
+      scope:actor: { is_dynasty_head_of: scope:recipient }
+      scope:recipient: { is_disinherited: no }
+    is_valid:
+      custom_tooltip:
+        text: ui.need_renown_100
+        trigger: { scope:actor: { dynasty_renown: 100 } }
+    auto_accept: yes
+    on_accept:
+      - scope:actor: { spend_dynasty_renown: 100 }
+      - scope:recipient:
+          disinherit: yes
+          add_opinion: { target: scope:actor, modifier: disinherited_me }
+
+  restore_inheritance:
+    icon: "📜"
+    category: dynasty
+    is_shown:
+      scope:actor: { is_dynasty_head_of: scope:recipient }
+      scope:recipient: { is_disinherited: yes }
+    is_valid:
+      custom_tooltip:
+        text: ui.need_renown_50
+        trigger: { scope:actor: { dynasty_renown: 50 } }
+    auto_accept: yes
+    on_accept:
+      - scope:actor: { spend_dynasty_renown: 50 }
+      - scope:recipient:
+          disinherit: no
+          add_opinion: { target: scope:actor, modifier: restored_my_rights }
+
+  # взыскать с родича-правителя золото на нужды рода
+  demand_family_tribute:
+    icon: "💰"
+    category: dynasty
+    is_shown:
+      scope:actor: { is_dynasty_head_of: scope:recipient }
+      scope:recipient: { is_ruler: yes }
+    is_valid:
+      NOT: { scope:actor: { is_at_war_with: scope:recipient } }
+      scope:recipient: { gold: 30 }
+      custom_tooltip:
+        text: ui.need_renown_50
+        trigger: { scope:actor: { dynasty_renown: 50 } }
+    auto_accept: yes
+    cooldown: { years: 5 }
+    on_accept:
+      - scope:actor: { spend_dynasty_renown: 50 }
+      - scope:recipient:
+          pay_gold: { target: scope:actor, value: { value: "scope:recipient.gold", multiply: 0.3, max: 150 } }
+          add_opinion: { target: scope:actor, modifier: demanded_tribute }
+    ai_targets: [dynasty_member]
+    ai_frequency_months: 24
+    ai_will_do:
+      value: 0
+      if:
+        - limit:
+            gold: "< 60"
+            scope:recipient: { gold: 200 }
+          add: { value: ai_greed, multiply: 15, add: 10 }
+
+  # воздать почести родичу: престиж ему и его благодарность
+  honor_kin:
+    icon: "🏅"
+    category: dynasty
+    is_shown:
+      scope:actor: { is_dynasty_head_of: scope:recipient }
+      scope:recipient: { is_adult: yes }
+    is_valid:
+      custom_tooltip:
+        text: ui.need_renown_100
+        trigger: { scope:actor: { dynasty_renown: 100 } }
+    auto_accept: yes
+    cooldown: { years: 5 }
+    on_accept:
+      - scope:actor: { spend_dynasty_renown: 100 }
+      - scope:recipient:
+          add_prestige: 100
+          add_opinion: { target: scope:actor, modifier: honored_by_head }
+    ai_targets: [dynasty_member]
+    ai_frequency_months: 24
+    ai_will_do:
+      value: 0
+      if:
+        - limit:
+            dynasty_renown: 600
+            scope:recipient: { is_ruler: yes, opinion: { target: scope:actor, value: "< 0" } }
+          add: 30
+
+decisions:
+  # основать младшую ветвь рода (свой дом, свой герб)
+  found_cadet_house:
+    category: dynasty
+    icon: "🌳"
+    is_shown:
+      is_lowborn: no
+      is_ruler: yes
+      is_house_head: no
+    is_valid:
+      is_adult: yes
+      tier: ">= duchy"
+    cost: { prestige: 250 }
+    effect:
+      - found_cadet_house: yes
+      - add_prestige: 50
+    ai_check_months: 24
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { prestige: 600, is_independent: yes }
+          add: 20
+        - limit: { prestige: 900 }
+          add: 10

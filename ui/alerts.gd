@@ -36,6 +36,35 @@ static func register_builtin(engine: GameEngine) -> void:
 		if empty.is_empty():
 			return null
 		return {"icon": "council", "kind": "info", "text": g.loc.t("alert.council_vacant", {"list": ", ".join(empty)}), "action": {"tab": "realm"}})
+	reg.call("legacy_available", 12, func(g: Game):
+		var p: Dictionary = g.player
+		if not g.engine.has_feature("dynasties") or p.dynasty == null or not Dynasties.is_head(g, p):
+			return null
+		var root: Variant = Chars.dynasty_root(g, p.dynasty)
+		if Dynasties.renown(g, root) < Dynasties.legacy_cost(g, root):
+			return null
+		for l in g.content.all("dynasty_legacies"):
+			if Dynasties.legacy_blockers(g, p, l.id).is_empty():
+				return {"icon": "dynasty", "kind": "good", "text": g.loc.t("alert.legacy_available", {"n": roundi(Dynasties.renown(g, root))}), "action": {"tab": "dynasty"}}
+		return null)
+	reg.call("child_no_guardian", 15, func(g: Game):
+		var p: Dictionary = g.player
+		if not g.engine.has_feature("upbringing"):
+			return null
+		var kids := []
+		var seen := {}
+		for x in g.courtiers_of(p.id) + Succession.alive_children(g, p) + [p]:
+			if seen.has(x.id) or not Upbringing.in_education(g, x) or Upbringing.guardian_of(g, x) != null or not Upbringing.can_manage(g, p, x):
+				continue
+			# чужих детей при дворе опекуном обеспечивает сам двор
+			if not (x.id == p.id or x.father == p.id or x.mother == p.id or (x.dynasty != null and x.dynasty == p.dynasty)):
+				continue
+			seen[x.id] = true
+			kids.append(x)
+		if kids.is_empty():
+			return null
+		var first: String = kids[0].id
+		return {"icon": "baby", "kind": "bad", "text": g.loc.t("alert.child_no_guardian", {"list": ", ".join(kids.map(func(k): return Chars.char_name(g, k)))}), "action": {"character": first, "subtab": ["character", "family"]}})
 	reg.call("powerful_snubbed", 22, func(g: Game):
 		var p: Dictionary = g.player
 		if not g.engine.has_feature("politics") or p.titles.is_empty():
@@ -183,6 +212,9 @@ static func invalidate() -> void:
 static func run_action(app: App, a: Variant) -> void:
 	if not (a is Dictionary):
 		return
+	# нужная вкладка окна: subtab: [вид окна, вкладка]
+	if a.get("subtab") is Array and a.subtab.size() == 2:
+		app.subtabs[str(a.subtab[0])] = str(a.subtab[1])
 	if a.get("tab") != null:
 		if not (app.panel_ref != null and app.panel_ref.kind == "tab" and app.panel_ref.id == a.tab):
 			app.open_tab(a.tab)

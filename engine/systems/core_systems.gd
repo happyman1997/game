@@ -68,9 +68,8 @@ static func _economy_char(game: Game, c: Dictionary) -> void:
 		c.gold += gold
 		c.prestige += prestige
 		c.piety += piety
-		var dyn: Variant = game.state.dynasties.get(c.dynasty) if c.dynasty != null else null
-		if dyn != null and prestige > 0:
-			dyn.prestige = float(dyn.prestige) + prestige * game.def_num("economy.dynasty_prestige_share", 0.1)
+		if c.dynasty != null and prestige > 0:
+			Chars.add_dynasty_renown(game, c.dynasty, prestige * game.def_num("economy.dynasty_prestige_share", 0.1))
 	else:
 		var flat := Stats.stat(game, c, "monthly_income")
 		if flat != 0.0:
@@ -153,6 +152,10 @@ static func _demography_char(game: Game, c: Dictionary) -> void:
 	# Совершеннолетие
 	if not c.flags.has("adult") and Chars.age_of(game, c) >= adult:
 		c.flags["adult"] = 0
+		# механики (воспитание) раньше всех решают образование и характер;
+		# дальше недостающее дополняется случайно
+		game.emit("character.coming_of_age", {"character": c})
+		Chars.assign_personality(game, c)
 		Chars.assign_education(game, c)
 		game.on_action("on_coming_of_age", {"type": "character", "id": c.id})
 	if c.female:

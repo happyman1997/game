@@ -1,0 +1,107 @@
+# Childhood, upbringing, regency and dynasty.
+trait:
+  rowdy: Rowdy
+  charming: Charming
+  curious: Curious
+  pensive: Pensive
+  bossy: Bossy
+trait_desc:
+  rowdy: "A child who never sits still: fights the pages and climbs the walls. Aptitude for martial; grows up brave — or a brawler."
+  charming: "This child's smile disarms even the guards. Aptitude for diplomacy; grows up gregarious and generous — or fickle."
+  curious: "A child who asks questions even the monks cannot answer. Aptitude for learning; grows up diligent — or cynical."
+  pensive: "A quiet child who sees and remembers everything. Aptitude for intrigue; grows up calm — or paranoid."
+  bossy: "A child who orders even their elders about. Aptitude for stewardship; grows up ambitious and just — or arrogant."
+
+opinion_modifier:
+  my_guardian: My Guardian
+  my_ward: My Ward
+  removed_as_guardian: Removed as Guardian
+  dismissed_regent: Dismissed as Regent
+  regent_thanked: Thanked for the Regency
+  regent_shamed: Shamed over the Treasury
+  disinherited_me: Disinherited Me
+  restored_my_rights: Restored My Rights
+  demanded_tribute: Demanded My Gold
+  honored_by_head: Honored by the Dynasty Head
+
+interaction:
+  choose_guardian: Assign Guardian
+  appoint_regent: Appoint as Regent
+  disinherit: Disinherit
+  restore_inheritance: Restore Inheritance
+  demand_family_tribute: Demand Dynasty Tribute
+  honor_kin: Honor a Kinsman
+interaction_desc:
+  choose_guardian: "The guardian teaches the child their craft: the higher their skill in the education focus, the better the education. The child may also pick up the guardian's personality."
+  appoint_regent: "While you are a child, a regent rules the realm. Their skills shape vassal opinion, taxes and levies — but an ambitious regent may dip into the treasury."
+  disinherit: "The dynasty head strikes a kinsman from every line of succession. They will not forgive it."
+  restore_inheritance: "The dynasty head restores a kinsman's rights as an heir."
+  demand_family_tribute: "The dynasty head takes a third of a ruling kinsman's treasury (at most 150) for the needs of the dynasty."
+  honor_kin: "The dynasty head honors a kinsman: they gain prestige and are grateful."
+
+decision:
+  found_cadet_house: Found a Cadet Branch
+decision_desc:
+  found_cadet_house: "You are not the senior of your dynasty, but noble enough to found a house of your own, with its own name and coat of arms. You and your descendants become a cadet branch; renown and legacies stay shared with the dynasty."
+
+legacy_track:
+  blood: Blood
+  warfare: Warfare
+  law: Law
+  guile: Guile
+  erudition: Erudition
+  kin: Kin
+dynasty_legacy:
+  blood_1: Hardy Stock
+  blood_2: Noble Blood
+  blood_3: Longevity
+  warfare_1: Martial Training
+  warfare_2: War Banners
+  warfare_3: A Line of Generals
+  law_1: Family Honor
+  law_2: Hereditary Rule
+  law_3: Old Blood
+  guile_1: Caution
+  guile_2: Hidden Paths
+  guile_3: The Family Web
+  erudition_1: Bookish
+  erudition_2: Tutors of the Dynasty
+  erudition_3: House of Learning
+  kin_1: Blood Ties
+  kin_2: The Head's Word
+  kin_3: Unity of the Dynasty
+dynasty_legacy_desc:
+  erudition_2: "Children of the dynasty learn a quarter faster."
+  kin_1: "Members of the dynasty think better of each other."
+  kin_2: "Members respect the dynasty head more, and the head's fame grows."
+  kin_3: "Blood sticks together: members are warmer still to each other."
+
+ui_category:
+  interactions:
+    dynasty: Dynasty
+  decisions:
+    dynasty: Dynasty
+
+ev:
+  upbringing.0001:
+    t: A Ward's Progress
+    desc: "[scope:child]'s guardian reports: the child tries hard, but could do more. The children of the court are drawn to whoever takes the time with them."
+    a: Praise them
+    b: Hire tutors (−40 gold)
+    c: Teach the child myself
+  upbringing.0002:
+    t: A Harsh Guardian
+    desc: "[scope:child] runs to you in tears: the guardian has struck them again. The guardian insists that strictness is the best teacher."
+    a: Change the guardian
+    b: Strictness builds character
+  upbringing.0003:
+    t: A Childish Prank
+    desc: "[scope:child] has caused an uproar at court: a terrified hen in the bishop's chambers and a broken jug of wine. The court waits for your word."
+    a: Punish them
+    b: Laugh along with everyone
+  regency.0001:
+    t: The End of the Regency
+    desc: "You have come of age, and [scope:regent] lays down the regency. All these years the realm was ruled in your name — now you rule it yourself. The treasurer, however, asks you to look at the accounts."
+    a: Thank the regent (−50 gold)
+    b: Demand an account of the treasury
+    c: Bid farewell with honors

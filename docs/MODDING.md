@@ -660,7 +660,7 @@ func init(api: ModApi) -> void:
 
 ---
 
-## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари, политика, характер, слава, вера земель, народ, правления, реликвии, дикие земли
+## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари, политика, характер, слава, вера земель, народ, правления, реликвии, дикие земли, воспитание, династия
 
 Крупные подсистемы в стиле CK3 устроены как **механики** (`engine/features`).
 Механика — модуль, который при запуске регистрирует свои системы, триггеры,
@@ -678,7 +678,8 @@ func init(api: ModApi) -> void:
 
   (доступны `lifestyles`, `council`, `prison`, `factions`, `regiments`,
   `secrets`, `laws`, `knights`, `politics`, `personality`, `renown`, `lands`,
-  `populace`, `governments`, `artifacts`, `wilds`, `momentum`, `duels`, `deeds`, `trials`, `spirit`;
+  `populace`, `governments`, `artifacts`, `wilds`, `momentum`, `duels`, `deeds`, `trials`, `spirit`,
+  `upbringing`, `dynasties`;
   интерфейс скрывает вкладки и разделы выключенных механик). Словарь скриптов
   механики (её триггеры, эффекты, значения) остаётся зарегистрированным, так что
   чужие данные, которые его упоминают, не ломаются — на пустом состоянии
@@ -1381,6 +1382,97 @@ casus_belli:
 «Возродить Солнечную империю» создаёт империю и снимает порчу. Орден Стражей
 Пепла (правление с `war_cbs: [ash_crusade, holy_war]`) воюет только с
 искателями венца и иноверцами.
+
+### Детство, воспитание и регентство
+
+Механика `upbringing` (`core/data/common/upbringing.yaml`). В `childhood_age`
+(3) года ребёнок получает **детскую черту** (`category: childhood`) со
+склонностью и чертами характера, в которые она скорее всего вырастет:
+
+```yaml
+traits:
+  rowdy: { category: childhood, icon: "🤸",
+           childhood: { aptitude: martial, personality: [brave, wrathful, gregarious] } }
+```
+
+С `education_age` (6) лет у ребёнка есть **направление воспитания** (любой
+навык, у которого есть черты образования) и **опекун**. Каждый месяц копятся
+очки воспитания: `base_points` + навык опекуна в направлении ×
+`per_guardian_skill` (не выше `guardian_skill_cap`) + `aptitude_bonus` при
+совпадении со склонностью + собственный навык × `own_skill_share`, всё ×
+(1 + `education_gain_mult`); без опекуна — × `no_guardian_mult`. В
+совершеннолетие очки (с разбросом `final_spread`) дают уровень черты
+образования по порогам `level_thresholds`. С
+`defines.character.personality_at_adulthood: yes` у детей нет черт характера:
+в 16 лет одна может прийти от опекуна (`adopt_guardian_trait`), одна — из
+детской черты (`childhood_bias`), остальные — случайно.
+
+Опекуна назначает тот, при чьём дворе живёт ребёнок (или родитель-правитель):
+взаимодействие `choose_guardian` (его `secondary_actor.value` — показатель,
+по которому сортируется список кандидатов и который виден в окне). ИИ
+назначает лучшего сам; игрок воспитывает детей своей семьи сам (оповещение
+«Детям нужен опекун»).
+
+**Регентство.** Правителем-ребёнком правит регент: мать, канцлер
+(`regent_council_position`), взрослый родич или лучший по дипломатии и
+управлению. Навыки регента (сверх `regent_skill_mid`) дают мнение вассалов,
+налог и ополчение; честолюбие — черты из `regent_ambition_traits` и мнение о
+правителе: честолюбивый регент тянет казну (секрет `secret_embezzler`), а
+регент из первых наследников может замыслить убийство. В совершеннолетие —
+событие `regency_end_event`. Игрок-ребёнок меняет регента в окне персонажа
+(взаимодействие `appoint_regent`).
+
+Скрипт: условия `has_guardian`, `is_guardian_of`, `can_be_guardian_of`,
+`in_education`, `education_focus`, `can_manage_upbringing`, `has_regent`,
+`is_regent`, `can_be_regent_of`; значения `education_points`,
+`guardian_skill(scope:x)`, `regent_score`; эффекты `set_guardian`,
+`remove_guardian`, `set_education_focus`, `add_education_points`,
+`set_regent`; ссылки `guardian`, `regent`; список `ward`. Хуки
+`character.coming_of_age` (до образования и характера), `upbringing.guardian_set`,
+`upbringing.educated`, `regency.started`, `regency.ended`, `regency.embezzled`.
+
+### Династия: известность, наследия, глава рода, дома
+
+Механика `dynasties` (`core/data/common/dynasty.yaml`). **Известность** —
+престиж династии, общий для рода и его младших ветвей: доля престижа членов
+(`economy.dynasty_prestige_share`), каждый месяц — правители рода по рангу
+(`dynasty.renown_by_tier`), деяния (`dynasty.renown_from_deeds`) и эффект
+`add_dynasty_prestige`. По накопленной за всё время известности род растёт в
+**славе** (`dynasty.levels`, названия `dynasty_level.<n>`), а правители рода
+получают престиж (`dynasty.level_prestige`).
+
+**Наследия** покупает глава рода за известность (`legacy_cost_base` +
+`legacy_cost_step` × уже открытых), уровни ветви — по порядку:
+
+```yaml
+legacy_tracks:
+  blood: { icon: heart, order: 1 }
+dynasty_legacies:
+  blood_1: { track: blood, level: 1, modifiers: { health: 0.5, fertility: 0.1 } }
+  kin_2:   { track: kin, level: 2, head_opinion: 15, head_modifiers: { monthly_prestige: 1 } }
+```
+
+`modifiers` действуют на всех живых членов рода (в том числе на детей —
+так `education_gain_mult` ускоряет воспитание), `head_modifiers` — на главу,
+`kin_opinion` — мнение членов рода друг о друге, `head_opinion` — о главе;
+`ai_weight`/`ai_skill` — чем ИИ руководствуется при выборе.
+
+**Глава рода** — основной наследник прежнего главы, если он из рода, иначе
+самый высокородный член рода. Взаимодействия главы: лишить наследства
+(`disinherit` — персонаж выпадает из всех линий наследования), вернуть права,
+взыскать золото на нужды рода, воздать почести. **Младшая ветвь (дом)** —
+решение `found_cadet_house`: основатель и его потомки получают свой дом (новая
+запись в `state.dynasties` с полем `parent`) с именем по культуре и гербом
+старшей линии с отличием; известность, наследия и глава рода остаются
+общими, условия `dynasty`, `same_dynasty_as` и наследование по роду видят
+ветви как один род.
+
+Скрипт: условия `is_dynasty_head`, `is_house_head`, `is_dynasty_head_of`,
+`is_disinherited`, `has_dynasty_legacy`, `is_cadet_house`; значения
+`dynasty_renown`, `dynasty_level`, `num_dynasty_legacies`; эффекты
+`spend_dynasty_renown`, `disinherit`, `found_cadet_house`,
+`unlock_dynasty_legacy`; ссылки `dynasty_head`, `house_head`. Хуки
+`dynasty.legacy_unlocked`, `dynasty.head_changed`, `dynasty.house_founded`.
 
 ### Связи между механиками
 
