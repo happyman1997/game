@@ -165,17 +165,17 @@ ambitions:
         - martial: ">= 8"
         - prowess: ">= 10"
     weight:
-      value: 1
-      add: { value: ai_boldness, multiply: 3 }
+      value: 0.5
+      add: { value: ai_boldness, multiply: 2 }
       if:
         - limit: { has_trait: brave }
-          add: 6
+          add: 4
         - limit: { has_trait: wrathful }
-          add: 3
+          add: 2
         - limit: { has_trait: craven }
           multiply: 0
-    progress: { value: "liege.deeds_battles_won", need: 3 }
-    patience: 4
+    progress: { value: "liege.deeds_battles_won", need: 2 }
+    patience: 5
     expire: 10
     credit: liege
     on_fulfilled: { add_prestige: 50, add_stress: -20 }
