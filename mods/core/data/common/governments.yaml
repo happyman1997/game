@@ -113,3 +113,7 @@ decisions:
           add: 20
         - limit: { has_trait: ambitious }
           add: 20
+
+modifiers:
+  # Всеобщее ополчение: на республику напали — за дамбы встаёт весь народ.
+  levee_en_masse: { icon: "🌊", good: true, modifiers: { levy_mult: 1.0, monthly_income: -1 } }

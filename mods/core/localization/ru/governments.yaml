@@ -24,3 +24,5 @@ decision:
   campaign_for_assembly: Агитировать на сходе
 decision_desc:
   campaign_for_assembly: "Угощения, подарки старостам и речи на площадях: на следующих выборах схода за ваш род проголосует больше графств."
+modifier:
+  levee_en_masse: Всеобщее ополчение

@@ -3,6 +3,32 @@
 on_actions:
   on_player_start:
     events: { $append: [marches.0001, marches.0002, marches.0003, marches.0004, marches.0005, marches.0006, marches.0007] }
+  # всеобщее ополчение: на народную республику напали — встаёт весь народ
+  on_war_started:
+    effect:
+      $append:
+        - scope:defender:
+            if:
+              limit: { government: people_republic }
+              then:
+                add_modifier: { id: levee_en_masse, years: 3 }
+  on_war_ended:
+    effect:
+        - scope:defender:
+            if:
+              limit: { has_modifier: levee_en_masse }
+              then:
+                remove_modifier: levee_en_masse
+  # поиск венца — дело рода: след переходит к наследнику
+  on_death:
+    effect:
+      $append:
+        - if:
+            limit: { var: { name: crown_trail, value: ">= 1" } }
+            then:
+              primary_heir:
+                change_var: { name: crown_trail, add: scope:deceased.var:crown_trail }
+                add_modifier: { id: crown_trail, years: 10 }
 
 scripted_triggers:
   # правитель одной из держав Пепельных марок — у них своё вступление

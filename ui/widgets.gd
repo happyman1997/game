@@ -435,3 +435,34 @@ class PortraitView:
 		if dead and not round:
 			var f := Fonts.bold()
 			draw_string(f, Vector2(4, size.y - 6), "✝", HORIZONTAL_ALIGNMENT_LEFT, -1, int(size.x * 0.22), Color(1, 1, 1, 0.8))
+
+
+## Вкладки окна (как в CK3): полоса кнопок и содержимое выбранной вкладки.
+## tabs: [{id, name, icon?, badge? (число справа), tip?}]; build(id) -> Control.
+## Выбор запоминается в app.subtabs[key] — и при переходе к другому персонажу.
+static func tabs(app: App, key: String, tabs_list: Array, build: Callable) -> Control:
+	var ids := tabs_list.map(func(x): return str(x.id))
+	var active := app.subtab(key, ids[0] if not ids.is_empty() else "")
+	if not ids.has(active) and not ids.is_empty():
+		active = ids[0]
+	var strip := K.hbox([], 2)
+	for tb in tabs_list:
+		var id: String = tb.id
+		var text: String = tb.name
+		if tb.get("badge") != null and int(tb.badge) > 0:
+			text += "  %d" % int(tb.badge)
+		var b := K.button(text, func(): app.set_subtab(key, id), {
+			"variation": "WindowTab", "icon": tb.get("icon"), "icon_size": 16,
+			"toggled": id == active, "tip": tb.get("tip"),
+		})
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		strip.add_child(b)
+	var line := ColorRect.new()
+	line.color = Color(UiArt.BRONZE, 0.5)
+	line.custom_minimum_size = Vector2(0, 1)
+	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var content: Variant = build.call(active)
+	var box := K.vbox([K.vbox([strip, line], 0)], 10)
+	if content is Control:
+		box.add_child(content)
+	return box

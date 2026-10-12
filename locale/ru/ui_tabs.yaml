@@ -1,0 +1,51 @@
+ui:
+  ctab:
+    overview: Обзор
+    family: Семья и связи
+    realm: Владения
+  rtab:
+    overview: Обзор
+    vassals: Вассалы
+    council: Совет
+    laws: Законы
+    politics: Политика
+  vassal_of: "Вассал: "
+  independent_ruler: Независимый правитель
+  born_on: "род. {date}"
+  relations: Связи
+  rel:
+    friend: Друг
+    rival: Соперник
+    lover: Возлюбленная
+    lover_m: Возлюбленный
+    feud: Вражда
+  no_relations: Близких связей нет.
+  dynasty_members_n: "Живых членов рода: {n}"
+  stress_level: "Стресс: {n}"
+  col:
+    vassal: Вассал
+    opinion: Мнение
+    tax: Налог
+    levy: Войско
+  vassals_total: "Вассалы дают {tax} золота и {levy} воинов в месяц."
+  vassal_powerful: Влиятельный вассал
+  vassal_in_faction: "Во фракции: {name}"
+  vassal_tip_tax: Налог сюзерену в месяц
+  vassal_tip_levy: Воинов к войску сюзерена
+  no_vassals: Вассалов нет.
+  realm_counties_n: "Графств: {n}"
+  realm_overview: Держава
+  war_months: "идёт {n} мес."
+  war_goal: Цель войны
+  battles: Битвы
+  no_battles: Битв ещё не было.
+  battle_won: Победа
+  battle_lost: Поражение
+  side_strength: Сила стороны
+  ol:
+    pinned: Закреплённые
+    factions: Фракции против вас
+    unhappy_vassals: Недовольные вассалы
+    construction: Стройки
+  pin: Закрепить в обзоре справа
+  unpin: Открепить

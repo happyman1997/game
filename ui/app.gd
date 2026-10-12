@@ -23,6 +23,10 @@ var lifestyle_view := ""
 ## Открытое окно: {kind: character|province|title|army|tab, id}.
 var panel_ref: Variant = null
 var history: Array = []
+## Выбранные вкладки окон: {ключ окна: id вкладки} (персонаж, владения…).
+var subtabs := {}
+## Свёрнутые разделы обзора справа: {id раздела: true}.
+var outliner_collapsed := {}
 var ui_theme: Theme
 
 var map_view: MapView
@@ -508,6 +512,33 @@ func open_tab(id: String) -> void:
 		close_panel()
 		return
 	open_panel({"kind": "tab", "id": id})
+
+
+## Вкладка окна (ключ — вид окна, например "character" или "realm").
+func subtab(key: String, default: String) -> String:
+	return str(subtabs.get(key, default))
+
+
+func set_subtab(key: String, id: String) -> void:
+	subtabs[key] = id
+	mark_dirty(true)
+
+
+## Закрепить персонажа в обзоре справа (или открепить).
+func toggle_pin(id: String) -> void:
+	if game == null:
+		return
+	var pins: Array = Data.as_array(game.state.get("pinned")).duplicate()
+	if pins.has(id):
+		pins.erase(id)
+	else:
+		pins.append(id)
+	game.state["pinned"] = pins
+	mark_dirty(true)
+
+
+func is_pinned(id: String) -> bool:
+	return game != null and Data.as_array(game.state.get("pinned")).has(id)
 
 
 func close_panel() -> void:

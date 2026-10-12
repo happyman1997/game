@@ -296,6 +296,12 @@ static func _battle(game: Game, w: Dictionary, loc: String, att: Array, def: Arr
 		"loser": game.scope_name({"type": "character", "id": lose_owner.id}),
 		"wl": win_loss, "ll": lose_loss,
 	}), "war", {"type": "province", "id": loc}, w.attackers + w.defenders)
+	# летопись битв войны (последние) — для окна войны
+	if not (w.get("battles") is Array):
+		w["battles"] = []
+	w.battles.append({"date": game.date, "location": loc, "winner": win_owner.id, "loser": lose_owner.id, "win_loss": win_loss, "lose_loss": lose_loss, "att_won": att_wins})
+	if w.battles.size() > 12:
+		w.battles = w.battles.slice(w.battles.size() - 12)
 	game.emit("battle", {"war": w, "location": loc, "winner": win_owner.id, "loser": lose_owner.id, "win_loss": win_loss, "lose_loss": lose_loss})
 	game.on_action("on_battle_won", {"type": "character", "id": win_owner.id}, {"enemy": {"type": "character", "id": lose_owner.id}})
 	game.on_action("on_battle_lost", {"type": "character", "id": lose_owner.id}, {"enemy": {"type": "character", "id": win_owner.id}})

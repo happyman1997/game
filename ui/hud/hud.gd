@@ -40,6 +40,8 @@ var _messages_sig := ""
 
 ## Пока игра идёт, открытое окно обновляется не чаще (мс).
 const LIVE_WINDOW_MS := 1000
+## Ширина окна слева.
+const WINDOW_W := 640
 
 
 func _init() -> void:
@@ -155,7 +157,7 @@ func build() -> void:
 	window.set_anchors_preset(Control.PRESET_LEFT_WIDE)
 	window.offset_left = 8
 	window.offset_top = 52
-	window.offset_right = 8 + 500
+	window.offset_right = 8 + WINDOW_W
 	window.offset_bottom = -166
 	window.visible = false
 	var head := K.hbox([], 6)
@@ -230,6 +232,10 @@ func _refresh_resources(p: Variant) -> void:
 		var pi := Economy.monthly_piety(g, p)
 		items.append(["piety", K.fmt(p.piety), K.signed(pi, 1), pi >= 0, func(): return _renown_tip(app.game.player, "piety")])
 		items.append(["levies", K.fmt(Economy.realm_levy(g, p)), "", true, BB.title(t("ui.levies"))])
+		if not p.titles.is_empty():
+			var dom := Titles.domain_counties(g, p).size()
+			var lim := Economy.domain_limit(g, p)
+			items.append(["castle", "%d/%d" % [dom, lim], "", dom <= lim, BB.title(t("ui.domain")) + "\n" + BB.esc(t("ui.domain_tip"))])
 		if float(p.stress) > 0:
 			items.append(["stress", K.fmt(p.stress), "", float(p.stress) < 100, func(): return W.stress_tip(app, app.game.player) if app.game.player != null else ""])
 		var widgets: Array = g.engine.ui.top_bar.values()
@@ -397,6 +403,9 @@ func _refresh_modes() -> void:
 		modes_box.add_child(b)
 
 
+## Обзор справа (как outliner в CK3): сворачиваемые разделы — закреплённые
+## персонажи, войны, армии, интриги, фракции против вас, недовольные
+## вассалы, стройки.
 func _refresh_outliner(p: Variant) -> void:
 	var g := app.game
 	var panel := outliner.get_parent() as Control
@@ -405,48 +414,146 @@ func _refresh_outliner(p: Variant) -> void:
 		_outliner_sig = ""
 		panel.visible = false
 		return
-	var wars := Wars.wars_of(g, p.id)
-	var armies := Military.armies_of(g, p.id)
-	var schemes := []
-	for s in g.state.schemes.values():
-		if s.owner == p.id:
-			schemes.append(s)
-	var sig := "%s|%s|" % [g.loc.lang, app.map_view.selected_army]
-	for w in wars:
-		sig += "w%s:%d;" % [w.id, int(Wars.warscore(g, w).total)]
-	for a in armies:
-		sig += "a%s:%d:%s:%d;" % [a.id, int(a.size), a.location, a.path.size()]
-	for s in schemes:
-		sig += "s%s:%d;" % [s.id, int(s.progress)]
+	var sections := _outliner_sections(p)
+	var sig := "%s|%s|%s|" % [g.loc.lang, app.map_view.selected_army, str(app.outliner_collapsed)]
+	for sec in sections:
+		sig += sec.id + ":" + sec.sig + ";"
 	if sig == _outliner_sig:
 		return
 	_outliner_sig = sig
 	K.clear(outliner)
-	panel.visible = not (wars.is_empty() and armies.is_empty() and schemes.is_empty())
+	panel.visible = not sections.is_empty()
+	for sec in sections:
+		var collapsed: bool = app.outliner_collapsed.get(sec.id, false)
+		var sid: String = sec.id
+		var head := K.button("%s  %d" % [sec.name, sec.rows.size()], func():
+			app.outliner_collapsed[sid] = not app.outliner_collapsed.get(sid, false)
+			app.mark_dirty(true), {"variation": "FlatButton", "icon": sec.icon, "align": HORIZONTAL_ALIGNMENT_LEFT})
+		head.add_theme_color_override("font_color", UiArt.C_GOLD)
+		head.add_child(_chevron(collapsed))
+		outliner.add_child(head)
+		if collapsed:
+			continue
+		for r in sec.rows:
+			outliner.add_child(r)
+
+
+func _chevron(collapsed: bool) -> Control:
+	var l := K.label("▸" if collapsed else "▾", "SmallLabel")
+	l.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT)
+	l.offset_left = -18
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return l
+
+
+func _outliner_sections(p: Dictionary) -> Array:
+	var g := app.game
+	var out := []
+	var row := func(text: String, icon: Variant, cb: Callable, opts: Dictionary = {}) -> Control:
+		var o := {"variation": "FlatButton", "icon": icon, "align": HORIZONTAL_ALIGNMENT_LEFT}
+		o.merge(opts)
+		var b := K.button(text, cb, o)
+		b.clip_text = true
+		b.custom_minimum_size.x = 280
+		return b
+	# закреплённые персонажи
+	var pins: Array = Data.as_array(g.state.get("pinned")).filter(func(id): return g.ch(id) != null)
+	if not pins.is_empty():
+		var rows := []
+		var sig := ""
+		for id in pins:
+			var c: Dictionary = g.ch(id)
+			var cid: String = id
+			var r: Control = row.call(Chars.full_name(g, c, true) + (" ✝" if c.death != null else ""), "person", func(): app.open_character(cid),
+				{"tip": func(): return app.character_tooltip(cid)})
+			rows.append(r)
+			sig += id + str(c.death) + c.name
+		out.append({"id": "pins", "name": t("ui.ol.pinned"), "icon": "star", "rows": rows, "sig": sig})
+	# войны
+	var wars := Wars.wars_of(g, p.id)
 	if not wars.is_empty():
-		outliner.add_child(K.label(t("ui.tab.wars"), "SubheaderLabel"))
+		var rows := []
+		var sig := ""
 		for w in wars:
 			var ws := Wars.warscore(g, w)
 			var side: Variant = Wars.participant_side(w, p.id)
 			var score := int(ws.total) if side == "att" else -int(ws.total)
-			var row := K.button("%s  %s%%" % [w.get("name", ""), K.signed(score)], func(): app.open_tab("wars"), {"variation": "FlatButton", "icon": "fire", "align": HORIZONTAL_ALIGNMENT_LEFT})
-			outliner.add_child(row)
+			rows.append(row.call("%s  %s%%" % [w.get("name", ""), K.signed(score)], "fire", func(): app.open_tab("wars")))
+			sig += "%s:%d," % [w.id, score]
+		out.append({"id": "wars", "name": t("ui.tab.wars"), "icon": "fire", "rows": rows, "sig": sig})
+	# армии
+	var armies := Military.armies_of(g, p.id)
 	if not armies.is_empty():
-		outliner.add_child(K.label(t("ui.armies"), "SubheaderLabel"))
+		var rows := []
+		var sig := ""
 		for a in armies:
 			var aid: String = a.id
 			var loc = a.location
 			var txt := "%s — %s%s" % [K.fmt(a.size), g.name_of("provinces", a.location), " →" if not a.path.is_empty() else ""]
-			var b := K.button(txt, func():
+			rows.append(row.call(txt, "swords", func():
 				app.select_army(aid)
-				app.map_view.focus(loc), {"variation": "FlatButton", "icon": "swords", "align": HORIZONTAL_ALIGNMENT_LEFT, "toggled": app.map_view.selected_army == aid})
-			outliner.add_child(b)
+				app.map_view.focus(loc), {"toggled": app.map_view.selected_army == aid}))
+			sig += "%s:%d:%s:%d," % [a.id, int(a.size), a.location, a.path.size()]
+		out.append({"id": "armies", "name": t("ui.armies"), "icon": "swords", "rows": rows, "sig": sig})
+	# интриги
+	var schemes: Array = g.state.schemes.values().filter(func(s): return s.owner == p.id)
 	if not schemes.is_empty():
-		outliner.add_child(K.label(t("ui.tab.intrigue"), "SubheaderLabel"))
+		var rows := []
+		var sig := ""
 		for s in schemes:
 			var def: Variant = g.content.get_def("schemes", s.type)
-			outliner.add_child(K.button("%s: %d%%" % [g.name_of("schemes", s.type), int(s.progress)], func(): app.open_tab("intrigue"),
-				{"variation": "FlatButton", "icon": def.get("icon", "dagger") if def != null else "dagger", "align": HORIZONTAL_ALIGNMENT_LEFT}))
+			var target: Variant = g.ch(s.target)
+			rows.append(row.call("%s → %s: %d%%" % [g.name_of("schemes", s.type), target.name if target != null else "?", int(s.progress)],
+				def.get("icon", "dagger") if def != null else "dagger", func(): app.open_tab("intrigue")))
+			sig += "%s:%d," % [s.id, int(s.progress)]
+		out.append({"id": "schemes", "name": t("ui.tab.intrigue"), "icon": "dagger", "rows": rows, "sig": sig})
+	# фракции против вас
+	if g.engine.has_feature("factions"):
+		var facs: Array = g.state.factions.values().filter(func(f): return f.get("target") == p.id)
+		if not facs.is_empty():
+			var rows := []
+			var sig := ""
+			for f in facs:
+				var disc := int(Data.num(f.get("discontent")))
+				rows.append(row.call("%s: %d%%" % [g.name_of("factions", f.type), disc], "fist", func():
+					app.subtabs["realm"] = "politics"
+					app.open_tab("realm"), {}))
+				sig += "%s:%d," % [f.id, disc]
+			out.append({"id": "factions", "name": t("ui.ol.factions"), "icon": "fist", "rows": rows, "sig": sig})
+	# недовольные вассалы
+	var unhappy := []
+	for v in g.vassals_of(p.id):
+		var op := Opinion.opinion(g, v, p)
+		if op < 0:
+			unhappy.append([op, v])
+	if not unhappy.is_empty():
+		unhappy.sort_custom(func(a, b): return a[0] < b[0])
+		var rows := []
+		var sig := ""
+		for item in unhappy.slice(0, 6):
+			var v: Dictionary = item[1]
+			var vid: String = v.id
+			rows.append(row.call("%s  %s" % [Chars.full_name(g, v, true), K.signed(item[0])], "person", func(): app.open_character(vid),
+				{"tip": func(): return app.character_tooltip(vid)}))
+			sig += "%s:%d," % [v.id, item[0]]
+		out.append({"id": "unhappy", "name": t("ui.ol.unhappy_vassals"), "icon": "warning", "rows": rows, "sig": sig})
+	# стройки в домене
+	var builds := []
+	for cid in Titles.domain_counties(g, p):
+		var pr: Variant = g.state.provinces.get(cid)
+		if pr != null and pr.construction != null:
+			builds.append([cid, pr.construction])
+	if not builds.is_empty():
+		var rows := []
+		var sig := ""
+		for item in builds:
+			var cid: String = item[0]
+			var left := maxi(0, int(item[1].done) - g.date)
+			rows.append(row.call("%s: %s (%s)" % [g.name_of("provinces", cid), g.name_of("buildings", item[1].building), t("ui.days_left", {"n": left})],
+				"castle", func(): app.open_province(cid, true)))
+			sig += "%s:%d," % [cid, left / 30]
+		out.append({"id": "builds", "name": t("ui.ol.construction"), "icon": "castle", "rows": rows, "sig": sig})
+	return out
 
 
 func _refresh_messages() -> void:
@@ -492,7 +599,8 @@ func _refresh_window(full: bool = true) -> void:
 		_window_key = ""
 		return
 	window.visible = true
-	var key: String = ref.kind + ":" + str(ref.id)
+	# вкладки окна — часть ключа: другая вкладка прокручивается с начала
+	var key: String = ref.kind + ":" + str(ref.id) + "|" + str(app.subtabs)
 	if not full and key == _window_key and Time.get_ticks_msec() - _window_at < LIVE_WINDOW_MS:
 		return
 	_window_at = Time.get_ticks_msec()

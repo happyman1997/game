@@ -19,27 +19,45 @@ static func build(app: App) -> Control:
 		var leader: bool = (w.attacker if side == "att" else w.defender) == p.id
 		var enemy_side := "def" if side == "att" else "att"
 		var cb: Variant = g.content.get_def("casus_belli", w.cb)
-		var box := K.vbox([], 6)
-		box.add_child(K.hbox([K.icon(cb.get("icon", "swords") if cb != null else "swords", 24), K.label(str(w.get("name", "")), "SubheaderLabel")], 6))
+		var box := K.vbox([], 8)
+		var months := int((g.date - int(w.get("start", g.date))) / 30)
+		box.add_child(K.hbox([K.icon(cb.get("icon", "swords") if cb != null else "swords", 26), K.label(str(w.get("name", "")), "SubheaderLabel"),
+			K.expand(), K.label(app.t("ui.war_months", {"n": months}), "SmallLabel")], 6))
 		var sub := g.name_of("casus_belli", w.cb)
 		if w.get("target") != null:
 			sub += " · " + Titles.full_name(g, w.target)
 		box.add_child(K.label(sub, "MutedLabel"))
+
+		# стороны: вождь крупно, союзники мелко, сила стороны
 		var sides := K.hbox([], 10)
-		for pair in [["ui.attackers", w.attackers], ["ui.defenders", w.defenders]]:
-			var col := K.vbox([K.label(app.t(pair[0]), "GoldLabel")], 2)
+		for pair in [["att", "ui.attackers", w.attackers, w.attacker], ["def", "ui.defenders", w.defenders, w.defender]]:
+			var strength := 0.0
+			for x in pair[2]:
+				var cx: Variant = g.ch(x)
+				if cx != null and cx.death == null:
+					strength += Economy.military_strength(g, cx)
+			var ours: bool = pair[0] == side
+			var head := K.hbox([K.label(app.t(pair[1]), "GoodLabel" if ours else "BadLabel"), K.expand(),
+				W.stat("levies", K.fmt(strength), BB.title(app.t("ui.side_strength")), UiArt.C_TEXT, 14)], 4)
+			var col := K.vbox([head], 4)
+			var lead: Variant = g.ch(pair[3])
 			var faces := K.flow([], 3)
-			for x in pair[1]:
+			if lead != null:
+				faces.add_child(W.portrait(app, lead, 56, {"coa": true}))
+			for x in pair[2]:
 				var c: Variant = g.ch(x)
-				if c != null:
-					faces.add_child(W.portrait(app, c, 40, {"coa": true}))
+				if c != null and x != pair[3]:
+					faces.add_child(W.portrait(app, c, 36, {"coa": true}))
 			col.add_child(faces)
-			col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			sides.add_child(col)
+			var side_panel := K.panel(col, "RowPanel")
+			side_panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			side_panel.size_flags_stretch_ratio = 1.0
+			sides.add_child(side_panel)
 		box.add_child(sides)
+
 		var track := WarScoreBar.new()
 		track.value = mine
-		track.custom_minimum_size = Vector2(0, 18)
+		track.custom_minimum_size = Vector2(0, 20)
 		var score_l := K.label("%s: %s%%" % [app.t("ui.warscore"), K.signed(mine)], "GoodLabel" if mine >= 0 else "BadLabel")
 		score_l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		var score := K.vbox([track, score_l], 2)
@@ -53,6 +71,44 @@ static func build(app: App) -> Control:
 				rows.append([BB.esc(x.label), BB.signed(Data.num(x.value) * sign)])
 			return BB.title(app.t("ui.warscore")) + "\n" + BB.rows(rows))
 		box.add_child(score)
+
+		# цель войны: графства и кто их держит сейчас
+		var goal: Array = Data.as_array(w.get("target_counties")).filter(func(c): return g.state.provinces.has(c))
+		if not goal.is_empty():
+			var chips := K.flow([], 4)
+			for cid in goal.slice(0, 12):
+				var pr: Dictionary = g.state.provinces[cid]
+				var occ: bool = pr.occupant != null and pr.get("occupant_war") == w.id
+				var occ_side: Variant = Wars.participant_side(w, pr.occupant) if occ else null
+				var col := UiArt.C_TEXT
+				if occ:
+					col = UiArt.C_GOOD if occ_side == side else UiArt.C_BAD
+				var chip := K.panel(K.hbox([K.icon("banner" if occ else "castle", 14, "green" if occ and occ_side == side else ("red" if occ else "gold")), K.label(g.name_of("provinces", cid), "SmallLabel")], 3))
+				chip.add_theme_stylebox_override("panel", UiArt.flat(Color(0, 0, 0, 0.25), Color(col, 0.6), 1, 3, 3))
+				K.on_click(chip, func(): app.open_province(cid, true))
+				K.tip(chip, func(): return app.province_tooltip(cid))
+				chips.add_child(chip)
+			box.add_child(K.vbox([K.label(app.t("ui.war_goal"), "GoldLabel"), chips], 3))
+
+		# битвы — последние сверху
+		var battles: Array = Data.as_array(w.get("battles")).duplicate()
+		battles.reverse()
+		var bl := K.vbox([], 1)
+		for b in battles.slice(0, 5):
+			var won: bool = (b.att_won and side == "att") or (not b.att_won and side == "def")
+			var d := GameDate.parts(int(b.date))
+			bl.add_child(K.rich("%s  %s %s — %s %s (%s / %s)" % [
+				BB.muted("%d.%d.%d" % [d.d, d.m, d.y]),
+				BB.icon("swords"),
+				BB.c(app.t("ui.battle_won" if won else "ui.battle_lost"), BB.GOOD if won else BB.BAD),
+				BB.esc(g.name_of("provinces", b.location)),
+				BB.char_link(g, b.winner),
+				BB.good("−" + K.fmt(b.win_loss)) if won else BB.bad("−" + K.fmt(b.lose_loss)),
+				BB.bad("−" + K.fmt(b.lose_loss)) if won else BB.good("−" + K.fmt(b.win_loss)),
+			], false))
+		if battles.is_empty():
+			bl.add_child(K.label(app.t("ui.no_battles"), "MutedLabel"))
+		box.add_child(K.vbox([K.label(app.t("ui.battles"), "GoldLabel"), bl], 3))
 		if leader:
 			var enemy_accepts := Wars.ai_will_accept_surrender(g, w, enemy_side)
 			var win := "victory" if side == "att" else "defeat"

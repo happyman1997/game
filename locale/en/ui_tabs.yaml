@@ -1,0 +1,51 @@
+ui:
+  ctab:
+    overview: Overview
+    family: Family & Relations
+    realm: Holdings
+  rtab:
+    overview: Overview
+    vassals: Vassals
+    council: Council
+    laws: Laws
+    politics: Politics
+  vassal_of: "Vassal of "
+  independent_ruler: Independent ruler
+  born_on: "born {date}"
+  relations: Relations
+  rel:
+    friend: Friend
+    rival: Rival
+    lover: Lover
+    lover_m: Lover
+    feud: Feud
+  no_relations: No close relations.
+  dynasty_members_n: "Living members: {n}"
+  stress_level: "Stress: {n}"
+  col:
+    vassal: Vassal
+    opinion: Opinion
+    tax: Tax
+    levy: Levy
+  vassals_total: "Vassals give {tax} gold and {levy} soldiers a month."
+  vassal_powerful: Powerful vassal
+  vassal_in_faction: "In faction: {name}"
+  vassal_tip_tax: Tax paid to the liege per month
+  vassal_tip_levy: Soldiers sent to the liege's army
+  no_vassals: No vassals.
+  realm_counties_n: "Counties: {n}"
+  realm_overview: Realm
+  war_months: "{n} months"
+  war_goal: War goal
+  battles: Battles
+  no_battles: No battles yet.
+  battle_won: Victory
+  battle_lost: Defeat
+  side_strength: Side strength
+  ol:
+    pinned: Pinned
+    factions: Factions against you
+    unhappy_vassals: Unhappy vassals
+    construction: Construction
+  pin: Pin to the outliner
+  unpin: Unpin

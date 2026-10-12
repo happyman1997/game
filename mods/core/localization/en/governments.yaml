@@ -24,3 +24,5 @@ decision:
   campaign_for_assembly: Campaign at the Assembly
 decision_desc:
   campaign_for_assembly: "Feasts, gifts to the village elders and speeches in the squares: more counties will vote for your family at the next assembly election."
+modifier:
+  levee_en_masse: Levée en masse

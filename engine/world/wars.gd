@@ -212,9 +212,8 @@ static func builtin_cb_targets() -> Dictionary:
 				var def := Titles.top_liege(game, h)
 				if def.faith == attacker.faith or def.id == attacker.id:
 					continue
-				# ереси одной религии священных войн друг другу не объявляют;
 				# вера может заключить мир с чужой религией (no_holy_war_with)
-				if _religion(game, def.faith) == _religion(game, attacker.faith) or _holy_peace(game, attacker.faith, def.faith):
+				if _holy_peace(game, attacker.faith, def.faith):
 					continue
 				var td: Variant = game.content.get_def("titles", c)
 				var duchy: Variant = td.get("liege") if td != null else null

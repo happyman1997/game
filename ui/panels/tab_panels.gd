@@ -1,6 +1,7 @@
 class_name TabPanels
 extends RefCounted
-## Вкладки «Интриги», «Решения», «Держава», «Летопись» и выбор персонажа.
+## Вкладки «Интриги», «Решения», «Держава» (с внутренними вкладками: обзор,
+## вассалы, совет, законы, политика), «Летопись» и выбор персонажа.
 
 
 static func intrigue(app: App) -> Control:
@@ -80,17 +81,125 @@ static func decisions(app: App) -> Control:
 static func realm(app: App) -> Control:
 	var g := app.game
 	var p: Dictionary = g.player
-	var root := K.vbox([], 10)
+	var vassals := g.vassals_of(p.id)
+	var tabs := [
+		{"id": "overview", "name": app.t("ui.rtab.overview"), "icon": "castle"},
+		{"id": "vassals", "name": app.t("ui.rtab.vassals"), "icon": "shield", "badge": vassals.size()},
+	]
+	if g.engine.has_feature("council"):
+		tabs.append({"id": "council", "name": app.t("ui.rtab.council"), "icon": "council"})
+	tabs.append({"id": "laws", "name": app.t("ui.rtab.laws"), "icon": "scroll"})
+	if g.engine.has_feature("politics") or g.engine.has_feature("factions"):
+		var against := 0
+		if g.engine.has_feature("factions"):
+			against = g.state.factions.values().filter(func(f): return f.get("target") == p.id).size()
+		tabs.append({"id": "politics", "name": app.t("ui.rtab.politics"), "icon": "fist", "badge": against})
+	return W.tabs(app, "realm", tabs, func(tab_id: String) -> Control:
+		var root := K.vbox([], 10)
+		match tab_id:
+			"vassals":
+				root.add_child(vassal_table(app, p, vassals))
+			"council":
+				var council: Variant = FeatureSections.council(app, p)
+				if council != null:
+					root.add_child(council)
+			"laws":
+				root.add_child(_succession(app, p))
+				var laws: Variant = FeatureSections.laws(app, p)
+				if laws != null:
+					root.add_child(laws)
+			"politics":
+				var politics: Variant = FeatureSections.politics(app, p)
+				if politics != null:
+					root.add_child(politics)
+				for f in FeatureSections.factions(app, p):
+					root.add_child(f)
+			_:
+				_realm_overview(app, p, root)
+		return root)
+
+
+## Обзор державы: домен, доход, наследник, титулы, двор, династия.
+static func _realm_overview(app: App, p: Dictionary, root: VBoxContainer) -> void:
+	var g := app.game
 	var dom := Titles.domain_counties(g, p)
 	var limit := Economy.domain_limit(g, p)
 	var income := Economy.monthly_income(g, p)
 	root.add_child(ProvincePanel._kv([
 		[app.t("ui.domain"), K.label("%d / %d" % [dom.size(), limit], "BadLabel" if dom.size() > limit else "", app.t("ui.domain_tip"))],
 		[app.t("ui.realm_size"), K.fmt(Titles.realm_counties(g, p).size())],
+		[app.t("ui.levies"), W.stat("levies", K.fmt(Economy.realm_levy(g, p)))],
 		[app.t("ui.income"), W.stat("gold", K.signed(income, 1), BB.breakdown(Economy.income_breakdown(g, p), 1), UiArt.C_GOOD if income >= 0 else UiArt.C_BAD)],
 	]))
+	# наследники — коротко (закон и его смена — на вкладке «Законы»)
+	var heirs := Succession.heirs_of(g, p).slice(0, 5)
+	var heir_row := K.flow([], 6)
+	for i in heirs.size():
+		var hc: Variant = g.ch(heirs[i])
+		if hc == null:
+			continue
+		var cap := K.label("%d. %s" % [i + 1, app.t("ui.age_n", {"n": Chars.age_of(g, hc)})], "SmallLabel")
+		cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		heir_row.add_child(K.vbox([W.portrait(app, hc, 56), cap], 0))
+	var law: Variant = Succession.law_of(g, p)
+	var succ := [K.label(g.name_of("succession_laws", law.id) if law != null else "—", "MutedLabel")]
+	succ.append(heir_row if not heirs.is_empty() else K.label(app.t("ui.no_heir"), "BadLabel"))
+	root.add_child(K.section(app.t("ui.succession"), succ, "crown"))
 
-	# наследование
+	# титулы
+	var titles: Array = p.titles.duplicate()
+	Data.sort_by(titles, func(t): return Titles.TIERS.find(g.title_def(t).tier) if g.title_def(t) != null else 0, true)
+	var tl := K.flow([], 8)
+	for t in titles:
+		var box := K.hbox([W.coa(app, t, 26), W.title_link(app, t)], 6)
+		box.custom_minimum_size.x = 280
+		tl.add_child(box)
+	root.add_child(K.section("%s (%d)" % [app.t("ui.titles"), titles.size()], [tl], "crown"))
+	var candidates := {}
+	for c in Titles.realm_counties(g, p):
+		var d: Variant = g.title_def(c)
+		var t: Variant = d.get("liege") if d != null else null
+		while t != null:
+			if not p.titles.has(t):
+				candidates[t] = true
+			var td: Variant = g.title_def(t)
+			t = td.get("liege") if td != null else null
+	var cands := []
+	for t in candidates:
+		cands.append({"t": t, "ok": Titles.can_create_title(g, p, t).ok})
+	cands.sort_custom(func(a, b): return int(a.ok) > int(b.ok))
+	var rows := []
+	for item in cands.slice(0, 8):
+		var row := K.hbox([W.coa(app, item.t, 20), W.title_link(app, item.t)], 6)
+		var act: Variant = ProvincePanel.title_actions(app, item.t)
+		if act != null:
+			rows.append(K.vbox([row, act], 2))
+		else:
+			rows.append(row)
+	if not rows.is_empty():
+		root.add_child(K.section(app.t("ui.claimable_titles"), rows, "crown"))
+
+	# двор
+	var court := g.courtiers_of(p.id)
+	var cf := K.flow([], 6)
+	for c in court:
+		var cap := K.label(str(Chars.age_of(g, c)), "SmallLabel")
+		cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		cf.add_child(K.vbox([W.portrait(app, c, 48), cap], 0))
+	root.add_child(K.section("%s (%d)" % [app.t("ui.court"), court.size()], [cf], "castle"))
+	if p.dynasty != null:
+		var d: Variant = g.state.dynasties.get(p.dynasty)
+		var members := g.living().filter(func(x): return x.dynasty == p.dynasty)
+		root.add_child(K.section(app.t("ui.dynasty"), [K.hbox([
+			W.dynasty_coa(app, p.dynasty, 40),
+			K.vbox([K.label(app.t("ui.dynasty_n", {"name": g.name_of("dynasties", p.dynasty)}), "SubheaderLabel"),
+				K.hbox([W.stat("prestige", K.fmt(d.prestige if d != null else 0)), K.label(app.t("ui.members_n", {"n": members.size()}), "MutedLabel")], 12)], 2),
+		], 10)], "dynasty"))
+
+
+## Закон наследования, наследники и смена закона.
+static func _succession(app: App, p: Dictionary) -> Control:
+	var g := app.game
 	var law: Variant = Succession.law_of(g, p)
 	var heirs := Succession.heirs_of(g, p).slice(0, 5)
 	var succ := K.vbox([], 4)
@@ -132,72 +241,77 @@ static func realm(app: App) -> Control:
 				"tip": BB.i(g.desc_of("succession_laws", lid)) + "\n" + BB.cost(g, {"prestige": cost}) + ("\n" + BB.reasons(reasons) if not reasons.is_empty() else "")}))
 		succ.add_child(K.label(app.t("ui.change_law"), "SmallLabel"))
 		succ.add_child(btns)
-	root.add_child(K.section(app.t("ui.succession"), [succ], "crown"))
-	var laws: Variant = FeatureSections.laws(app, p)
-	if laws != null:
-		root.add_child(laws)
-	var council: Variant = FeatureSections.council(app, p)
-	if council != null:
-		root.add_child(council)
-	var politics: Variant = FeatureSections.politics(app, p)
-	if politics != null:
-		root.add_child(politics)
-	for f in FeatureSections.factions(app, p):
-		root.add_child(f)
+	return K.section(app.t("ui.succession"), [succ], "crown")
 
-	# титулы
-	var tl := K.vbox([], 2)
-	for t in p.titles:
-		tl.add_child(K.hbox([W.coa(app, t, 22), W.title_link(app, t)], 6))
-	root.add_child(K.section(app.t("ui.titles"), [tl], "crown"))
-	var candidates := {}
-	for c in Titles.realm_counties(g, p):
-		var d: Variant = g.title_def(c)
-		var t: Variant = d.get("liege") if d != null else null
-		while t != null:
-			if not p.titles.has(t):
-				candidates[t] = true
-			var td: Variant = g.title_def(t)
-			t = td.get("liege") if td != null else null
-	var cands := []
-	for t in candidates:
-		cands.append({"t": t, "ok": Titles.can_create_title(g, p, t).ok})
-	cands.sort_custom(func(a, b): return int(a.ok) > int(b.ok))
+
+## Таблица вассалов (как в CK3): портрет и титул, мнение, налог и войско,
+## которые вассал даёт сюзерену; значки — влиятельный, во фракции, повинность.
+static func vassal_table(app: App, liege: Dictionary, vassals: Array) -> Control:
+	var g := app.game
+	if vassals.is_empty():
+		return K.label(app.t("ui.no_vassals"), "MutedLabel")
+	var powerful := Politics.powerful_vassals(g, liege) if g.engine.has_feature("politics") else []
 	var rows := []
-	for item in cands.slice(0, 8):
-		var row := K.hbox([W.coa(app, item.t, 20), W.title_link(app, item.t)], 6)
-		var act: Variant = ProvincePanel.title_actions(app, item.t)
-		if act != null:
-			rows.append(K.vbox([row, act], 2))
-		else:
-			rows.append(row)
-	if not rows.is_empty():
-		root.add_child(K.section(app.t("ui.claimable_titles"), rows, "crown"))
-
-	# вассалы и двор
-	var vassals := g.vassals_of(p.id)
-	var vl := []
+	var total_tax := 0.0
+	var total_levy := 0
 	for v in vassals:
-		var op := Opinion.opinion(g, v, p)
-		var chip: Variant = FeatureSections.obligation_chip(app, v)
-		vl.append(W.char_row(app, v, [chip] if chip != null else [], [K.rich(BB.signed(op), false)], 40))
-	root.add_child(K.section("%s (%d)" % [app.t("ui.vassals"), vassals.size()], vl, "shield"))
-	var court := g.courtiers_of(p.id)
-	var cf := K.flow([], 6)
-	for c in court:
-		var cap := K.label(str(Chars.age_of(g, c)), "SmallLabel")
-		cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		cf.add_child(K.vbox([W.portrait(app, c, 48), cap], 0))
-	root.add_child(K.section("%s (%d)" % [app.t("ui.court"), court.size()], [cf], "castle"))
-	if p.dynasty != null:
-		var d: Variant = g.state.dynasties.get(p.dynasty)
-		var members := g.living().filter(func(x): return x.dynasty == p.dynasty)
-		root.add_child(K.section(app.t("ui.dynasty"), [K.hbox([
-			W.dynasty_coa(app, p.dynasty, 40),
-			K.vbox([K.label(app.t("ui.dynasty_n", {"name": g.name_of("dynasties", p.dynasty)}), "SubheaderLabel"),
-				K.hbox([W.stat("prestige", K.fmt(d.prestige if d != null else 0)), K.label(app.t("ui.members_n", {"n": members.size()}), "MutedLabel")], 12)], 2),
-		], 10)], "dynasty"))
-	return root
+		var tax := Economy.vassal_tax_to(g, liege, v)
+		var levy := Economy.vassal_levy_to(g, liege, v)
+		total_tax += tax
+		total_levy += levy
+		rows.append({"v": v, "tax": tax, "levy": levy, "op": Opinion.opinion(g, v, liege)})
+	rows.sort_custom(func(a, b): return a.levy > b.levy)
+	var box := K.vbox([], 2)
+	box.add_child(K.para(app.t("ui.vassals_total", {"tax": K.fmt(total_tax, 1), "levy": K.fmt(total_levy)}), "MutedLabel"))
+	var head := K.hbox([K.label(app.t("ui.col.vassal"), "SmallLabel"), K.expand()], 6)
+	for col in ["opinion", "tax", "levy"]:
+		var l := K.label(app.t("ui.col." + col), "SmallLabel")
+		l.custom_minimum_size.x = 64
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		head.add_child(l)
+	box.add_child(K.margin(head, 8, 2, 8, 2))
+	for r in rows:
+		var v: Dictionary = r.v
+		var badges := K.hbox([], 4)
+		if powerful.has(v.id):
+			badges.add_child(K.tip(K.icon("crown", 14), app.t("ui.vassal_powerful")))
+		if g.engine.has_feature("factions"):
+			var f: Variant = Factions.faction_of(g, v)
+			if f != null:
+				badges.add_child(K.tip(K.icon("fist", 14, "red"), app.t("ui.vassal_in_faction", {"name": g.name_of("factions", f.type)})))
+		# повинность — значком (обычная — без значка)
+		if g.engine.has_feature("politics"):
+			var ob: Variant = Politics.obligation_of(g, v)
+			var lvl := Data.num(ob.get("level")) if ob != null else 0.0
+			if ob != null and lvl != 0.0:
+				var ob_name := g.name_of("vassal_obligations", ob.id)
+				badges.add_child(K.tip(K.icon("scales", 14, "red" if lvl > 0 else "green"), BB.title(ob_name) + "\n" + BB.esc(app.t("ui.obligation_tip"))))
+		var t0: String = v.titles[0] if not v.titles.is_empty() else ""
+		var sub := K.label(Titles.full_name(g, t0) if t0 != "" else "", "SmallLabel")
+		sub.clip_text = true
+		sub.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		sub.custom_minimum_size.x = 60
+		var info := K.vbox([W.char_link(app, v.id, true), K.hbox([sub, badges], 6)], 0)
+		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		info.custom_minimum_size.x = 120
+		var row := K.hbox([W.portrait(app, v, 40, {"coa": true}), info], 8)
+		var op_l := K.rich("[right]%s[/right]" % BB.signed(r.op), false)
+		op_l.custom_minimum_size.x = 64
+		op_l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		K.tip(op_l, func(): return BB.title(app.t("ui.opinion_of_you")) + "\n" + BB.breakdown(Opinion.breakdown(g, v, liege)))
+		row.add_child(op_l)
+		var tax_l := W.stat("gold", K.fmt(r.tax, 1), app.t("ui.vassal_tip_tax"), UiArt.C_TEXT, 14) as HBoxContainer
+		tax_l.custom_minimum_size.x = 64
+		tax_l.alignment = BoxContainer.ALIGNMENT_END
+		tax_l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(tax_l)
+		var levy_l := W.stat("levies", K.fmt(r.levy), app.t("ui.vassal_tip_levy"), UiArt.C_TEXT, 14) as HBoxContainer
+		levy_l.custom_minimum_size.x = 64
+		levy_l.alignment = BoxContainer.ALIGNMENT_END
+		levy_l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(levy_l)
+		box.add_child(K.panel(row, "RowPanel"))
+	return box
 
 
 static func log(app: App) -> Control:

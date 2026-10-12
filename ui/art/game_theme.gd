@@ -3,7 +3,7 @@ extends RefCounted
 ## Тема интерфейса (Godot Theme): шрифты, цвета и стили всех виджетов.
 ## Варианты типов (theme_type_variation) задают особые виды:
 ##   панели — InsetPanel, HeaderPanel, ParchmentPanel, DarkPanel, BarPanel, RowPanel;
-##   кнопки — GoldButton, RoundButton, FlatButton, EventOption, TabButton, CloseButton;
+##   кнопки — GoldButton, RoundButton, FlatButton, EventOption, TabButton, WindowTab, CloseButton;
 ##   надписи — TitleLabel, HeaderLabel, SubheaderLabel, MutedLabel, SmallLabel,
 ##             InkLabel, InkTitle, GoodLabel, BadLabel, GoldLabel.
 
@@ -142,6 +142,31 @@ static func _buttons(t: Theme) -> void:
 		"normal": UiArt.round_box("normal"), "hover": UiArt.round_box("hover"), "pressed": UiArt.round_box("active"),
 		"hover_pressed": UiArt.round_box("active"), "disabled": UiArt.round_box("normal"),
 	}, light, 22, Fonts.emoji())
+
+	# Вкладка окна (как в CK3): тёмная плашка, у активной — золотая черта снизу.
+	t.set_type_variation("WindowTab", "Button")
+	var tab_box := func(bg: Color, line: Color, line_w: int) -> StyleBoxFlat:
+		var sb := UiArt.flat(bg, Color(0, 0, 0, 0), 0, 3)
+		sb.corner_radius_bottom_left = 0
+		sb.corner_radius_bottom_right = 0
+		sb.border_color = line
+		sb.border_width_bottom = line_w
+		sb.content_margin_left = 10
+		sb.content_margin_right = 10
+		sb.content_margin_top = 5
+		sb.content_margin_bottom = 5
+		return sb
+	var tab_colors := light.duplicate()
+	tab_colors.font_color = UiArt.C_MUTED
+	tab_colors.font_pressed_color = Color("#fff0c0")
+	tab_colors.font_hover_pressed_color = Color("#fff0c0")
+	_button_states(t, "WindowTab", {
+		"normal": tab_box.call(Color(1, 1, 1, 0.04), Color(UiArt.BRONZE, 0.5), 1),
+		"hover": tab_box.call(Color(UiArt.GOLD, 0.12), Color(UiArt.GOLD, 0.7), 1),
+		"pressed": tab_box.call(Color(UiArt.GOLD, 0.2), Color(UiArt.GOLD_LIGHT), 3),
+		"hover_pressed": tab_box.call(Color(UiArt.GOLD, 0.24), Color(UiArt.GOLD_LIGHT), 3),
+		"disabled": tab_box.call(Color(0, 0, 0, 0), Color(0, 0, 0, 0), 0),
+	}, tab_colors, 15, Fonts.bold())
 
 	t.set_type_variation("FlatButton", "Button")
 	var row_hover := UiArt.flat(Color(UiArt.GOLD, 0.12), Color(UiArt.GOLD, 0.35), 1, 2, 4)

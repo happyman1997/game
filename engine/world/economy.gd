@@ -78,11 +78,8 @@ static func income_breakdown(game: Game, c: Dictionary) -> Array:
 	parts.append({"label": game.loc.t("ui.domain_tax"), "value": dom})
 	var share := vassal_tax_share(game)
 	var from_vassals := 0.0
-	var tax_mult := maxf(0.0, 1.0 + Stats.stat(game, c, "vassal_tax_mult"))
 	for v in game.vassals_of(c.id):
-		if not in_revolt(game, v.id, c.id):
-			# vassal_contribution_tax — личные условия службы вассала (привилегии, повинности)
-			from_vassals += domain_tax(game, v) * share * tax_mult * maxf(0.0, 1.0 + Stats.stat(game, v, "vassal_contribution_tax"))
+		from_vassals += vassal_tax_to(game, c, v)
 	if from_vassals != 0.0:
 		parts.append({"label": game.loc.t("ui.vassal_tax"), "value": from_vassals})
 	if c.liege != null:
@@ -102,6 +99,23 @@ static func income_breakdown(game: Game, c: Dictionary) -> Array:
 	for extra in game.engine.hooks.collect("economy.income", {"game": game, "character": c}):
 		parts.append(extra)
 	return parts
+
+
+## Налог, который вассал платит сюзерену в месяц (0 — если он в мятеже).
+## vassal_contribution_tax — личные условия службы вассала (привилегии, повинности).
+static func vassal_tax_to(game: Game, liege: Dictionary, v: Dictionary) -> float:
+	if in_revolt(game, v.id, liege.id):
+		return 0.0
+	var tax_mult := maxf(0.0, 1.0 + Stats.stat(game, liege, "vassal_tax_mult"))
+	return domain_tax(game, v) * vassal_tax_share(game) * tax_mult * maxf(0.0, 1.0 + Stats.stat(game, v, "vassal_contribution_tax"))
+
+
+## Ополчение, которое вассал (со своими вассалами) приводит сюзерену.
+static func vassal_levy_to(game: Game, liege: Dictionary, v: Dictionary) -> int:
+	if in_revolt(game, v.id, liege.id):
+		return 0
+	var share = game.def_num("economy.vassal_levy_share", 0.35) * maxf(0.0, 1.0 + Stats.stat(game, liege, "vassal_levy_mult"))
+	return roundi(realm_levy(game, v) * share * maxf(0.0, 1.0 + Stats.stat(game, v, "vassal_contribution_levy")))
 
 
 static func monthly_income(game: Game, c: Dictionary) -> float:
