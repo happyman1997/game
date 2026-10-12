@@ -57,7 +57,8 @@ decisions:
     major: true
     is_shown:
       is_ruler: yes
-      NOT: { government: order }
+      # Стражи стерегут пепел, а цверги боятся огня людей
+      NOR: [ { government: order }, { culture: zwerg } ]
       OR:
         - any_wild_county: { terrain: ash }
         - any_domain_province: { terrain: ash }
@@ -71,16 +72,20 @@ decisions:
       - trigger_event: ash.0001
     ai_check_months: 12
     ai_will_do:
-      value: 4
+      value: 6
       if:
-        - limit: { has_claim_on: title:e_sun_empire }
-          add: 20
+        # внуки и правнуки Отгара — маркграфы — ищут венец из поколения в поколение
+        - limit:
+            OR:
+              - has_claim_on: title:e_sun_empire
+              - AND: [ { culture: marcher }, { tier: ">= kingdom" } ]
+          add: 30
         - limit: { has_trait: ambitious }
           add: 10
         - limit: { gold: ">= 250" }
           add: 8
         - limit: { var: { name: crown_trail, value: ">= 1" } }
-          add: 15
+          add: 30
 
   # Заселить пепелище: ничейное графство у границы становится вашим.
   settle_ashlands:
@@ -170,12 +175,12 @@ casus_belli:
     requires_feature: artifacts
     icon: "👑"
     targets: artifact_holder
+    is_shown:
+      OR:
+        - has_claim_on: title:e_sun_empire
+        - culture: marcher
     is_valid:
       scope:defender: { realm_has_artifact: sun_crown }
-      scope:attacker:
-        OR:
-          - has_claim_on: title:e_sun_empire
-          - culture: marcher
     cost:
       prestige: 150
     on_victory:
@@ -196,8 +201,8 @@ casus_belli:
     requires_feature: [artifacts, governments]
     icon: "⚱"
     targets: independent_ruler
+    is_shown: { government: order }
     is_valid:
-      scope:attacker: { government: order }
       scope:defender:
         OR:
           - realm_has_artifact: sun_crown

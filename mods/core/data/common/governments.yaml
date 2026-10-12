@@ -53,8 +53,10 @@ governments:
     icon: "🏛"
     order: 4
     succession: master_council_law
-    # цверги торгуют и служат, а не завоёвывают
-    ai_war_mult: 0.3
+    # цверги торгуют и служат, а не завоёвывают: воюют только за свои
+    # претензии и де-юре земли
+    ai_war_mult: 0.5
+    war_cbs: [claim, de_jure]
     ruler_modifiers: { domain_limit: 5, build_cost_mult: -0.3, domain_fort: 2 }
     county_modifiers: { tax_mult: 0.2 }
 

@@ -212,8 +212,9 @@ static func builtin_cb_targets() -> Dictionary:
 				var def := Titles.top_liege(game, h)
 				if def.faith == attacker.faith or def.id == attacker.id:
 					continue
-				# ереси одной религии священных войн друг другу не объявляют
-				if _religion(game, def.faith) == _religion(game, attacker.faith):
+				# ереси одной религии священных войн друг другу не объявляют;
+				# вера может заключить мир с чужой религией (no_holy_war_with)
+				if _religion(game, def.faith) == _religion(game, attacker.faith) or _holy_peace(game, attacker.faith, def.faith):
 					continue
 				var td: Variant = game.content.get_def("titles", c)
 				var duchy: Variant = td.get("liege") if td != null else null
@@ -228,6 +229,14 @@ static func builtin_cb_targets() -> Dictionary:
 				out.append({"defender": def.id, "title": duchy if duchy != null else c, "counties": counties})
 			return out},
 	}
+
+
+## Вера одной из сторон запрещает священные войны с религией другой.
+static func _holy_peace(game: Game, a: String, b: String) -> bool:
+	var fa: Variant = game.content.get_def("faiths", a)
+	var fb: Variant = game.content.get_def("faiths", b)
+	return (fa != null and Data.as_array(fa.get("no_holy_war_with")).has(_religion(game, b))) \
+		or (fb != null and Data.as_array(fb.get("no_holy_war_with")).has(_religion(game, a)))
 
 
 static func _religion(game: Game, faith: String) -> String:
@@ -259,6 +268,11 @@ static func available_war_targets(game: Game, attacker: Dictionary, defender: Va
 		# правление может ограничить поводы (орден воюет только с искателями венца)
 		if not game.engine.hooks.veto("war.cb_allowed", {"game": game, "attacker": attacker, "cb": cb.id}):
 			continue
+		# is_shown — условие на самого нападающего (root): проверяется до поиска целей
+		if cb.get("is_shown") != null:
+			var sctx := ScriptContext.make(game, {"type": "character", "id": attacker.id})
+			if not Interp.eval_trigger(sctx, sctx.root, cb.is_shown):
+				continue
 		var prov: Variant = game.engine.cb_targets.get_item(str(cb.get("targets")))
 		if prov == null:
 			game.script_error("Нет поставщика целей войны \"%s\"" % cb.get("targets"))

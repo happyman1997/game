@@ -51,6 +51,9 @@ faiths:
     color: "#6a5a8a"
     icon: "🕯"
     doctrines: { polygamy: false }
+    # Каменный договор Отгара с Подгорьем: люди империи и цверги
+    # не ведут друг с другом священных войн
+    no_holy_war_with: [christianity]
     virtues: [diligent, patient, honest, stubborn]
     sins: [lazy, fickle, deceitful, greedy]
 
