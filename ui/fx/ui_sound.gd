@@ -2,7 +2,7 @@ class_name UiSound
 extends RefCounted
 ## Звуки интерфейса. Как и графика (ui/art рисует всё из SVG), звуки
 ## синтезируются кодом при первом проигрывании: щелчки дерева и пергамента,
-## шелест страниц, колокол события, барабан войны, звон монет. Свой файл
+## шелест страниц, перебор арфы у события, барабан войны, звон монет. Свой файл
 ## res://assets/sounds/<имя>.ogg или .wav заменяет синтезированный звук.
 ## Громкость — настройка ui_volume (0–1), шина «UI».
 ##
@@ -83,8 +83,11 @@ static func follow(sound: String) -> void:
 
 ## Подготовить все звуки заранее (чтобы первый щелчок не запинался).
 static func warm_up() -> void:
-	for s in ["hover", "click", "click_soft", "click_gold", "tab", "open", "close", "error", "notify", "notify_good", "notify_bad", "event", "coin", "war", "select"]:
+	for s in ["hover", "click", "click_soft", "click_gold", "tab", "open", "close", "error", "notify", "notify_good", "notify_bad", "event", "coin", "war", "select", "pause", "unpause"]:
 		_stream(s)
+		# по звуку за кадр — меню не замирает
+		if not _players.is_empty() and _players[0].is_inside_tree():
+			await _players[0].get_tree().process_frame
 
 
 static func _stream(sound: String) -> AudioStream:
@@ -138,10 +141,13 @@ static func _synth(sound: String) -> PackedFloat32Array:
 		"error": return _level(_warm(_seq([[0.0, _thock(0.12, 230.0, 190.0, 0.035, 0.006)], [0.09, _thock(0.12, 195.0, 160.0, 0.035, 0.006)]]), 1800.0), 0.07)
 		"pause": return _level(_warm(_seq([[0.0, _thock(0.07, 300.0, 260.0, 0.02)], [0.07, _thock(0.08, 230.0, 200.0, 0.025)]]), 2000.0), 0.045)
 		"unpause": return _level(_warm(_seq([[0.0, _thock(0.07, 230.0, 200.0, 0.02)], [0.07, _thock(0.08, 300.0, 260.0, 0.025)]]), 2000.0), 0.045)
-		"event": return _level(_warm(_seq([
-			[0.0, _bell(1.6, 523.25, [1.0, 2.0, 3.0], [1.0, 0.5, 0.25], [1.0, 0.22, 0.06], 0.012)],
-			[0.18, _bell(1.4, 783.99, [1.0, 2.0, 3.0], [0.9, 0.45, 0.2], [0.7, 0.15, 0.04], 0.012)],
-		]), 2400.0), 0.07)
+		# событие: тихий перебор арфы в нижнем регистре (ре — соль — си) с
+		# лёгким эхом зала — не звонок, а «к вам пришли»
+		"event": return _level(_warm(_hall(_seq([
+			[0.0, _harp(1.3, 293.66, 0.55)],
+			[0.075, _harp(1.25, 392.0, 0.5)],
+			[0.15, _harp(1.2, 493.88, 0.45)],
+		]), 0.28), 1700.0), 0.04)
 		"notify": return _level(_warm(_pluck(0.55, 440.0, 0.995), 2200.0), 0.04)
 		"notify_good": return _level(_warm(_seq([[0.0, _pluck(0.5, 523.25, 0.995)], [0.1, _pluck(0.6, 783.99, 0.995)]]), 2200.0), 0.045)
 		"notify_bad": return _level(_warm(_seq([[0.0, _pluck(0.55, 329.63, 0.994)], [0.13, _pluck(0.7, 261.63, 0.994)]]), 1800.0), 0.045)
@@ -306,6 +312,45 @@ static func _bell(dur: float, f: float, ratios: Array, taus: Array, amps: Array,
 		for i in n:
 			var t := float(i) / RATE
 			out[i] += sin(w * i) * amp * exp(-t / tau) * minf(1.0, t / attack)
+	return out
+
+
+## Мягкая струна арфы: почти чистый тон с тёплой второй гармоникой, едва
+## расстроенный двойник (медленные биения — «живой» звук) и плавная атака.
+static func _harp(dur: float, f: float, tau: float) -> PackedFloat32Array:
+	var n := _n(dur)
+	var out := PackedFloat32Array()
+	out.resize(n)
+	var w1 := TAU * f / RATE
+	var w2 := TAU * f * 2.0 / RATE
+	var wd := TAU * f * 1.0025 / RATE
+	for i in n:
+		var t := float(i) / RATE
+		var env := minf(1.0, t / 0.018) * exp(-t / tau)
+		out[i] = (sin(w1 * i) + 0.35 * sin(wd * i) + 0.12 * sin(w2 * i) * exp(-t / (tau * 0.35))) * env
+	return out
+
+
+## Эхо зала: несколько затухающих приглушённых отражений, хвост ~0,5 с.
+static func _hall(s: PackedFloat32Array, wet: float) -> PackedFloat32Array:
+	var delays := [0.0297, 0.0371, 0.0411, 0.0437]
+	var tail := _n(0.5)
+	var out := PackedFloat32Array()
+	out.resize(s.size() + tail)
+	for i in s.size():
+		out[i] = s[i]
+	for d in delays:
+		var dn := _n(d)
+		var buf := PackedFloat32Array()
+		buf.resize(dn)
+		var lp := 0.0
+		var fb := pow(0.001, d / 1.1)
+		for i in out.size():
+			var x := s[i] if i < s.size() else 0.0
+			var y := buf[i % dn]
+			lp += 0.35 * (y - lp)
+			buf[i % dn] = x + lp * fb
+			out[i] += y * wet / delays.size()
 	return out
 
 
