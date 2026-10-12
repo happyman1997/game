@@ -35,6 +35,7 @@ static func build(app: App, ref: Dictionary) -> Dictionary:
 					"lifestyle": body = LifestylePanel.build(app)
 					"realm": body = TabPanels.realm(app)
 					"dynasty": body = DynastyPanel.build(app, g.player.dynasty)
+					"inventory": body = InventoryPanel.build(app, g.player)
 					"military": body = MilitaryPanel.build(app)
 					"wars": body = WarsPanel.build(app)
 					"intrigue": body = TabPanels.intrigue(app)

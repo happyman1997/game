@@ -1,17 +1,103 @@
+# Inventory and artifacts: engine and interface strings.
 ui:
   artifacts: Artifacts
+  inventory: Inventory
+  tab:
+    inventory: Inventory
+  ctab:
+    inventory: Items
+  inv_equipment: Equipment
+  inv_court: Court Display
+  inv_court_tip: "The court display — throne, walls and pedestals — belongs to rulers only."
+  inv_storage: Storage
+  inv_storage_empty: Storage is empty
+  inv_empty_slot: "Empty: {slot}"
+  inv_equip: Equip
+  inv_place: Display
+  inv_unequip: Unequip
+  inv_remove: Take down
+  inv_repair: Repair
+  inv_repair_tip: "Repair for {n} gold"
+  inv_melt: Melt Down
+  inv_melt_tip: "Melt it down for {n} gold. The item is gone for good."
+  inv_durability: "Durability: {n}%"
+  inv_durability_tip: "Items wear out: equipped ones faster, weapons and armor in battle too. An item that falls apart is gone. Repair it while you can."
+  inv_indestructible: Never wears out
+  inv_history: History
+  inv_claims: Claimed by
+  inv_house_claim: "Heirloom of the {name} dynasty"
+  inv_value: "Value: {n}"
+  inv_type_rarity: "{type} · {rarity}"
+  inv_select_hint: "Click an item to see details and actions"
+  inv_slot_count: "{n} of {m}"
+  inv_commission: Commission an Artisan
+  inv_commission_tip: "An artisan makes an item to order: the more generous the pay, the better the chance of a masterwork, famed or illustrious piece. The patron's stewardship improves the odds."
+  inv_commission_type: What to commission
+  inv_commission_tier: Quality of work
+  inv_commission_cost: "{n} gold · {m} mo"
+  inv_commission_chances: Odds
+  inv_commission_in_progress: "The artisan is at work: {type} ({tier}) — ready on {date}"
+  inv_commission_busy: The artisan is already busy with your order
+  inv_need_gold: "Need {n} gold"
+  inv_too_young: Too young to commission
+  inv_no_tier: No such commission
+  inv_order: Commission
+  inv_some_artifact: an item
+  inv_choose_artifact: Which item to give
+  inv_choose_claimed: Which item to demand
+  inv_your_claims: Your claims
+  inv_claims_on_you: Claims on your items
+  inv_demand: Demand
+  inv_nothing: No items
+  inv_unique: Unique artifact
+  inv_equipped_mods: Grants while equipped
+  inv_stored_mods: Would grant if equipped
+alert:
+  artifact_wearing: "Items wearing out: {list}"
+  artifact_free_slot: "Something to equip: {list}"
 msg:
-  artifact_gained: "The artifact is yours: {value}."
-  artifact_taken: "{who} takes your artifact: {value}."
+  artifact_gained: "Now in your hands: {value}."
+  artifact_taken: "{who} takes your item: {value}."
   artifact_lost: "The artifact is lost: {value}."
+  artifact_destroyed: "The item fell apart: {value}."
+  artifact_commissioned: "The artisan has finished: {value} ({rarity})."
   attrition: "Ash storm: the army loses {n} soldiers ({place})."
+inv_hist:
+  created: "Made"
+  commissioned: "Commissioned: {to}"
+  heirloom: "Family heirloom: {to}"
+  inherited: "Inherited: {to}"
+  gift: "Gift: {from} → {to}"
+  looted: "Taken in battle: {from} → {to}"
+  trophy: "Picked up on the battlefield: {to}"
+  seized: "Seized: {from} → {to}"
+  stolen: "Stolen: {from} → {to}"
+  returned: "Returned: {from} → {to}"
+  bought: "Bought: {to}"
+  found: "Found: {to}"
+  gained: "Passed: {from} → {to}"
+  repaired: "Repaired"
+  lost: "Lost: {from}"
+opinion:
+  holds_my_artifact: "Holds my item: {name}"
 tr:
-  has_artifact: "Holds the artifact: {value}"
+  has_artifact: "Holds the item: {value}"
   realm_has_artifact: "The realm keeps the artifact: {value}"
   artifact_is_held: "Someone holds «{value}»"
+  has_artifact_type: "Has an item: {value}"
+  has_artifact_claim: "Claims an item of {who}"
+  has_artifact_claim_any: Claims someone's item
+  artifact_type: "Item: {value}"
+  artifact_rarity: "Rarity at least: {value}"
+  artifact_is_equipped: The item is equipped
+  artifact_is_equipped.not: The item is in storage
 fx:
-  gain_artifact: "{who} gains the artifact: {value}"
-  lose_artifact: "{who} loses the artifact: {value}"
+  gain_artifact: "{who} gains: {value}"
+  lose_artifact: "{who} loses: {value}"
   seize_realm_artifacts: "{who} seizes the contested artifacts of {from}"
+  create_artifact: "{who} gains: {value}"
+  transfer_artifact: "«{value}» passes to: {who}"
+  add_artifact_durability: "Item durability {value}"
+  destroy_artifact: "«{value}» is destroyed"
 stat:
   attrition: Army losses per month

@@ -1,0 +1,235 @@
+# Inventory: slots, rarity, item types and names, artifacts of 1066.
+artifact_slot:
+  helmet: Helmet
+  regalia: Regalia
+  armor: Armor
+  weapon: Weapon
+  trinket: Trinket
+  throne: Throne
+  wall: Wall
+  pedestal: Pedestal
+
+artifact_rarity:
+  common: Common
+  masterwork: Masterwork
+  famed: Famed
+  illustrious: Illustrious
+
+commission_tier:
+  modest: Modest Order
+  fine: Fine Work
+  lavish: Masterpiece
+
+artifact_type:
+  sword: Sword
+  axe: Battle Axe
+  spear: Spear
+  mace: Mace
+  helm: Helm
+  mail: Mail Shirt
+  lamellar: Lamellar Armor
+  crown: Crown
+  circlet: Circlet
+  scepter: Scepter
+  ring: Ring
+  amulet: Amulet
+  book: Book
+  dagger: Dagger
+  seal: Seal
+  horn: Horn
+  throne: Throne
+  tapestry: Tapestry
+  banner: Banner
+  trophy_shield: Trophy Shield
+  reliquary: Reliquary
+  goblet: Goblet
+  codex: Codex
+  chessmen: Chessmen
+
+artifact_name:
+  sword:
+    "1": Sword “Widowmaker”
+    "2": Sword “Northern Fang”
+    "3": Sword “Oath”
+    "4": Sword “Raven's Claw”
+    "5": Sword “Final Word”
+    "6": Sword “Dawn”
+  axe:
+    "1": Axe “Kingsbane”
+    "2": Axe “Wolf's Maw”
+    "3": Axe “Shieldbreaker”
+    "4": Axe “Blood Eagle”
+    "5": Axe “Tempest”
+  spear:
+    "1": Spear “Ash”
+    "2": Spear “Sting”
+    "3": Spear “Herald”
+    "4": Spear “Star of the Fields”
+    "5": Spear “Long Reach”
+  mace:
+    "1": Mace “Hammer of Faith”
+    "2": Mace “Bonecrusher”
+    "3": Mace “Morning Star”
+    "4": Mace “Mentor”
+    "5": Mace “Bell”
+  helm:
+    "1": Helm “Mask”
+    "2": Helm “Boar”
+    "3": Helm “Eagle Crest”
+    "4": Helm “Ironbrow”
+    "5": Helm “Warden”
+  mail:
+    "1": Mail “Wayland's Net”
+    "2": Mail “Silver Scales”
+    "3": Mail “Night Shirt”
+    "4": Mail “Thousand Rings”
+    "5": Mail “Soul Shield”
+  lamellar:
+    "1": Armor “Dragonhide”
+    "2": Armor “Tortoise”
+    "3": Armor “Bronze Plates”
+    "4": Armor “Serpent Scale”
+  crown:
+    "1": Crown “Iron Hoop”
+    "2": Crown “Golden Leaf”
+    "3": Crown “North Star”
+    "4": Crown “Diadem of the Forefathers”
+    "5": Crown “Sun over the Sea”
+  circlet:
+    "1": Circlet “Silver Thread”
+    "2": Circlet “Moonlit”
+    "3": Circlet “Laurel”
+    "4": Circlet “Slender Hoop”
+  scepter:
+    "1": Scepter “Rod of Truth”
+    "2": Scepter “Hand of the Law”
+    "3": Scepter “Shepherd's Staff”
+    "4": Scepter “Golden Bough”
+  ring:
+    "1": Ring “Seal of the Heart”
+    "2": Ring “Serpent”
+    "3": Ring “Ruby”
+    "4": Ring “Wedding Band”
+    "5": Ring “Andvari's Ring”
+  amulet:
+    "1": Amulet “Thor's Hammer”
+    "2": Amulet “Phylactery”
+    "3": Amulet “Odin's Eye”
+    "4": Amulet “Saint Christopher”
+    "5": Amulet “Bear's Tooth”
+  book:
+    "1": Book “Consolation of Philosophy”
+    "2": Book “Book of Hours”
+    "3": Book “Herbal”
+    "4": Book “Chronicle of Kings”
+    "5": Book “Star Tables”
+  dagger:
+    "1": Dagger “Whisper”
+    "2": Dagger “Mercy”
+    "3": Dagger “Serpent's Tongue”
+    "4": Dagger “Shadow”
+    "5": Dagger “Night Guest”
+  seal:
+    "1": Seal “Great Royal”
+    "2": Seal “Treasury”
+    "3": Seal “Privy”
+    "4": Seal “Red Wax”
+  horn:
+    "1": Horn “Voice of Battle”
+    "2": Horn “Aurochs”
+    "3": Horn “Call of the Hunt”
+    "4": Horn “Last Muster”
+  throne:
+    "1": Throne “Oaken Seat”
+    "2": Throne “Carved Ash”
+    "3": Throne “Stone Chair”
+    "4": Throne “Seat of the Forefathers”
+  tapestry:
+    "1": Tapestry “The Stag Hunt”
+    "2": Tapestry “Battle at the Ford”
+    "3": Tapestry “The Family Tree”
+    "4": Tapestry “Holy Martyrs”
+    "5": Tapestry “Longships”
+  banner:
+    "1": Banner “White Dragon”
+    "2": Banner “Raven”
+    "3": Banner “Golden Lion”
+    "4": Banner “Cross and Sword”
+    "5": Banner “Red Boar”
+  trophy_shield:
+    "1": Shield “Taken from the Sea”
+    "2": Shield “Split”
+    "3": Shield “Gatekeeper”
+    "4": Shield “Last Stand”
+  reliquary:
+    "1": Reliquary “Finger of the Saint”
+    "2": Reliquary “Piece of the Cross”
+    "3": Reliquary “Virgin's Veil”
+    "4": Reliquary “Martyr's Tooth”
+    "5": Reliquary “The Little Ark”
+  goblet:
+    "1": Goblet “Victor's Feast”
+    "2": Goblet “Silver Raven”
+    "3": Goblet “Cup of Peace”
+    "4": Goblet “Cornucopia”
+  codex:
+    "1": Codex “Illuminated Gospels”
+    "2": Codex “Laws of the Forefathers”
+    "3": Codex “Bestiary”
+    "4": Codex “Song of Heroes”
+  chessmen:
+    "1": Chessmen “Walrus Ivory”
+    "2": Chessmen “Kings and Bishops”
+    "3": Chessmen “Black and White”
+
+artifact:
+  edward_crown: Crown of Edward the Confessor
+  joyeuse: Joyeuse, Sword of Charlemagne
+  landwaster: Banner “Landwaster”
+  papal_banner: Banner of Saint Peter
+  stone_of_destiny: Stone of Destiny
+  bell_of_patrick: Bell of Saint Patrick
+artifact_desc:
+  edward_crown: "The crown of England's saintly king. Harold was crowned with it at Westminster — and whoever wears it may call themselves the rightful king."
+  joyeuse: "Charlemagne's sword, said to change its color thirty times a day. The kings of the Franks are girded with it at their coronation."
+  landwaster: "A raven on white silk. The saga says Harald Hardrada never lost a battle under this banner."
+  papal_banner: "A consecrated banner sent by Pope Alexander to the Duke of Normandy. With it, the war for the English throne is a holy cause."
+  stone_of_destiny: "The sandstone block of Scone on which the kings of Scotland are crowned. Whoever sits upon it is king."
+  bell_of_patrick: "Saint Patrick's iron bell in a golden shrine. Its ringing, they say, drove the snakes and demons out of Ireland."
+
+opinion_modifier:
+  artifact_gift: Gift
+  returned_artifact: Returned My Item
+  refused_artifact: Refused to Return My Item
+
+interaction:
+  gift_artifact: Give an Item
+  demand_artifact: Demand an Item
+interaction_desc:
+  gift_artifact: "Give an item from your inventory. The rarer it is, the greater the gratitude."
+  demand_artifact: "Demand back an item you have a claim on: it was taken from you or from your dynasty. A refusal leaves a grudge."
+
+ev:
+  artifact.0001:
+    t: A Dealer in Curiosities
+    desc: "A merchant from distant lands has come to court. His chests are full of wonders: jeweled rings, amulets, goblets of chased silver, books in gilded covers. Everything — for those with taste and gold to spare."
+    a: Buy a ring or an amulet (−100 gold)
+    b: Buy a curiosity for the court (−160 gold)
+    c: Send the merchant away
+  artifact.0002:
+    t: A Vassal's Gift
+    desc: "[scope:vassal] asks leave to present you with a gift — a token of loyalty and love. Servants carry in a bundle tied with a scarlet ribbon."
+    a: Accept it gratefully
+    b: Give a gift in return (−60 gold)
+  artifact.0003:
+    t: A Worn Treasure
+    desc: "“[scope:artifact]” has served you well, but the years take their toll: the metal is worn, the seams are parting. A little more, and it will fall apart in your hands."
+    a: Summon the finest artisan (−40 gold)
+    b: Let the court smith mend it
+    c: Let it serve as long as it can
+  artifact.0004:
+    t: A Neighbor's Envy
+    desc: "Envoys of [scope:buyer] have brought rich gifts and a request: their lord wishes to have “[scope:artifact]” and offers two hundred and fifty gold for it."
+    a: Sell it for 250 gold
+    b: Give it away — and gain a friend
+    c: Refuse

@@ -45,7 +45,7 @@ static var BODIES := {
 	"speech": '<path d="M3 5 H21 V16 H11 L6 20.5 V16 H3 Z"/><path d="M6.5 8.5 H17.5 M6.5 12 H14" fill="none" stroke-width="1.2"/>',
 	"cross": '<path d="M10.2 2.5 H13.8 V7.5 H18.8 V11.1 H13.8 V21.5 H10.2 V11.1 H5.2 V7.5 H10.2 Z"/>',
 	"skull": '<path d="M12 2.5 C6.5 2.5 3.5 6.5 3.5 11 C3.5 14 5 15.5 6.5 16.5 V20.5 H17.5 V16.5 C19 15.5 20.5 14 20.5 11 C20.5 6.5 17.5 2.5 12 2.5 Z"/><circle cx="8.7" cy="11" r="2.3" fill="#1c140a"/><circle cx="15.3" cy="11" r="2.3" fill="#1c140a"/><path d="M12 13.5 L13.2 16 H10.8 Z" fill="#1c140a"/>',
-	"ring": '<circle cx="12" cy="14" r="6.5" fill="none" stroke-width="3"/><path d="M9.5 7.5 L12 3 L14.5 7.5 Z"/>',
+	"ring": '<path d="M5.5 14 A6.5 6.5 0 1 0 18.5 14 A6.5 6.5 0 1 0 5.5 14 Z M8.4 14 A3.6 3.6 0 1 1 15.6 14 A3.6 3.6 0 1 1 8.4 14 Z" fill-rule="evenodd"/><path d="M9.3 7.6 L12 3 L14.7 7.6 Z"/>',
 	"heart": '<path d="M12 21 C5 15.5 2.5 12 2.5 8.5 C2.5 5.5 4.8 3.5 7.5 3.5 C9.5 3.5 11 4.8 12 6.5 C13 4.8 14.5 3.5 16.5 3.5 C19.2 3.5 21.5 5.5 21.5 8.5 C21.5 12 19 15.5 12 21 Z"/>',
 	"chain": '<rect x="2.5" y="8.5" width="10" height="7" rx="3.5" fill="none" stroke-width="2.4"/><rect x="11.5" y="8.5" width="10" height="7" rx="3.5" fill="none" stroke-width="2.4"/>',
 	"tower": '<path d="M7 21 V9 H5.5 V3.5 H8.5 V5.5 H10.5 V3.5 H13.5 V5.5 H15.5 V3.5 H18.5 V9 H17 V21 Z"/><path d="M10 21 V16 A2 2 0 0 1 14 16 V21 Z" fill="#1c140a"/>',
@@ -58,6 +58,22 @@ static var BODIES := {
 	"dynasty": '<path d="M12 21 V12 M12 12 L6 7 M12 12 L18 7 M12 16 L8 13 M12 16 L16 13" fill="none" stroke-width="2"/><circle cx="12" cy="5" r="2.6"/><circle cx="5.5" cy="6.5" r="2.2"/><circle cx="18.5" cy="6.5" r="2.2"/>',
 	"baby": '<circle cx="12" cy="9" r="5"/><path d="M6 21 C6 16.5 8.5 14.5 12 14.5 C15.5 14.5 18 16.5 18 21 Z"/><circle cx="12" cy="3.5" r="1.4"/>',
 	"tournament": '<path d="M3 21 L17 3.5 L19 5 L5.5 22 Z"/><path d="M14 3 H21 V10 L18 7.5 Z"/>',
+	"sword": '<path d="M21.6 2.4 L21.6 5.2 L11.6 15.2 L8.8 12.4 L18.8 2.4 Z"/><path d="M5.3 11.4 L12.6 18.7 L11.1 20.2 L3.8 12.9 Z"/><path d="M7.9 16.1 L4.3 19.7 L5.4 20.8 L9 17.2 Z"/><circle cx="3.7" cy="20.6" r="1.7"/>',
+	"axe": '<path d="M6 21.5 L4.5 20 L15 9.5 L16.5 11 Z"/><path d="M13 3.5 C16.8 2.5 21 5 21.5 9.5 C19.5 8.3 17.6 8.8 16 10.4 L11.2 5.6 C11.8 4.8 12.4 4 13 3.5 Z"/>',
+	"mace": '<path d="M4.6 21.8 L2.8 20 L11 11.8 L12.8 13.6 Z"/><circle cx="15" cy="9" r="5"/><path d="M15 1.2 L16.5 4.3 H13.5 Z M22.8 9 L19.7 10.5 V7.5 Z M20.5 3.5 L19.6 6.8 L17.6 4.8 Z M9.5 3.5 L12.4 4.8 L10.4 6.8 Z M20.5 14.5 L17.6 13.2 L19.6 11.2 Z"/>',
+	"armor": '<path d="M8 3 L12 5 L16 3 L21 6 L19 11 L17 10 V21 H7 V10 L5 11 L3 6 Z"/><path d="M9 13 H15 M9 16 H15 M9 19 H15" fill="none" stroke-width="0.9"/>',
+	"circlet": '<path d="M3 13 C3 9.5 7 8 12 8 C17 8 21 9.5 21 13 C21 16 17 17.5 12 17.5 C7 17.5 3 16 3 13 Z M5.6 13 C5.6 14.8 8.5 15.4 12 15.4 C15.5 15.4 18.4 14.8 18.4 13 C18.4 11.1 15.5 10.4 12 10.4 C8.5 10.4 5.6 11.1 5.6 13 Z" fill-rule="evenodd"/><path d="M12 3.5 L14.2 7.2 L12 10.2 L9.8 7.2 Z"/>',
+	"scepter": '<path d="M10.8 9 H13.2 L13.6 22 H10.4 Z"/><circle cx="12" cy="5.5" r="3.6"/><rect x="8" y="9.2" width="8" height="1.8" rx="0.4"/><path d="M12 0.6 V2.6" fill="none" stroke-width="1.4"/>',
+	"amulet": '<path d="M5 2.5 C5 9 8 12 12 12.5 C16 12 19 9 19 2.5" fill="none" stroke-width="1.4"/><path d="M12 11.5 L17 16.5 L12 22 L7 16.5 Z"/><circle cx="12" cy="16.6" r="1.6" fill="#b02020"/>',
+	"seal": '<path d="M8 15 L6 22 L9 20.5 L10.5 22.5 L12 16 Z M16 15 L18 22 L15 20.5 L13.5 22.5 L12 16 Z"/><circle cx="12" cy="10" r="7.5"/><circle cx="12" cy="10" r="4.5" fill="none" stroke-width="1.2"/>',
+	"horn": '<path d="M2.5 6 C10.5 5.5 17.5 10 20.5 18 L21.8 21.5 L17 19.8 C15 13.2 9 10.5 2.8 10.5 Z"/><path d="M2.5 5.5 V11" fill="none" stroke-width="2.2"/><path d="M9 7.2 L8 11 M14 9.5 L12.5 13" fill="none" stroke-width="0.9"/>',
+	"throne": '<path d="M6 2.5 H18 V12 H6 Z"/><path d="M4 12 H20 V15 H4 Z"/><path d="M5 15 H7.5 V22 H5 Z M16.5 15 H19 V22 H16.5 Z"/><path d="M9 5 H15 V9.5 H9 Z" fill="#b02020"/>',
+	"tapestry": '<path d="M2.5 3 H21.5" fill="none" stroke-width="2"/><path d="M4.5 4 H19.5 V19 L17.5 21 L15.5 19 L13.5 21 L11.5 19 L9.5 21 L7.5 19 L5.5 21 L4.5 20 Z"/><path d="M8 8 L12 13 L16 8" fill="none" stroke-width="1.3"/>',
+	"reliquary": '<path d="M3.5 10 L12 4 L20.5 10 Z"/><path d="M4.5 10.5 H19.5 V20.5 H4.5 Z"/><path d="M11 12 H13 V14 H15 V16 H13 V19 H11 V16 H9 V14 H11 Z" fill="#1c140a"/>',
+	"goblet": '<path d="M6 3 H18 C18 8 16 11.5 13 12.3 V18 C14.5 18.5 16.5 19.3 16.5 21 H7.5 C7.5 19.3 9.5 18.5 11 18 V12.3 C8 11.5 6 8 6 3 Z"/>',
+	"chessmen": '<path d="M11 1.5 H13 V3 H14.5 V5 H13 V6.5 C15.5 7 16.5 9 15.5 11 H8.5 C7.5 9 8.5 7 11 6.5 V5 H9.5 V3 H11 Z"/><path d="M9 12 H15 L16 18 H8 Z"/><path d="M6 18.5 H18 V21.5 H6 Z"/>',
+	"bag": '<path d="M8 6.5 C8 3.8 9.8 2 12 2 C14.2 2 16 3.8 16 6.5" fill="none" stroke-width="1.6"/><path d="M5 7 H19 L21 20 C21 21 20.3 21.8 19.3 21.8 H4.7 C3.7 21.8 3 21 3 20 Z"/><path d="M9.5 11 H14.5" fill="none" stroke-width="1.4"/>',
+	"hammer": '<path d="M4 18.5 L13 9.5 L14.5 11 L5.5 20 Z"/><path d="M11 5 L16 2.5 L21.5 8 L19 13 Z"/>',
 }
 
 ## Эмодзи из данных → имя нарисованной иконки.
@@ -71,6 +87,7 @@ static var EMOJI := {
 	"⛓": "chain", "⛓️": "chain", "🗼": "tower", "⏳": "hourglass", "⌛": "hourglass", "⚠": "warning", "⚠️": "warning",
 	"😣": "stress", "😰": "stress", "🚩": "banner", "🏳": "banner", "🏴": "banner", "🗺": "map", "🗺️": "map",
 	"🌳": "dynasty", "👶": "baby", "🏇": "tournament", "🐎": "tournament", "💾": "save", "⚙": "gear", "⚙️": "gear",
+	"🎒": "bag", "🪓": "axe", "🏆": "goblet", "📯": "horn", "🔨": "hammer", "⚒": "hammer", "⚒️": "hammer", "📿": "amulet",
 }
 
 static var _tex := {}

@@ -526,22 +526,22 @@ static func artifacts(app: App, c: Dictionary) -> Variant:
 	var g := app.game
 	if not g.engine.has_feature("artifacts"):
 		return null
-	var held := Artifacts.held_by(g, c)
-	if held.is_empty():
+	var eq := Artifacts.equipped(g, c)
+	if eq.is_empty():
 		return null
+	Data.sort_by(eq, func(it):
+		var sd: Variant = Artifacts.slot_def(g, Artifacts.slot_of(g, it))
+		return Data.num(sd.get("order") if sd != null else 99))
 	var flow := K.flow([], 4)
-	for aid in held:
-		var d: Variant = g.content.get_def("artifacts", aid)
-		var chip := K.panel(K.hbox([K.icon(d.get("icon", "crown") if d != null else "crown", 18), K.label(g.name_of("artifacts", aid), "SmallLabel")], 4))
-		chip.add_theme_stylebox_override("panel", UiArt.flat(Color("#4a3a1a"), Color(UiArt.GOLD, 0.8), 1, 3, 3))
-		var tip := BB.title(g.name_of("artifacts", aid))
-		var desc := g.desc_of("artifacts", aid)
-		if desc != "":
-			tip += "\n" + BB.i(desc)
-		tip += "\n" + BB.modifiers(g, d.get("modifiers") if d != null else null)
-		K.tip(chip, tip)
-		flow.add_child(chip)
-	return K.section(app.t("ui.artifacts"), [flow], "crown")
+	for it in eq:
+		var iid: String = it.id
+		var cl := InventoryPanel.cell_small(app, it)
+		cl.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		cl.gui_input.connect(func(e: InputEvent):
+			if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+				InventoryPanel.open_detail(app, iid))
+		flow.add_child(cl)
+	return K.section(app.t("ui.inv_equipment"), [flow], "helm")
 
 
 static func government(app: App, c: Dictionary) -> Variant:

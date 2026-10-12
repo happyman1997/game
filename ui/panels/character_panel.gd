@@ -60,10 +60,13 @@ static func build(app: App, id: String) -> Control:
 	tabs.append({"id": "family", "name": app.t("ui.ctab.family"), "icon": "dynasty"})
 	if not c.titles.is_empty() or not c.claims.is_empty():
 		tabs.append({"id": "realm", "name": app.t("ui.ctab.realm"), "icon": "crown", "badge": c.titles.size()})
+	if g.engine.has_feature("artifacts") and (is_me or not Artifacts.items_of(g, c).is_empty()):
+		tabs.append({"id": "inventory", "name": app.t("ui.ctab.inventory"), "icon": "bag", "badge": Artifacts.items_of(g, c).size()})
 	root.add_child(W.tabs(app, "character", tabs, func(tab_id: String) -> Control:
 		match tab_id:
 			"family": return _family_tab(app, c)
 			"realm": return _realm_tab(app, c)
+			"inventory": return InventoryPanel.build(app, c)
 		return _overview_tab(app, c)))
 	return root
 
@@ -205,7 +208,7 @@ static func _overview_tab(app: App, c: Dictionary) -> Control:
 			mods.add_child(chip)
 		root.add_child(mods)
 
-	# реликвии: венец, меч, печать…
+	# снаряжение — строкой значков (подробно — во вкладке «Вещи»)
 	var arts: Variant = FeatureSections.artifacts(app, c)
 	if arts != null:
 		root.add_child(arts)

@@ -18,6 +18,7 @@ const PREFIXED := {
 	"dynasty:": "dynasty",
 	"war:": "war",
 	"scheme:": "scheme",
+	"artifact:": "artifact",
 }
 
 const OP_ALIASES := {

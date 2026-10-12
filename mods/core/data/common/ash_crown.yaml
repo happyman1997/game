@@ -31,22 +31,27 @@ artifacts:
   sun_crown:
     requires_feature: artifacts
     icon: "👑"
+    type: crown
+    slot: regalia
     contested: yes
     modifiers: { monthly_prestige: 3, vassal_opinion: 15, diplomacy: 2, stress_gain_mult: 0.25 }
   # Меч Отгара: им император сражался до последнего дня.
   otgar_sword:
     requires_feature: artifacts
-    icon: "⚔"
+    icon: sword
+    type: sword
     modifiers: { prowess: 4, martial: 2, commander_advantage: 3 }
   # Печать империи: ею скреплялись указы и договоры.
   imperial_seal:
     requires_feature: artifacts
-    icon: "📜"
+    icon: seal
+    type: seal
     modifiers: { diplomacy: 2, stewardship: 2, monthly_prestige: 0.5 }
   # Солнечное знамя: под ним ходили имперские рыцари.
   sun_banner:
     requires_feature: artifacts
-    icon: "🚩"
+    icon: banner
+    type: banner
     modifiers: { commander_advantage: 2, knight_effectiveness: 0.15, monthly_prestige: 0.5 }
 
 decisions:

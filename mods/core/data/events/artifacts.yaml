@@ -1,0 +1,129 @@
+# События инвентаря: торговец редкостями, дар вассала, ветхая вещь, зависть
+# соседа к прославленной реликвии.
+on_actions:
+  on_monthly_pulse:
+    random_events:
+      events:
+        artifact.0001: 5
+        artifact.0002: 4
+        artifact.0003: 5
+        artifact.0004: 3
+
+events:
+  # Странствующий торговец редкостями
+  artifact.0001:
+    theme: court
+    icon: "💍"
+    requires_feature: artifacts
+    trigger:
+      is_ruler: yes
+      is_adult: yes
+      gold: 120
+    cooldown: { years: 4 }
+    options:
+      # перстень или оберег
+      - trigger: { gold: 100 }
+        effect:
+          add_gold: -100
+          create_artifact: { slot: trinket, rarity: [masterwork, masterwork, famed], how: bought }
+        ai_chance: { value: 20, add: { value: ai_greed, multiply: -10 } }
+      # диковина для двора
+      - trigger: { gold: 160 }
+        effect:
+          add_gold: -160
+          create_artifact: { type: [goblet, reliquary, chessmen, codex, tapestry], rarity: [masterwork, famed], how: bought }
+        ai_chance: { value: 10, add: { value: ai_greed, multiply: -8 } }
+      # отпустить торговца
+      - effect: { add_prestige: -5 }
+        ai_chance: 40
+
+  # Дар верного вассала
+  artifact.0002:
+    theme: realm
+    icon: "🎁"
+    requires_feature: artifacts
+    trigger:
+      any_vassal: { opinion: { target: root, value: ">= 30" } }
+    cooldown: { years: 5 }
+    immediate:
+      random_vassal:
+        limit: { opinion: { target: root, value: ">= 30" } }
+        save_scope_as: vassal
+    options:
+      # принять с благодарностью
+      - effect:
+          create_artifact: { rarity: [common, masterwork, masterwork], how: gift }
+          scope:vassal: { add_opinion: { target: root, modifier: grateful } }
+        ai_chance: 50
+      # одарить в ответ
+      - trigger: { gold: 60 }
+        effect:
+          add_gold: -60
+          create_artifact: { rarity: [masterwork, masterwork, famed], how: gift }
+          scope:vassal: { add_opinion: { target: root, modifier: gift } }
+        ai_chance: { value: 20, add: { value: ai_greed, multiply: -10 } }
+
+  # Ветхая вещь: оружие или регалия вот-вот рассыплется
+  artifact.0003:
+    theme: court
+    icon: "⚒"
+    requires_feature: artifacts
+    trigger:
+      any_artifact: { artifact_is_equipped: yes, artifact_durability: "< 35" }
+    cooldown: { years: 3 }
+    immediate:
+      random_artifact:
+        limit: { artifact_is_equipped: yes, artifact_durability: "< 35" }
+        save_scope_as: artifact
+    options:
+      # позвать лучшего мастера
+      - trigger: { gold: 40 }
+        effect:
+          add_gold: -40
+          scope:artifact: { add_artifact_durability: 60 }
+        ai_chance: 50
+      # кузнец при дворе справится и так
+      - effect:
+          scope:artifact: { add_artifact_durability: 20 }
+          add_stress: 5
+        ai_chance: 30
+      # пусть служит, сколько сможет
+      - effect: { add_prestige: 10 }
+        ai_chance: 20
+
+  # Зависть соседа: правитель просит продать прославленную реликвию
+  artifact.0004:
+    theme: court
+    icon: "👑"
+    requires_feature: artifacts
+    trigger:
+      is_ruler: yes
+      any_artifact: { artifact_rarity: famed }
+      any_neighboring_ruler: { is_ai: yes, gold: 300 }
+    cooldown: { years: 8 }
+    immediate:
+      random_artifact:
+        limit: { artifact_rarity: famed }
+        save_scope_as: artifact
+      random_neighboring_ruler:
+        limit: { is_ai: yes, gold: 300 }
+        save_scope_as: buyer
+    options:
+      # продать за 250 золотых
+      - effect:
+          add_gold: 250
+          scope:buyer:
+            add_gold: -250
+            add_opinion: { target: root, modifier: grateful }
+          transfer_artifact: { artifact: scope:artifact, to: scope:buyer, how: bought }
+        ai_chance: { value: 20, add: { value: ai_greed, multiply: 10 } }
+      # подарить — и обрести друга
+      - effect:
+          transfer_artifact: { artifact: scope:artifact, to: scope:buyer, how: gift }
+          scope:buyer: { add_opinion: { target: root, modifier: artifact_gift, value: 40 } }
+          add_prestige: 30
+        ai_chance: 10
+      # отказать
+      - effect:
+          scope:buyer: { add_opinion: { target: root, modifier: refused_artifact } }
+        ai_chance: 50

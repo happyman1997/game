@@ -124,6 +124,7 @@ func exists(ref: Variant) -> bool:
 		"scheme": return state.schemes.has(ref.id)
 		"army": return state.armies.has(ref.id)
 		"faction": return state.factions.has(ref.id)
+		"artifact": return state.get("artifacts") is Dictionary and state.artifacts.get(ref.id) is Dictionary
 	return false
 
 
@@ -328,6 +329,9 @@ func scope_name(ref: Dictionary, prop: String = "name") -> String:
 		"faction":
 			var f: Variant = state.factions.get(ref.id)
 			return name_of("factions", f.type) if f != null else "?"
+		"artifact":
+			var it: Variant = Artifacts.item(self, ref.id)
+			return Artifacts.name_of(self, it) if it != null else "?"
 	return str(ref.id)
 
 

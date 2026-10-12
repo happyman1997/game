@@ -660,7 +660,7 @@ func init(api: ModApi) -> void:
 
 ---
 
-## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари, политика, характер, слава, вера земель, народ, правления, реликвии, дикие земли, воспитание, династия, желания
+## 10. Механики: образ жизни, совет, темница, фракции, отряды, секреты, законы, рыцари, политика, характер, слава, вера земель, народ, правления, инвентарь и реликвии, дикие земли, воспитание, династия, желания
 
 Крупные подсистемы в стиле CK3 устроены как **механики** (`engine/features`).
 Механика — модуль, который при запуске регистрирует свои системы, триггеры,
@@ -1336,33 +1336,70 @@ governments:
 `succession.law`, `marriage.allowed`, `war.allowed`, `player.next_character`
 доступны и модам.
 
-### Реликвии
+### Инвентарь и реликвии
 
-Механика `artifacts`: единственные в мире предметы. Реликвию держит один
-персонаж, её `modifiers` действуют на владельца (раздел «Реликвии» в окне
-персонажа). После смерти владельца реликвия переходит к основному наследнику,
-а без наследника (или с `inherit: no`) теряется — её можно найти снова.
+Механика `artifacts` (`core/data/common/artifacts.yaml`) — инвентарь как в
+CK3. Каждая вещь — отдельный предмет мира с типом, редкостью, своими
+модификаторами, прочностью, историей владельцев и притязаниями.
+Модификаторы даёт только **надетое**: личное снаряжение (шлем, регалия,
+доспех, оружие, три безделушки) и **убранство двора** правителя (трон, две
+стены, два постамента). Остальное лежит в хранилище. Вкладка «Вещи» в окне
+персонажа и раздел «Инвентарь» (клавиша B).
 
 ```yaml
-artifacts:
-  sun_crown:
-    icon: "👑"
-    contested: yes          # за неё воюют: повод с targets: artifact_holder
-    modifiers: { monthly_prestige: 3, vassal_opinion: 15, stress_gain_mult: 0.25 }
-
-casus_belli:
-  crown_war:
-    targets: artifact_holder
-    is_valid: { scope:defender: { realm_has_artifact: sun_crown } }
-    on_victory:
-      - scope:attacker: { seize_realm_artifacts: scope:defender }
+artifact_slots:
+  trinket: { group: personal, order: 5, icon: ring, count: 3 }
+  throne:  { group: court, order: 10, icon: throne }     # court — только правителю
+artifact_rarities:
+  masterwork: { order: 2, mult: 1.5, bonuses: 1, durability: 70, value: 80, gift_opinion: 20, color: "#7fb4e6" }
+artifact_types:
+  sword:
+    slot: weapon
+    icon: sword
+    modifiers: { prowess: 3 }                 # у обычной; × mult редкости
+    bonus: [ { martial: 1 }, { commander_advantage: 2 } ]   # добавки мастера
+    names: 6                                  # artifact_name.sword.1 … 6
+commission_tiers:
+  fine: { order: 2, cost: 120, months: 8, chances: { common: 20, masterwork: 60, famed: 18, illustrious: 2 } }
+artifacts:                                    # уникальные реликвии
+  joyeuse:
+    type: sword
+    rarity: illustrious
+    holder: philip                            # у кого с начала партии
+    modifiers: { prowess: 8, martial: 2 }
+    # contested: yes — за неё воюют (повод с targets: artifact_holder)
+    # inherit: no — не наследуется, а теряется
 ```
 
-Скрипт: условия `has_artifact`, `realm_has_artifact` (у правителя, вассалов
-или двора), `artifact_is_held` (реликвия у кого-то есть); значение
-`num_artifacts`; эффекты `gain_artifact` (у прежнего владельца пропадает),
-`lose_artifact` (теряется), `seize_realm_artifacts: <скоуп>` (забрать спорные
-реликвии чужой державы). Хуки `artifact.gained`, `artifact.lost`.
+Вещи **ветшают** (`defines.artifacts.decay_per_year`, в хранилище — медленнее,
+оружие и доспехи полководца — ещё и в битвах); рассыпавшаяся вещь исчезает,
+уникальные реликвии не ветшают. Ремонт стоит золота (ценность × износ ×
+`repair_mult`), переплавка даёт `melt_mult` ценности. **Заказ мастеру**: тип,
+качество (`commission_tiers`), шансы редкости растут с управлением
+заказчика. После смерти всё переходит основному наследнику (без него —
+сюзерену). Победитель битвы может снять вещь с побеждённого полководца
+(`loot_chance`) или подобрать трофей (`trophy_chance`). Отнятое оставляет
+**притязание** прежнему владельцу, а прославленная вещь, ушедшая из рода
+к наследнику-чужаку, — притязание главы рода: «держит мою вещь» портит
+мнение, вещь можно потребовать назад (`demand_artifact`). Подарок
+(`gift_artifact`) радует тем сильнее, чем вещь редче. Стартовые вещи
+правителей по рангу — `defines.artifacts.start`. ИИ надевает лучшее, чинит
+изношенное, переплавляет лишнее и заказывает вещи, когда есть золото.
+
+Скрипт: условия `has_artifact` (реликвия по id или предмет),
+`realm_has_artifact`, `artifact_is_held`, `has_artifact_type`,
+`has_artifact_claim`; в скоупе вещи — `artifact_type`, `artifact_rarity`,
+`artifact_is_equipped`; значения `num_artifacts`, `num_equipped_artifacts`,
+`num_spare_artifacts`, `artifact_value`, `artifact_durability`,
+`artifact_gift_opinion`; эффекты `gain_artifact`, `lose_artifact`,
+`seize_realm_artifacts`, `create_artifact: { type | slot, rarity,
+save_scope_as }`, `transfer_artifact: { artifact, to, how }`,
+`add_artifact_durability`, `destroy_artifact`; список `artifact`
+(`any_artifact`, `random_artifact`…), `artifact_claim_holders`; ссылка
+`artifact_owner`; скоуп `artifact:<id>`. Хуки `artifact.gained`
+(`how`: gift, inherited, looted, returned…), `artifact.lost`,
+`artifact.destroyed`, `artifact.created`. Хук `battle` несёт
+`win_commander` и `lose_commander`.
 
 ### Дикие земли и пепелище
 
@@ -1568,6 +1605,10 @@ ambitions:
   затянувшееся копит обиду (а с ней и фракции), пожалованная другому земля
   оставляет «обойдённого»; ИИ охотнее сажает в совет и наделяет землёй тех,
   кто об этом мечтает;
+- **инвентарь ↔ война ↔ мнение ↔ казна**: полководцы изнашивают оружие в
+  битвах и снимают его с побеждённых — отнятое оставляет притязание и
+  неприязнь; ремонт и заказы мастерам тратят золото, переплавка его
+  возвращает, подарок редкой вещи покупает дружбу;
 - **учёность ↔ магия** (мод `arcana`): учёность помогает постигать колдовство,
   защищает от порчи и выдаёт чудовищ при дворе.
 

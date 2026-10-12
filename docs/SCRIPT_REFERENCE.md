@@ -10,7 +10,10 @@
 | `ambition_frustrated` | character | Желание давно не исполняется — копится обида | core/ambitions |
 | `ambition_grantable_by` | character | Сюзерен может исполнить желание сам: ambition_grantable_by: scope:actor | core/ambitions |
 | `ambition_target_is` | character | Цель желания — этот скоуп: ambition_target_is: scope:target | core/ambitions |
+| `artifact_is_equipped` | artifact | Вещь надета или стоит при дворе | core/artifacts |
 | `artifact_is_held` | любой | Реликвия у кого-то есть (не утеряна): artifact_is_held: <id> | core/artifacts |
+| `artifact_rarity` | artifact | Редкость вещи не ниже: artifact_rarity: masterwork | core/artifacts |
+| `artifact_type` | artifact | Тип вещи: artifact_type: sword | core/artifacts |
 | `assembly_supports_war` | character | Сход одобряет наступательную войну (или правление его не требует) | core/governments |
 | `can_be_guardian_of` | character | Может стать опекуном ребёнка: can_be_guardian_of: scope:recipient | core/upbringing |
 | `can_be_regent_of` | character | Может стать регентом: can_be_regent_of: scope:actor | core/upbringing |
@@ -31,7 +34,9 @@
 | `has_ambition` | character | Есть желание (yes/no) или именно это: has_ambition: land | core/ambitions |
 | `has_any_claim` | character | Есть претензии | core |
 | `has_archetype` | character | Есть архетип — связка высоких навыков (skill_archetypes): has_archetype: <id> или yes | core |
-| `has_artifact` | character | Персонаж держит реликвию: has_artifact: <id> | core/artifacts |
+| `has_artifact` | character | Персонаж держит вещь (реликвию по id или предмет): has_artifact: <id> | core/artifacts |
+| `has_artifact_claim` | character | Притязает на чью-то вещь (yes) или на вещь этого персонажа: has_artifact_claim: scope:recipient | core/artifacts |
+| `has_artifact_type` | character | Есть вещь этого типа: has_artifact_type: sword | core/artifacts |
 | `has_building` | province | Есть постройка | core |
 | `has_champion` | character | За персонажа в поединке бьётся поборник | core/duels |
 | `has_claim_on` | character | Есть претензия на титул | core |
@@ -148,6 +153,7 @@
 |---|---|---|
 | `add_alliance` | Союз с персонажем | core |
 | `add_arcane_power` | Изменить колдовскую силу: add_arcane_power: -30 | arcana |
+| `add_artifact_durability` | Изменить прочность вещи: add_artifact_durability: -20 | core/artifacts |
 | `add_beast_control` | Сдвинуть власть оборотня над зверем (+ укрощение, − одичание) | arcana |
 | `add_blood_potency` | Изменить силу крови вампира | arcana |
 | `add_blood_thirst` | Изменить жажду крови | arcana |
@@ -199,9 +205,11 @@
 | `consecrate_against_dead` | Освятить земли державы против нежити | arcana |
 | `convert_to_holder_culture` | Привить графству культуру владельца | core/lands |
 | `convert_to_holder_faith` | Обратить графство в веру владельца | core/lands |
+| `create_artifact` | Создать вещь персонажу: create_artifact: { type: sword \| [ring, amulet] \| slot: trinket, rarity: masterwork \| [common, masterwork], save_scope_as } | core/artifacts |
 | `create_character` | Создать персонажа: { culture, faith, female, age, traits, dynasty: new\|none\|path, court, save_scope_as } | core |
 | `cure_ailments` | Снять болезни, раны и порчу | arcana |
 | `death` | Смерть: yes, причина или { reason, killer } | core |
+| `destroy_artifact` | Уничтожить вещь (уникальная — теряется): destroy_artifact: yes | core/artifacts |
 | `discover_scheme_against` | Раскрыть случайную враждебную интригу против персонажа или его семьи | core/council |
 | `discover_secret` | Узнать случайный секрет кого-то из своей державы | core/secrets |
 | `disinherit` | Лишить наследства (yes) или восстановить в правах (no) | core/dynasties |
@@ -216,7 +224,7 @@
 | `firestorm` | Огненная буря на крупнейшее вражеское войско у границ | arcana |
 | `found_cadet_house` | Основать младшую ветвь рода: found_cadet_house: yes | core/dynasties |
 | `fulfill_ambition` | Исполнить желание персонажа (благодарность — patron): fulfill_ambition: scope:actor | core/ambitions |
-| `gain_artifact` | Получить реликвию (у прежнего владельца она пропадает): gain_artifact: <id> | core/artifacts |
+| `gain_artifact` | Получить реликвию или вещь (у прежнего владельца она пропадает): gain_artifact: <id> | core/artifacts |
 | `gain_title` | Получить титул | core |
 | `give_title` | Пожаловать титул: { title, to } — получатель становится вассалом | core |
 | `grant_archetype` | Дать архетип без испытания: grant_archetype: <архетип> | core/trials |
@@ -281,6 +289,7 @@
 | `start_scheme` | Начать интригу: { type, target } | core |
 | `take_faction_counties` | Вожак народной фракции (scope:faction) забирает её графства и правит сам: yes или { create_titles: yes } | core/populace |
 | `take_title` | Отобрать титул себе: { title, from? } | core |
+| `transfer_artifact` | Отдать вещь персонажу: transfer_artifact: { artifact: scope:target, to: scope:recipient, how: gift } | core/artifacts |
 | `unlock_dynasty_legacy` | Открыть наследие рода (если можно): unlock_dynasty_legacy: <id> | core/dynasties |
 | `witch_hunt` | Охота на ведьм в державе | arcana |
 
@@ -304,6 +313,9 @@
 | `ambition_grant_prestige` | character | Цена исполнения желания сюзереном: престиж | core/ambitions |
 | `ambition_remaining` | character | Сколько осталось до исполнения желания (по progress) | core/ambitions |
 | `arcane_power` | character | Колдовская сила персонажа | arcana |
+| `artifact_durability` | artifact | Прочность вещи, % от наибольшей | core/artifacts |
+| `artifact_gift_opinion` | artifact | Насколько радует такой подарок (мнение, по редкости) | core/artifacts |
+| `artifact_value` | artifact | Ценность вещи (по редкости) | core/artifacts |
 | `attraction` | character | Привлекательность | core |
 | `attrition` | province | Доля воинов, которую армия теряет здесь за месяц | core/wilds |
 | `audit_chance` | character | Характеристика: audit_chance | core |
@@ -374,7 +386,7 @@
 | `monthly_piety` | character | Характеристика: monthly_piety | core |
 | `monthly_prestige` | character | Характеристика: monthly_prestige | core |
 | `num_archetypes` | character | Сколько архетипов заслужено | core/trials |
-| `num_artifacts` | character | Число реликвий у персонажа | core/artifacts |
+| `num_artifacts` | character | Число вещей у персонажа | core/artifacts |
 | `num_buildings` | province | Число построек | core |
 | `num_children` | character | Число живых детей | core |
 | `num_claims` | character | Число претензий | core |
@@ -382,6 +394,7 @@
 | `num_courtiers` | character | Число придворных | core |
 | `num_de_jure_counties` | title | Де-юре графств в титуле | core |
 | `num_dynasty_legacies` | character | Открыто наследий у рода | core/dynasties |
+| `num_equipped_artifacts` | character | Число надетых вещей и убранства двора | core/artifacts |
 | `num_faction_counties` | faction | Графств в народной фракции | core/populace |
 | `num_faction_members` | faction | Число членов фракции | core/factions |
 | `num_foreign_culture_counties` | character | Графств домена чужой культуры | core/lands |
@@ -396,6 +409,7 @@
 | `num_prisoners` | character | Число пленников | core/prison |
 | `num_regiments` | character | Число отрядов | core/regiments |
 | `num_secrets` | character | Число секретов персонажа | core/secrets |
+| `num_spare_artifacts` | character | Число вещей в хранилище (не надетых) | core/artifacts |
 | `num_spouses` | character | Число супругов | core |
 | `num_traits` | character | Число черт | core |
 | `num_unhappy_counties` | character | Графств домена, недовольных владельцем (мнение не выше defines.populace.unhappy_opinion) | core/populace |
@@ -439,6 +453,7 @@
 
 | Имя | Скоупы | Описание | Источник |
 |---|---|---|---|
+| `artifact_owner` | artifact | Владелец вещи | core/artifacts |
 | `attacker` | war | Нападающий | core |
 | `capital` | character | Столица (провинция) | core |
 | `capital_province` | title | Столица титула | core |
@@ -482,6 +497,8 @@
 | Имя | Скоупы | Описание | Источник |
 |---|---|---|---|
 | `ally` | character | Союзники | core |
+| `artifact` | character | Вещи персонажа (any_artifact, random_artifact, every_artifact) | core/artifacts |
+| `artifact_claim_holders` | character | Те, у кого вещи, на которые притязает персонаж | core/artifacts |
 | `child` | character | Живые дети | core |
 | `claim` | character | Претензии | core |
 | `close_family` | character | Близкая семья (супруги, дети, родители, братья/сёстры) | core |
@@ -554,7 +571,7 @@
 | `lands` | Вера и культура земель: чужие графства дают меньше, их можно обратить | да |
 | `populace` | Народ графств: мнение о владельце, контроль, крестьянские и народные мятежи | да |
 | `governments` | Типы правления: феодалы, рыцарский орден, народная республика, совет мастеров | да |
-| `artifacts` | Реликвии: уникальные предметы, переходят по наследству и добываются войной | да |
+| `artifacts` | Инвентарь и реликвии: снаряжение, убранство двора, прочность, притязания | да |
 | `wilds` | Дикие земли без владельцев и истощение армий | да |
 | `momentum` | Удачи и неудачи: успех снимает стресс, провал добавляет | да |
 | `duels` | Поединки: вызов на бой один на один, поборники из рыцарей | да |
@@ -571,11 +588,11 @@
 
 - **succession_algorithms**: `primogeniture`, `partition`, `seniority`, `elected_member`, `best_master`, `republic_election`, `elective`
 - **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `faction`, `artifact_holder`, `monster_hunt`
-- **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`
+- **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`, `own_artifacts`, `claimed_artifacts`
 - **interaction_deciders**: `payer`
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `upbringing`, `dynasty`, `ambitions`, `arcana_faith`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `populace`, `governments`, `deeds`, `trials`, `spirit`
-- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `arcana_faith`
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`
+- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

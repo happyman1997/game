@@ -1,17 +1,103 @@
+# Инвентарь и реликвии: строки движка и интерфейса.
 ui:
   artifacts: Реликвии
+  inventory: Инвентарь
+  tab:
+    inventory: Инвентарь
+  ctab:
+    inventory: Вещи
+  inv_equipment: Снаряжение
+  inv_court: Убранство двора
+  inv_court_tip: "Убранство двора — трон, стены и постаменты — есть только у правителя."
+  inv_storage: Хранилище
+  inv_storage_empty: Хранилище пусто
+  inv_empty_slot: "Пусто: {slot}"
+  inv_equip: Надеть
+  inv_place: Выставить
+  inv_unequip: Снять
+  inv_remove: Убрать
+  inv_repair: Починить
+  inv_repair_tip: "Починить за {n} золота"
+  inv_melt: Переплавить
+  inv_melt_tip: "Переплавить и получить {n} золота. Вещь исчезнет навсегда."
+  inv_durability: "Прочность: {n}%"
+  inv_durability_tip: "Вещи ветшают: надетые — быстрее, оружие и доспехи — ещё и в битвах. Рассыпавшаяся вещь исчезает. Почините её, пока не поздно."
+  inv_indestructible: Не ветшает
+  inv_history: История
+  inv_claims: Притязают
+  inv_house_claim: "Реликвия рода {name}"
+  inv_value: "Ценность: {n}"
+  inv_type_rarity: "{type} · {rarity}"
+  inv_select_hint: "Нажмите на вещь, чтобы увидеть подробности и действия"
+  inv_slot_count: "{n} из {m}"
+  inv_commission: Заказать у мастера
+  inv_commission_tip: "Мастер сделает вещь на заказ: чем щедрее оплата, тем выше шанс на работу мастера, прославленную или легендарную вещь. Управление заказчика повышает шансы."
+  inv_commission_type: Что заказать
+  inv_commission_tier: Качество работы
+  inv_commission_cost: "{n} золота · {m} мес."
+  inv_commission_chances: Шансы
+  inv_commission_in_progress: "Мастер работает: {type} ({tier}) — будет готово {date}"
+  inv_commission_busy: Мастер уже занят вашим заказом
+  inv_need_gold: "Нужно {n} золота"
+  inv_too_young: Слишком юн для заказов
+  inv_no_tier: Нет такого заказа
+  inv_order: Заказать
+  inv_some_artifact: вещь
+  inv_choose_artifact: Какую вещь подарить
+  inv_choose_claimed: Какую вещь потребовать
+  inv_your_claims: Ваши притязания
+  inv_claims_on_you: Притязают на ваши вещи
+  inv_demand: Потребовать
+  inv_nothing: Вещей нет
+  inv_unique: Уникальная реликвия
+  inv_equipped_mods: Даёт, пока надета
+  inv_stored_mods: Даст, если надеть
+alert:
+  artifact_wearing: "Вещи ветшают: {list}"
+  artifact_free_slot: "Есть что надеть: {list}"
 msg:
-  artifact_gained: "В ваших руках реликвия: {value}."
-  artifact_taken: "{who} забирает у вас реликвию: {value}."
+  artifact_gained: "В ваших руках: {value}."
+  artifact_taken: "{who} забирает вашу вещь: {value}."
   artifact_lost: "Реликвия утеряна: {value}."
+  artifact_destroyed: "Вещь рассыпалась: {value}."
+  artifact_commissioned: "Мастер закончил работу: {value} ({rarity})."
   attrition: "Пепельная буря: армия теряет {n} воинов ({place})."
+inv_hist:
+  created: "Создана"
+  commissioned: "Сделана на заказ: {to}"
+  heirloom: "Фамильная вещь: {to}"
+  inherited: "Наследство: {to}"
+  gift: "Подарок: {from} → {to}"
+  looted: "Трофей в битве: {from} → {to}"
+  trophy: "Подобрана на поле боя: {to}"
+  seized: "Отнята: {from} → {to}"
+  stolen: "Похищена: {from} → {to}"
+  returned: "Возвращена: {from} → {to}"
+  bought: "Куплена: {to}"
+  found: "Найдена: {to}"
+  gained: "Перешла: {from} → {to}"
+  repaired: "Починена"
+  lost: "Утеряна: {from}"
+opinion:
+  holds_my_artifact: "Держит мою вещь: {name}"
 tr:
-  has_artifact: "Держит реликвию: {value}"
+  has_artifact: "Держит вещь: {value}"
   realm_has_artifact: "В державе хранится реликвия: {value}"
   artifact_is_held: "Реликвия «{value}» у кого-то есть"
+  has_artifact_type: "Есть вещь: {value}"
+  has_artifact_claim: "Притязает на вещь персонажа {who}"
+  has_artifact_claim_any: Притязает на чью-то вещь
+  artifact_type: "Вещь: {value}"
+  artifact_rarity: "Редкость не ниже: {value}"
+  artifact_is_equipped: Вещь надета
+  artifact_is_equipped.not: Вещь в хранилище
 fx:
-  gain_artifact: "{who} получает реликвию: {value}"
-  lose_artifact: "{who} утрачивает реликвию: {value}"
+  gain_artifact: "{who} получает: {value}"
+  lose_artifact: "{who} утрачивает: {value}"
   seize_realm_artifacts: "{who} забирает спорные реликвии державы {from}"
+  create_artifact: "{who} получает: {value}"
+  transfer_artifact: "«{value}» переходит к: {who}"
+  add_artifact_durability: "Прочность вещи {value}"
+  destroy_artifact: "«{value}» гибнет"
 stat:
   attrition: Потери армий в месяц

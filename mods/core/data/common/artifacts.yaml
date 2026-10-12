@@ -1,0 +1,368 @@
+# Инвентарь и реликвии (механика artifacts, engine/features/artifacts.gd).
+# Вещи — снаряжение правителя и убранство его двора: модификаторы дают
+# только надетые. Вещи ветшают (чинят за золото), их заказывают у мастеров,
+# дарят, берут трофеями в битвах и переплавляют; по смерти всё переходит
+# основному наследнику. Отнятое оставляет притязание.
+defines:
+  artifacts:
+    decay_per_year: 4          # прочность надетой вещи за год
+    storage_decay_mult: 0.5    # в хранилище ветшают медленнее
+    battle_wear: 2             # износ оружия и доспехов полководца за битву
+    loot_chance: 0.12          # победитель снимает вещь с побеждённого полководца
+    trophy_chance: 0.06        # …или подбирает чужое оружие на поле
+    repair_mult: 0.6           # ремонт: ценность × износ × это
+    melt_mult: 0.3             # переплавка: доля ценности
+    storage_max: 10            # ИИ переплавляет лишнее
+    claim_opinion: -10         # «держит мою вещь» (за каждую, до двух)
+    ai_commission_chance: 0.04
+    ai_commission_reserve: 60   # ИИ заказывает, если золота ≥ цена × 2 + это
+    ai_repair_below: 0.35
+    ai_repair_reserve: 20       # …и чинит, если золота ≥ ремонт + это
+    commission_skill: stewardship
+    commission_skill_base: 8
+    commission_skill_step: 0.04
+    # стартовые вещи правителей по рангу: slot или types, rarity,
+    # upgrade — шанс на редкость выше, chance — шанс вообще получить
+    start:
+      county:
+        - { slot: weapon, rarity: common, chance: 0.5 }
+        - { slot: trinket, rarity: common, chance: 0.3 }
+      duchy:
+        - { slot: weapon, rarity: common, upgrade: 0.5 }
+        - { slot: regalia, types: [circlet, scepter], rarity: common, chance: 0.6 }
+        - { slot: armor, rarity: common, chance: 0.5 }
+        - { slot: trinket, rarity: common, upgrade: 0.3, chance: 0.6 }
+        - { slot: wall, rarity: common, chance: 0.5 }
+      kingdom:
+        - { slot: regalia, types: [crown], rarity: masterwork, upgrade: 0.4 }
+        - { slot: weapon, rarity: masterwork, upgrade: 0.2 }
+        - { slot: armor, rarity: common, upgrade: 0.5 }
+        - { slot: helmet, rarity: common, upgrade: 0.5 }
+        - { slot: throne, rarity: masterwork, upgrade: 0.3 }
+        - { slot: wall, rarity: common, upgrade: 0.5 }
+        - { slot: pedestal, rarity: common, upgrade: 0.5 }
+        - { slot: trinket, rarity: masterwork, chance: 0.7 }
+      empire:
+        - { slot: regalia, types: [crown], rarity: famed, upgrade: 0.3 }
+        - { slot: weapon, rarity: masterwork, upgrade: 0.5 }
+        - { slot: armor, rarity: masterwork }
+        - { slot: helmet, rarity: masterwork }
+        - { slot: throne, rarity: famed }
+        - { slot: wall, rarity: masterwork }
+        - { slot: pedestal, rarity: masterwork }
+        - { slot: trinket, rarity: masterwork }
+
+opinion_modifiers:
+  artifact_gift: { value: 15, years: 10 }
+  returned_artifact: { value: 15, years: 10 }
+  refused_artifact: { value: -20, years: 10 }
+
+# ---------------------------------------------------------------- слоты
+artifact_slots:
+  helmet:   { group: personal, order: 1, icon: helm }
+  regalia:  { group: personal, order: 2, icon: crown }
+  armor:    { group: personal, order: 3, icon: armor }
+  weapon:   { group: personal, order: 4, icon: sword }
+  trinket:  { group: personal, order: 5, icon: ring, count: 3 }
+  throne:   { group: court, order: 10, icon: throne }
+  wall:     { group: court, order: 11, icon: tapestry, count: 2 }
+  pedestal: { group: court, order: 12, icon: goblet, count: 2 }
+
+# ---------------------------------------------------------------- редкость
+artifact_rarities:
+  common:      { order: 1, mult: 1.0, bonuses: 0, durability: 50,  value: 30,  gift_opinion: 10, color: "#c9c3b4" }
+  masterwork:  { order: 2, mult: 1.5, bonuses: 1, durability: 70,  value: 80,  gift_opinion: 20, color: "#7fb4e6" }
+  famed:       { order: 3, mult: 2.2, bonuses: 1, durability: 90,  value: 200, gift_opinion: 35, color: "#c58bf0" }
+  illustrious: { order: 4, mult: 3.0, bonuses: 2, durability: 110, value: 500, gift_opinion: 50, color: "#f0b44a" }
+
+# ---------------------------------------------------------------- заказ мастеру
+commission_tiers:
+  modest: { order: 1, cost: 40,  months: 4,  chances: { common: 75, masterwork: 23, famed: 2 } }
+  fine:   { order: 2, cost: 120, months: 8,  chances: { common: 20, masterwork: 60, famed: 18, illustrious: 2 } }
+  lavish: { order: 3, cost: 350, months: 12, chances: { masterwork: 35, famed: 50, illustrious: 15 } }
+
+# ---------------------------------------------------------------- типы вещей
+# modifiers — у обычной вещи (умножаются на mult редкости), bonus — добавки
+# работы мастера, names — сколько имён artifact_name.<тип>.<n>
+artifact_types:
+  # оружие
+  sword:
+    slot: weapon
+    icon: sword
+    order: 1
+    weight: 14
+    modifiers: { prowess: 3 }
+    bonus: [ { martial: 1 }, { commander_advantage: 2 }, { monthly_prestige: 0.2 } ]
+    names: 6
+  axe:
+    slot: weapon
+    icon: axe
+    order: 2
+    weight: 10
+    modifiers: { prowess: 4 }
+    bonus: [ { commander_advantage: 2 }, { dread_gain_mult: 0.15 }, { pursuit: 0.05 } ]
+    names: 5
+  spear:
+    slot: weapon
+    icon: spear
+    order: 3
+    weight: 8
+    modifiers: { prowess: 3 }
+    bonus: [ { knight_effectiveness: 0.05 }, { martial: 1 }, { pursuit: 0.05 } ]
+    names: 5
+  mace:
+    slot: weapon
+    icon: mace
+    order: 4
+    weight: 6
+    modifiers: { prowess: 3 }
+    bonus: [ { martial: 1 }, { dread_gain_mult: 0.15 }, { battle_survival: 0.1 } ]
+    names: 5
+  # шлемы и доспехи
+  helm:
+    slot: helmet
+    icon: helm
+    order: 1
+    modifiers: { prowess: 2 }
+    bonus: [ { health: 0.15 }, { battle_survival: 0.1 }, { commander_advantage: 1 } ]
+    names: 5
+  mail:
+    slot: armor
+    icon: armor
+    order: 1
+    weight: 12
+    modifiers: { prowess: 2, health: 0.1 }
+    bonus: [ { battle_survival: 0.1 }, { knight_effectiveness: 0.05 }, { prowess: 1 } ]
+    names: 5
+  lamellar:
+    slot: armor
+    icon: armor
+    order: 2
+    weight: 6
+    modifiers: { prowess: 3 }
+    bonus: [ { battle_survival: 0.1 }, { commander_advantage: 1 }, { health: 0.15 } ]
+    names: 4
+  # регалии
+  crown:
+    slot: regalia
+    icon: crown
+    order: 1
+    weight: 6
+    modifiers: { monthly_prestige: 0.4, vassal_opinion: 3 }
+    bonus: [ { diplomacy: 1 }, { general_opinion: 3 }, { monthly_prestige: 0.3 } ]
+    names: 5
+  circlet:
+    slot: regalia
+    icon: circlet
+    order: 2
+    weight: 8
+    modifiers: { diplomacy: 1, monthly_prestige: 0.2 }
+    bonus: [ { general_opinion: 3 }, { fertility: 0.05 }, { vassal_opinion: 2 } ]
+    names: 4
+  scepter:
+    slot: regalia
+    icon: scepter
+    order: 3
+    weight: 8
+    modifiers: { stewardship: 1, monthly_prestige: 0.2 }
+    bonus: [ { tax_mult: 0.03 }, { vassal_opinion: 2 }, { monthly_prestige: 0.2 } ]
+    names: 4
+  # безделушки
+  ring:
+    slot: trinket
+    icon: ring
+    order: 1
+    modifiers: { diplomacy: 1 }
+    bonus: [ { general_opinion: 3 }, { scheme_power: 5 }, { fertility: 0.05 } ]
+    names: 5
+  amulet:
+    slot: trinket
+    icon: amulet
+    order: 2
+    modifiers: { health: 0.15, stress_gain_mult: -0.05 }
+    bonus: [ { monthly_piety: 0.2 }, { fertility: 0.05 }, { health: 0.15 } ]
+    names: 5
+  book:
+    slot: trinket
+    icon: book
+    order: 3
+    modifiers: { learning: 1, lifestyle_xp_mult: 0.04 }
+    bonus: [ { learning: 1 }, { education_gain_mult: 0.05 }, { monthly_piety: 0.2 } ]
+    names: 5
+  dagger:
+    slot: trinket
+    icon: dagger
+    order: 4
+    modifiers: { intrigue: 1 }
+    bonus: [ { scheme_power: 5 }, { scheme_defense: 5 }, { prowess: 1 } ]
+    names: 5
+  seal:
+    slot: trinket
+    icon: seal
+    order: 5
+    modifiers: { stewardship: 1 }
+    bonus: [ { tax_mult: 0.02 }, { diplomacy: 1 }, { monthly_prestige: 0.1 } ]
+    names: 4
+  horn:
+    slot: trinket
+    icon: horn
+    order: 6
+    modifiers: { martial: 1, levy_mult: 0.02 }
+    bonus: [ { commander_advantage: 1 }, { knight_effectiveness: 0.05 }, { levy_mult: 0.02 } ]
+    names: 4
+  # убранство двора
+  throne:
+    slot: throne
+    icon: throne
+    order: 1
+    modifiers: { vassal_opinion: 3, monthly_prestige: 0.3 }
+    bonus: [ { general_opinion: 3 }, { diplomacy: 1 }, { monthly_prestige: 0.2 } ]
+    names: 4
+  tapestry:
+    slot: wall
+    icon: tapestry
+    order: 1
+    modifiers: { diplomacy: 1, general_opinion: 2 }
+    bonus: [ { monthly_prestige: 0.2 }, { learning: 1 }, { vassal_opinion: 2 } ]
+    names: 5
+  banner:
+    slot: wall
+    icon: banner
+    order: 2
+    modifiers: { commander_advantage: 2, levy_mult: 0.03 }
+    bonus: [ { knight_effectiveness: 0.05 }, { martial: 1 }, { monthly_prestige: 0.2 } ]
+    names: 5
+  trophy_shield:
+    slot: wall
+    icon: shield
+    order: 3
+    modifiers: { prowess: 1, monthly_prestige: 0.15 }
+    bonus: [ { dread_gain_mult: 0.15 }, { martial: 1 }, { commander_advantage: 1 } ]
+    names: 4
+  reliquary:
+    slot: pedestal
+    icon: reliquary
+    order: 1
+    modifiers: { monthly_piety: 0.3 }
+    bonus: [ { learning: 1 }, { county_opinion: 3 }, { stress_gain_mult: -0.05 } ]
+    names: 5
+  goblet:
+    slot: pedestal
+    icon: goblet
+    order: 2
+    modifiers: { stewardship: 1, general_opinion: 1 }
+    bonus: [ { monthly_prestige: 0.2 }, { tax_mult: 0.02 }, { diplomacy: 1 } ]
+    names: 4
+  codex:
+    slot: pedestal
+    icon: book
+    order: 3
+    modifiers: { learning: 1, lifestyle_xp_mult: 0.04 }
+    bonus: [ { monthly_piety: 0.2 }, { education_gain_mult: 0.05 }, { learning: 1 } ]
+    names: 4
+  chessmen:
+    slot: pedestal
+    icon: chessmen
+    order: 4
+    weight: 5
+    modifiers: { intrigue: 1, diplomacy: 1 }
+    bonus: [ { scheme_defense: 5 }, { stress_gain_mult: -0.05 }, { martial: 1 } ]
+    names: 3
+
+# ---------------------------------------------------------------- реликвии 1066
+# Уникальные вещи: у исторических владельцев с начала партии, не ветшают.
+artifacts:
+  edward_crown:
+    type: crown
+    rarity: illustrious
+    icon: crown
+    holder: harold
+    modifiers: { monthly_prestige: 1.2, vassal_opinion: 8, diplomacy: 1 }
+  joyeuse:
+    type: sword
+    rarity: illustrious
+    icon: sword
+    holder: philip
+    modifiers: { prowess: 8, martial: 2, monthly_prestige: 0.5 }
+  landwaster:
+    type: banner
+    rarity: illustrious
+    icon: banner
+    holder: harald_hardrada
+    modifiers: { commander_advantage: 6, knight_effectiveness: 0.1, dread_gain_mult: 0.25 }
+  papal_banner:
+    type: banner
+    rarity: famed
+    icon: banner
+    holder: william
+    modifiers: { commander_advantage: 3, levy_mult: 0.05, monthly_piety: 0.5 }
+  stone_of_destiny:
+    type: throne
+    rarity: illustrious
+    icon: throne
+    holder: malcolm
+    modifiers: { vassal_opinion: 10, monthly_prestige: 1, county_opinion: 3 }
+  bell_of_patrick:
+    type: reliquary
+    rarity: famed
+    icon: reliquary
+    holder: toirdelbach
+    modifiers: { monthly_piety: 1, learning: 1, county_opinion: 3 }
+
+# ---------------------------------------------------------------- взаимодействия
+interactions:
+  # подарить вещь из своего инвентаря
+  gift_artifact:
+    requires_feature: artifacts
+    icon: "🎁"
+    category: diplomacy
+    is_shown:
+      scope:actor: { num_artifacts: "> 0" }
+      scope:recipient: { is_adult: yes }
+    target:
+      provider: own_artifacts
+      title: ui.inv_choose_artifact
+    auto_accept: yes
+    on_accept:
+      - transfer_artifact: { artifact: scope:target, to: scope:recipient, how: gift }
+      - scope:recipient:
+          add_opinion: { target: scope:actor, modifier: artifact_gift, value: "scope:target.artifact_gift_opinion" }
+    ai_targets: [liege]
+    ai_frequency_months: 24
+    ai_will_do:
+      value: 0
+      if:
+        - limit:
+            num_spare_artifacts: "> 1"
+            scope:target: { artifact_is_equipped: no }
+            scope:recipient: { opinion: { target: scope:actor, value: "< 10" } }
+          add: 25
+      subtract: { value: "scope:target.artifact_value", divide: 20 }
+
+  # потребовать назад вещь, на которую есть притязание
+  demand_artifact:
+    requires_feature: artifacts
+    icon: "✊"
+    category: hostile
+    is_shown:
+      scope:actor: { has_artifact_claim: scope:recipient }
+    target:
+      provider: claimed_artifacts
+      title: ui.inv_choose_claimed
+    cooldown: { years: 3 }
+    ai_accept:
+      value: -30
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.5 } }
+        - { desc: ai.relative_power, value: { value: "scope:actor.levies", divide: { value: levies, min: 100 }, multiply: 10, max: 30 } }
+        - limit: { scope:recipient: { is_vassal_of: scope:actor } }
+          desc: ai.current_liege
+          value: 25
+    on_accept:
+      - transfer_artifact: { artifact: scope:target, to: scope:actor, how: returned }
+      - scope:actor: { add_opinion: { target: scope:recipient, modifier: returned_artifact } }
+    on_decline:
+      - scope:actor: { add_opinion: { target: scope:recipient, modifier: refused_artifact } }
+    ai_targets: [artifact_claim_holders]
+    ai_frequency_months: 12
+    ai_will_do: 40

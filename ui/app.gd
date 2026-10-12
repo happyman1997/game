@@ -425,7 +425,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 ## Горячие клавиши разделов (WASD двигают карту).
 const TAB_KEYS := {
 	KEY_L: "lifestyle", KEY_R: "realm", KEY_Y: "dynasty", KEY_M: "military",
-	KEY_X: "wars", KEY_I: "intrigue", KEY_N: "decisions", KEY_J: "log",
+	KEY_X: "wars", KEY_I: "intrigue", KEY_N: "decisions", KEY_J: "log", KEY_B: "inventory",
 }
 
 
@@ -546,6 +546,12 @@ func open_ref(ref: Variant) -> void:
 			open_title(ref.id)
 		"war":
 			open_tab("wars")
+		"artifact":
+			var it: Variant = Artifacts.item(game, ref.id) if game != null else null
+			if it != null and it.get("owner") != null:
+				subtabs["character"] = "inventory"
+				open_character(str(it.owner))
+				InventoryPanel.open_detail(self, str(it.id))
 
 
 func open_tab(id: String) -> void:

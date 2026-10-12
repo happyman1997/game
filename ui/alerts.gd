@@ -65,6 +65,28 @@ static func register_builtin(engine: GameEngine) -> void:
 			return null
 		var first: String = kids[0].id
 		return {"icon": "baby", "kind": "bad", "text": g.loc.t("alert.child_no_guardian", {"list": ", ".join(kids.map(func(k): return Chars.char_name(g, k)))}), "action": {"character": first, "subtab": ["character", "family"]}})
+	reg.call("artifact_wearing", 24, func(g: Game):
+		var p: Dictionary = g.player
+		if not g.engine.has_feature("artifacts"):
+			return null
+		var worn: Array = Artifacts.equipped(g, p).filter(func(it): return not Artifacts.indestructible(g, it) and Artifacts.durability_frac(it) < 0.25)
+		if worn.is_empty():
+			return null
+		return {"icon": "hammer", "kind": "bad", "text": g.loc.t("alert.artifact_wearing", {"list": ", ".join(worn.slice(0, 3).map(func(it): return Artifacts.name_of(g, it)))}),
+			"action": {"character": p.id, "subtab": ["character", "inventory"]}})
+	reg.call("artifact_free_slot", 34, func(g: Game):
+		var p: Dictionary = g.player
+		if not g.engine.has_feature("artifacts"):
+			return null
+		var fit := []
+		for it in Artifacts.storage(g, p):
+			var slot := Artifacts.slot_of(g, it)
+			if Artifacts.in_slot(g, p, slot).size() < Artifacts.slot_capacity(g, p, slot):
+				fit.append(it)
+		if fit.is_empty():
+			return null
+		return {"icon": "bag", "kind": "info", "text": g.loc.t("alert.artifact_free_slot", {"list": ", ".join(fit.slice(0, 3).map(func(it): return Artifacts.name_of(g, it)))}),
+			"action": {"character": p.id, "subtab": ["character", "inventory"]}})
 	reg.call("choose_ambition", 16, func(g: Game):
 		var p: Dictionary = g.player
 		if not g.engine.has_feature("ambitions") or Ambitions.offers(p).is_empty():
