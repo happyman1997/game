@@ -11,6 +11,8 @@ msg:
   popular_faction_created: "Графство {place} вступает во фракцию «{faction}»: народ недоволен вами."
   popular_revolt: "{leader} поднимает «{faction}» в {place} против {holder}!"
   popular_realm: "{leader} правит отвоёванными землями: графств — {n}."
+tr:
+  county_grievance: "Главная обида графства: {value}"
 fx:
   add_control: "Контроль над {place}: {value}"
   add_county_opinion: "Мнение графства {place}: {value} ({name})"

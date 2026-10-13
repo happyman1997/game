@@ -22,12 +22,16 @@
 | `can_marry` | character | Может вступить в брак с персонажем | core |
 | `can_use_hook_on` | character | Крюк на персонажа можно использовать сейчас | core |
 | `capital_has_disease` | character | В столице персонажа (или его сюзерена) эпидемия. | plague |
+| `county_grievance` | province | Главная причина недовольства графства (id из county_grievances; yes/no — есть ли она) | core/populace |
 | `culture` | character, province | Культура равна | core |
 | `dragon_wary` | character | Ближайший дракон настороже после недавней охоты | arcana |
+| `dread_tier` | character | Ступень страха, которую внушает правитель: dread_tier: fear или dread_tier: ">= horror" | core/politics |
 | `dynasty` | character | Из этой династии (или её младшей ветви) | core |
 | `education_focus` | character | Направление воспитания: education_focus: martial | core/upbringing |
 | `faction_type` | faction | Тип фракции | core/factions |
 | `faith` | character, province | Вера равна | core |
+| `fear_stance` | character | Как подданный относится к страху сюзерена: defiant (дерзкий), broken (сломленный), obedient (покорный) | core/politics |
+| `felt_dread_tier` | character | Ступень страха, которую подданный чувствует перед сюзереном (дерзкие — нижняя, сломленные — выше): felt_dread_tier: "< unease" | core/politics |
 | `global_var` | любой | Сравнение глобальной переменной | core |
 | `government` | character | Правление персонажа (id из governments или список) | core/governments |
 | `has_active_trial` | character | Проходит испытание (yes/no, id архетипа или список) | core/trials |
@@ -59,7 +63,7 @@
 | `has_nickname` | character | Есть прозвище (yes/no или id прозвища из nicknames) | core/deeds |
 | `has_opinion_modifier` | character | Есть модификатор мнения: { target, modifier } | core |
 | `has_perk` | character | Открыт перк | core/lifestyles |
-| `has_province_flag` | province | Есть флаг провинции | core |
+| `has_province_flag` | province | Есть флаг провинции (с неистёкшим сроком) | core |
 | `has_province_modifier` | province | Есть модификатор провинции | core |
 | `has_realm_law` | character | Действует закон державы | core/laws |
 | `has_regent` | character | Правителем-ребёнком правит регент | core/upbringing |
@@ -228,6 +232,7 @@
 | `fulfill_ambition` | Исполнить желание персонажа (благодарность — patron): fulfill_ambition: scope:actor | core/ambitions |
 | `gain_artifact` | Получить реликвию или вещь (у прежнего владельца она пропадает): gain_artifact: <id> | core/artifacts |
 | `gain_title` | Получить титул | core |
+| `give_nickname` | Дать прозвище из nicknames (женская форма — nick.<id>_f): give_nickname: terrible | core/deeds |
 | `give_title` | Пожаловать титул: { title, to } — получатель становится вассалом | core |
 | `grant_archetype` | Дать архетип без испытания: grant_archetype: <архетип> | core/trials |
 | `grant_minor_county` | Пожаловать персонажу самое бедное графство своего домена (не столицу) | core/politics |
@@ -249,6 +254,7 @@
 | `pay_gold` | Передать золото: { target, value } | core |
 | `plague_of_the_dead` | Лич поднимает мёртвых в столице главного врага | arcana |
 | `purge_restless_dead` | Выжечь нежить в самой поражённой провинции державы (purge_restless_dead: { magic: yes } — светом чар, а не ополчением) | arcana |
+| `raise_dread_tier` | Поднять страх правителя на ступень (или на N ступеней): raise_dread_tier: 1 | core/politics |
 | `release_from_prison` | Освободить этого персонажа из темницы | core/prison |
 | `remove_building` | Убрать постройку | core |
 | `remove_claim` | Убрать претензию | core |
@@ -262,6 +268,7 @@
 | `remove_modifier` | Убрать модификатор | core |
 | `remove_opinion` | Убрать модификатор мнения: { target, modifier } | core |
 | `remove_perk` | Убрать перк | core/lifestyles |
+| `remove_province_flag` | Снять флаг провинции | core |
 | `remove_province_modifier` | Убрать модификатор провинции | core |
 | `remove_trait` | Убрать черту | core |
 | `remove_var` | Удалить переменную | core |
@@ -279,7 +286,7 @@
 | `set_government` | Сменить правление персонажа: set_government: <id> | core/governments |
 | `set_guardian` | Назначить ребёнку опекуна: set_guardian: scope:x | core/upbringing |
 | `set_nickname` | Прозвище (ключ локализации или текст) | core |
-| `set_province_flag` | Флаг провинции | core |
+| `set_province_flag` | Флаг провинции: name или { name, days/months/years } | core |
 | `set_realm_law` | Установить закон державы (без цены и перерыва) | core/laws |
 | `set_regent` | Назначить регента правителю-ребёнку: set_regent: scope:x | core/upbringing |
 | `set_succession_law` | Закон наследования | core |
@@ -291,6 +298,7 @@
 | `start_ambition` | Завести желание: start_ambition: land (цель — случайная подходящая) | core/ambitions |
 | `start_disease` | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
 | `start_scheme` | Начать интригу: { type, target } | core |
+| `stress_reaction` | Отклик характера на поступок из события: stress_reaction: <id из defines.personality.event_actions> | core/personality |
 | `take_faction_counties` | Вожак народной фракции (scope:faction) забирает её графства и правит сам: yes или { create_titles: yes } | core/populace |
 | `take_title` | Отобрать титул себе: { title, from? } | core |
 | `transfer_artifact` | Отдать вещь персонажу: transfer_artifact: { artifact: scope:target, to: scope:recipient, how: gift } | core/artifacts |
@@ -360,6 +368,7 @@
 | `diplomacy` | character | Навык: diplomacy | core |
 | `domain_limit` | character | Лимит домена | core |
 | `dread` | character | Страх, который внушает правитель (0–100) | core/politics |
+| `dread_tier_level` | character | Номер ступени страха правителя (0 — нижняя) | core/politics |
 | `duel_odds` | character | Шанс победить персонажа в поединке, %: duel_odds(scope:x) | core/duels |
 | `dynasty_level` | character | Уровень славы рода (0 — безвестный) | core/dynasties |
 | `dynasty_prestige` | character | Известность (престиж) династии | core |
@@ -444,6 +453,7 @@
 | `soul` | character | Сколько души осталось (вживления её отягощают) | grafts |
 | `stewardship` | character | Навык: stewardship | core |
 | `stress` | character | Стресс | core |
+| `stress_for` | character | Сколько стресса принесёт поступок (по чертам): stress_for(drive_away_petitioners) | core/personality |
 | `stress_level` | character | Уровень стресса (стресс / 100) | core |
 | `tax` | province | Налог провинции | core |
 | `tier` | character | Ранг основного титула (0 — нет земель, 1 — граф ... 4 — император) | core |
@@ -596,9 +606,9 @@
 - **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `faction`, `artifact_holder`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`, `own_artifacts`, `claimed_artifacts`
 - **interaction_deciders**: `payer`
-- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `grafts`, `plague_fear`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `grafts`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `arcana_faith`, `grafts`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`
 - **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

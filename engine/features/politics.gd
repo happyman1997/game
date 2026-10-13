@@ -12,11 +12,23 @@ extends EngineFeature
 ##     dread_decay_compassionate, intimidated_per_dread, defiant_per_dread,
 ##     defiant_traits, respect_from, respect_per_point, respect_max, petition_chance_ai,
 ##     petition_chance_player, discord_base_chance }
-##   Дерзкие вассалы (defiant_traits) страха не знают, но уважают доблестного
-##   сюзерена; dread_gain_mult правителя (доблесть) ускоряет рост страха.
-##   on_actions.on_vassal_petition — события-прошения (root — сюзерен)
+##   dread_tiers: { <id>: { min, icon, modifiers, silence, stress_monthly,
+##     stress_immune: [черты], dissolve_factions } } — ступени страха: по
+##     порогу min; modifiers — правителю (complaint_mult — реже жалобы и
+##     прошения), silence — их нет вовсе, stress_monthly — бессонница правителя
+##     (кроме носителей stress_immune), dissolve_factions — фракции против него
+##     распадаются (остаются только дерзкие).
+##   Кто боится (stance): «сломленные» (побывали в темнице сюзерена) чувствуют
+##   страх на ступень выше (politics.broken_fear) и не вступают во фракции;
+##   «дерзкие» — черты defiant_traits, влиятельные вассалы и кровники
+##   казнённых (defiant_modifiers) — не боятся, а злятся, но уважают
+##   доблестного сюзерена; остальные — «покорные». dread_gain_mult правителя
+##   (доблесть) ускоряет рост страха.
+##   on_actions: on_vassal_petition — события-прошения (root — сюзерен),
+##   on_dread_tier_up / on_dread_tier_down — страх перешёл ступень.
 ## Состояние: вассал — c.obligation = {liege, id} (с другим сюзереном
-## действуют обычные условия); правитель — c.vars.dread.
+## действуют обычные условия); правитель — c.vars.dread, c.vars.dread_tier
+## (номер ступени); c.vars.broken_by — в чьей темнице побывал.
 
 const OWNER := "core/politics"
 
@@ -143,31 +155,196 @@ static func add_dread(game: Game, c: Dictionary, v: float) -> void:
 	# dread_gain_mult — устрашение (доблесть): страх перед силачом копится быстрее
 	if v > 0.0:
 		v *= maxf(0.0, 1.0 + Stats.stat(game, c, "dread_gain_mult"))
-	var before := dread(c)
-	c.vars["dread"] = clampf(before + v, 0.0, game.def_num("politics.dread_max", 100))
+	_set_dread(game, c, dread(c) + v)
+
+
+static func _set_dread(game: Game, c: Dictionary, v: float) -> void:
+	c.vars["dread"] = clampf(v, 0.0, game.def_num("politics.dread_max", 100))
 	if dread(c) <= 0.0:
 		c.vars.erase("dread")
 	# мнение подданных о правителе изменилось
 	for x in game.vassals_of(c.id) + game.courtiers_of(c.id):
 		game.stat_cache.erase("op:%s>%s" % [x.id, c.id])
+	_check_tier(game, c)
 
 
-## Не склоняются перед страхом (храбрые, гневливые) — а ненавидят тирана.
-static func is_defiant(game: Game, c: Dictionary) -> bool:
+# ------------------------------------------------------------ ступени страха
+
+## Ступени страха по возрастанию порога.
+static func tiers(game: Game) -> Array:
+	var hit: Variant = game.engine.cache.get("politics:tiers")
+	if hit == null:
+		hit = game.content.all("dread_tiers").duplicate()
+		Data.sort_by(hit, func(x): return Data.num(x.get("min")))
+		game.engine.cache["politics:tiers"] = hit
+	return hit
+
+
+## Номер ступени для такого страха (0 — нижняя; −1 — ступеней нет).
+static func level_for(game: Game, d: float) -> int:
+	var lvl := -1
+	var ts := tiers(game)
+	for i in ts.size():
+		if d >= Data.num(ts[i].get("min")):
+			lvl = i
+	return lvl
+
+
+## Номер ступени по её id (−1 — нет такой).
+static func level_of_id(game: Game, id: String) -> int:
+	var ts := tiers(game)
+	for i in ts.size():
+		if ts[i].id == id:
+			return i
+	return -1
+
+
+static func tier_at(game: Game, lvl: int) -> Variant:
+	var ts := tiers(game)
+	return ts[lvl] if lvl >= 0 and lvl < ts.size() else null
+
+
+## Ступень страха, которую внушает правитель.
+static func tier_level(game: Game, c: Dictionary) -> int:
+	return level_for(game, dread(c))
+
+
+static func tier_of(game: Game, c: Dictionary) -> Variant:
+	return tier_at(game, tier_level(game, c))
+
+
+## Сравнение ступени со значением условия: "fear", ">= horror", "< unease".
+static func compare_tier(game: Game, lvl: int, arg: Variant) -> bool:
+	var p := _tier_arg(str(arg))
+	var want := level_of_id(game, p[1])
+	if want < 0:
+		game.script_error("Неизвестная ступень страха \"%s\"" % p[1])
+		return false
+	match p[0]:
+		">=":
+			return lvl >= want
+		">":
+			return lvl > want
+		"<=":
+			return lvl <= want
+		"<":
+			return lvl < want
+		"!=":
+			return lvl != want
+	return lvl == want
+
+
+static func _tier_arg(a: String) -> Array:
+	a = a.strip_edges()
+	for op in [">=", "<=", "!=", ">", "<", "=="]:
+		if a.begins_with(op):
+			return [op, a.substr(op.length()).strip_edges()]
+	return ["==", a]
+
+
+static func describe_tier(game: Game, key: String, arg: Variant) -> String:
+	var p := _tier_arg(str(arg))
+	var op: String = {">=": "ge", ">": "gt", "<=": "le", "<": "lt", "!=": "ne", "==": "eq"}[p[0]]
+	return game.loc.t(key, {"cond": game.loc.t("tr.tier_cmp." + op, {"tier": game.name_of("dread_tiers", p[1])})})
+
+
+## Поднять страх до следующей ступени (с запасом в пять очков).
+static func raise_tier(game: Game, c: Dictionary, steps: int = 1) -> void:
+	var nxt: Variant = tier_at(game, tier_level(game, c) + maxi(1, steps))
+	if nxt == null:
+		_set_dread(game, c, game.def_num("politics.dread_max", 100))
+	else:
+		_set_dread(game, c, maxf(dread(c), Data.num(nxt.get("min")) + 5.0))
+
+
+## Страх перешёл ступень: модификаторы правителя, мнения, on_action.
+static func _check_tier(game: Game, c: Dictionary) -> void:
+	var lvl := tier_level(game, c)
+	var was := int(Data.num(c.vars.get("dread_tier"), 0.0))
+	if lvl == was or lvl < 0:
+		return
+	if lvl <= 0:
+		c.vars.erase("dread_tier")
+	else:
+		c.vars["dread_tier"] = lvl
+	game.stat_cache.erase(c.id)
+	game.emit("politics.dread_tier", {"character": c, "from": was, "to": lvl})
+	var t: Variant = tier_at(game, lvl)
+	if game.is_player(c.id) and t != null:
+		game.message(game.loc.t("msg.dread_tier_up" if lvl > was else "msg.dread_tier_down", {"tier": game.name_of("dread_tiers", t.id)}),
+			"war" if lvl > was else "info", {"type": "character", "id": c.id})
+	game.on_action("on_dread_tier_up" if lvl > was else "on_dread_tier_down", {"type": "character", "id": c.id})
+
+
+# ------------------------------------------------------------ кто боится
+
+## Как подданный относится к страху сюзерена:
+##   "broken"   — побывал в его темнице: боится на ступень сильнее, во фракции не идёт;
+##   "defiant"  — дерзкий (храбрые, гневливые, влиятельные вассалы, кровники
+##                казнённых): не боится, а злится;
+##   "obedient" — покорный: ступени страха действуют как есть.
+static func stance(game: Game, c: Dictionary, liege: Variant = null) -> String:
+	if liege == null:
+		liege = game.ch(c.liege) if c.liege != null else null
+	if liege == null:
+		return "obedient"
+	if Data.as_array(c.vars.get("broken_by")).has(liege.id):
+		return "broken"
 	for t in game.def_val("politics.defiant_traits", ["brave", "wrathful"]):
 		if c.traits.has(t):
-			return true
-	return false
+			return "defiant"
+	var mods: Array = game.def_val("politics.defiant_modifiers", ["executed_relative"])
+	for e in c.opinions.get(liege.id, []):
+		if mods.has(e.mod):
+			return "defiant"
+	if c.liege == liege.id and is_powerful(game, c):
+		return "defiant"
+	return "obedient"
 
 
-## Насколько персонаж боится своего сюзерена: его страх, если сам не из дерзких.
+## Не склоняются перед страхом — а ненавидят тирана.
+static func is_defiant(game: Game, c: Dictionary) -> bool:
+	return stance(game, c) == "defiant"
+
+
+## Насколько персонаж боится своего сюзерена: дерзкие — нисколько,
+## сломленные — сильнее на politics.broken_fear (примерно ступень).
 static func fear_of_liege(game: Game, c: Dictionary) -> float:
 	if c.liege == null:
 		return 0.0
 	var l: Variant = game.ch(c.liege)
-	if l == null or not l.vars.has("dread") or is_defiant(game, c):
+	if l == null:
 		return 0.0
+	match stance(game, c, l):
+		"defiant":
+			return 0.0
+		"broken":
+			return minf(game.def_num("politics.dread_max", 100), dread(l) + game.def_num("politics.broken_fear", 20))
 	return dread(l)
+
+
+## Ступень страха, которую чувствует подданный перед сюзереном.
+static func felt_level(game: Game, c: Dictionary) -> int:
+	return maxi(0, level_for(game, fear_of_liege(game, c)))
+
+
+## Пленник вышел из темницы сломленным: боится тюремщика (и его наследника).
+static func mark_broken(game: Game, c: Dictionary, jailer_id: String) -> void:
+	var l: Array = Data.as_array(c.vars.get("broken_by")).duplicate()
+	if l.has(jailer_id):
+		return
+	l.append(jailer_id)
+	c.vars["broken_by"] = l.slice(maxi(0, l.size() - 6))
+	game.stat_cache.erase("op:%s>%s" % [c.id, jailer_id])
+
+
+## Во сколько раз реже приходят жалобы и прошения (0 — не приходят;
+## ступень с silence — молчат все, что бы ни было).
+static func complaint_mult(game: Game, c: Dictionary) -> float:
+	var t: Variant = tier_of(game, c) if c.vars.has("dread_tier") else null
+	if t != null and t.get("silence", false):
+		return 0.0
+	return clampf(1.0 + Stats.stat(game, c, "complaint_mult"), 0.0, 1.0)
 
 
 # ------------------------------------------------------------ интриги и тяжбы
@@ -243,6 +420,23 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 		c.vars["dread"] = d - decay
 		if dread(c) <= 0.0:
 			c.vars.erase("dread")
+		if level_for(game, dread(c)) != int(Data.num(c.vars.get("dread_tier"), 0.0)):
+			_check_tier(game, c)
+	var tier: Variant = tier_of(game, c) if c.vars.has("dread_tier") else null
+	if tier != null:
+		# бессонница: кто внушает ужас, тот и сам не спит (кроме бессердечных)
+		var sm := Data.num(tier.get("stress_monthly"))
+		if sm > 0.0 and not Data.as_array(tier.get("stress_immune")).any(func(t): return c.traits.has(t)):
+			Chars.change_stress(game, c, sm, "dread_tier")
+		# террор: фракции распадаются — остаются лишь дерзкие
+		if tier.get("dissolve_factions", false) and game.engine.has_feature("factions"):
+			for f in Factions.against(game, c.id):
+				if f.get("popular", false) or game.state.wars.values().any(func(w): return w.get("faction") == f.id):
+					continue
+				for mid in f.members.duplicate():
+					var m: Variant = game.ch(mid)
+					if m != null and stance(game, m, c) != "defiant":
+						Factions.leave(game, m)
 	# Тиран: каждый пленник в темнице — немного страха в месяц
 	var per_prisoner := Stats.stat(game, c, "dread_per_prisoner")
 	if per_prisoner > 0.0 and game.engine.has_feature("prison"):
@@ -253,11 +447,12 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 		return
 	# Прошения вассалов: игрок — с небольшим шансом каждый месяц, остальные
 	# правители — раз в год, в «свой» месяц.
+	# страх затыкает рты: complaint_mult ступени страха
 	if game.is_player(c.id):
-		if game.rng.next() * 100.0 < game.def_num("politics.petition_chance_player", 5):
+		if game.rng.next() * 100.0 < game.def_num("politics.petition_chance_player", 5) * complaint_mult(game, c):
 			game.on_action("on_vassal_petition", {"type": "character", "id": c.id})
 	elif (Rng.hash_string(c.id) & 0x7FFFFFFF) % 12 == GameDate.parts(game.date).m - 1:
-		if game.rng.next() * 100.0 < game.def_num("politics.petition_chance_ai", 30):
+		if game.rng.next() * 100.0 < game.def_num("politics.petition_chance_ai", 30) * complaint_mult(game, c):
 			game.on_action("on_vassal_petition", {"type": "character", "id": c.id})
 
 
@@ -291,18 +486,37 @@ func install(engine: GameEngine) -> void:
 				else:
 					out.append({"label": game.loc.t("opinion.powerful_snubbed"), "value": game.def_num("politics.powerful_snub_opinion", -15)})
 		var d := Politics.dread(b)
-		# дерзкие (храбрые, гневливые) не боятся, но уважают силу: доблестного сюзерена
-		if Politics.is_defiant(game, a):
+		var st := Politics.stance(game, a, b)
+		# дерзкие (храбрые, гневливые, влиятельные, кровники) не боятся, но уважают силу: доблестного сюзерена
+		if st == "defiant":
 			var resp := minf(game.def_num("politics.respect_max", 15), (Stats.skill(game, b, "prowess") - game.def_num("politics.respect_from", 12)) * game.def_num("politics.respect_per_point", 1.5))
 			if resp >= 1.0:
 				out.append({"label": game.loc.t("opinion.respects_strength"), "value": roundf(resp)})
-		if d >= 1.0:
-			if Politics.is_defiant(game, a):
+			if d >= 1.0:
 				out.append({"label": game.loc.t("opinion.defiant"), "value": roundf(d * game.def_num("politics.defiant_per_dread", -0.15))})
-			else:
-				out.append({"label": game.loc.t("opinion.intimidated"), "value": roundf(d * game.def_num("politics.intimidated_per_dread", 0.3))})
+		else:
+			var fear := Politics.fear_of_liege(game, a) if a.liege == b.id else d
+			if fear >= 1.0:
+				out.append({"label": game.loc.t("opinion.broken" if st == "broken" else "opinion.intimidated"), "value": roundf(fear * game.def_num("politics.intimidated_per_dread", 0.3))})
 		return out if not out.is_empty() else null
 	}, OWNER)
+	# Ступень страха — модификаторы правителя (ступени выше нижней).
+	engine.modifier_providers.register("dread_tier", {"fn": func(game: Game, c: Dictionary) -> Variant:
+		if not c.vars.has("dread_tier"):
+			return null
+		var t: Variant = Politics.tier_at(game, int(c.vars.dread_tier))
+		if t == null or not (t.get("modifiers") is Dictionary) or t.modifiers.is_empty():
+			return null
+		var tid: String = t.id
+		return [{"label": func(): return game.loc.t("ui.dread_tier_mod", {"tier": game.name_of("dread_tiers", tid)}), "modifiers": t.modifiers}]
+	}, OWNER)
+	# Темница ломает: вышедший из неё боится тюремщика сильнее и не бунтует.
+	engine.hooks.on("prison.released", func(p):
+		var game: Game = p.game
+		var c: Dictionary = p.prisoner
+		if Chars.is_alive(c) and game.ch(p.jailer) != null:
+			Politics.mark_broken(game, c, str(p.jailer))
+	, 0, OWNER)
 	# Совет: ИИ охотнее сажает влиятельных вассалов (их обида дороже).
 	engine.hooks.on("council.candidate_score", func(p):
 		return p.game.def_num("politics.council_seat_bonus", 4) if Politics.powerful_vassals(p.game, p.liege).has(p.candidate.id) else null
@@ -341,6 +555,25 @@ func register_script(engine: GameEngine) -> void:
 		var c: Variant = ch.call(ctx, s)
 		return Politics.fear_of_liege(ctx.game, c) if c != null else 0.0
 	}, OWNER)
+	r.triggers.register("dread_tier", {"scopes": CH, "doc": "Ступень страха, которую внушает правитель: dread_tier: fear или dread_tier: \">= horror\"", "eval": func(ctx, s, arg):
+		var c: Variant = ch.call(ctx, s)
+		return c != null and Politics.compare_tier(ctx.game, Politics.tier_level(ctx.game, c), arg),
+		"describe": func(ctx, _s, arg): return Politics.describe_tier(ctx.game, "tr.dread_tier", arg),
+	}, OWNER)
+	r.triggers.register("felt_dread_tier", {"scopes": CH, "doc": "Ступень страха, которую подданный чувствует перед сюзереном (дерзкие — нижняя, сломленные — выше): felt_dread_tier: \"< unease\"", "eval": func(ctx, s, arg):
+		var c: Variant = ch.call(ctx, s)
+		return c != null and Politics.compare_tier(ctx.game, Politics.felt_level(ctx.game, c), arg),
+		"describe": func(ctx, _s, arg): return Politics.describe_tier(ctx.game, "tr.felt_dread_tier", arg),
+	}, OWNER)
+	r.triggers.register("fear_stance", {"scopes": CH, "doc": "Как подданный относится к страху сюзерена: defiant (дерзкий), broken (сломленный), obedient (покорный)", "eval": func(ctx, s, arg):
+		var c: Variant = ch.call(ctx, s)
+		return c != null and Politics.stance(ctx.game, c) == str(arg),
+		"describe": func(ctx, _s, arg): return ctx.game.loc.t("tr.fear_stance", {"value": ctx.game.loc.t("ui.stance." + str(arg))}),
+	}, OWNER)
+	r.values.register("dread_tier_level", {"scopes": CH, "doc": "Номер ступени страха правителя (0 — нижняя)", "get": func(ctx, s, _a):
+		var c: Variant = ch.call(ctx, s)
+		return float(maxi(0, Politics.tier_level(ctx.game, c))) if c != null else 0.0
+	}, OWNER)
 	r.values.register("num_powerful_vassals", {"scopes": CH, "doc": "Число влиятельных вассалов", "get": func(ctx, s, _a):
 		var c: Variant = ch.call(ctx, s)
 		return float(Politics.powerful_vassals(ctx.game, c).size()) if c != null else 0.0
@@ -359,6 +592,12 @@ func register_script(engine: GameEngine) -> void:
 		if c != null:
 			Politics.add_dread(ctx.game, c, Interp.eval_value(ctx, s, arg)),
 		"describe": func(ctx, s, arg): return ctx.game.loc.t("fx.add_dread", {"value": "%+d" % roundi(Interp.eval_value(ctx, s, arg))}),
+	}, OWNER)
+	r.effects.register("raise_dread_tier", {"scopes": CH, "doc": "Поднять страх правителя на ступень (или на N ступеней): raise_dread_tier: 1", "apply": func(ctx, s, arg):
+		var c: Variant = ch.call(ctx, s)
+		if c != null:
+			Politics.raise_tier(ctx.game, c, maxi(1, roundi(Interp.eval_value(ctx, s, arg)) if not (arg is bool) else 1)),
+		"describe": func(ctx, _s, _a): return ctx.game.loc.t("fx.raise_dread_tier"),
 	}, OWNER)
 	r.effects.register("set_vassal_obligation", {"scopes": CH, "doc": "Установить вассалу условия службы: set_vassal_obligation: privileged", "apply": func(ctx, s, arg):
 		var c: Variant = ch.call(ctx, s)
@@ -407,6 +646,11 @@ func register_script(engine: GameEngine) -> void:
 			var v: Variant = other.call(ctx, s, arg)
 			return ctx.game.loc.t("fx.grant_minor_county", {"who": ctx.game.scope_name({"type": "character", "id": v.id})}) if v != null else null,
 	}, OWNER)
+	engine.content_validators.register("dread_tiers", func(e: GameEngine, v: ScriptValidator):
+		for t in e.content.all("dread_tiers"):
+			if not (t.get("min") is float or t.get("min") is int):
+				v.issue("dread_tiers/%s: нужен порог min" % t.id)
+	, OWNER)
 	engine.content_validators.register("politics", func(e: GameEngine, v: ScriptValidator):
 		var defaults := e.content.all("vassal_obligations").filter(func(o): return o.get("default", false))
 		if not e.content.all("vassal_obligations").is_empty() and defaults.size() != 1:

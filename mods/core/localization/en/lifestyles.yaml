@@ -109,7 +109,7 @@ perk:
   relic_keeper: Keeper of Relics
   doctor_of_theology: Doctor of Theology
 perk_desc:
-  regal_bearing: "Your glory weighs more: prestige levels raise your subjects' opinion half again as much."
+  regal_bearing: "Your glory weighs more: prestige levels raise your subjects' opinion half again as much. The sovereign listens to the people: petitioners and petitions are not cowed even under Unease, and hearing petitioners brings prestige."
   court_etiquette: "Feasts cost half as much and add 50 prestige. You enjoy feasts — they relieve stress."
   statesman: "Neighbours are readier to become your vassals: +10 acceptance per level of your prestige."
   august_majesty: "Unlocks the Royal Progress: your domain counties and vassals long remember your visit."

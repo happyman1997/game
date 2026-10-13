@@ -218,9 +218,19 @@ traits:
     category: personality
     icon: "💗"
     modifiers: { diplomacy: 2, intrigue: -2, general_opinion: 5 }
-    opposites: [callous]
-    compatibility: { callous: -15, compassionate: 10 }
+    opposites: [callous, sadistic]
+    compatibility: { callous: -15, compassionate: 10, sadistic: -30 }
     ai: { compassion: 3, aggression: -1 }
+  # Садист: чужая боль ему в радость. Обычная черта характера — бывает и с
+  # рождения; казни и темница успокаивают, милость тяготит, ИИ жесток.
+  sadistic:
+    category: personality
+    icon: "🔪"
+    weight: 0.5
+    modifiers: { intrigue: 2, diplomacy: -2, general_opinion: -5, dread_gain_mult: 0.25 }
+    opposites: [compassionate]
+    compatibility: { compassionate: -20, sadistic: 5 }
+    ai: { compassion: -5, vengefulness: 2, aggression: 1 }
   callous:
     category: personality
     icon: "🧊"

@@ -11,6 +11,8 @@ msg:
   popular_faction_created: "{place} joins the {faction}: the people are unhappy with you."
   popular_revolt: "{leader} raises the {faction} in {place} against {holder}!"
   popular_realm: "{leader} now rules the lands won in the uprising: {n} counties."
+tr:
+  county_grievance: "The county's main grievance: {value}"
 fx:
   add_control: "Control over {place}: {value}"
   add_county_opinion: "Opinion of {place}: {value} ({name})"

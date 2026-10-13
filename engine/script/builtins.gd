@@ -607,9 +607,10 @@ static func register(engine: GameEngine) -> void:
 		var p: Variant = ctx.game.state.provinces.get(s.id)
 		return p != null and p.modifiers.any(func(m): return m.id == arg)
 	)
-	trig.call("has_province_flag", PROV, "Есть флаг провинции", func(ctx, s, arg):
+	trig.call("has_province_flag", PROV, "Есть флаг провинции (с неистёкшим сроком)", func(ctx, s, arg):
 		var p: Variant = ctx.game.state.provinces.get(s.id)
-		return p != null and p.flags.has(str(arg))
+		var v: Variant = p.flags.get(str(arg)) if p != null else null
+		return v != null and (v == 0 or v > ctx.game.date)
 	)
 	trig.call("is_held", TITLE, "У титула есть владелец", func(ctx, s, arg):
 		var t: Variant = ctx.game.state.titles.get(s.id)
@@ -1049,11 +1050,16 @@ static func _register_effects(engine: GameEngine) -> void:
 			p.modifiers = p.modifiers.filter(func(m): return m.id != arg)
 		ctx.game.stat_cache.clear()
 	)
-	eff.call("set_province_flag", PROV, "Флаг провинции", func(ctx, s, arg):
+	eff.call("set_province_flag", PROV, "Флаг провинции: name или { name, days/months/years }", func(ctx, s, arg):
 		var p: Variant = ctx.game.state.provinces.get(s.id)
 		if p != null:
 			var f := _flag_args(ctx.game, arg)
 			p.flags[f.name] = f.value
+	, silent)
+	eff.call("remove_province_flag", PROV, "Снять флаг провинции", func(ctx, s, arg):
+		var p: Variant = ctx.game.state.provinces.get(s.id)
+		if p != null:
+			p.flags.erase(str(arg))
 	, silent)
 
 

@@ -228,7 +228,8 @@ func install(engine: GameEngine) -> void:
 				for x in Data.as_array(hint.get("interactions")):
 					v.ref("interactions", x, "deeds/%s ai_hint" % d.id)
 		for n in e.content.all("nicknames"):
-			v.ref("deeds", n.get("deed"), "nicknames/" + n.id)
+			if n.get("deed") != null:
+				v.ref("deeds", n.get("deed"), "nicknames/" + n.id)
 	)
 
 
@@ -247,6 +248,13 @@ func register_script(engine: GameEngine) -> void:
 			var n := roundi(Interp.eval_value(ctx, s, arg.get("value", 1))) if arg is Dictionary else 1
 			Deeds.record(ctx.game, c, did, n),
 		"describe": func(_ctx, _s, _arg): return null,
+	}, OWNER)
+	r.effects.register("give_nickname", {"scopes": CH, "doc": "Дать прозвище из nicknames (женская форма — nick.<id>_f): give_nickname: terrible",
+		"apply": func(ctx, s, arg):
+			var c: Variant = ctx.game.ch(s.id)
+			if c != null:
+				Deeds.give_nickname(ctx.game, c, str(arg)),
+		"describe": func(ctx, _s, arg): return ctx.game.loc.t("fx.give_nickname", {"nick": ctx.game.loc.t("nick." + str(arg))}),
 	}, OWNER)
 	r.triggers.register("has_nickname", {"scopes": CH, "doc": "Есть прозвище (yes/no или id прозвища из nicknames)", "eval": func(ctx, s, arg):
 		var c: Variant = ctx.game.ch(s.id)

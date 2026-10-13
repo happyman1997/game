@@ -18,7 +18,7 @@ decision_desc:
   royal_progress: "You ride through your lands with your court and banners. Your domain counties and vassals will long remember the visit, and word of your majesty travels far."
   gather_kin: "The rulers of your house gather for a family council and bring gifts — a share of their treasuries. The house's fame grows and kin warm to their head."
   grand_muster: "A muster of the host: for two years levies gather more readily, regiments are drilled, the commander is confident and knights are flattered."
-  public_execution: "The noblest of your prisoners is executed in the square before the people. Dread spreads through the realm; the brave will hate the tyrant."
+  public_execution: "The noblest of your prisoners is executed in the square before the people. Your dread rises by a tier, the capital long remembers the execution, the defiant will hate the tyrant and the kin of the executed become blood enemies."
   glory_quest: "You set out where swords ring: to the lists of a foreign court or to a border where glory is sought. Fight yourself or send your best knight."
   great_work: "Once in a lifetime the Architect may raise in the capital something that outlives him: a cathedral, a keep or a market."
   take_loan: "Lombard moneylenders give 300 gold at once. Repayment: 2.5 gold a month for twelve years. A new loan only after the old one."
@@ -33,7 +33,7 @@ interaction:
   compel_service: Compel Service
   heart_pact: Pact of Hearts
 interaction_desc:
-  intimidate: "Demand a third of a vassal's treasury. Those who fear you comply; the brave refuse — and give you a lawful reason to imprison them."
+  intimidate: "Demand a third of a vassal's treasury. Only the obedient or the broken can be intimidated: those who fear you comply, and a refusal gives you a lawful reason to imprison them."
   bribe: "Gold instead of feasts: a vassal or courtier warms to you for years and leaves their faction. The honest and the just are offended."
   sell_secret: "Sell a neighbouring ruler a secret you know — best of all about their vassal or enemy. They pay in silver and are grateful."
   compel_service: "Spend a hook: the one on your hook pays in gold, enters an alliance, or takes a seat on your council and forgets factions."

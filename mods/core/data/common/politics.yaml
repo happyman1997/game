@@ -14,12 +14,32 @@ defines:
     intimidated_per_dread: 0.3      # робкие подданные: + мнение за очко страха
     defiant_per_dread: -0.15        # храбрые и гневливые: − мнение
     defiant_traits: [brave, wrathful]
+    defiant_modifiers: [executed_relative]   # кровники казнённых — тоже дерзкие
+    broken_fear: 20                 # сломленные темницей боятся сильнее (≈ ступень)
     respect_from: 12                # дерзкие уважают сюзерена с доблестью выше этой:
     respect_per_point: 1.5          #   + мнение за каждое очко сверх
     respect_max: 15
     petition_chance_ai: 30          # % в год, что к правителю ИИ придут с прошением
     petition_chance_player: 5       # % в месяц для игрока
     discord_base_chance: 35
+
+# Ступени страха. Чем страшнее правитель, тем тише двор и земли: реже
+# жалобы и прошения (complaint_mult; silence — их нет вовсе), покорнее вассалы.
+# Но ужас не даёт спать (stress_monthly — кроме stress_immune), а террор
+# разгоняет фракции (dissolve_factions — остаются только дерзкие), губит
+# деревни и навлекает осуждение Храма. События ступеней — events/dread.yaml.
+dread_tiers:
+  calm:   { min: 0,  icon: "🕊" }
+  unease: { min: 20, icon: "👁",
+            modifiers: { complaint_mult: -0.5, scheme_defense: 5 } }
+  fear:   { min: 40, icon: "⛓",
+            modifiers: { complaint_mult: -0.75, scheme_defense: 10, vassal_tax_mult: 0.1, vassal_levy_mult: 0.1 } }
+  horror: { min: 60, icon: "💀", silence: yes,
+            modifiers: { complaint_mult: -1, scheme_defense: 15, vassal_tax_mult: 0.15, vassal_levy_mult: 0.15, peace_persuasion: 10, siege_speed: 0.25 },
+            stress_monthly: 3, stress_immune: [callous, paranoid, sadistic] }
+  terror: { min: 80, icon: "☠", silence: yes,
+            modifiers: { complaint_mult: -1, scheme_defense: 20, vassal_tax_mult: 0.2, vassal_levy_mult: 0.2, peace_persuasion: 15, siege_speed: 0.4, monthly_piety: -1, development_growth: -0.05 },
+            stress_monthly: 4, stress_immune: [callous, paranoid, sadistic], dissolve_factions: yes }
 
 # Условия службы вассала. tax/levy — доля к взносу (налог и ополчение),
 # opinion — мнение вассала о сюзерене.
@@ -240,7 +260,12 @@ factions:
         - scope:liege: { crown_authority_level: ">= 2" }
       is_vassal: yes
       is_imprisoned: no
-      NOT: { scope:liege: { has_strong_hook_on: root } }
+      # сломленные темницей во фракции не идут
+      NOR:
+        - scope:liege: { has_strong_hook_on: root }
+        - fear_stance: broken
+    # при страхе сюзерена покорные вступают, но не зачинают
+    can_create: { felt_dread_tier: "< unease" }
     ai_join:
       value: -15
       add:
@@ -253,6 +278,7 @@ factions:
         - { desc: ai.content, limit: { has_trait: content }, value: -15 }
         - { desc: ai.councillor, limit: { is_councillor: yes }, value: -15 }
         - { desc: ai.dread, value: { value: fear_of_liege, multiply: -0.6 } }
+        - { desc: ai.tyrant_hated, limit: { fear_stance: defiant, scope:liege: { dread_tier: ">= horror" } }, value: 25 }
         - { desc: ai.rival_leader, limit: { exists: scope:faction_leader, has_opinion_modifier: { target: scope:faction_leader, modifier: rival } }, value: -60 }
     ai_accept_demands:
       value: -40

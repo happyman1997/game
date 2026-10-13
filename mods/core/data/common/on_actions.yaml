@@ -95,3 +95,5 @@ on_actions:
           if:
             limit: { development: ">= 3" }
             add_development: -1
+          # народ долго помнит разорение (причина жалоб «Разорение»)
+          add_county_opinion: county_ravaged

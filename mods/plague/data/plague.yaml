@@ -18,6 +18,10 @@ diseases:
     duration_months: 6
     development_loss: 0
 
+# Причина жалоб графств «Мор» (часть мнения из хука populace.opinion).
+county_grievances:
+  plague: { icon: "☠", parts: [plague] }
+
 modifiers:
   quarantine: { icon: "🚧", modifiers: { tax_mult: -0.3 }, good: true }
   plague_aftermath: { icon: "⚰", modifiers: { tax_mult: -0.2, levy_mult: -0.2 } }

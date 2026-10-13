@@ -30,6 +30,8 @@ interactions:
         - { desc: ai.marry_heir, limit: { scope:secondary_actor: { is_heir_of: scope:actor } }, value: 15 }
         - { desc: ai.different_faith, limit: { NOT: { same_faith_as: scope:actor } }, value: -40 }
         - { desc: ai.at_war, limit: { is_at_war: yes }, value: -20 }
+        # кто внушает ужас, с тем соседи не роднятся
+        - { desc: ai.dread_horror, limit: { NOT: { is_vassal_of: scope:actor }, scope:actor: { dread_tier: ">= horror" } }, value: -50 }
     on_accept:
       - scope:secondary_actor: { marry: scope:recipient }
       - if:
@@ -86,6 +88,7 @@ interactions:
       add:
         - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.6 } }
         - { desc: ai.relative_power, value: { value: "scope:actor.levies", divide: { value: levies, min: 100 }, multiply: 10, max: 30 } }
+        - { desc: ai.dread_horror, limit: { NOT: { is_vassal_of: scope:actor }, scope:actor: { dread_tier: ">= horror" } }, value: -50 }
     on_accept:
       - scope:actor: { add_alliance: scope:recipient }
     ai_targets: [neighboring_ruler]

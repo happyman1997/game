@@ -34,7 +34,13 @@ static func build(app: App, id: String) -> Control:
 		K.tip(op1, func(): return BB.title(app.t("ui.opinion_of_you")) + "\n" + BB.breakdown(Opinion.breakdown(g, c, p)))
 		var op2 := K.rich("%s: %s" % [BB.esc(app.t("ui.your_opinion")), BB.signed(mine)], false)
 		K.tip(op2, func(): return BB.title(app.t("ui.your_opinion")) + "\n" + BB.breakdown(Opinion.breakdown(g, p, c)))
-		root.add_child(K.panel(K.hbox([op1, K.expand(), op2], 12), "InsetPanel"))
+		var op_row := K.hbox([op1, K.expand(), op2], 12)
+		# подданный: покорный, дерзкий или сломленный перед вашим страхом
+		var st_chip: Variant = FeatureSections.stance_chip(app, c, p)
+		if st_chip != null:
+			op_row.add_child(st_chip)
+			op_row.move_child(st_chip, 1)
+		root.add_child(K.panel(op_row, "InsetPanel"))
 
 	# ---------------------------------------------------- навыки и ресурсы
 	var stats := Stats.char_stats(g, c)

@@ -91,6 +91,8 @@ tr:
   has_holder_culture: County shares its holder's culture
   not_holder_culture: County of a foreign culture
 fx:
+  stress_reaction: "Character reacts: {value} stress"
+  give_nickname: "Nickname: {nick}"
   begin_trial: "Trial of the {name}, {years} years. Goals:"
   trial_fail: "Fail — stress +{stress} and {years} years before you may try this path again"
   grant_archetype: "The path of the {name} is yours"
@@ -164,6 +166,7 @@ stress_src:
   trait: "{name}"
   momentum: "Successes and failures: {name}"
   prison: Prison
+  dread_tier: Sleepless nights of a dread ruler
   dragon: Fight with a dragon
 decision:
   begin_trial: "Set out on the path: {name}"

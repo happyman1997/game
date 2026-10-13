@@ -31,6 +31,26 @@ defines:
     unhappy_opinion: -20         # для ИИ и подсказок: недовольное графство
     low_control: 60              # для ИИ и подсказок: низкий контроль
     negotiated_modifier: heard_out_people
+    # «Ходоки из графства»: графство домена с мнением не выше complaint_opinion
+    # шлёт челобитчиков (событие populace.0010); чем страшнее правитель, тем
+    # реже (ступени страха, complaint_mult)
+    complaint_opinion: -10
+    complaint_chance_player: 4   # % в месяц
+    complaint_chance_ai: 25      # % в год
+    complaint_cooldown_years: 3
+
+# Причины жалоб графств: части мнения графства (ключи — faith, religion,
+# culture, culture_group, control, levies, holder, county, id модификаторов
+# мнения графства). Побеждает причина с самой большой суммой обид.
+county_grievances:
+  taxes:    { icon: "💰", parts: [emergency_taxes_levied] }
+  levies:   { icon: "⚔", parts: [levies] }
+  faith:    { icon: "✝", parts: [faith, religion] }
+  customs:  { icon: "🗣", parts: [culture, culture_group] }
+  ruin:     { icon: "🔥", parts: [county_ravaged] }
+  new_lord: { icon: "🏰", parts: [control] }
+  cruelty:  { icon: "⛓", parts: [harsh_crackdown, petitioners_driven_away, executions_witnessed] }
+  lies:     { icon: "🐍", parts: [broken_promises] }
 
 factions:
   # Земли чужой веры или культуры требуют правителя своей крови и веры.
@@ -67,6 +87,8 @@ factions:
     order: 2
     cb: peasant_revolt
     ultimatum_event: populace.0001
+    # при терроре крестьяне не смеют поднять голову
+    can_rise: { NOT: { dread_tier: terror } }
     popular:
       join_opinion: -30
       leave_opinion: -15
@@ -173,9 +195,22 @@ opinion_modifiers:
   alms_for_the_poor: { value: 10, years: 3 }
   harsh_crackdown: { value: -15, years: 5 }
   grievances_heard: { value: 15, years: 5 }
+  # ходоки из графства и то, что с ними сделали
+  grievances_eased: { value: 20, years: 5 }
+  false_hope: { value: 5, years: 1 }
+  broken_promises: { value: -25, years: 10 }
+  petitioners_driven_away: { value: -10, years: 5 }
+  botched_inquiry: { value: -5, years: 3 }
+  prayed_together: { value: 15, years: 5 }
+  # разорение после осады и казни на площади
+  county_ravaged: { value: -10, years: 5 }
+  executions_witnessed: { value: -10, years: 5 }
 
 modifiers:
   peasant_concessions: { icon: "🌾", modifiers: { tax_mult: -0.3 } }
+  # ходокам облегчили подати (Казначей знает, как обойтись половиной)
+  tax_relief: { icon: "🌾", modifiers: { tax_mult: -0.3 }, good: true }
+  tax_relief_light: { icon: "🌾", modifiers: { tax_mult: -0.15 }, good: true }
   # волнения теперь бьют и по мнению графства
   peasant_unrest: { modifiers: { county_opinion: -10 } }
 
@@ -198,6 +233,7 @@ traits:
   greedy: { modifiers: { county_opinion: -5 } }
   compassionate: { modifiers: { county_opinion: 5 } }
   callous: { modifiers: { county_opinion: -5 } }
+  sadistic: { modifiers: { county_opinion: -5 } }
 
 council_tasks:
   # Маршал наводит порядок: контроль над графствами домена растёт быстрее.

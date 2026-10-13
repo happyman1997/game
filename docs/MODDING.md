@@ -972,9 +972,34 @@ vassal_obligations:                 # условия службы, ровно о
   `has_snubbed_powerful_vassal`, списки `powerful_vassal`,
   `snubbed_powerful_vassal`, эффект `seat_in_council: <персонаж>`.
 - **Страх** (`dread`, 0–100) растёт от `add_dread` (в данных — казни, бессудные
-  аресты, отзыв титулов, подавленные мятежи) и спадает каждый месяц. Робкие
-  подданные получают плюс к мнению, храбрые и гневливые (`defiant_traits`) —
-  минус; фракции учитывают страх в `ai_join`.
+  аресты, отзыв титулов, подавленные мятежи) и спадает каждый месяц. У него
+  **ступени** — `dread_tiers` (Спокойствие, Опасение, Страх, Ужас, Террор):
+
+  ```yaml
+  dread_tiers:
+    fear:   { min: 40, icon: "⛓", modifiers: { complaint_mult: -0.75, vassal_tax_mult: 0.1 } }
+    horror: { min: 60, silence: yes, stress_monthly: 3, stress_immune: [callous, paranoid, sadistic],
+              modifiers: { peace_persuasion: 10, siege_speed: 0.25 } }
+    terror: { min: 80, silence: yes, dissolve_factions: yes, modifiers: { monthly_piety: -1 } }
+  ```
+
+  `modifiers` получает сам правитель (`complaint_mult` — реже жалобы ходоков и
+  прошения вассалов; `silence` — их нет вовсе), `stress_monthly` — бессонница
+  (кроме носителей `stress_immune`), `dissolve_factions` — фракции против него
+  распадаются, в них остаются только дерзкие. Переход ступени — on_actions
+  `on_dread_tier_up` / `on_dread_tier_down` (root — правитель). Скрипт:
+  `dread_tier: fear` или `dread_tier: ">= horror"`, значение `dread_tier_level`,
+  эффект `raise_dread_tier: 1`.
+- **Кто боится** (`fear_stance: defiant | broken | obedient`): **дерзкие** —
+  черты `defiant_traits`, влиятельные вассалы и кровники казнённых
+  (`defiant_modifiers` — модификаторы мнения о сюзерене) — не боятся, а злятся
+  (минус к мнению за страх, но уважают доблесть: `respect_*`); **сломленные** —
+  кто побывал в темнице сюзерена — боятся сильнее на `broken_fear` (примерно
+  ступень); остальные — **покорные**. `felt_dread_tier` — ступень, которую
+  подданный чувствует перед сюзереном; `fear_of_liege` — то же числом.
+  Фракции: `can_create` (кто может основать фракцию сверх `can_join`) — в
+  основном моде покорные при опасении вступают, но не зачинают, сломленные не
+  вступают вовсе.
 - **Прошения** — события из `on_actions.on_vassal_petition` (root — сюзерен):
   игроку — с шансом `petition_chance_player` в месяц, ИИ — раз в год.
 - Ещё эффекты: `sow_discord: <вассал>` (рассорить с ближайшим союзником),
@@ -1228,6 +1253,17 @@ traits:
 (`defines.personality.ai_weight` — воли за очко стресса). Хук
 `personality.reacted` — `{character, action, stress}`.
 
+Поступки бывают и в событиях: их id перечислены в
+`defines.personality.event_actions` (название — `personality_action.<id>`).
+Вариант события вызывает эффект `stress_reaction: <id>`, а ИИ взвешивает его
+значением `stress_for(<id>)`:
+
+```yaml
+options:
+  - effect: { stress_reaction: drive_away_petitioners, add_dread: 5 }
+    ai_chance: { value: 15, add: { value: "stress_for(drive_away_petitioners)", multiply: -1 } }
+```
+
 ### Слава и благочестие
 
 Механика `renown` (данные — `core/data/common/renown.yaml`). Престиж и
@@ -1324,9 +1360,30 @@ factions:
 графств). После ультиматума графства `revolt_cooldown_years` не бунтуют,
 подавленные теряют `crushed_control_loss` контроля.
 
+**Ходоки из графства**: графство домена с мнением не выше
+`complaint_opinion` шлёт челобитчиков — on_action `on_county_complaint` (root —
+владелец, `scope:province` — графство). Игроку — с шансом
+`complaint_chance_player` в месяц, остальным — `complaint_chance_ai` раз в год;
+шанс умножается на `complaint_mult` правителя (ступени страха), после жалобы
+графство молчит `complaint_cooldown_years`. Причину жалобы определяет
+`county_grievances` — какие части мнения на неё указывают; побеждает причина с
+самой большой суммой обид (условие графства `county_grievance: taxes`). Часть
+мнения из хука `populace.opinion` может нести `key` — так мод «Моровые
+поветрия» добавляет причину «Мор»:
+
+```yaml
+county_grievances:
+  taxes:  { icon: "💰", parts: [emergency_taxes_levied] }   # id модификатора мнения графства
+  faith:  { icon: "✝", parts: [faith, religion] }           # встроенные части
+  plague: { icon: "☠", parts: [plague] }                    # key из хука populace.opinion
+```
+
+Народная фракция с `can_rise` (root — владелец) копит недовольство, только
+пока условие верно (крестьяне не бунтуют при терроре).
+
 Скрипт: значения графства `county_opinion`, `control`; условия `in_popular_faction`,
-`is_in_revolt`; эффекты графства `add_control`, `add_county_opinion`,
-`remove_county_opinion`; значения правителя `num_unhappy_counties`,
+`is_in_revolt`, `county_grievance`, `has_province_flag`; эффекты графства `add_control`, `add_county_opinion`,
+`remove_county_opinion`, `set_province_flag` (с `years`), `remove_province_flag`; значения правителя `num_unhappy_counties`,
 `num_low_control_counties`; у фракции — значение `num_faction_counties`, список
 `faction_county`; эффект `take_faction_counties`. Режимы карты
 `county_opinion` и `control`.

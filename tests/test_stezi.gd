@@ -49,9 +49,9 @@ func test_tyrant_fear_and_reactions() -> void:
 	# показательная казнь
 	var def: Dictionary = g.content.get_def("decisions", "public_execution")
 	check(Decisions.can_take(g, def, h), "показательная казнь доступна: %s" % [Decisions.blockers(g, def, h)])
-	var before := Politics.dread(h)
+	var before := Politics.tier_level(g, h)
 	check(Decisions.take(g, def, h), "казнь состоялась")
-	check(Politics.dread(h) >= before + 25.0, "страх вырос")
+	check(Politics.tier_level(g, h) >= before + 1, "грозная слава — ступенью выше")
 	check(victims.any(func(v): return v.death != null), "пленник казнён")
 
 
@@ -59,8 +59,8 @@ func test_intimidate_vassal() -> void:
 	var g := _game()
 	var h: Dictionary = g.ch("harold")
 	_perks(g, h, ["stern_gaze", "bloody_justice", "dungeon_dread", "iron_fist"])
-	var vs: Array = g.vassals_of("harold").filter(func(v): return float(v.gold) >= 20.0)
-	check(not vs.is_empty(), "есть вассал с золотом")
+	var vs: Array = g.vassals_of("harold").filter(func(v): return float(v.gold) >= 20.0 and Politics.stance(g, v, h) != "defiant")
+	check(not vs.is_empty(), "есть покорный вассал с золотом")
 	var v: Dictionary = vs[0]
 	v.gold = 200.0
 	Politics.add_dread(g, h, 100)

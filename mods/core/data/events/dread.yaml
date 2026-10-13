@@ -1,0 +1,450 @@
+# Грозная слава: ходоки из графств и события ступеней страха.
+#
+# «Ходоки из графства» (populace.0010): графство домена с мнением не выше
+# defines.populace.complaint_opinion шлёт челобитчиков (on_county_complaint;
+# root — владелец, scope:province — графство). Причина — county_grievance
+# (самая тяжёлая обида графства). Чем выше ступень страха, тем реже ходоки:
+# опасение — вдвое, страх — вчетверо, ужас и террор — никогда (complaint_mult).
+#
+# События ступеней (игроку, из on_monthly_pulse): опасение — «Донос», страх —
+# «Дары без повода» и «Пустое место за столом», ужас — «Ворота открыты» и «Сон
+# о казнённых», террор — «Опустевшие деревни», «Кинжал под подушкой», «Шут».
+# Амнистия — только выбором в событиях («Сон о казнённых», «Шут»).
+
+scripted_effects:
+  # Облегчить обиду графства (root — владелец, scope:province — графство).
+  ease_grievance:
+    effect:
+      - scope:province: { add_county_opinion: grievances_eased }
+      - if:
+          limit: { scope:province: { county_grievance: taxes } }
+          then:
+            - stress_reaction: ease_taxes
+            # Казначей знает, как обойтись половиной
+            - if:
+                limit: { has_perk: tax_collectors }
+                scope:province: { add_province_modifier: { id: tax_relief_light, years: 5 } }
+            - else:
+                scope:province: { add_province_modifier: { id: tax_relief, years: 5 } }
+      - else_if:
+          limit: { scope:province: { county_grievance: levies } }
+          add_gold: -40
+      - else_if:
+          limit: { scope:province: { county_grievance: faith } }
+          add_piety: -40
+      - else_if:
+          limit: { scope:province: { county_grievance: customs } }
+          add_prestige: -40
+          scope:province: { add_control: 15 }
+      - else_if:
+          limit: { scope:province: { county_grievance: ruin } }
+          add_gold: -60
+          scope:province: { add_development: 1 }
+      - else_if:
+          limit: { scope:province: { county_grievance: new_lord } }
+          add_prestige: -30
+          scope:province: { add_control: 20 }
+      - else_if:
+          limit: { scope:province: { county_grievance: cruelty } }
+          add_dread: -15
+      - else_if:
+          limit: { scope:province: { county_grievance: lies } }
+          add_gold: -30
+          scope:province: { remove_county_opinion: broken_promises }
+      - else:
+          add_gold: -25
+  # То же вполовину дешевле (дознание удалось).
+  ease_grievance_half:
+    effect:
+      - scope:province: { add_county_opinion: grievances_eased }
+      - if:
+          limit: { scope:province: { county_grievance: taxes } }
+          stress_reaction: ease_taxes
+          scope:province: { add_province_modifier: { id: tax_relief_light, years: 5 } }
+      - else_if:
+          limit: { scope:province: { county_grievance: levies } }
+          add_gold: -20
+      - else_if:
+          limit: { scope:province: { county_grievance: faith } }
+          add_piety: -20
+      - else_if:
+          limit: { scope:province: { county_grievance: customs } }
+          add_prestige: -20
+          scope:province: { add_control: 15 }
+      - else_if:
+          limit: { scope:province: { county_grievance: ruin } }
+          add_gold: -30
+          scope:province: { add_development: 1 }
+      - else_if:
+          limit: { scope:province: { county_grievance: new_lord } }
+          add_prestige: -15
+          scope:province: { add_control: 20 }
+      - else_if:
+          limit: { scope:province: { county_grievance: cruelty } }
+          add_dread: -8
+      - else_if:
+          limit: { scope:province: { county_grievance: lies } }
+          add_gold: -15
+          scope:province: { remove_county_opinion: broken_promises }
+      - else:
+          add_gold: -12
+
+events:
+  # ------------------------------------------------------------ ходоки из графства
+  populace.0010:
+    requires_feature: populace
+    theme: realm
+    icon: "📜"
+    triggered_only: true
+    desc:
+      - trigger: { scope:province: { county_grievance: taxes } }
+        desc: ev.populace.0010.desc_taxes
+      - trigger: { scope:province: { county_grievance: levies } }
+        desc: ev.populace.0010.desc_levies
+      - trigger: { scope:province: { county_grievance: faith } }
+        desc: ev.populace.0010.desc_faith
+      - trigger: { scope:province: { county_grievance: customs } }
+        desc: ev.populace.0010.desc_customs
+      - trigger: { scope:province: { county_grievance: ruin } }
+        desc: ev.populace.0010.desc_ruin
+      - trigger: { scope:province: { county_grievance: plague } }
+        desc: ev.populace.0010.desc_plague
+      - trigger: { scope:province: { county_grievance: new_lord } }
+        desc: ev.populace.0010.desc_new_lord
+      - trigger: { scope:province: { county_grievance: cruelty } }
+        desc: ev.populace.0010.desc_cruelty
+      - trigger: { scope:province: { county_grievance: lies } }
+        desc: ev.populace.0010.desc_lies
+      - desc: ev.populace.0010.desc
+    options:
+      # Выслушать и облегчить: цена — по причине жалобы
+      - name: ev.populace.0010.a
+        effect:
+          - stress_reaction: hear_petitioners
+          - ease_grievance: yes
+          - add_deed: judgments
+          # Государь: народ славит того, кто его слушает
+          - if:
+              limit: { has_perk: regal_bearing }
+              add_prestige: 30
+        ai_chance:
+          value: 35
+          add:
+            - { value: "stress_for(hear_petitioners)", multiply: -1 }
+            - { value: ai_compassion, multiply: 8 }
+      # Святой: помолиться вместе с ними — благочестие вместо золота
+      - name: ev.populace.0010.pray
+        trigger: { has_perk: devout_prayer }
+        effect:
+          - add_piety: -50
+          - scope:province: { add_county_opinion: prayed_together }
+          - add_deed: devotions
+        ai_chance: 45
+      # Пообещать и забыть: даром, но графство запомнит
+      - name: ev.populace.0010.b
+        effect:
+          - stress_reaction: false_promise
+          - if:
+              limit: { scope:province: { has_province_flag: false_promise } }
+              scope:province:
+                add_county_opinion: broken_promises
+                remove_province_flag: false_promise
+              send_message: { text: msg.broken_promises, kind: bad }
+          - else:
+              scope:province:
+                add_county_opinion: false_hope
+                set_province_flag: { name: false_promise, years: 5 }
+        ai_chance:
+          value: 25
+          add:
+            - { value: "stress_for(false_promise)", multiply: -1 }
+            - { value: ai_honor, multiply: -5 }
+      # Прогнать: страх растёт, графство озлобится
+      - name: ev.populace.0010.c
+        effect:
+          - stress_reaction: drive_away_petitioners
+          - add_dread: { value: 5, if: { limit: { has_trait: tyrant }, multiply: 2 } }
+          - scope:province: { add_county_opinion: petitioners_driven_away }
+        ai_chance:
+          value: 15
+          add:
+            - { value: "stress_for(drive_away_petitioners)", multiply: -1 }
+            - { value: ai_compassion, multiply: -6 }
+      # Разобраться самому: удача — вполовину дешевле и вдвое больше славы судьи
+      - name: ev.populace.0010.d
+        skill: { skill: stewardship, check: 14 }
+        success:
+          - ease_grievance_half: yes
+          - add_deed: { id: judgments, value: 2 }
+        failure:
+          - add_gold: -30
+          - scope:province: { add_county_opinion: botched_inquiry }
+        ai_chance: { value: 5, add: { value: stewardship, multiply: 1.5 } }
+
+  # ------------------------------------------------------------ опасение: донос
+  dread.0001:
+    requires_feature: politics
+    theme: intrigue
+    icon: "👁"
+    trigger:
+      is_player: yes
+      dread_tier: ">= unease"
+      any_courtier: { is_adult: yes, is_ruler: no }
+      any_vassal: { fear_stance: obedient, opinion: { target: root, value: "< 10" } }
+    cooldown: { years: 4 }
+    immediate:
+      - random_vassal:
+          limit: { fear_stance: obedient, opinion: { target: root, value: "< 10" } }
+          weight: { value: 1, if: { limit: { is_in_faction: yes }, add: 5 } }
+          save_scope_as: accused
+      - random_courtier:
+          limit: { is_adult: yes, is_ruler: no }
+          save_scope_as: informer
+    options:
+      # Наградить доносчика — у вас законный повод к темнице
+      - effect:
+          - add_gold: -20
+          - scope:informer: { add_opinion: { target: root, modifier: gift } }
+          - scope:accused: { mark_criminal: { target: root, years: 5 } }
+        ai_chance: 40
+      # Пригрозить обвиняемому — пусть знает, что его слышат
+      - effect:
+          - add_dread: 5
+          - scope:accused:
+              leave_faction: yes
+              add_opinion: { target: root, modifier: intimidated }
+        ai_chance: 30
+      # Прогнать доносчика: государь не верит наветам
+      - effect:
+          - add_dread: -5
+          - add_prestige: 15
+          - scope:accused: { add_opinion: { target: root, modifier: fair_judgment } }
+        ai_chance: 30
+
+  # ------------------------------------------------------------ страх: дары без повода
+  dread.0002:
+    requires_feature: politics
+    theme: court
+    icon: "🎁"
+    trigger:
+      is_player: yes
+      dread_tier: ">= fear"
+      num_vassals: ">= 2"
+    cooldown: { years: 4 }
+    options:
+      - effect:
+          add_gold: { value: num_vassals, multiply: 12, max: 120 }
+        ai_chance: 70
+      # вернуть дары: милость тирана помнят дольше его гнева
+      - effect:
+          - add_prestige: 25
+          - add_dread: -5
+          - every_vassal: { add_opinion: { target: root, modifier: fair_judgment } }
+        ai_chance: 30
+
+  # ------------------------------------------------------------ страх: пустое место за столом
+  dread.0003:
+    requires_feature: politics
+    theme: court
+    icon: "🍷"
+    trigger:
+      is_player: yes
+      dread_tier: ">= fear"
+      any_courtier: { has_trait: [just, honest, compassionate], is_adult: yes, is_ruler: no, NOT: { is_close_family_of: root } }
+      any_neighboring_ruler: { always: yes }
+    cooldown: { years: 5 }
+    immediate:
+      - random_courtier:
+          limit: { has_trait: [just, honest, compassionate], is_adult: yes, is_ruler: no, NOT: { is_close_family_of: root } }
+          save_scope_as: leaver
+      - random_neighboring_ruler: { save_scope_as: refuge }
+    options:
+      # пусть уходит
+      - effect:
+          scope:leaver: { move_to_court: scope:refuge }
+        ai_chance: 50
+      # удержать: смягчить нрав
+      - effect:
+          - add_dread: -10
+          - add_stress: 10
+        ai_chance: 30
+      # в темницу за дерзость
+      - effect:
+          - imprison: { target: scope:leaver }
+          - add_dread: 5
+        ai_chance: { value: 10, add: { value: ai_compassion, multiply: -5 } }
+
+  # ------------------------------------------------------------ ужас: ворота открыты
+  dread.0004:
+    requires_feature: politics
+    theme: war
+    icon: "🏰"
+    trigger:
+      is_player: yes
+      dread_tier: ">= horror"
+      is_at_war: yes
+    cooldown: { years: 3 }
+    options:
+      - effect:
+          - add_gold: 60
+          - add_prestige: 20
+          - add_modifier: { id: open_gates, years: 1 }
+        ai_chance: 100
+
+  # ------------------------------------------------------------ ужас: сон о казнённых
+  dread.0005:
+    requires_feature: politics
+    theme: stress
+    icon: "🌑"
+    trigger:
+      is_player: yes
+      dread_tier: ">= horror"
+      deeds_executions: ">= 1"
+    cooldown: { years: 3 }
+    options:
+      # это лишь сон
+      - effect:
+          if:
+            limit: { has_trait: [callous, sadistic, paranoid] }
+            add_stress: -10
+          else:
+            add_stress: 20
+        ai_chance: 50
+      # молебен за души казнённых
+      - effect:
+          - add_gold: -30
+          - add_piety: 25
+          - add_dread: -10
+          - add_stress: -15
+        ai_chance: 30
+      # распахнуть темницы
+      - trigger: { any_prisoner: { always: yes } }
+        effect:
+          - every_prisoner: { release_from_prison: released }
+          - add_dread: -25
+          - add_stress: -30
+          - add_prestige: -20
+        ai_chance: { value: 5, add: { value: ai_compassion, multiply: 10 } }
+
+  # ------------------------------------------------------------ террор: опустевшие деревни
+  dread.0006:
+    requires_feature: politics
+    theme: realm
+    icon: "🏚"
+    trigger:
+      is_player: yes
+      dread_tier: terror
+      any_domain_province: { development: ">= 4" }
+    cooldown: { years: 3 }
+    immediate:
+      - random_domain_province:
+          limit: { development: ">= 4" }
+          save_scope_as: province
+    options:
+      # пусть бегут
+      - effect:
+          scope:province: { add_development: -2 }
+        ai_chance: 40
+      # вернуть беглых силой
+      - effect:
+          - add_gold: -30
+          - add_dread: 5
+          - scope:province:
+              add_development: -1
+              add_county_opinion: harsh_crackdown
+        ai_chance: 30
+      # отменить поборы — пусть возвращаются
+      - effect:
+          - add_dread: -10
+          - scope:province: { add_province_modifier: { id: tax_relief, years: 3 } }
+        ai_chance: 30
+
+  # ------------------------------------------------------------ террор: кинжал под подушкой
+  dread.0007:
+    requires_feature: politics
+    theme: intrigue
+    icon: "🗡"
+    trigger:
+      is_player: yes
+      dread_tier: terror
+    cooldown: { years: 4 }
+    options:
+      # казнить стражу той ночи
+      - effect:
+          - add_dread: 8
+          - add_stress: -10
+          - add_prestige: -20
+        ai_chance: 30
+      # удвоить стражу
+      - effect:
+          - add_gold: -50
+          - add_modifier: { id: double_guard, years: 3 }
+        ai_chance: 40
+      # спать с мечом
+      - effect:
+          add_stress: 25
+        ai_chance: 30
+
+  # ------------------------------------------------------------ террор: шут
+  dread.0008:
+    requires_feature: politics
+    theme: court
+    icon: "🃏"
+    trigger:
+      is_player: yes
+      dread_tier: terror
+    cooldown: { years: 5 }
+    options:
+      # казнить шута
+      - effect:
+          - add_dread: 5
+          - add_prestige: -25
+          - add_stress: -10
+        ai_chance: 40
+      # рассмеяться вместе со всеми
+      - effect:
+          - add_dread: -15
+          - add_stress: -20
+        ai_chance: 40
+      # шут прав: объявить милость
+      - effect:
+          - every_prisoner: { release_from_prison: released }
+          - add_dread: -35
+          - add_prestige: -30
+          - every_vassal: { add_opinion: { target: root, modifier: amnesty } }
+        ai_chance: { value: 5, add: { value: ai_compassion, multiply: 10 } }
+
+# прозвище за террор (не за деяния — эффектом give_nickname)
+nicknames:
+  terrible: { priority: 7 }
+
+modifiers:
+  open_gates: { icon: "🏰", good: true, modifiers: { siege_speed: 0.5 } }
+  double_guard: { icon: "🛡", good: true, modifiers: { scheme_defense: 15, monthly_income: -1 } }
+
+on_actions:
+  on_county_complaint:
+    events: [populace.0010]
+  # террор приносит прозвище «Грозный»
+  on_dread_tier_up:
+    effect:
+      - if:
+          limit:
+            dread_tier: terror
+            OR:
+              - has_nickname: no
+              - has_nickname: cruel
+              - has_nickname: bloody
+              - has_nickname: jailer
+          give_nickname: terrible
+  on_monthly_pulse:
+    random_events:
+      events:
+        dread.0001: 6
+        dread.0002: 5
+        dread.0003: 5
+        dread.0004: 6
+        dread.0005: 6
+        dread.0006: 5
+        dread.0007: 5
+        dread.0008: 5

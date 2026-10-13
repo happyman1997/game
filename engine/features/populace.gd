@@ -42,6 +42,19 @@ extends EngineFeature
 ## правителем). После мятежа графства revolt_cooldown_years не бунтуют,
 ## разбитые теряют crushed_control_loss контроля.
 ##
+## Жалобы графств («ходоки»): графство домена с мнением не выше
+## complaint_opinion шлёт челобитчиков — on_action on_county_complaint
+## (root — владелец, scope:province — графство). Игроку — с шансом
+## complaint_chance_player в месяц, остальным — complaint_chance_ai раз в год
+## (в «свой» месяц); шанс умножается на Politics.complaint_mult (ступени
+## страха: чем страшнее правитель, тем реже жалобы). После жалобы графство
+## молчит complaint_cooldown_years.
+## Причина жалобы — county_grievances: { <id>: { parts: [ключи частей мнения] } }:
+## побеждает причина с самой большой суммой отрицательных частей (ключи —
+## faith, religion, culture, culture_group, control, levies, holder, county,
+## id модификаторов мнения графства и key у частей из хука populace.opinion).
+## Народная фракция с can_rise (root — владелец) копит недовольство, только
+## пока условие верно (например, при терроре крестьяне не бунтуют).
 ## Состояние: p.vars.control (нет — 100), p.vars.copinions =
 ## [{mod, value, expires}], p.vars.revolt_cd (до какого дня), p.vars.revolt
 ## (id войны); c.vars.levies_since — с какого дня собрано ополчение;
@@ -123,8 +136,73 @@ static func opinion_parts(game: Game, prov_id: String, labels: bool = true) -> A
 	for x in game.engine.hooks.collect("populace.opinion", {"game": game, "province": prov_id, "holder": h}):
 		for part in Data.as_array(x):
 			if part is Dictionary and Data.num(part.get("value")) != 0.0:
-				out.append(part)
+				out.append(part if labels or part.get("key") == null else {"label": str(part.key), "value": part.value})
 	return out
+
+
+# ------------------------------------------------------------ жалобы графств
+
+## Причина недовольства графства (id из county_grievances) или "".
+static func grievance(game: Game, prov_id: String) -> String:
+	var defs := game.content.all("county_grievances")
+	if defs.is_empty():
+		return ""
+	var by_key := {}
+	for part in opinion_parts(game, prov_id, false):
+		var v := Data.num(part.value)
+		if v < 0.0:
+			by_key[str(part.label)] = float(by_key.get(str(part.label), 0.0)) + v
+	var best := ""
+	var worst := 0.0
+	for d in defs:
+		var sum := 0.0
+		for k in Data.as_array(d.get("parts")):
+			sum += float(by_key.get(str(k), 0.0))
+		if sum < worst:
+			worst = sum
+			best = d.id
+	return best
+
+
+## Графство домена, которое пришлёт ходоков: самое недовольное из тех,
+## чьё мнение не выше complaint_opinion (null — жаловаться некому).
+static func complaining_county(game: Game, c: Dictionary) -> Variant:
+	var thr := _d(game, "complaint_opinion", -10)
+	var best: Variant = null
+	var worst := INF
+	for pid in Titles.domain_counties(game, c):
+		var p: Variant = game.state.provinces.get(pid)
+		if p == null or p.occupant != null or p.vars.has("revolt"):
+			continue
+		if p.vars.has("complaint_cd") and int(p.vars.complaint_cd) > game.date:
+			continue
+		var op := opinion(game, pid)
+		if op <= thr and op < worst:
+			worst = op
+			best = pid
+	return best
+
+
+## Ходоки: раз в месяц для игрока, раз в год для остальных правителей.
+static func monthly_char(game: Game, c: Dictionary) -> void:
+	if c.death != null or c.titles.is_empty() or c.get("prison") != null:
+		return
+	var chance := 0.0
+	if game.is_player(c.id):
+		chance = _d(game, "complaint_chance_player", 4)
+	elif (Rng.hash_string(c.id + ":plea") & 0x7FFFFFFF) % 12 == GameDate.parts(game.date).m - 1:
+		chance = _d(game, "complaint_chance_ai", 25)
+	else:
+		return
+	if game.engine.has_feature("politics"):
+		chance *= Politics.complaint_mult(game, c)
+	if chance <= 0.0 or game.rng.next() * 100.0 >= chance:
+		return
+	var pid: Variant = complaining_county(game, c)
+	if pid == null:
+		return
+	game.state.provinces[pid].vars["complaint_cd"] = game.date + roundi(_d(game, "complaint_cooldown_years", 3) * GameDate.DAYS_PER_YEAR)
+	game.on_action("on_county_complaint", {"type": "character", "id": c.id}, {"province": {"type": "province", "id": pid}})
 
 
 ## county_opinion построек и модификаторов графства (без поставщиков:
@@ -446,6 +524,9 @@ static func monthly(game: Game) -> void:
 				_forget(game, p.id)
 		if p.vars.has("revolt_cd") and int(p.vars.revolt_cd) <= game.date:
 			p.vars.erase("revolt_cd")
+		if p.vars.has("complaint_cd") and int(p.vars.complaint_cd) <= game.date:
+			p.vars.erase("complaint_cd")
+
 	if not game.engine.has_feature("factions") or popular_defs(game).is_empty():
 		return
 	_update_membership(game)
@@ -520,7 +601,11 @@ static func _update_discontent(game: Game) -> void:
 		var pop := _pop(def)
 		var gain := Data.num(pop.get("discontent_gain"), 4)
 		var thr: Variant = pop.get("power_threshold")
-		if thr == null or power(game, f) >= Data.num(thr):
+		var can_rise := true
+		if def.get("can_rise") != null:
+			var hctx := ScriptContext.make(game, {"type": "character", "id": holder.id})
+			can_rise = Interp.eval_trigger(hctx, hctx.root, def.can_rise)
+		if can_rise and (thr == null or power(game, f) >= Data.num(thr)):
 			f.discontent = minf(100.0, float(f.discontent) + gain)
 		else:
 			f.discontent = maxf(0.0, float(f.discontent) - game.def_num("factions.discontent_decay", 4))
@@ -546,7 +631,7 @@ static func _manage_revolts(game: Game) -> void:
 # ------------------------------------------------------------ установка
 
 func install(engine: GameEngine) -> void:
-	engine.systems.register("populace", {"id": "populace", "order": 59, "on_month": Populace.monthly}, OWNER)
+	engine.systems.register("populace", {"id": "populace", "order": 59, "on_month": Populace.monthly, "on_character_month": Populace.monthly_char}, OWNER)
 	# низкий контроль — меньше налога и ополчения
 	# контроль (крепость власти) и мнение графства (отношение народа) —
 	# налог и ополчение графства
@@ -643,6 +728,9 @@ func install(engine: GameEngine) -> void:
 			for k in Data.as_array(pop.get("group_by")):
 				if not ["faith", "culture"].has(str(k)):
 					v.issue(w + ": group_by — faith или culture, а не \"%s\"" % k)
+		for gdef in e.content.all("county_grievances"):
+			if Data.as_array(gdef.get("parts")).is_empty():
+				v.issue("county_grievances/%s: нужен список parts" % gdef.id)
 		var nm: Variant = e.content.singleton("defines").get("populace", {}).get("negotiated_modifier")
 		if nm != null:
 			v.ref("opinion_modifiers", nm, "defines.populace.negotiated_modifier")
@@ -669,6 +757,13 @@ func register_script(engine: GameEngine) -> void:
 	r.triggers.register("is_in_revolt", {"scopes": PR, "doc": "Графство поднялось на мятеж", "eval": func(ctx, s, arg):
 		var p: Variant = ctx.game.state.provinces.get(s.id)
 		return (p != null and p.vars.has("revolt")) == ScriptContext.is_yes(arg)
+	}, OWNER)
+	r.triggers.register("county_grievance", {"scopes": PR, "doc": "Главная причина недовольства графства (id из county_grievances; yes/no — есть ли она)", "eval": func(ctx, s, arg):
+		var gr := Populace.grievance(ctx.game, s.id)
+		if arg is bool or (arg is String and (arg == "yes" or arg == "no")):
+			return (gr != "") == ScriptContext.is_yes(arg)
+		return gr == str(arg),
+		"describe": func(ctx, _s, arg): return ctx.game.loc.t("tr.county_grievance", {"value": ctx.game.name_of("county_grievances", str(arg))}),
 	}, OWNER)
 	r.effects.register("add_control", {"scopes": PR, "doc": "Изменить контроль над графством: add_control: 20", "apply": func(ctx, s, arg):
 		Populace.add_control(ctx.game, s.id, Interp.eval_value(ctx, s, arg)),

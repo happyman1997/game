@@ -145,10 +145,12 @@ decisions:
           every_close_family:
             limit: { NOT: { is_same_as: root } }
             add_opinion: { target: root, modifier: executed_relative }
-      - add_dread: 30
+      # казнь на площади поднимает страх на ступень, а столица её не забудет
+      - raise_dread_tier: 1
+      - capital: { add_county_opinion: executions_witnessed }
       - add_deed: executions
       - every_vassal:
-          limit: { fear_of_liege: "< 1" }
+          limit: { fear_stance: defiant }
           add_opinion: { target: root, modifier: public_execution_horror }
       - scope:condemned:
           death: { reason: execution, killer: root }
@@ -310,6 +312,10 @@ interactions:
       scope:recipient: { is_vassal_of: scope:actor }
     is_valid:
       scope:recipient: { gold: 20, is_imprisoned: no }
+      # дерзких не запугать — только покорных и сломленных
+      custom_tooltip:
+        text: ui.not_defiant
+        trigger: { scope:recipient: { NOT: { fear_stance: defiant } } }
     hookable: no
     cooldown: { years: 3 }
     ai_accept:

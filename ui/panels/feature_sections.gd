@@ -14,10 +14,27 @@ static func politics(app: App, liege: Dictionary) -> Variant:
 	var box := K.vbox([], 6)
 	var d := Politics.dread(liege)
 	if d >= 1.0:
-		var row := K.hbox([K.icon("chain", 20), K.label(app.t("ui.dread"), "SubheaderLabel")], 6)
-		K.tip(row, BB.title(app.t("ui.dread")) + "\n" + BB.esc(app.t("ui.dread_tip")))
+		var t: Variant = Politics.tier_of(g, liege)
+		var tname: String = g.name_of("dread_tiers", t.id) if t != null else ""
+		var row := K.hbox([K.icon(t.get("icon", "chain") if t != null else "chain", 20), K.label(app.t("ui.dread") + (" — " + tname if tname != "" else ""), "SubheaderLabel")], 6)
+		K.tip(row, func(): return dread_tip(app, liege))
 		box.add_child(row)
-		box.add_child(K.bar(d, g.def_num("politics.dread_max", 100), Color("#8a2a2a"), 8, str(roundi(d))))
+		var bar := K.bar(d, g.def_num("politics.dread_max", 100), Color("#8a2a2a"), 8, str(roundi(d)))
+		K.tip(bar, func(): return dread_tip(app, liege))
+		box.add_child(bar)
+		# кто боится: покорные, сломленные, дерзкие среди вассалов
+		var counts := {"obedient": 0, "broken": 0, "defiant": 0}
+		for v in g.vassals_of(liege.id):
+			counts[Politics.stance(g, v, liege)] += 1
+		var chips := K.hbox([K.label(app.t("ui.dread_who_fears") + ":", "MutedLabel")], 8)
+		for k in ["obedient", "broken", "defiant"]:
+			if counts[k] > 0:
+				var l := K.label(app.t("ui.stance_n." + k, {"n": counts[k]}), "SmallLabel")
+				if k == "defiant":
+					l.add_theme_color_override("font_color", UiArt.C_BAD)
+				chips.add_child(l)
+		K.tip(chips, BB.title(app.t("ui.dread_who_fears")) + "\n" + BB.esc(app.t("ui.dread_stance_tip")))
+		box.add_child(chips)
 	var pw := Politics.powerful_vassals(g, liege)
 	var head := K.hbox([K.icon("crown", 20), K.label(app.t("ui.powerful_vassals"), "SubheaderLabel")], 6)
 	K.tip(head, BB.title(app.t("ui.powerful_vassals")) + "\n" + BB.esc(app.t("ui.powerful_tip")))
@@ -34,6 +51,39 @@ static func politics(app: App, liege: Dictionary) -> Variant:
 	if d < 1.0 and pw.is_empty():
 		return null
 	return K.section(app.t("ui.politics"), [box], "council")
+
+
+## Подсказка страха: ступень, что она значит, её модификаторы и следующая ступень.
+static func dread_tip(app: App, c: Dictionary) -> String:
+	var g := app.game
+	var d := Politics.dread(c)
+	var lvl := Politics.tier_level(g, c)
+	var t: Variant = Politics.tier_at(g, lvl)
+	var bb := BB.title(app.t("ui.dread") + ": " + str(roundi(d)) + (" — " + g.name_of("dread_tiers", t.id) if t != null else ""))
+	if t != null:
+		var desc := g.desc_of("dread_tiers", t.id)
+		if desc != "":
+			bb += "\n" + BB.i(desc)
+		if t.get("modifiers") is Dictionary and not t.modifiers.is_empty():
+			bb += "\n" + BB.modifiers(g, t.modifiers)
+	var nxt: Variant = Politics.tier_at(g, lvl + 1)
+	if nxt != null:
+		bb += "\n" + BB.muted(app.t("ui.dread_next", {"tier": g.name_of("dread_tiers", nxt.id), "min": roundi(Data.num(nxt.get("min")))}))
+	bb += "\n\n" + BB.small(BB.muted(app.t("ui.dread_tip")))
+	return bb
+
+
+## Плашка «покорный / дерзкий / сломленный» для подданного правителя p.
+static func stance_chip(app: App, c: Dictionary, p: Dictionary) -> Variant:
+	var g := app.game
+	if not g.engine.has_feature("politics") or c.liege != p.id or p.titles.is_empty():
+		return null
+	var st := Politics.stance(g, c, p)
+	var l := K.label(app.t("ui.stance." + st), "SmallLabel")
+	l.add_theme_color_override("font_color", UiArt.C_BAD if st == "defiant" else (UiArt.C_GOOD if st == "broken" else UiArt.C_MUTED))
+	K.tip(l, BB.title(app.t("ui.dread_who_fears")) + "\n" + BB.esc(app.t("ui.dread_stance_tip")))
+	l.mouse_filter = Control.MOUSE_FILTER_PASS
+	return l
 
 
 ## Подпись условий службы вассала (для строк списка вассалов).
@@ -250,7 +300,7 @@ static func factions(app: App, p: Dictionary) -> Array:
 						claimant = cands[0].id
 					if claimant == null:
 						continue
-				var ok := Factions.can_join(g, p, def, liege, claimant)
+				var ok := Factions.can_create(g, p, def, liege, claimant)
 				var did: String = def.id
 				var card := K.vbox([K.hbox([K.icon(def.get("icon", "fist"), 20), K.label(g.name_of("factions", def.id), "SubheaderLabel")], 6)], 4)
 				K.tip(card, BB.i(g.desc_of("factions", def.id)))

@@ -10,7 +10,12 @@ factions:
       is_vassal: yes
       is_imprisoned: no
       # сюзерен держит вассала сильным крюком — тот не посмеет
-      NOT: { scope:liege: { has_strong_hook_on: root } }
+      # сломленные темницей во фракции не идут
+      NOR:
+        - scope:liege: { has_strong_hook_on: root }
+        - fear_stance: broken
+    # при страхе сюзерена покорные вступают, но не зачинают
+    can_create: { felt_dread_tier: "< unease" }
     ai_join:
       value: -10
       add:
@@ -24,6 +29,7 @@ factions:
         - { desc: ai.councillor, limit: { is_councillor: yes }, value: -15 }
         # политика двора (условия службы уже сказались на мнении): страх, вражда с лидером
         - { desc: ai.dread, value: { value: fear_of_liege, multiply: -0.6 } }
+        - { desc: ai.tyrant_hated, limit: { fear_stance: defiant, scope:liege: { dread_tier: ">= horror" } }, value: 25 }
         - { desc: ai.rival_leader, limit: { exists: scope:faction_leader, has_opinion_modifier: { target: scope:faction_leader, modifier: rival } }, value: -60 }
     ai_accept_demands:
       value: -60
@@ -42,7 +48,12 @@ factions:
     can_join:
       is_vassal: yes
       is_imprisoned: no
-      NOT: { scope:liege: { has_strong_hook_on: root } }
+      # сломленные темницей во фракции не идут
+      NOR:
+        - scope:liege: { has_strong_hook_on: root }
+        - fear_stance: broken
+    # при страхе сюзерена покорные вступают, но не зачинают
+    can_create: { felt_dread_tier: "< unease" }
     ai_join:
       value: -20
       add:
@@ -54,6 +65,7 @@ factions:
         - { desc: ai.councillor, limit: { is_councillor: yes }, value: -15 }
         - { desc: ai.swore_fealty, limit: { has_opinion_modifier: { target: scope:liege, modifier: swore_fealty } }, value: -30 }
         - { desc: ai.dread, value: { value: fear_of_liege, multiply: -0.6 } }
+        - { desc: ai.tyrant_hated, limit: { fear_stance: defiant, scope:liege: { dread_tier: ">= horror" } }, value: 25 }
         - { desc: ai.rival_leader, limit: { exists: scope:faction_leader, has_opinion_modifier: { target: scope:faction_leader, modifier: rival } }, value: -60 }
     ai_accept_demands:
       value: -90

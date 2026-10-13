@@ -42,6 +42,19 @@ static func infect(game: Game, prov: String, disease: String) -> void:
 
 
 func init(api: ModApi) -> void:
+	# ------------------------------------------------ народ графств
+	# Мор пугает и озлобляет: графство в эпидемии или после неё недовольно
+	# владельцем (причина жалоб «Мор» — county_grievances.plague).
+	api.hooks.on("populace.opinion", func(p):
+		var game: Game = p.game
+		var prov: String = p.province
+		if state_of(game).infected.has(prov):
+			return [{"label": game.loc.t("plague.copinion_plague"), "key": "plague", "value": -15.0}]
+		var pr: Variant = game.state.provinces.get(prov)
+		if pr != null and pr.modifiers.any(func(m): return m.id == "plague_aftermath"):
+			return [{"label": game.loc.t("plague.copinion_aftermath"), "key": "plague", "value": -8.0}]
+		return null
+	, 0, api.owner)
 	# ------------------------------------------------ скриптовый язык
 	api.trigger("province_has_disease", {
 		"scopes": ["province"],

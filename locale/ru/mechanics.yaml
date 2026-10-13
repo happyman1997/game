@@ -91,6 +91,8 @@ tr:
   has_holder_culture: Графство одной культуры с владельцем
   not_holder_culture: Графство чужой культуры
 fx:
+  stress_reaction: "Отклик характера: {value} стресса"
+  give_nickname: "Прозвище: {nick}"
   begin_trial: "Испытание пути «{name}» на {years} лет. Цели:"
   trial_fail: "Не успеете — стресс +{stress} и {years} лет перерыва на этот путь"
   grant_archetype: "Путь «{name}» пройден"
@@ -164,6 +166,7 @@ stress_src:
   trait: "{name}"
   momentum: "Удачи и неудачи: {name}"
   prison: Темница
+  dread_tier: Бессонница грозного правителя
   dragon: Схватка с драконом
 decision:
   begin_trial: "Встать на путь: {name}"

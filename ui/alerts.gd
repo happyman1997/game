@@ -119,7 +119,10 @@ static func register_builtin(engine: GameEngine) -> void:
 			var d := Politics.dread(p)
 			if d < 1.0:
 				return null
-			return {"icon": "chain", "text": str(roundi(d)), "tooltip": BB.title(g.loc.t("ui.dread")) + "\n" + BB.esc(g.loc.t("ui.dread_tip"))}}, "core")
+			var t: Variant = Politics.tier_of(g, p)
+			var tip := func() -> String:
+				return FeatureSections.dread_tip(App.instance, p) if App.instance != null else BB.esc(g.loc.t("ui.dread_tip"))
+			return {"icon": t.get("icon", "chain") if t != null else "chain", "text": str(roundi(d)), "tooltip": tip}}, "core")
 	reg.call("title_creatable", 30, func(g: Game):
 		var p: Dictionary = g.player
 		var cands := {}

@@ -6,7 +6,10 @@ extends EngineFeature
 ##       stress_reactions: { execute_prisoner: 40, give_alms: -15 }   # поступок → стресс
 ##       stress_monthly: { trigger: { is_at_war: yes }, value: 4 }     # каждый месяц, пока верно
 ## Поступок — id взаимодействия (принятого; если оно запускает интригу —
-## считается сама интрига), решения, интриги (при её начале) или declare_war.
+## считается сама интрига), решения, интриги (при её начале), declare_war
+## или поступок из событий: id из defines.personality.event_actions
+## (название — personality_action.<id>), который вызывает эффект
+## stress_reaction: <id>; ИИ взвешивает его через значение stress_for(<id>).
 ## Отрицательное значение — поступок по душе и снимает стресс. ИИ избегает
 ## того, что ему претит, и охотнее делает то, что по душе
 ## (defines.personality.ai_weight — сколько воли за очко стресса).
@@ -117,7 +120,8 @@ static func action_name(game: Game, action: String) -> String:
 	for kind in ["interactions", "decisions", "schemes"]:
 		if game.content.has(kind, action):
 			return game.name_of(kind, action)
-	return action
+	var r: Variant = game.loc.raw("personality_action." + action)
+	return str(r) if r != null else action
 
 
 ## Строки для подсказки черты: что претит, что по душе, что тяготит каждый месяц.
@@ -212,8 +216,24 @@ func install(engine: GameEngine) -> void:
 
 
 func register_script(engine: GameEngine) -> void:
+	var r := engine.scripting
+	r.effects.register("stress_reaction", {"scopes": ["character"], "doc": "Отклик характера на поступок из события: stress_reaction: <id из defines.personality.event_actions>", "apply": func(ctx, s, arg):
+		var c: Variant = ctx.game.ch(s.id) if s != null and s.type == "character" else null
+		if c != null:
+			Personality.react(ctx.game, c, str(arg), Personality.action_name(ctx.game, str(arg))),
+		"describe": func(ctx, s, arg):
+			var c: Variant = ctx.game.ch(s.id) if s != null and s.type == "character" else null
+			var v := Personality.stress_for(ctx.game, c, str(arg)) if c != null else 0.0
+			return ctx.game.loc.t("fx.stress_reaction", {"value": Builtins.signed(v)}) if v != 0.0 else null,
+	}, OWNER)
+	r.values.register("stress_for", {"scopes": ["character"], "doc": "Сколько стресса принесёт поступок (по чертам): stress_for(drive_away_petitioners)", "get": func(ctx, s, a):
+		var c: Variant = ctx.game.ch(s.id) if s != null and s.type == "character" else null
+		return Personality.stress_for(ctx.game, c, str(a)) if c != null else 0.0
+	}, OWNER)
 	engine.content_validators.register("personality", func(e: GameEngine, v: ScriptValidator):
 		var known := {"declare_war": true}
+		for x in Data.as_array(e.content.singleton("defines").get("personality", {}).get("event_actions")):
+			known[str(x)] = true
 		for kind in ["interactions", "decisions", "schemes"]:
 			for d in e.content.all(kind):
 				known[str(d.id)] = true
@@ -231,11 +251,11 @@ func register_script(engine: GameEngine) -> void:
 			if not (t is Dictionary):
 				v.issue("%s: ожидается словарь" % where)
 				continue
-			var r: Variant = t.get("stress_reactions")
-			if r != null and not (r is Dictionary):
+			var rx: Variant = t.get("stress_reactions")
+			if rx != null and not (rx is Dictionary):
 				v.issue("%s: stress_reactions должен быть словарём" % where)
 				continue
-			for action in (r if r is Dictionary else {}):
+			for action in (rx if rx is Dictionary else {}):
 				if not known.has(str(action)):
 					v.issue("%s: stress_reactions — неизвестный поступок \"%s\"" % [where, action])
 			var m: Variant = t.get("stress_monthly")

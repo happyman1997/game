@@ -1,11 +1,13 @@
 # Court politics feature: engine and UI strings.
 stat:
+  complaint_mult: Complaints and petitions
   vassal_contribution_tax: Tax owed to liege
   vassal_contribution_levy: Levies owed to liege
 opinion:
   powerful_seated: "Powerful: has a council seat"
   powerful_snubbed: "Powerful: passed over for the council"
   intimidated: Fear of the ruler
+  broken: Broken by the dungeon
   defiant: Hates a tyrant
   respects_strength: Respects strength
 ai:
@@ -17,11 +19,22 @@ ai:
   rival_leader: A rival leads the faction
   swore_fealty: Swore fealty at the council
 tr:
+  dread_tier: "Dread: {cond}"
+  felt_dread_tier: "Fear of the liege: {cond}"
+  tier_cmp:
+    ge: "at least “{tier}”"
+    gt: "above “{tier}”"
+    le: "at most “{tier}”"
+    lt: "below “{tier}”"
+    ne: "not “{tier}”"
+    eq: "“{tier}”"
+  fear_stance: "Facing the liege's dread: {value}"
   is_powerful_vassal: Powerful vassal
   not_powerful_vassal: Not a powerful vassal
   vassal_obligation: "Obligations: {value}"
 fx:
   add_dread: "Dread: {value}"
+  raise_dread_tier: Your dread rises by one tier
   set_vassal_obligation: "{who}: obligations become {value}"
   seat_in_council: "{who} gains a council seat"
   remove_from_council: "{who} loses their council seat"
@@ -31,6 +44,8 @@ fx:
   shift_realm_law_down: "{value}: one step down"
   shift_realm_law_up: "{value}: one step up"
 msg:
+  dread_tier_up: "Your dread has grown: “{tier}”."
+  dread_tier_down: "The fear of you is fading: “{tier}”."
   discord_sown: "Discord sown: {a} and {b} are now rivals."
   discord_failed: "{who} saw through your scheme and will not forgive it."
   complaint_true: The inquiry confirmed the complaint — the councillor is dismissed.
@@ -38,7 +53,19 @@ msg:
 ui:
   politics: Court Politics
   dread: Dread
-  dread_tip: "The fear a ruler inspires. It grows with executions, imprisonment without cause, revoked titles and crushed revolts, and fades over time. Timid subjects grow more loyal and stay out of factions; the brave and the wrathful hate a tyrant."
+  dread_tip: "The fear a ruler inspires. It grows with executions, imprisonment without cause, revoked titles and crushed revolts, and fades over time. Dread has five tiers — from Calm to Terror: the higher it is, the quieter the court and the land, but the worse you sleep and the angrier the defiant become."
+  dread_tier_mod: "Dread: {tier}"
+  dread_next: "Next tier — “{tier}” (from {min})"
+  dread_who_fears: "Who fears you"
+  dread_stance_tip: "The obedient feel the tiers of dread as they are. Those broken by your dungeon fear you a tier more and never join factions. The defiant — the brave, the wrathful, powerful vassals and the kin of the executed — are not afraid but angry."
+  stance:
+    defiant: defiant
+    broken: broken
+    obedient: obedient
+  stance_n:
+    defiant: "Defiant: {n}"
+    broken: "Broken: {n}"
+    obedient: "Obedient: {n}"
   powerful_vassals: Powerful vassals
   powerful_tip: "The vassals with the largest holdings expect a council seat: seated, they are content; passed over, they resent it and join factions more readily."
   in_council: on the council

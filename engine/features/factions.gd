@@ -7,8 +7,10 @@ extends EngineFeature
 ## войну, в которой все члены фракции выступают вместе.
 ##
 ## Данные:
-##   factions: { icon, cb, claimant, can_join, ai_join, ai_accept_demands,
-##               on_demands_accepted, ultimatum_event }
+##   factions: { icon, cb, claimant, can_join, can_create, ai_join,
+##               ai_accept_demands, on_demands_accepted, ultimatum_event }
+##   can_create — кто может основать фракцию (сверх can_join; например,
+##   покорные при страхе сюзерена вступают, но не зачинают).
 ##   defines.factions: { power_threshold, discontent_gain, discontent_decay,
 ##                       ai_join_chance, ai_create_threshold, ai_create_chance,
 ##                       ai_leave_below, cooldown_years, negotiation_check,
@@ -94,6 +96,17 @@ static func can_join(game: Game, c: Dictionary, def: Dictionary, liege: Dictiona
 	return Interp.eval_trigger(ctx, ctx.root, def.get("can_join"))
 
 
+## Может ли персонаж основать фракцию (can_join и can_create).
+static func can_create(game: Game, c: Dictionary, def: Dictionary, liege: Dictionary, claimant: Variant = null, ctx: ScriptContext = null) -> bool:
+	if not can_join(game, c, def, liege, claimant, ctx):
+		return false
+	if def.get("can_create") == null:
+		return true
+	if ctx == null:
+		ctx = context(game, c, liege, null, claimant)
+	return Interp.eval_trigger(ctx, ctx.root, def.can_create)
+
+
 static func ai_join_score(game: Game, c: Dictionary, def: Dictionary, liege: Dictionary, f: Variant = null, claimant: Variant = null, ctx: ScriptContext = null) -> float:
 	if def.get("ai_join") == null:
 		return 0.0
@@ -126,7 +139,7 @@ static func create(game: Game, type: String, founder: Dictionary, claimant: Vari
 		return null
 	if def.get("claimant", false) and claimant == null:
 		claimant = _best_claimant(game, liege, founder)
-	if not can_join(game, founder, def, liege, claimant):
+	if not can_create(game, founder, def, liege, claimant):
 		return null
 	if against(game, liege.id).any(func(f): return f.type == type):
 		return null
@@ -336,7 +349,8 @@ static func monthly_char(game: Game, v: Dictionary) -> void:
 			if score > 0 and game.rng.chance(game.def_num("factions.ai_join_chance", 0.5)):
 				join(game, v, f)
 				break
-		elif score > game.def_num("factions.ai_create_threshold", 20) and game.rng.chance(game.def_num("factions.ai_create_chance", 0.25)):
+		elif score > game.def_num("factions.ai_create_threshold", 20) and game.rng.chance(game.def_num("factions.ai_create_chance", 0.25)) \
+				and can_create(game, v, def, liege, claimant, ctx):
 			create(game, def.id, v, claimant)
 			break
 
@@ -596,5 +610,6 @@ func register_script(engine: GameEngine) -> void:
 			v.ref("casus_belli", f.get("cb"), w)
 			v.ref("events", f.get("ultimatum_event"), w)
 			v.trigger(f.get("can_join"), w + " can_join")
+			v.trigger(f.get("can_create"), w + " can_create")
 			v.effect(f.get("on_demands_accepted"), w + " on_demands_accepted")
 	, OWNER)

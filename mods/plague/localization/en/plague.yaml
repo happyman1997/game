@@ -1,3 +1,5 @@
+county_grievance:
+  plague: Plague
 disease:
   bubonic_plague: Bubonic Plague
   camp_fever: Camp Fever
@@ -11,10 +13,12 @@ decision_desc:
 ev:
   plague.0001:
     t: Pestilence in the Capital!
-    desc: "More and more dead are found in the streets of the capital. Physicians are helpless and priests cannot keep up with the funerals."
+    desc: "More and more dead are found in the streets of the capital. Physicians are helpless and sun-priests cannot keep up with the funerals."
     a: Declare a quarantine (−40 gold)
     b: Trust in the Sun
 plague:
+  copinion_plague: Plague in the county
+  copinion_aftermath: The plague is not forgotten
   quarantine_tip: A year of quarantine lowers mortality and slows the spread.
   widget_tip: "Provinces struck by epidemics: {n}"
   months: "{n} mo."

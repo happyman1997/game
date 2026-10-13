@@ -1,0 +1,129 @@
+# Dread: tiers, who fears you, petitioners from the counties, the Sadistic trait.
+dread_tier:
+  calm: Calm
+  unease: Unease
+  fear: Fear
+  horror: Horror
+  terror: Terror
+dread_tier_desc:
+  calm: "No one fears you. Complaints and petitions flow freely; factions gather without a backward glance."
+  unease: "Voices drop at court. The obedient join factions but do not start them; complaints come half as often. Informers appear."
+  fear: "Taxes and levies are gathered without evasion, schemes against you stall, complaints come a quarter as often. Courtiers with a conscience leave, and vassals send gifts for no reason."
+  horror: "No complaints at all. Enemies make peace sooner and weak garrisons surrender, but neighbours will not marry into your house or ally with you. You sleep badly — unless you are callous, paranoid or a sadist."
+  terror: "Factions fall apart — only the defiant remain — and peasants dare not revolt. But villages empty, the Temple condemns you, sleepless nights torment you and the brave sharpen their knives. They call you the Terrible."
+
+county_grievance:
+  taxes: Taxes
+  levies: Levies
+  faith: Foreign cult
+  customs: Foreign customs
+  ruin: Ruin
+  new_lord: New lord
+  cruelty: Cruelty
+  lies: Broken promises
+
+trait:
+  sadistic: Sadistic
+trait_desc:
+  sadistic: "Others' pain is a pleasure to them. Executions and the dungeon calm them, mercy weighs on them; fear of them grows faster."
+
+personality_action:
+  hear_petitioners: hear the petitioners
+  false_promise: promise and forget
+  drive_away_petitioners: drive the petitioners away
+  ease_taxes: ease the taxes
+
+nick:
+  terrible: the Terrible
+  terrible_f: the Terrible
+
+opinion_modifier:
+  grievances_eased: The petitioners were heard
+  false_hope: Promised relief
+  broken_promises: Broken promises
+  petitioners_driven_away: Petitioners driven away
+  botched_inquiry: A botched inquiry
+  prayed_together: The sovereign prayed with the people
+  county_ravaged: Ravaged
+  executions_witnessed: Executions in the square
+
+modifier:
+  tax_relief: Eased taxes
+  tax_relief_light: Eased taxes
+  open_gates: Open Gates
+  double_guard: Double Guard
+
+ai:
+  dread_horror: Horror of the ruler
+  tyrant_hated: Hates a tyrant
+
+ui:
+  not_defiant: The defiant cannot be intimidated — only the obedient or the broken
+
+msg:
+  broken_promises: "The county remembered your last promise. Broken hopes are not forgiven."
+
+ev:
+  populace.0010:
+    t: Petitioners from the County
+    desc: "Petitioners have come from the county of [scope:province] — village elders in their best coats, caps in hand. They bow to the floor and beg to be heard: life has become unbearable."
+    desc_taxes: "Petitioners have come from the county of [scope:province] — village elders in their best coats, caps in hand. The emergency taxes swept the granaries bare: “Nothing to sow, my lord, nothing to feed the children.”"
+    desc_levies: "Petitioners have come from the county of [scope:province] — the wives and mothers of the levied men. The men have been under the banners for years, the fields are going to weed and no one mends the roofs."
+    desc_faith: "Petitioners have come from the county of [scope:province]. Your men look askance at their rites and threaten to tear down their ancestral shrines. “We honour the same Emperor, my lord — only in our own way.”"
+    desc_customs: "Petitioners have come from the county of [scope:province]. Your reeves break their old customs: judging not by their law, speaking not their tongue. The elders ask to keep their ways."
+    desc_ruin: "Petitioners have come from the county of [scope:province], still smelling of smoke. After the siege only chimneys are left of the villages. They ask for help to rebuild."
+    desc_plague: "Petitioners have come from the county of [scope:province] — keeping their distance, for there is plague in the county. They ask for physicians and bread before whole villages die out."
+    desc_new_lord: "Petitioners have come from the county of [scope:province]. Their former lord granted them liberties, and your men will not hear of them. The elders hold up the old charters and ask you to confirm them."
+    desc_cruelty: "Petitioners have come from the county of [scope:province] — pale, speaking in whispers. Executions, whips, empty farmsteads. They ask for nothing — only that it end."
+    desc_lies: "Petitioners have come from the county of [scope:province] again — the very same ones. Last time you promised. They remember every word."
+    a: Hear them and ease their burden
+    pray: Pray together with them
+    b: Promise and forget
+    c: Drive them away
+    d: Look into it yourself
+
+  dread.0001:
+    t: The Informer
+    desc: "[scope:informer] asks to speak in private and, glancing at the door, whispers: [scope:accused] cursed you over wine and invited others to “talk about the future”."
+    a: Reward the informer — let all know I hear everything
+    b: Threaten the accused
+    c: Send the informer away — I do not heed slander
+  dread.0002:
+    t: Gifts Without Reason
+    desc: "With no feast and no request, wagons roll into the courtyard: your vassals send silver, furs and wine. None of them writes what they want. All of them write how loyal they are."
+    a: Accept the gifts
+    b: Return the gifts with thanks
+  dread.0003:
+    t: An Empty Seat at the Table
+    desc: "At supper the seat of [scope:leaver] is empty. In the morning the servants say they packed in the night and left for the court of [scope:refuge]. “I serve my conscience, not fear,” were the parting words."
+    a: Let them go
+    b: Bring them back — and temper my ways
+    c: Ride after them and throw them in the dungeon
+  dread.0004:
+    t: The Gates Are Open
+    desc: "No sooner had your host appeared on the hill than the gates of the enemy fortress swung open: the castellan fled in the night and the townsfolk carried out the keys on a cushion. Your name marches ahead of your army."
+    a: Enter without a fight
+  dread.0005:
+    t: A Dream of the Executed
+    desc: "In the night they came — everyone you have executed. They stood around your bed in silence. You woke in a cold sweat; the candle had burned down to the socket."
+    a: It is only a dream
+    b: Order prayers for their souls
+    c: Throw open the dungeons
+  dread.0006:
+    t: Empty Villages
+    desc: "Word comes from the county of [scope:province]: the villages are emptying. People leave at night, whole families, abandoning their homes — anywhere, so long as it is far from you."
+    a: Let them flee
+    b: Bring the runaways back by force
+    c: Lift the levies — let them come back
+  dread.0007:
+    t: A Dagger Under the Pillow
+    desc: "Making your bed, a maid found a dagger under your pillow — unsheathed, its point toward the headboard. No one knows who put it there. Or everyone is silent."
+    a: Execute that night's guard
+    b: Double the guard
+    c: Sleep with a sword
+  dread.0008:
+    t: The Jester
+    desc: "The feast goes on in silence — no one dares to laugh. Only the jester rises, bows and says: “My lord, why is our funeral so merry?” The hall freezes."
+    a: Execute the jester
+    b: Laugh
+    c: The jester is right — proclaim mercy
