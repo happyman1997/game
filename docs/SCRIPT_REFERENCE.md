@@ -134,6 +134,7 @@
 | `is_spouse_of` | character | Супруг(а) персонажа | core |
 | `is_vassal` | character | Вассал | core |
 | `is_vassal_of` | character | Прямой вассал персонажа | core |
+| `karma_tier` | character | Ступень кармы: karma_tier: ashen или karma_tier: ">= pious" | core/karma |
 | `knows_secret_of` | character | Знает какой-то секрет персонажа | core/secrets |
 | `near_dragon_lair` | character | Логово дракона в державе персонажа или по соседству | arcana |
 | `province_has_disease` | province | В провинции эпидемия. Аргумент: yes или id болезни. | plague |
@@ -178,6 +179,7 @@
 | `add_gold` | Изменить gold | core |
 | `add_health` | Изменить базовое здоровье | core |
 | `add_hook` | Крюк на персонажа: path или { target, strong, years } | core |
+| `add_karma` | Изменить карму: add_karma: -15 или { value: -15, deed: unjust_execution } (deed — запись в Книге деяний) | core/karma |
 | `add_lifestyle_xp` | Опыт образа жизни: число (текущий образ жизни) или { lifestyle, value } | core/lifestyles |
 | `add_modifier` | Добавить модификатор: id или { id, years/months/days } | core |
 | `add_monster_kill` | Засчитать уничтоженное чудовище: add_monster_kill: 2 (слава охотника) | arcana |
@@ -206,6 +208,7 @@
 | `change_culture` | Сменить культуру | core |
 | `change_faith` | Сменить веру | core |
 | `change_var` | Изменить переменную: { name, add } | core |
+| `cleanse_ash` | Снять пепел: поднять отрицательную карму к нулю (не выше) на N: cleanse_ash: 40 или { value, deed } | core/karma |
 | `clear_ambition` | Снять желание без последствий: clear_ambition: yes | core/ambitions |
 | `command_restless_dead` | Некромант подчиняет восставших мёртвых своей державы | arcana |
 | `consecrate_against_dead` | Освятить земли державы против нежити | arcana |
@@ -386,6 +389,8 @@
 | `income` | character | Ежемесячный доход | core |
 | `infected_provinces` | любой | Число заражённых провинций в мире. | plague |
 | `intrigue` | character | Навык: intrigue | core |
+| `karma` | character | Карма «Свет и Пепел» (−100…100) | core/karma |
+| `karma_tier_level` | character | Номер ступени кармы (0 — самая пепельная) | core/karma |
 | `knights_power` | character | Сила рыцарей (в ополченцах) | core/knights |
 | `learning` | character | Навык: learning | core |
 | `levies` | character | Ополчение державы | core |
@@ -597,6 +602,7 @@
 | `upbringing` | Детство, опекуны и воспитание, регентство при малолетнем правителе | да |
 | `dynasties` | Династия: известность рода, наследия, глава рода и младшие ветви | да |
 | `ambitions` | Желания персонажей: цели из характера, благодарность и обида сюзерену | да |
+| `karma` | Свет и Пепел: карма от деяний, ступени, Книга деяний | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -606,9 +612,9 @@
 - **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `faction`, `artifact_holder`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`, `own_artifacts`, `claimed_artifacts`
 - **interaction_deciders**: `payer`
-- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `grafts`, `plague_fear`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `grafts`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `arcana_faith`, `grafts`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`
-- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `karma`, `arcana_faith`, `grafts`
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`, `karma`
+- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

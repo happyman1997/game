@@ -1264,6 +1264,41 @@ options:
     ai_chance: { value: 15, add: { value: "stress_for(drive_away_petitioners)", multiply: -1 } }
 ```
 
+### Свет и Пепел (карма)
+
+Механика `karma` (данные — `core/data/common/soul.yaml`, события —
+`core/data/events/soul.yaml`). У персонажа есть карма от −`max` до `max`.
+Её не копят напрямую: она растёт и падает от деяний — эффект `add_karma` в
+данных самих поступков (казнь без вины, убийство, шантаж, ложь ходокам —
+пепел; милостыня, справедливый суд, милость к пленнику, паломничество — свет):
+
+```yaml
+on_accept:
+  - add_karma: { value: -15, deed: unjust_execution }   # deed — запись в «Книге деяний» (karma_deed.<deed>)
+```
+
+Пепел сам не тает: эффект `cleanse_ash: 15` (исповедь, паломничество к
+Пепелищу, покаяние) поднимает отрицательную карму к нулю, но не выше.
+Совестливых (`defines.karma.conscience_traits`, кроме `conscience_immune`) грех
+мучает: стресс `conscience_stress` за очко пепла. Ступени:
+
+```yaml
+karma_tiers:
+  ashen:   { icon: "🔥", modifiers: { monthly_piety: -0.8 }, zealot_opinion: -25 }   # нижняя — без min
+  tainted: { min: -59, modifiers: { monthly_piety: -0.3 }, zealot_opinion: -10 }
+  common:  { min: -19 }
+  pious:   { min: 20, modifiers: { monthly_piety: 0.5 }, zealot_opinion: 10 }
+```
+
+`modifiers` получает сам носитель, `zealot_opinion` — мнение о нём ревнителей
+веры (`zealot_traits`). Переход ступени — on_actions `on_karma_tier_up` /
+`on_karma_tier_down`. Свою карму персонаж знает точно, чужую — лишь по ступени
+(точно её видят носители черт `known_by`). Вкладка персонажа «Свет и Пепел» —
+миниатюра с весами Императора-Солнца и Князя Пепла, ступень и «Книга деяний»
+(`log_size` последних записей). Скрипт: значения `karma`, `karma_tier_level`,
+условие `karma_tier: ashen` или `karma_tier: ">= pious"`, эффекты `add_karma`,
+`cleanse_ash`.
+
 ### Слава и благочестие
 
 Механика `renown` (данные — `core/data/common/renown.yaml`). Престиж и

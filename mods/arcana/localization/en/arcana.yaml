@@ -439,3 +439,7 @@ ui_category:
     arcane: Arcane Arts
   regiment_types:
     arcane: Arcane Arts
+karma_deed:
+  necromancy: Disturbed the dead
+  light_magic: Light magic
+  healing: Healed the suffering

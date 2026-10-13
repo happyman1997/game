@@ -94,4 +94,5 @@ events:
           add_trait: pilgrim
           add_piety: 100
           add_stress: -30
+          add_karma: { value: 10, deed: pilgrimage }
           add_modifier: { id: pilgrim_blessing, years: 5 }

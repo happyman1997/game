@@ -74,12 +74,14 @@ static var BODIES := {
 	"chessmen": '<path d="M11 1.5 H13 V3 H14.5 V5 H13 V6.5 C15.5 7 16.5 9 15.5 11 H8.5 C7.5 9 8.5 7 11 6.5 V5 H9.5 V3 H11 Z"/><path d="M9 12 H15 L16 18 H8 Z"/><path d="M6 18.5 H18 V21.5 H6 Z"/>',
 	"bag": '<path d="M8 6.5 C8 3.8 9.8 2 12 2 C14.2 2 16 3.8 16 6.5" fill="none" stroke-width="1.6"/><path d="M5 7 H19 L21 20 C21 21 20.3 21.8 19.3 21.8 H4.7 C3.7 21.8 3 21 3 20 Z"/><path d="M9.5 11 H14.5" fill="none" stroke-width="1.4"/>',
 	"hammer": '<path d="M4 18.5 L13 9.5 L14.5 11 L5.5 20 Z"/><path d="M11 5 L16 2.5 L21.5 8 L19 13 Z"/>',
+	"ash": '<path d="M6 13.5 C3.2 13.5 2.5 9.6 5.2 8.8 C5.6 5.6 9.6 4.6 11.2 7 C12.6 3.8 18 4.6 18.2 8.6 C21.4 8.8 21.6 13.5 18.4 13.5 Z" fill="#8a837c"/><circle cx="7" cy="17" r="1.3" fill="#8a837c"/><circle cx="12" cy="19.5" r="1.3" fill="#8a837c"/><circle cx="16.5" cy="16.8" r="1.1" fill="#ff7a2a"/><circle cx="10" cy="22" r="0.9" fill="#8a837c"/>',
+	"eclipse": '<circle cx="12" cy="12" r="9.5" fill="#ffd34a" opacity="0.55"/><circle cx="12" cy="12" r="7.2" fill="#1c140a" stroke="#ffd34a" stroke-width="1.2"/>',
 	"wolf": '<path d="M3.5 2.5 L8.8 8 H15.2 L20.5 2.5 L19.4 11 C19.4 15 16.4 18.2 13.6 21.5 H10.4 C7.6 18.2 4.6 15 4.6 11 Z"/><path d="M8.2 12 L10.6 13.1 M15.8 12 L13.4 13.1" stroke-width="1.5" fill="none"/><path d="M10.9 17 H13.1 L12 18.6 Z" fill="#1c140a"/>',
 }
 
 ## Эмодзи из данных → имя нарисованной иконки.
 static var EMOJI := {
-	"💰": "gold", "🪙": "gold", "⭐": "prestige", "🌟": "prestige", "✝": "piety", "✝️": "piety", "🙏": "piety", "☀": "cross", "☀️": "cross", "🐺": "wolf",
+	"💰": "gold", "🪙": "gold", "⭐": "prestige", "🌟": "prestige", "✝": "piety", "✝️": "piety", "🙏": "piety", "☀": "cross", "☀️": "cross", "🐺": "wolf", "🌫": "ash", "🌫️": "ash", "🌑": "eclipse",
 	"⚔": "swords", "⚔️": "swords", "🗡": "dagger", "🗡️": "dagger", "🔪": "dagger", "👑": "crown", "🏰": "castle",
 	"🛡": "shield", "🛡️": "shield", "🔥": "fire", "📜": "scroll", "📖": "book", "👤": "person", "🌿": "leaf",
 	"🏛": "council", "🏛️": "council", "⚖": "scales", "⚖️": "scales", "✊": "fist", "🔱": "spear", "👁": "eye",

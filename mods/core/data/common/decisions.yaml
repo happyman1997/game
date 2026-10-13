@@ -66,6 +66,7 @@ decisions:
     effect:
       - add_piety: 50
       - add_stress: -10
+      - add_karma: { value: 4, deed: alms }
       - every_vassal:
           add_opinion: { target: root, modifier: alms_given }
     ai_will_do:

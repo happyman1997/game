@@ -1,0 +1,122 @@
+# «Свет и Пепел»: знамения и кошмары по ступени кармы, холод жрецов,
+# изгнание из Света. Сама карма в событиях не называется — её видно по
+# последствиям (и во вкладке «Свет и Пепел»).
+events:
+  # ------------------------------------------------------------ солнечный: доброе знамение
+  soul.0001:
+    requires_feature: karma
+    theme: faith
+    icon: "☀"
+    trigger: { is_ruler: yes, karma_tier: solar }
+    cooldown: { years: 5 }
+    options:
+      - effect:
+          - add_piety: 40
+          - add_stress: -10
+        ai_chance: 50
+      - effect:
+          - add_modifier: { id: good_omen, years: 3 }
+          - add_prestige: 30
+        ai_chance: 50
+
+  # ------------------------------------------------------------ пепельный: дурное знамение
+  soul.0002:
+    requires_feature: karma
+    theme: death
+    icon: "🌑"
+    trigger: { is_ruler: yes, karma_tier: ashen }
+    cooldown: { years: 4 }
+    options:
+      - effect:
+          add_modifier: { id: bad_omen, years: 3 }
+        ai_chance: 60
+      - trigger: { piety: 60 }
+        effect:
+          - add_piety: -60
+          - cleanse_ash: { value: 10, deed: penance }
+        ai_chance: { value: 20, add: { value: ai_zeal, multiply: 10 } }
+
+  # ------------------------------------------------------------ запятнанный: кошмар
+  soul.0003:
+    requires_feature: karma
+    theme: stress
+    icon: "🌫"
+    trigger: { is_adult: yes, karma_tier: "<= tainted" }
+    cooldown: { years: 4 }
+    options:
+      - effect:
+          if:
+            limit: { has_trait: [callous, sadistic] }
+            add_stress: 5
+          else:
+            add_stress: 20
+        ai_chance: 50
+      - effect:
+          - add_piety: -25
+          - add_stress: -10
+          - cleanse_ash: { value: 5, deed: prayer }
+        ai_chance: { value: 30, add: { value: ai_zeal, multiply: 10 } }
+
+  # ------------------------------------------------------------ холод жрецов
+  soul.0004:
+    requires_feature: karma
+    theme: faith
+    icon: "🕯"
+    trigger:
+      is_ruler: yes
+      religion: solar
+      karma_tier: "<= tainted"
+    cooldown: { years: 5 }
+    options:
+      # пожертвовать Храму
+      - trigger: { gold: 60 }
+        effect:
+          - add_gold: -60
+          - add_piety: 30
+          - cleanse_ash: { value: 5, deed: donation }
+        ai_chance: 40
+      # стерпеть
+      - effect:
+          add_prestige: -20
+        ai_chance: 40
+      # прогнать жреца со двора
+      - effect:
+          - add_piety: -50
+          - add_dread: 5
+          - add_karma: { value: -3, deed: sacrilege }
+        ai_chance: { value: 10, add: { value: ai_zeal, multiply: -10 } }
+
+  # ------------------------------------------------------------ изгнание из Света
+  soul.0005:
+    requires_feature: karma
+    theme: faith
+    icon: "🌑"
+    trigger:
+      is_ruler: yes
+      religion: solar
+      karma_tier: ashen
+      NOT: { has_modifier: cast_out_of_light }
+    cooldown: { years: 8 }
+    options:
+      # покаяться: золото и благочестие Храму
+      - trigger: { gold: 150 }
+        effect:
+          - add_gold: -150
+          - add_prestige: -50
+          - cleanse_ash: { value: 20, deed: penance }
+        ai_chance: { value: 30, add: { value: ai_zeal, multiply: 10 } }
+      # пусть отлучают
+      - effect:
+          - add_modifier: { id: cast_out_of_light, years: 10 }
+          - add_prestige: 20
+        ai_chance: 50
+
+on_actions:
+  on_yearly_pulse:
+    random_events:
+      events:
+        soul.0001: 4
+        soul.0002: 4
+        soul.0003: 4
+        soul.0004: 3
+        soul.0005: 3

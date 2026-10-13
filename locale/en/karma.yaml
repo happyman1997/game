@@ -1,0 +1,30 @@
+# Light and Ash feature: engine and UI strings.
+opinion:
+  karma_zealot: "Zealot: a soul “{tier}”"
+tr:
+  karma_tier: "Soul: {cond}"
+fx:
+  add_karma_light: A step toward the Light
+  add_karma_ash: Ash on the soul
+  cleanse_ash: Ash falls from the soul
+msg:
+  karma_tier_up: "Your soul grows lighter: “{tier}”."
+  karma_tier_down: "Ash settles on your soul: “{tier}”."
+stress_src:
+  karma: Pangs of conscience
+ui:
+  karma_tier_mod: "Soul: {tier}"
+  ctab:
+    soul: Light and Ash
+  soul: Light and Ash
+  soul_tip: "The soul is weighed on the scales of the Sun Emperor. Every deed falls into the pan of Light or of Ash — not by words, but by deeds."
+  soul_light: Light
+  soul_ash: Ash
+  soul_value_light: "Light: {n}"
+  soul_value_ash: "Ash: {n}"
+  soul_value_none: The scales are balanced
+  soul_hidden: "Another's soul is darkness: only its tier can be seen."
+  soul_book: Book of Deeds
+  soul_book_empty: The book is still clean.
+  soul_cleanse_hint: "Ash does not fade on its own: confession and a pilgrimage to the Ashlands remove it. Light is gathered by mercy, just judgment, alms and pilgrimage."
+  need_stress_or_ash: Requires at least 30 stress or ash on the soul

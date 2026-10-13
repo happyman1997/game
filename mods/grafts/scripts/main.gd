@@ -220,6 +220,9 @@ static func _condition(game: Game, c: Dictionary) -> void:
 	if h < _n(game, "possession_below", 20) and game.rng.chance(_n(game, "possession_chance", 0.06)):
 		Chars.add_trait(game, c, "iron_possession")
 		game.stat_cache.erase(c.id)
+		# шёпот из железа — голос Князя Пепла: пепел ложится на душу
+		if game.engine.has_feature("karma"):
+			Karma.add(game, c, -10.0, "iron_whisper")
 		var p: Variant = game.player
 		if p != null and (c.id == p.id or c.liege == p.id):
 			game.message(game.loc.t("grafts.msg_possessed" + ("_own" if c.id == p.id else ""), {"who": game.scope_name({"type": "character", "id": c.id})}), "bad",

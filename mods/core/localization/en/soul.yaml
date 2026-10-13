@@ -1,0 +1,79 @@
+# Light and Ash: tiers of the soul, the Book of Deeds, the pilgrimage to the Ashlands, omens.
+karma_tier:
+  ashen: Ashen
+  tainted: Ash-stained
+  common: Like Everyone
+  pious: Devout
+  solar: Sunlit
+karma_tier_desc:
+  ashen: "The soul is black with ash. Omens are ill, priests turn away, and the Great Lightbearer may cast you out of the Light. The Prince of Ash has long been looking this way."
+  tainted: "There is ash on the soul. Priests are cold, and bad dreams come at night."
+  common: "Sins and repents like everyone. The scales are balanced."
+  pious: "A clean soul: piety gathers faster and zealots honour you."
+  solar: "The soul is bright as the noonday sun. Omens are kind, and after death such souls leave relics and glory for their house."
+karma_deed:
+  other: A deed
+  unjust_execution: Execution without guilt
+  execution: Execution
+  public_execution: Execution in the square
+  unjust_imprisonment: Imprisonment without guilt
+  murder: Murder
+  blackmail: Blackmail
+  betrayal: Took land without cause
+  treachery: Sowed discord
+  intimidation: Intimidated a vassal
+  false_promise: Lied to petitioners
+  petitioners_driven_away: Drove petitioners away
+  sacrilege: Drove out a priest
+  mercy: Mercy to prisoners
+  alms: Alms
+  just_judgment: Just judgment
+  prayer_with_people: Prayed with the people
+  pilgrimage: Pilgrimage
+  confession: Confession
+  penance: Penance
+  prayer: Prayer
+  donation: Gift to the Temple
+  ash_pilgrimage: Pilgrimage to the Ashlands
+
+decision:
+  ash_pilgrimage: Pilgrimage to the Ashlands
+decision_desc:
+  ash_pilgrimage: "Walk to the edge of the Ashlands, where the Prince of Ash fell on the night of the fire, and cast your sin into the ash. The road is hard — ash storms maim — but there more ash falls from the soul than after any confession."
+
+modifier:
+  cast_out_of_light: Cast Out of the Light
+  good_omen: Good Omen
+  bad_omen: Ill Omen
+
+msg:
+  ash_pilgrimage_back: "You have returned from the Ashlands. Your soul is lighter."
+  ash_pilgrimage_storm: "An ash storm caught the pilgrims at the very edge. You returned — but not whole."
+
+ev:
+  soul.0001:
+    t: A Good Omen
+    desc: "On your birthday a double rainbow rose over the castle, and in the field they found an ear of wheat with two grains to every stalk. The sun-priests say the Sun Emperor looks upon you with love."
+    a: Give thanks to the Sun
+    b: Proclaim the omen to the people
+  soul.0002:
+    t: An Ill Omen
+    desc: "All across the district the milk soured at once, crows have circled the tower for three days, and the fire in the great hall burns without heat. The servants whisper and look away."
+    a: Empty superstition
+    b: Order a cleansing prayer
+  soul.0003:
+    t: A Dream of Ash
+    desc: "You dream you are walking on ash, and it is warm, like the embers of last night's fire. Someone walks behind you — step for step. You do not turn. You know that if you turn, he will smile."
+    a: Wake and forget
+    b: Pray until dawn
+  soul.0004:
+    t: The Coldness of Priests
+    desc: "At the festival service the sun-priest did not hand you a consecrated candle and walked past as if he had not seen you. The whole court saw it."
+    a: Make a gift to the Temple
+    b: Endure it
+    c: Drive the priest from court
+  soul.0005:
+    t: Cast Out of the Light
+    desc: "A messenger of the Great Lightbearer brought a charter with a black seal: for your deeds you are cast out of the Light. Henceforth priests will not bless your undertakings, and the faithful may turn from you."
+    a: Repent and pay
+    b: Let them cast me out

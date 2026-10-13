@@ -184,6 +184,8 @@ interactions:
               every_vassal:
                 limit: { NOT: { is_same_as: scope:recipient } }
                 add_opinion: { target: scope:actor, modifier: tyranny }
+          # отнять землю без вины — предательство вассала
+          add_karma: { value: -6, deed: betrayal }
       - add_dread: 10
     # ИИ отбирает земли у вассалов, которых держит в темнице за преступление или мятеж
     ai_targets: [prisoner]

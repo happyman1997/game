@@ -148,6 +148,7 @@ decisions:
       # казнь на площади поднимает страх на ступень, а столица её не забудет
       - raise_dread_tier: 1
       - capital: { add_county_opinion: executions_witnessed }
+      - add_karma: { value: -10, deed: public_execution }
       - add_deed: executions
       - every_vassal:
           limit: { fear_stance: defiant }
@@ -329,6 +330,7 @@ interactions:
           pay_gold: { target: scope:actor, value: { value: gold, multiply: 0.3, min: 0, max: 150 } }
           add_opinion: { target: scope:actor, modifier: intimidated }
       - add_dread: 3
+      - add_karma: { value: -3, deed: intimidation }
     on_decline:
       - scope:recipient:
           mark_criminal: { target: scope:actor, years: 5 }

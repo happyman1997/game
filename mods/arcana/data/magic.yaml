@@ -327,6 +327,8 @@ decisions:
       - discover_secret: yes
       - add_lifestyle_xp: 50
       - add_stress: 5
+      # тревожить мёртвых — пепел на душе («Свет и Пепел»)
+      - add_karma: { value: -2, deed: necromancy }
     ai_will_do: 20
     ai_check_months: 6
 
@@ -342,6 +344,7 @@ decisions:
       - add_regiment: risen_dead
       - add_regiment: risen_dead
       - add_stress: 15
+      - add_karma: { value: -8, deed: necromancy }
       - arcane_witness: { secret: secret_necromancy, chance: 25 }
       - custom_tooltip: arcana.raise_dead_tip
     ai_will_do: { value: 20, if: { limit: { is_at_war: yes }, add: 60 } }
@@ -359,6 +362,7 @@ decisions:
     cost: { gold: 300 }
     effect:
       - add_arcane_power: -100
+      - add_karma: { value: -25, deed: necromancy }
       - trigger_event: arcana.0060
       - custom_tooltip: arcana.lich_ritual_tip
     ai_will_do: { value: 5, if: { limit: { age: ">= 50" }, add: 60 } }
@@ -375,6 +379,8 @@ decisions:
     effect:
       - add_arcane_power: -40
       - purge_restless_dead: { magic: yes }
+      # светлая магия — шаг к Свету
+      - add_karma: { value: 4, deed: light_magic }
       - custom_tooltip: arcana.purifying_light_tip
     ai_will_do: 90
     ai_check_months: 2
@@ -390,6 +396,7 @@ decisions:
       - add_arcane_power: -60
       - bless_domain: yes
       - add_piety: 50
+      - add_karma: { value: 6, deed: light_magic }
     ai_will_do: 70
     ai_check_months: 6
 
@@ -420,6 +427,7 @@ decisions:
     effect:
       - add_arcane_power: -80
       - plague_of_the_dead: yes
+      - add_karma: { value: -10, deed: necromancy }
       - custom_tooltip: arcana.plague_dead_tip
     ai_will_do: 70
     ai_check_months: 2
@@ -526,7 +534,7 @@ interactions:
     auto_accept: yes
     cooldown: { months: 6 }
     on_accept:
-      - scope:actor: { add_arcane_power: -30, add_lifestyle_xp: 30 }
+      - scope:actor: { add_arcane_power: -30, add_lifestyle_xp: 30, add_karma: { value: 3, deed: healing } }
       - scope:recipient:
           cure_ailments: yes
           if:

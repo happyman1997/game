@@ -39,7 +39,9 @@ schemes:
           every_close_family:
             limit: { is_adult: yes }
             add_opinion: { target: scope:owner, modifier: murdered_relative }
-      - scope:owner: { add_secret: { type: secret_murder, target: scope:target } }
+      - scope:owner:
+          add_secret: { type: secret_murder, target: scope:target }
+          add_karma: { value: -20, deed: murder }
       - scope:target: { death: { reason: murder, killer: scope:owner } }
     on_failure:
       - scope:owner:

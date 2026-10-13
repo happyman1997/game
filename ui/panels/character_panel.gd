@@ -68,6 +68,8 @@ static func build(app: App, id: String) -> Control:
 		tabs.append({"id": "realm", "name": app.t("ui.ctab.realm"), "icon": "crown", "badge": c.titles.size()})
 	if g.engine.has_feature("artifacts") and (is_me or not Artifacts.items_of(g, c).is_empty()):
 		tabs.append({"id": "inventory", "name": app.t("ui.ctab.inventory"), "icon": "bag", "badge": Artifacts.items_of(g, c).size()})
+	if g.engine.has_feature("karma") and Chars.is_adult(g, c):
+		tabs.append({"id": "soul", "name": app.t("ui.ctab.soul"), "icon": "piety"})
 	# вкладки модов
 	var mod_tabs: Array = g.engine.ui.character_tabs.values()
 	Data.sort_by(mod_tabs, func(x): return Data.num(x.get("order")))
@@ -89,6 +91,7 @@ static func build(app: App, id: String) -> Control:
 			"family": return _family_tab(app, c)
 			"realm": return _realm_tab(app, c)
 			"inventory": return InventoryPanel.build(app, c)
+			"soul": return SoulPanel.build(app, c)
 		return _overview_tab(app, c)))
 	return root
 

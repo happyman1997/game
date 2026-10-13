@@ -439,3 +439,7 @@ ui_category:
     arcane: Тайные искусства
   regiment_types:
     arcane: Тайные искусства
+karma_deed:
+  necromancy: Тревожил мёртвых
+  light_magic: Светлая магия
+  healing: Исцелил страждущего

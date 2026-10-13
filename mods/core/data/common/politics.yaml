@@ -205,6 +205,7 @@ interactions:
     on_accept:
       - sow_discord: scope:recipient
       - custom_tooltip: ui.discord_tip
+      - add_karma: { value: -4, deed: treachery }
     ai_targets: [vassal]
     ai_frequency_months: 24
     ai_potential:

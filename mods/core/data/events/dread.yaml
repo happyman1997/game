@@ -123,6 +123,7 @@ events:
           - stress_reaction: hear_petitioners
           - ease_grievance: yes
           - add_deed: judgments
+          - add_karma: { value: 4, deed: just_judgment }
           # Государь: народ славит того, кто его слушает
           - if:
               limit: { has_perk: regal_bearing }
@@ -139,11 +140,13 @@ events:
           - add_piety: -50
           - scope:province: { add_county_opinion: prayed_together }
           - add_deed: devotions
+          - add_karma: { value: 4, deed: prayer_with_people }
         ai_chance: 45
       # Пообещать и забыть: даром, но графство запомнит
       - name: ev.populace.0010.b
         effect:
           - stress_reaction: false_promise
+          - add_karma: { value: -4, deed: false_promise }
           - if:
               limit: { scope:province: { has_province_flag: false_promise } }
               scope:province:
@@ -164,6 +167,7 @@ events:
         effect:
           - stress_reaction: drive_away_petitioners
           - add_dread: { value: 5, if: { limit: { has_trait: tyrant }, multiply: 2 } }
+          - add_karma: { value: -3, deed: petitioners_driven_away }
           - scope:province: { add_county_opinion: petitioners_driven_away }
         ai_chance:
           value: 15
@@ -176,6 +180,7 @@ events:
         success:
           - ease_grievance_half: yes
           - add_deed: { id: judgments, value: 2 }
+          - add_karma: { value: 6, deed: just_judgment }
         failure:
           - add_gold: -30
           - scope:province: { add_county_opinion: botched_inquiry }
@@ -270,6 +275,7 @@ events:
         ai_chance: 30
       # в темницу за дерзость
       - effect:
+          - add_karma: { value: -5, deed: unjust_imprisonment }
           - imprison: { target: scope:leaver }
           - add_dread: 5
         ai_chance: { value: 10, add: { value: ai_compassion, multiply: -5 } }
@@ -321,6 +327,7 @@ events:
       - trigger: { any_prisoner: { always: yes } }
         effect:
           - every_prisoner: { release_from_prison: released }
+          - add_karma: { value: 10, deed: mercy }
           - add_dread: -25
           - add_stress: -30
           - add_prestige: -20
@@ -371,6 +378,7 @@ events:
     options:
       # казнить стражу той ночи
       - effect:
+          - add_karma: { value: -10, deed: unjust_execution }
           - add_dread: 8
           - add_stress: -10
           - add_prestige: -20
@@ -397,6 +405,7 @@ events:
     options:
       # казнить шута
       - effect:
+          - add_karma: { value: -10, deed: unjust_execution }
           - add_dread: 5
           - add_prestige: -25
           - add_stress: -10
@@ -409,6 +418,7 @@ events:
       # шут прав: объявить милость
       - effect:
           - every_prisoner: { release_from_prison: released }
+          - add_karma: { value: 10, deed: mercy }
           - add_dread: -35
           - add_prestige: -30
           - every_vassal: { add_opinion: { target: root, modifier: amnesty } }

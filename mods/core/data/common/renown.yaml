@@ -49,12 +49,14 @@ decisions:
       religion: solar
     is_valid:
       custom_tooltip:
-        text: ui.need_stress
-        trigger: { stress: 30 }
+        text: ui.need_stress_or_ash
+        trigger: { OR: [ { stress: 30 }, { karma: "< 0" } ] }
     cost: { piety: 75 }
     cooldown: { years: 2 }
     effect:
       - add_stress: -40
+      # исповедь снимает пепел с души (не выше нуля)
+      - cleanse_ash: { value: 15, deed: confession }
     ai_check_months: 6
     ai_will_do:
       value: 0

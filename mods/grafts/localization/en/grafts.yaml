@@ -170,3 +170,5 @@ ev:
     a: Repent and pay the Temple (−80 gold)
     b: Call an exorcist (−100 gold)
     c: Let them grumble
+karma_deed:
+  iron_whisper: The whisper from the iron

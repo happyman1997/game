@@ -1,0 +1,96 @@
+# «Свет и Пепел» (механика karma): карма персонажа −100…100. Её не видно
+# напрямую — она копится от деяний (эффект add_karma в данных): казнь без
+# вины, убийство, шантаж, ложь, предательство — пепел; милостыня,
+# справедливый суд, милость к пленнику, паломничество — свет. Пепел сам не
+# тает: снять его можно исповедью и паломничеством к Пепелищу (cleanse_ash).
+# Совестливые мучаются от греха. События ступеней — events/soul.yaml.
+
+defines:
+  karma:
+    max: 100
+    conscience_traits: [just, honest, compassionate, zealous]   # грех — стресс
+    conscience_immune: [callous, sadistic]
+    conscience_stress: 1.0      # стресса за очко пепла
+    zealot_traits: [zealous]    # ревнители веры судят по душе
+    log_size: 12                # записей в Книге деяний
+    known_by: []                # кто видит чужую карму точно
+    # нрав души: с чего начинают взрослые в начале игры...
+    trait_seed:
+      compassionate: 14
+      just: 10
+      zealous: 8
+      honest: 8
+      generous: 6
+      forgiving: 6
+      humble: 5
+      sadistic: -18
+      callous: -10
+      deceitful: -8
+      arbitrary: -8
+      vengeful: -6
+      greedy: -4
+    # ...и куда их понемногу ведут повседневные дела (в год, не больше drift_max)
+    trait_drift:
+      compassionate: 1
+      just: 1
+      zealous: 0.5
+      honest: 0.5
+      generous: 0.5
+      forgiving: 0.5
+      sadistic: -2
+      callous: -1
+      deceitful: -1
+      arbitrary: -0.5
+      vengeful: -0.5
+    drift_max: 3
+
+# Ступени кармы: min — нижний порог (у нижней ступени его нет).
+karma_tiers:
+  ashen:   { icon: "🔥", modifiers: { monthly_piety: -0.8, general_opinion: -5 }, zealot_opinion: -25 }
+  tainted: { min: -59, icon: "🌫", modifiers: { monthly_piety: -0.3 }, zealot_opinion: -10 }
+  common:  { min: -19, icon: "⚖" }
+  pious:   { min: 20, icon: "🕯", modifiers: { monthly_piety: 0.5 }, zealot_opinion: 10 }
+  solar:   { min: 60, icon: "☀", modifiers: { monthly_piety: 1, general_opinion: 5, stress_gain_mult: -0.1 }, zealot_opinion: 20 }
+
+decisions:
+  # Пепел снимают у самого Пепелища: тяжёлый путь сквозь пепельные бури.
+  ash_pilgrimage:
+    requires_feature: karma
+    category: faith
+    icon: "🔥"
+    is_shown:
+      is_adult: yes
+      religion: solar
+      karma: "< 0"
+    is_valid:
+      is_at_war: no
+      is_imprisoned: no
+    cost: { gold: 80 }
+    cooldown: { years: 5 }
+    effect:
+      - cleanse_ash: { value: 40, deed: ash_pilgrimage }
+      - add_piety: 50
+      - add_stress: 15
+      - add_deed: devotions
+      - random_list:
+          - weight: 75
+            send_message: { text: msg.ash_pilgrimage_back, kind: good }
+          - weight: 25
+            add_trait: wounded
+            send_message: { text: msg.ash_pilgrimage_storm, kind: bad }
+    ai_check_months: 12
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { karma: "< -40" }
+          add: 20
+        - limit: { has_trait: [zealous, just, honest, compassionate] }
+          multiply: 2
+        - limit: { has_trait: [cynical, sadistic] }
+          multiply: 0
+
+modifiers:
+  # изгнание из Света: Великий Светоч отлучил грешника от Храма
+  cast_out_of_light: { icon: "🌑", modifiers: { monthly_piety: -2, vassal_opinion: -10, general_opinion: -10 } }
+  good_omen: { icon: "☀", good: true, modifiers: { monthly_prestige: 0.5, county_opinion: 5 } }
+  bad_omen: { icon: "🌑", modifiers: { county_opinion: -5, stress_gain_mult: 0.1 } }

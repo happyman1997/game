@@ -29,6 +29,8 @@ interactions:
                   add_opinion: { target: scope:actor, modifier: tyranny }
           - add_prestige: -50
           - add_dread: 8
+          # «Свет и Пепел»: темница без вины
+          - add_karma: { value: -5, deed: unjust_imprisonment }
           - if:
               limit: { scope:recipient: { is_ruler: yes } }
               # Землевладелец может успеть бежать в свои владения.
@@ -74,6 +76,8 @@ interactions:
       - scope:recipient:
           release_from_prison: yes
           add_opinion: { target: scope:actor, modifier: released }
+      # милость к пленнику — шаг к Свету
+      - add_karma: { value: 5, deed: mercy }
     ai_targets: prisoner
     ai_frequency_months: 3
     ai_will_do:
@@ -112,6 +116,12 @@ interactions:
       - if:
           limit: { has_trait: [compassionate, forgiving] }
           add_stress: 40
+      # «Свет и Пепел»: казнь без вины — пепел на душе, и по вине — немного
+      - if:
+          limit: { NOT: { has_imprisonment_reason: scope:recipient } }
+          add_karma: { value: -15, deed: unjust_execution }
+      - else:
+          add_karma: { value: -2, deed: execution }
       # казнь внушает страх, а казнь знатного — вдвойне
       - add_dread: 15
       - if:
