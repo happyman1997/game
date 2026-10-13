@@ -7,6 +7,7 @@ fx:
   add_karma_light: A step toward the Light
   add_karma_ash: Ash on the soul
   cleanse_ash: Ash falls from the soul
+  create_relics: The righteous one's relics are laid in a reliquary
 msg:
   karma_tier_up: "Your soul grows lighter: “{tier}”."
   karma_tier_down: "Ash settles on your soul: “{tier}”."
@@ -29,6 +30,7 @@ ui:
   soul_cleanse_hint: "Ash does not fade on its own: confession and a pilgrimage to the Ashlands remove it. Light is gathered by mercy, just judgment, alms and pilgrimage."
   need_stress_or_ash: Requires at least 30 stress or ash on the soul
   need_piety_300: Requires 300 piety
+  relics_of: "Relics of {who}"
   soul_seals: Seals of Ash
   soul_seals_tip: "Three seals stand between the soul and the Prince of Ash. Every sin of an ashen soul may break the next one. Before the third seal the Ashlands can still release you; after it — only death or the prayer of a Living Saint."
   soul_vow: Vow to the Sun

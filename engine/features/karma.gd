@@ -296,13 +296,14 @@ func register_script(engine: GameEngine) -> void:
 			var op: String = {">=": "ge", ">": "gt", "<=": "le", "<": "lt", "!=": "ne", "==": "eq"}[p[0]]
 			return ctx.game.loc.t("tr.karma_tier", {"cond": ctx.game.loc.t("tr.tier_cmp." + op, {"tier": ctx.game.name_of("karma_tiers", p[1])})}),
 	}, OWNER)
-	r.effects.register("add_karma", {"scopes": CH, "doc": "Изменить карму: add_karma: -15 или { value: -15, deed: unjust_execution } (deed — запись в Книге деяний)",
+	r.effects.register("add_karma", {"scopes": CH, "doc": "Изменить карму: add_karma: -15 или { value: -15, deed: unjust_execution, quiet: yes } (deed — запись в Книге деяний; quiet — без записи, мук совести и on_sin/on_virtue)",
 		"apply": func(ctx, s, arg):
 			var c: Variant = ch.call(ctx, s)
 			if c == null:
 				return
 			var v := Interp.eval_value(ctx, s, arg.get("value", 0)) if arg is Dictionary else Interp.eval_value(ctx, s, arg)
-			Karma.add(ctx.game, c, v, str(arg.get("deed", "")) if arg is Dictionary else ""),
+			var quiet: bool = arg is Dictionary and arg.get("quiet") != null and ScriptContext.is_yes(arg.quiet)
+			Karma.add(ctx.game, c, v, str(arg.get("deed", "")) if arg is Dictionary else "", quiet),
 		"describe": func(ctx, s, arg):
 			var v := Interp.eval_value(ctx, s, arg.get("value", 0)) if arg is Dictionary else Interp.eval_value(ctx, s, arg)
 			return ctx.game.loc.t("fx.add_karma_light" if v > 0 else "fx.add_karma_ash"),
@@ -315,6 +316,23 @@ func register_script(engine: GameEngine) -> void:
 			var v := Interp.eval_value(ctx, s, arg.get("value", 0)) if arg is Dictionary else Interp.eval_value(ctx, s, arg)
 			Karma.cleanse(ctx.game, c, v, str(arg.get("deed", "")) if arg is Dictionary else ""),
 		"describe": func(ctx, _s, _arg): return ctx.game.loc.t("fx.cleanse_ash"),
+	}, OWNER)
+	r.effects.register("create_relics", {"scopes": CH, "doc": "Мощи праведника — реликварий с его именем: create_relics: { of: scope:predecessor, rarity: famed } (получает текущий персонаж)", "apply": func(ctx, s, arg):
+		var c: Variant = ch.call(ctx, s)
+		if c == null or not ctx.game.engine.has_feature("artifacts") or not ctx.game.content.has("artifact_types", "reliquary"):
+			return
+		var a: Dictionary = arg if arg is Dictionary else {}
+		var saint: Variant = Interp.resolve_scope(ctx, s, a.of) if a.get("of") != null else s
+		if saint == null:
+			return
+		var rarity := str(a.get("rarity", "famed"))
+		if not ctx.game.content.has("artifact_rarities", rarity):
+			rarity = "famed"
+		var nm: String = ctx.game.loc.t("ui.relics_of", {"who": ctx.game.scope_name(saint, "first_name")})
+		var it := Artifacts.create(ctx.game, "reliquary", rarity, null, {"how": "relics", "name": nm})
+		if not it.is_empty():
+			Artifacts.give(ctx.game, it.id, c, "relics"),
+		"describe": func(ctx, _s, _a): return ctx.game.loc.t("fx.create_relics"),
 	}, OWNER)
 	engine.content_validators.register("karma", func(e: GameEngine, v: ScriptValidator):
 		var lows := e.content.all("karma_tiers").filter(func(t): return t.get("min") == null)

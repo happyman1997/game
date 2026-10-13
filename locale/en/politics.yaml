@@ -35,6 +35,7 @@ tr:
 fx:
   add_dread: "Dread: {value}"
   raise_dread_tier: Your dread rises by one tier
+  inherit_dread: "The old sovereign's dread, one tier lower; the broken stay broken"
   set_vassal_obligation: "{who}: obligations become {value}"
   seat_in_council: "{who} gains a council seat"
   remove_from_council: "{who} loses their council seat"

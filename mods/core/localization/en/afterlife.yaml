@@ -1,0 +1,25 @@
+# Succession and the afterlife.
+modifier:
+  ash_curse: The Ash Takes Its Own
+opinion_modifier:
+  humbled_by_liege: Humbled by the new sovereign
+karma_deed:
+  ash_inherited: Ash upon the house
+msg:
+  relics_of_saint: "Your predecessor went to the Sun as a righteous soul: their relics were laid in a reliquary, and their glory upon the whole house."
+ev:
+  succession.0010:
+    t: A Shadow on the Throne
+    desc: "[scope:predecessor.first_name] ruled by fear. The dungeons are full, the court speaks in undertones and watches you sidelong: what will the new reign be? The shadow of the old sovereign still stands behind the throne — decide whether to leave it there."
+    a: Keep a tight rein
+    b: Throw open the dungeons
+  succession.0011:
+    t: Testing the New Sovereign
+    desc: "[scope:challenger] did not come to swear fealty and told your messenger: “Let them first prove their hand is no weaker than their father's.” The court waits to see what you will do."
+    a: Call them to account
+    b: Meet them in a duel
+    c: Yield for the sake of peace
+  afterlife.0003:
+    t: The Ash Takes Its Own
+    desc: "Neither fire nor earth would take the remains of [scope:predecessor.first_name]. Since that night a curse lies on the house: children are born weak, chapel candles go out by themselves, and in every hearth someone whispers your names. The ash takes its own — and will not soon be sated."
+    a: What has he done…

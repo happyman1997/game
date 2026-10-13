@@ -179,7 +179,7 @@
 | `add_gold` | Изменить gold | core |
 | `add_health` | Изменить базовое здоровье | core |
 | `add_hook` | Крюк на персонажа: path или { target, strong, years } | core |
-| `add_karma` | Изменить карму: add_karma: -15 или { value: -15, deed: unjust_execution } (deed — запись в Книге деяний) | core/karma |
+| `add_karma` | Изменить карму: add_karma: -15 или { value: -15, deed: unjust_execution, quiet: yes } (deed — запись в Книге деяний; quiet — без записи, мук совести и on_sin/on_virtue) | core/karma |
 | `add_lifestyle_xp` | Опыт образа жизни: число (текущий образ жизни) или { lifestyle, value } | core/lifestyles |
 | `add_modifier` | Добавить модификатор: id или { id, years/months/days } | core |
 | `add_monster_kill` | Засчитать уничтоженное чудовище: add_monster_kill: 2 (слава охотника) | arcana |
@@ -216,6 +216,7 @@
 | `convert_to_holder_faith` | Обратить графство в веру владельца | core/lands |
 | `create_artifact` | Создать вещь персонажу: create_artifact: { type: sword \| [ring, amulet] \| slot: trinket, rarity: masterwork \| [common, masterwork], save_scope_as } | core/artifacts |
 | `create_character` | Создать персонажа: { culture, faith, female, age, traits, dynasty: new\|none\|path, court, save_scope_as } | core |
+| `create_relics` | Мощи праведника — реликварий с его именем: create_relics: { of: scope:predecessor, rarity: famed } (получает текущий персонаж) | core/karma |
 | `cure_ailments` | Снять болезни, раны и порчу | arcana |
 | `death` | Смерть: yes, причина или { reason, killer } | core |
 | `destroy_artifact` | Уничтожить вещь (уникальная — теряется): destroy_artifact: yes | core/artifacts |
@@ -242,6 +243,7 @@
 | `hunt_dragon` | Выйти на бой с ближайшим драконом | arcana |
 | `hunt_monsters` | Выследить чудовище в державе: найденная тайна раскрывается | arcana |
 | `imprison` | Заключить персонажа в свою темницу: imprison: scope:x или { target, reason } | core/prison |
+| `inherit_dread` | Наследник держит страх предшественника в узде (ступенью ниже), сломленные остаются сломленными: inherit_dread: scope:predecessor | core/politics |
 | `install_graft` | Вживить бесплатно: install_graft: glass_eye | grafts |
 | `join_faction` | Вступить во фракцию против сюзерена (или создать): join_faction: <тип> | core/factions |
 | `learn_secret` | Узнать тайну персонажа (тип — необязателен): learn_secret: { owner: scope:x, type: secret_embezzler } | core/secrets |

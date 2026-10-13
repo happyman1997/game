@@ -35,6 +35,7 @@ tr:
 fx:
   add_dread: "Страх: {value}"
   raise_dread_tier: Грозная слава поднимается на ступень
+  inherit_dread: "Страх прежнего государя — ступенью ниже; сломленные остаются сломленными"
   set_vassal_obligation: "{who}: условия службы — {value}"
   seat_in_council: "{who} получает место в совете"
   remove_from_council: "{who} лишается места в совете"

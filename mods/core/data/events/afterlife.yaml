@@ -1,0 +1,156 @@
+# Смена правителя и посмертие («Грозная слава» и «Свет и Пепел»).
+#
+# Тень на троне (succession.0010): наследник грозного правителя решает —
+#   держать страх в узде (ступенью ниже отцовского, сломленные остаются
+#   сломленными) или распахнуть темницы (страх уходит, вассалы благодарны,
+#   шаг к Свету, но престиж страдает).
+# Проверка нового государя (succession.0011): в первый год одного-двух
+#   дерзких вассалов тянет проверить, крепка ли новая рука.
+# Посмертие — по душе предшественника: Солнечный оставляет мощи и славу
+#   роду, Пепельный — «пепел на роду» (наследник начинает запятнанным),
+#   Наместник Пепла — «Пепел забирает своё»: долгое проклятие рода.
+
+events:
+  # ------------------------------------------------------------ тень на троне
+  succession.0010:
+    requires_feature: politics
+    theme: realm
+    icon: "⛓"
+    triggered_only: true
+    trigger: { exists: scope:predecessor }
+    options:
+      # держать в узде
+      - effect:
+          - inherit_dread: scope:predecessor
+        ai_chance:
+          value: 45
+          add: { value: ai_compassion, multiply: -8 }
+      # распахнуть темницы
+      - effect:
+          - every_prisoner: { release_from_prison: released }
+          - add_dread: -100
+          - every_vassal: { add_opinion: { target: root, modifier: amnesty } }
+          - add_karma: { value: 10, deed: mercy }
+          - add_prestige: -50
+        ai_chance:
+          value: 35
+          add: { value: ai_compassion, multiply: 10 }
+
+  # ------------------------------------------------------------ проверка нового государя
+  succession.0011:
+    requires_feature: politics
+    theme: realm
+    icon: "🛡"
+    triggered_only: true
+    trigger:
+      is_ruler: yes
+      any_vassal: { fear_stance: defiant, is_adult: yes }
+    cooldown: { months: 3 }
+    immediate:
+      - random_vassal:
+          limit: { fear_stance: defiant, is_adult: yes }
+          weight: { value: 1, if: { limit: { is_powerful_vassal: yes }, add: 3 } }
+          save_scope_as: challenger
+    options:
+      # призвать к ответу
+      - effect:
+          - scope:challenger: { mark_criminal: { target: root, years: 3 } }
+          - add_dread: 5
+        ai_chance: { value: 35, add: { value: ai_vengefulness, multiply: 5 } }
+      # выйти на поединок
+      - skill: { skill: prowess, check: 14 }
+        success:
+          - add_prestige: 60
+          - scope:challenger: { add_opinion: { target: root, modifier: humbled_by_liege } }
+        failure:
+          - add_prestige: -60
+          - add_trait: wounded
+        ai_chance: { value: 10, add: { value: prowess, multiply: 1.5 } }
+      # уступить ради мира
+      - effect:
+          - add_prestige: -40
+          - scope:challenger: { add_opinion: { target: root, modifier: fair_judgment } }
+        ai_chance: { value: 25, add: { value: ai_compassion, multiply: 5 } }
+
+  # ------------------------------------------------------------ пепел забирает своё
+  afterlife.0003:
+    requires_feature: karma
+    theme: death
+    icon: "☠"
+    triggered_only: true
+    options:
+      - effect: { add_stress: 20 }
+
+modifiers:
+  # проклятие рода Наместника Пепла
+  ash_curse: { icon: "🌑", modifiers: { fertility: -0.2, health: -0.5, monthly_piety: -0.5, general_opinion: -10 } }
+
+opinion_modifiers:
+  humbled_by_liege: { value: 20, years: 10 }
+
+on_actions:
+  on_inheritance:
+    effect:
+      $append:
+        # посмертие: мощи праведника и слава роду
+        - if:
+            limit:
+              scope:predecessor:
+                karma_tier: solar
+                NOT: { has_flag: relics_made }
+            then:
+              - if:
+                  limit: { scope:predecessor: { has_trait: living_saint } }
+                  create_relics: { of: scope:predecessor, rarity: illustrious }
+              - else:
+                  create_relics: { of: scope:predecessor, rarity: famed }
+              - add_dynasty_prestige: 150
+              - scope:predecessor: { set_flag: relics_made }
+              - send_message: { text: msg.relics_of_saint, kind: good }
+        # Наместник Пепла: пепел забирает своё
+        - if:
+            limit:
+              scope:predecessor:
+                has_trait: ash_viceroy
+                NOT: { has_flag: ash_curse_cast }
+            then:
+              - scope:predecessor: { set_flag: ash_curse_cast }
+              - add_modifier: { id: ash_curse, years: 50 }
+              - every_dynasty_member: { add_modifier: { id: ash_curse, years: 50 } }
+              - add_karma: { value: -30, deed: ash_inherited }
+              - trigger_event: { id: afterlife.0003, days: 1 }
+        # пепельный предшественник: пепел на роду
+        - else_if:
+            limit: { scope:predecessor: { karma_tier: ashen } }
+            add_karma: { value: -25, deed: ash_inherited }
+        # тень на троне
+        - if:
+            limit:
+              is_ruler: yes
+              scope:predecessor: { dread_tier: ">= unease" }
+            trigger_event: { id: succession.0010, days: 1 }
+        # проверка нового государя: раз-другой в первый год
+        - if:
+            limit: { is_ruler: yes }
+            then:
+              - trigger_event: { id: succession.0011, days: 90 }
+              - random: { chance: 50, trigger_event: { id: succession.0011, days: 270 } }
+
+  # проклятие держится на роду: каждый год — немного пепла на душу
+  on_yearly_pulse:
+    effect:
+      $append:
+        - if:
+            limit: { has_modifier: ash_curse }
+            add_karma: { value: -2, quiet: yes }
+
+  # дети проклятого рода рождаются под проклятием
+  on_birth:
+    effect:
+      $append:
+        - if:
+            limit:
+              OR:
+                - scope:mother: { has_modifier: ash_curse }
+                - scope:father: { has_modifier: ash_curse }
+            add_modifier: { id: ash_curse, years: 30 }

@@ -332,6 +332,18 @@ static func felt_level(game: Game, c: Dictionary) -> int:
 	return maxi(0, level_for(game, fear_of_liege(game, c)))
 
 
+## Наследник держит в узде страх отца: страх на steps ступеней ниже отцовского
+## (не ниже своего), а сломленные отцовской темницей остаются сломленными.
+static func inherit_dread(game: Game, heir: Dictionary, pred: Dictionary, steps: int = 1) -> void:
+	var lvl := tier_level(game, pred) - steps
+	var t: Variant = tier_at(game, lvl)
+	if t != null and lvl > 0:
+		_set_dread(game, heir, maxf(dread(heir), Data.num(t.get("min")) + 5.0))
+	for c in game.living():
+		if Data.as_array(c.vars.get("broken_by")).has(pred.id):
+			mark_broken(game, c, heir.id)
+
+
 ## Пленник вышел из темницы сломленным: боится тюремщика (и его наследника).
 static func mark_broken(game: Game, c: Dictionary, jailer_id: String) -> void:
 	var l: Array = Data.as_array(c.vars.get("broken_by")).duplicate()
@@ -607,6 +619,13 @@ func register_script(engine: GameEngine) -> void:
 		if c != null:
 			Politics.add_dread(ctx.game, c, Interp.eval_value(ctx, s, arg)),
 		"describe": func(ctx, s, arg): return ctx.game.loc.t("fx.add_dread", {"value": "%+d" % roundi(Interp.eval_value(ctx, s, arg))}),
+	}, OWNER)
+	r.effects.register("inherit_dread", {"scopes": CH, "doc": "Наследник держит страх предшественника в узде (ступенью ниже), сломленные остаются сломленными: inherit_dread: scope:predecessor", "apply": func(ctx, s, arg):
+		var c: Variant = ch.call(ctx, s)
+		var pred: Variant = other.call(ctx, s, arg)
+		if c != null and pred != null:
+			Politics.inherit_dread(ctx.game, c, pred),
+		"describe": func(ctx, _s, _a): return ctx.game.loc.t("fx.inherit_dread"),
 	}, OWNER)
 	r.effects.register("raise_dread_tier", {"scopes": CH, "doc": "Поднять страх правителя на ступень (или на N ступеней): raise_dread_tier: 1", "apply": func(ctx, s, arg):
 		var c: Variant = ch.call(ctx, s)
