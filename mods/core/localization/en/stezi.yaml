@@ -24,7 +24,7 @@ decision_desc:
   take_loan: "Lombard moneylenders give 300 gold at once. Repayment: 2.5 gold a month for twelve years. A new loan only after the old one."
   magnum_opus: "You sit down to a work that will be copied for centuries. The book becomes a famed relic of your court (illustrious at learning 20)."
   miracle: "A prayer after which the bedridden rise. Heals your wounds and illnesses and those of your family; your domain counties speak of the miracle."
-  holy_call: "At war with infidels you call your coreligionists to arms: for three years levies are larger, knights fiercer, and coreligionist vassals grateful."
+  holy_call: "At war with another cult or a heretic you call your coreligionists to arms: for three years levies are larger, knights fiercer, and coreligionist vassals grateful."
 
 interaction:
   intimidate: Intimidate
@@ -70,7 +70,7 @@ ui:
   need_ruling_kin: Needs kin who rule
   great_work_once: The Great Work — once in a lifetime
   loan_unpaid: The previous loan is not yet repaid
-  need_war_vs_infidel: Needs a war against infidels
+  need_war_vs_infidel: Needs a war against another cult or a heretic
   need_secret_to_sell: Needs someone else's secret to sell
   need_lover: The ruler must be your lover
 
@@ -94,7 +94,7 @@ ev:
   stezi.0002:
     t: The Great Work
     desc: "The masons are gathered, the stone ordered, the treasury open. What shall rise in the capital, to be remembered when you are only a name in a chronicle?"
-    a: A cathedral — to the glory of God
+    a: A cathedral — to the glory of the Sun
     b: A keep — to the terror of enemies
     c: A market — to the joy of merchants
   stezi.0003:

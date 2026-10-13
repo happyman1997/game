@@ -66,7 +66,7 @@ static func char_link(game: Game, id: Variant, with_rank: bool = false) -> Strin
 		return muted("—")
 	var name := Chars.full_name(game, ch, with_rank)
 	if ch.death != null:
-		return link("char", id, name + " ✝", "#b0a38a")
+		return link("char", id, name + " †", "#b0a38a")
 	return link("char", id, name, "#ffe08a" if game.is_player(id) else LINK)
 
 

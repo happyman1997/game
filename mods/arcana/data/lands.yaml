@@ -1,6 +1,6 @@
 # «Тайные искусства»: легенды земель. У каждого народа и веры — своё тайное:
-#   Север (норвежцы, датчане, шведы) — сейд вёльв (крещёным — грех), рунные
-#     камни, драугры в курганах; язычники чтят сейд и ульфхеднаров (мнение вер
+#   Север (норвежцы, датчане, шведы) — сейд вёльв (кроме Культа Волка — грех), рунные
+#     камни, драугры в курганах; Культ Зимнего Волка чтит сейд и ульфхеднаров (мнение вер
 #     — в скрипте);
 #   кельты (ирландцы, валлийцы, шотландцы, бретонцы) — сделки с Дивным народом,
 #     зов холмов для подменышей; ирландцы и шотландцы — плач банши; валлийцы —
@@ -8,7 +8,7 @@
 #   англичане — Дикая охота;
 #   нормандцы, французы, окситанцы — дама у источника (Мелюзина);
 #   фламандцы и окситанцы — алхимики;
-#   христиане — инквизиция, охота на ведьм, экзорцизм, освящение земель,
+#   Храм Солнца — инквизиция, охота на ведьм, экзорцизм, освящение земель,
 #     Орден Серебряного пламени (magic/creatures).
 # И путь для всех — охота на нечисть.
 
@@ -35,7 +35,7 @@ decisions:
       is_ruler: yes
       OR:
         - culture: [norse, danish, swedish]
-        - religion: germanic
+        - faith: wolf_cult
     is_valid:
       gold: 40
       custom_tooltip:
@@ -47,8 +47,9 @@ decisions:
     cost: { gold: 40 }
     cooldown: { years: 3 }
     effect:
+      # жрецы Солнца видят в сейде колдовство; Зимний Волк — дар предков
       - if:
-          limit: { religion: christianity }
+          limit: { NOT: { faith: wolf_cult } }
           add_piety: -40
       - trigger_event: arcana.0090
       - custom_tooltip: arcana.seidr_tip
@@ -57,7 +58,7 @@ decisions:
       if:
         - limit: { is_at_war: yes }
           add: 30
-        - limit: { religion: christianity, has_trait: zealous }
+        - limit: { NOT: { faith: wolf_cult }, has_trait: zealous }
           multiply: 0
     ai_check_months: 6
 
@@ -68,7 +69,7 @@ decisions:
       is_ruler: yes
       OR:
         - culture: [norse, danish, swedish]
-        - religion: germanic
+        - faith: wolf_cult
     is_valid:
       gold: 80
     cost: { gold: 80 }
@@ -383,7 +384,7 @@ events:
         ai_chance: { value: 20, add: { value: ai_boldness, multiply: 15 } }
       - effect: { add_stress: 10 }
         ai_chance: 50
-      - trigger: { religion: christianity }
+      - trigger: { religion: solar }
         effect: { add_piety: 40 }
         ai_chance: 30
 

@@ -150,8 +150,8 @@ faith:
   ash_penitence: Ashen Penitence
   ancestor_cult: Covenant of the Ancestors
 faith_desc:
-  ash_penitence: "The ash is punishment for the pride of the empire. The sacraments of the old church — but pride and ambition are the first of sins."
-  ancestor_cult: "The zwerge honour their ancestor-masters, whose names are carved in stone, and swear by their hammers."
+  ash_penitence: "The ash is punishment for the pride of the empire and the trace of the Prince of Ash. The same rites as the Temple of the Sun, but pride and ambition are the first of sins. The Wardens of Ash are recruited from the penitent."
+  ancestor_cult: "The zwerge honour their ancestor-masters, who forged the Sun Crown and swore fealty to the Emperor; their names are carved in stone, and the zwerge swear by their hammers."
 
 terrain:
   ash: Ashlands
@@ -258,7 +258,7 @@ ev:
     c: Make a pact with Underhill
   marches.0005:
     t: The Wardens' Vow
-    desc: "Fifty years ago Otgar's confessor saw the fire of the crown burn the emperor and his city. He founded the order at the edge of the ashes: the crown is cursed, and whoever puts it on will light the fire again. You are the grand master. The margraves send expeditions into the ash, and the brothers await your word."
+    desc: "Fifty years ago Otgar's confessor saw the fire of the crown burn the emperor and his city, and the Prince of Ash fall from the sky into the very heart of the empire. He founded the order at the edge of the ashes: the Unclean One waits beneath the ash, the crown is cursed, and whoever puts it on will light the fire again. The margraves believe the opposite — that only the crown on a rightful head will drive the Prince into the dark. You are the grand master. The margraves send expeditions into the ash, and the brothers await your word."
     a: Keep watch over the ashes
     b: Call volunteers from over the sea
   marches.0006:

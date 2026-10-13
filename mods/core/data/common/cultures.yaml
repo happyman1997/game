@@ -123,25 +123,33 @@ cultures:
     male_names: [Yaroslav, Vladimir, Izyaslav, Svyatoslav, Vsevolod, Mstislav, Boris, Gleb, Oleg, Igor, Rostislav, Vyacheslav]
     female_names: [Anna, Elizaveta, Anastasia, Olga, Evpraksia, Predslava, Yanka, Agafya]
 
+# Одна вера на весь мир — вера Солнечного Императора (religion: solar).
+# Основатель Солнечной империи вознёсся в пламени и стал богом; его
+# антипод — Князь Пепла, низвергнутый в сердце империи в ночь пожара.
+# Веры ниже — культы этой веры: между ними соперничество, а не священные
+# войны (священная война — только против еретиков, см. traits.heretic).
 faiths:
-  catholic:
-    religion: christianity
-    color: "#d8d0b0"
-    icon: "✝"
+  # Солнечный обряд: главный культ — Храм Солнца, жрецы-светочи, Великий Светоч
+  sun_rite:
+    religion: solar
+    color: "#e0c070"
+    icon: "☀"
     doctrines: { polygamy: false, divorce: approval }
     virtues: [chaste, temperate, humble, just, patient, generous, diligent]
     sins: [lustful, gluttonous, arrogant, arbitrary, impatient, greedy, lazy]
-  orthodox:
-    religion: christianity
+  # Восточный обряд: те же таинства, но Император чтится прежде всего как судья
+  east_rite:
+    religion: solar
     color: "#b07a3a"
-    icon: "☦"
+    icon: "☀"
     doctrines: { polygamy: false }
     virtues: [chaste, temperate, humble, zealous]
     sins: [lustful, gluttonous, arrogant, cynical]
-  norse_pagan:
-    religion: germanic
+  # Культ Зимнего Волка: бог-воин севера, побратим Императора
+  wolf_cult:
+    religion: solar
     color: "#5a6a8a"
-    icon: "ᚱ"
+    icon: "🐺"
     doctrines: { polygamy: true }
     virtues: [brave, wrathful, gregarious]
     sins: [craven, shy, content]

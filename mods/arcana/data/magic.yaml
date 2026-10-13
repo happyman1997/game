@@ -70,7 +70,7 @@ traits:
     modifiers: { health: -1.5, fertility: -0.3, stress_gain_mult: 0.25, diplomacy: -1 }
     portrait: { skin: "#a0ac94", skin_amount: 0.25 }
 
-  # Как веры смотрят на дар (христиане-ревнители, северный сейд) — в
+  # Как веры смотрят на дар (ревнители Храма Солнца, северный сейд) — в
   # поставщике мнения скрипта; здесь — то, в чём сходятся все.
   zealous:
     compatibility: { necromancer: -40 }
@@ -236,7 +236,7 @@ secret_types:
           mark_criminal: { target: liege, years: 5 }
           liege:
             if:
-              limit: { religion: christianity }
+              limit: { religion: solar }
               add_opinion: { target: root, modifier: practises_witchcraft }
   secret_necromancy:
     icon: "🪦"
@@ -429,7 +429,7 @@ decisions:
     icon: "🔥"
     is_shown:
       is_ruler: yes
-      religion: christianity
+      religion: solar
       OR:
         - has_trait: zealous
         - piety: ">= 300"

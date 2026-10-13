@@ -101,6 +101,7 @@
 | `is_guardian_of` | character | Опекун этого ребёнка: is_guardian_of: scope:child | core/upbringing |
 | `is_heir_of` | character | Основной наследник персонажа | core |
 | `is_held` | title | У титула есть владелец | core |
+| `is_heretic` | character | Еретик в глазах своей религии (черта с heretic: yes): is_heretic: yes | core |
 | `is_house_head` | character | Глава своего дома (ветви или рода) | core/dynasties |
 | `is_imprisoned` | character | В темнице | core/prison |
 | `is_imprisoned_by` | character | В темнице у персонажа | core/prison |

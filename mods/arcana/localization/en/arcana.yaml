@@ -65,7 +65,7 @@ perk_desc:
   herbalism: "Unlocks the spell «Healing Draught»."
   warding_signs: "Unlocks the spell «Ward». Curses and schemes against you are harder."
   mending_hands: "Unlocks the interaction «Heal with Magic»."
-  light_bearer: "You become a White Mage: your healing lifts even the werewolf's curse. Unlocks Purifying Light and Bless the Land; the Church honours holy healers."
+  light_bearer: "You become a White Mage: your healing lifts even the werewolf's curse. Unlocks Purifying Light and Bless the Land; the Temple of the Sun honours holy healers."
   stormcall: "Unlocks the spell «Call the Storm» in wartime."
   master_of_storms: "You become a Battlemage. Unlocks Firestorm — a strike against an enemy army near your borders."
   weather_lord: Rain comes when it should — harvests are richer.
@@ -128,7 +128,7 @@ secret_type:
   secret_vampire: Vampirism
   secret_werewolf: Werewolf's Curse
 secret_type_desc:
-  secret_witchcraft: Cast curses and love charms. The Church will call it heresy.
+  secret_witchcraft: Cast curses and love charms. The Temple of the Sun will call it heresy.
   secret_necromancy: Raises the dead. People are burned for this.
   secret_vampire: Not human — a vampire feeding on the blood of the living.
   secret_werewolf: Turns into a beast at the full moon.
@@ -399,7 +399,7 @@ ev:
     c: Go yourself
   arcana.0051:
     t: Changeling
-    desc: "The midwife crosses herself: the child does not cry but stares unblinking at the fire. Its eyes are green as the water of a forest lake. They say it is a changeling — a fairy child."
+    desc: "The midwife makes the sun-sign: the child does not cry but stares unblinking at the fire. Its eyes are green as the water of a forest lake. They say it is a changeling — a fairy child."
     a: Love it as your own
     b: Call a priest
     c: Carry it back to the hills
@@ -415,7 +415,7 @@ ev:
     b: Walk away and do not look back
   arcana.0070:
     t: The Inquisition
-    desc: "Men in black arrived at the castle with a bishop's writ. They were told of witchcraft at your court. They are polite, patient — and will not leave without someone guilty."
+    desc: "Men in black arrived at the castle with a writ from a sun-priest. They were told of witchcraft at your court. They are polite, patient — and will not leave without someone guilty."
     a: Pay them off
     b: Hand over the court sorcerer
     c: Drive them away

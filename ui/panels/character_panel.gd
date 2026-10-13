@@ -115,6 +115,9 @@ static func _header(app: App, c: Dictionary) -> Control:
 	var faith_l := K.hbox([K.icon(fdef.get("icon", "piety") if fdef != null else "piety", 16), K.label(g.name_of("faiths", c.faith))], 4)
 	K.tip(faith_l, func():
 		var bb := BB.title(g.name_of("faiths", c.faith))
+		var rel: Variant = g.loc.raw("religion." + str(fdef.get("religion"))) if fdef != null else null
+		if rel != null:
+			bb += "\n" + BB.muted(str(rel))
 		var d := g.desc_of("faiths", c.faith)
 		if d != "":
 			bb += "\n" + BB.i(d)

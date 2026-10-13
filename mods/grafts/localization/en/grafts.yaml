@@ -89,7 +89,7 @@ graft_desc:
 trait:
   iron_possession: Possession
 trait_desc:
-  iron_possession: "There is more iron than soul now. At night a whisper rises from the metal, rage comes without cause and pity leaves — the court crosses itself and whispers of demons."
+  iron_possession: "There is more iron than soul now. At night a whisper rises from the metal, rage comes without cause and pity leaves — the court makes the sun-sign and whispers that it is the voice of the Prince of Ash."
 
 opinion_modifier:
   graft_rampage: Harmed by the possessed
@@ -124,7 +124,7 @@ grafts:
   ui_all: Whole body
   ui_install: Graft
   ui_exorcism: "Call an exorcist ({n} gold)"
-  ui_exorcism_tip: "A priest prays over the possessed for three days and three nights. The possession leaves and piety grows — but so does stress. If much iron remains in the body, the demons will return."
+  ui_exorcism_tip: "A sun-priest prays over the possessed for three days and three nights. The possession leaves and piety grows — but so does stress. If much iron remains in the body, the Prince of Ash's whisper will return."
   status_whole: Soul whole
   status_troubled: Troubled
   status_brink: On the brink
@@ -165,8 +165,8 @@ ev:
     b: Give the rage free rein
     c: Tear the iron from the flesh
   graft.0003:
-    t: The Church Condemns Iron Men
-    desc: "From the pulpit the bishop curses the “iron men”, and the faithful glance at your hands. Star-iron, they say, is of the Evil One, and whoever grafts it into himself has sold a piece of his soul."
-    a: Repent and pay the Church (−80 gold)
+    t: The Temple Condemns Iron Men
+    desc: "From the temple steps a sun-priest curses the “iron men”, and the faithful glance at your hands. Star-iron, they say, is of the Prince of Ash, and whoever grafts it into himself has sold a piece of his soul."
+    a: Repent and pay the Temple (−80 gold)
     b: Call an exorcist (−100 gold)
     c: Let them grumble

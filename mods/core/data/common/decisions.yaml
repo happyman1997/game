@@ -45,7 +45,7 @@ decisions:
   go_on_pilgrimage:
     category: faith
     icon: "🧭"
-    is_shown: { is_ruler: yes, faith: catholic }
+    is_shown: { is_ruler: yes }
     is_valid:
       is_at_war: no
       is_adult: yes

@@ -264,7 +264,7 @@ decisions:
     is_valid:
       custom_tooltip:
         text: ui.need_war_vs_infidel
-        trigger: { any_war_enemy: { NOT: { same_faith_as: root } } }
+        trigger: { any_war_enemy: { OR: { NOT: { same_faith_as: root }, is_heretic: yes } } }
     cost: { piety: 200 }
     cooldown: { years: 5 }
     effect:

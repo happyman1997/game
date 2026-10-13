@@ -36,24 +36,22 @@ cultures:
     female_names: [Malakhita, Yashma, Rudana, Zlata, Ogneslava, Iskra, Medunitsa, Srebrena, Daryona, Agata, Ladomira, Beloslava]
 
 faiths:
-  # Пепельное покаяние: пепел — кара за гордыню империи. Ересь, близкая к
-  # старой церкви: те же таинства, но гордыня и честолюбие — первые грехи.
+  # Покаяние Пепла: пепел — кара за гордыню империи и след Князя Пепла.
+  # Аскеты и каратели; из них набирают Стражей Пепла.
   ash_penitence:
-    religion: christianity
+    religion: solar
     color: "#8c8478"
     icon: "⚱"
     doctrines: { polygamy: false, divorce: approval }
     virtues: [humble, patient, temperate, chaste, just]
     sins: [arrogant, ambitious, wrathful, greedy]
-  # Завет предков: цверги чтут предков-мастеров, чьи имена высечены в камне.
+  # Каменные Предки: цверги чтут предков-мастеров, выковавших Солнечный
+  # венец и присягнувших Императору; их имена высечены в камне.
   ancestor_cult:
-    religion: ancestors
+    religion: solar
     color: "#6a5a8a"
     icon: "🕯"
     doctrines: { polygamy: false }
-    # Каменный договор Отгара с Подгорьем: люди империи и цверги
-    # не ведут друг с другом священных войн
-    no_holy_war_with: [christianity]
     virtues: [diligent, patient, honest, stubborn]
     sins: [lazy, fickle, deceitful, greedy]
 

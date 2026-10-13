@@ -69,7 +69,7 @@ events:
           scope:child: { add_stress: 25 }
           add_piety: 30
         ai_chance: { value: 30, if: { limit: { has_trait: zealous }, add: 40 } }
-      - trigger: { religion: christianity }
+      - trigger: { religion: solar }
         effect:
           scope:child:
             add_piety: 50
@@ -254,7 +254,7 @@ events:
         ai_chance: { value: 40, add: { value: ai_rationality, multiply: 10 } }
       - effect: { add_stress: -5, add_prestige: -10 }
         ai_chance: 30
-      - trigger: { religion: christianity }
+      - trigger: { religion: solar }
         effect:
           add_piety: 25
           random:
@@ -289,7 +289,7 @@ events:
         effect:
           add_gold: -40
           purge_restless_dead: yes
-      - trigger: { religion: christianity }
+      - trigger: { religion: solar }
         effect: { add_piety: 30, add_stress: 5 }
       - effect: { add_stress: 10 }
 
@@ -469,7 +469,7 @@ events:
     triggered_only: true
     options:
       - effect: { add_stress: -5 }
-      - trigger: { religion: christianity }
+      - trigger: { religion: solar }
         effect: { add_piety: 20 }
       - effect:
           scope:child: { death: { reason: fey } }
@@ -514,7 +514,7 @@ events:
     theme: faith
     icon: "🔥"
     trigger:
-      religion: christianity
+      religion: solar
       NOT: { has_trait: zealous }
       OR:
         - has_secret: [secret_witchcraft, secret_necromancy]

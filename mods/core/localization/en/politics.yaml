@@ -68,7 +68,7 @@ ev:
     c: Show them the door
   politics.0002:
     t: A Boundary Dispute
-    desc: "[scope:first] and [scope:second] quarrel over a mill and a wood on the border of their lands. Both have brought witnesses, both swear on the Gospels. The court awaits your judgment."
+    desc: "[scope:first] and [scope:second] quarrel over a mill and a wood on the border of their lands. Both have brought witnesses, both swear on the Solar Tablets. The court awaits your judgment."
     a: "[scope:first] is in the right"
     b: "[scope:second] is in the right"
     c: Split the land and compensate both

@@ -51,7 +51,7 @@ ambition_hint:
   wealth: "Save {left} more gold. The liege can grant the rest."
   renown: "Gain {left} more prestige. The liege can shower them with honors."
   glory: "Battles won by the liege: {need}."
-  devotion: "The liege performs a pious deed (pilgrimage, converting lands, a gift to the church) or becomes righteous."
+  devotion: "The liege performs a pious deed (pilgrimage, converting lands, a gift to the Temple) or becomes righteous."
   revenge: "{target} is in prison or in the grave. The liege earns gratitude if the enemy is in their prison."
   independence: "Become an independent ruler."
   heir: "Have a child."

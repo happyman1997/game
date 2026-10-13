@@ -495,7 +495,7 @@ func _outliner_sections(p: Dictionary) -> Array:
 		for id in pins:
 			var c: Dictionary = g.ch(id)
 			var cid: String = id
-			var r: Control = row.call(Chars.full_name(g, c, true) + (" ✝" if c.death != null else ""), "person", func(): app.open_character(cid),
+			var r: Control = row.call(Chars.full_name(g, c, true) + (" †" if c.death != null else ""), "person", func(): app.open_character(cid),
 				{"tip": func(): return app.character_tooltip(cid)})
 			rows.append(r)
 			sig += id + str(c.death) + c.name

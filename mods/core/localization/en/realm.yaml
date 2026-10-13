@@ -3,7 +3,7 @@ decision:
   confession: Confession
   send_missionaries: Send Missionaries
 decision_desc:
-  coronation: "Have the Church anoint you: rule sanctified by God, for life. Subjects respect a crowned sovereign, and your vassals will remember the ceremony."
+  coronation: "Have the Great Lightbearer anoint you: rule sanctified by the Sun, for life. Subjects respect a crowned sovereign, and your vassals will remember the ceremony."
   confession: Unburden your soul in confession. Piety pays for peace of mind.
   send_missionaries: Monks and priests travel to a county of your domain that does not share your faith and convert it.
 council_task:

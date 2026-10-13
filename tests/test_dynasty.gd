@@ -19,7 +19,7 @@ func _run_months(g: Game, months: int) -> void:
 func test_childhood_and_guardian() -> void:
 	var g := _game()
 	var will: Dictionary = g.ch("william")
-	var kid := Chars.create_character(g, {"culture": "norman", "faith": "catholic", "age": 7, "female": false, "father": will.id, "liege": will.id, "dynasty": will.dynasty})
+	var kid := Chars.create_character(g, {"culture": "norman", "faith": "sun_rite", "age": 7, "female": false, "father": will.id, "liege": will.id, "dynasty": will.dynasty})
 	# характер складывается к совершеннолетию
 	var personality: Array = kid.traits.filter(func(t): return g.content.get_def("traits", t).get("category") == "personality")
 	check(personality.is_empty(), "у ребёнка нет черт характера")
@@ -50,7 +50,7 @@ func test_childhood_and_guardian() -> void:
 func test_coming_of_age_education() -> void:
 	var g := _game()
 	var will: Dictionary = g.ch("william")
-	var kid := Chars.create_character(g, {"culture": "norman", "faith": "catholic", "age": 15, "female": false, "father": will.id, "liege": will.id, "dynasty": will.dynasty})
+	var kid := Chars.create_character(g, {"culture": "norman", "faith": "sun_rite", "age": 15, "female": false, "father": will.id, "liege": will.id, "dynasty": will.dynasty})
 	Upbringing.monthly_char(g, kid)
 	Upbringing.set_focus(g, kid, "stewardship")
 	kid.vars["edu_points"] = 400.0
@@ -76,7 +76,7 @@ func test_coming_of_age_education() -> void:
 func test_regency() -> void:
 	var g := _game()
 	var will: Dictionary = g.ch("william")
-	var heir := Chars.create_character(g, {"culture": "norman", "faith": "catholic", "age": 8, "female": false, "father": will.id, "liege": will.id, "dynasty": will.dynasty})
+	var heir := Chars.create_character(g, {"culture": "norman", "faith": "sun_rite", "age": 8, "female": false, "father": will.id, "liege": will.id, "dynasty": will.dynasty})
 	# мальчик получает графство и становится правителем-ребёнком
 	var county: String = Titles.domain_counties(g, will)[-1]
 	Titles.transfer_title(g, county, heir.id)

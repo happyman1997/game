@@ -10,8 +10,8 @@ extends RefCounted
 ##   • пути развития: сила крови вампира (птенец → древний), зверь внутри
 ##     оборотня (укрощение или одичание), слава охотника на нечисть, упадок
 ##     мертвецов без колдовской силы некроманта;
-##   • взгляды вер: христиане видят в чудовищах нечисть, язычники Севера
-##     чтят сейд и ульфхеднаров;
+##   • взгляды вер: Вера Солнечного Императора видит в чудовищах нечисть,
+##     Культ Зимнего Волка чтит сейд и ульфхеднаров;
 ##   • стартовая расстановка мира, иконки и интерфейс (режим карты, вкладка,
 ##     виджеты, оповещения, раздел провинции).
 ## Состояние мода — game.mod_data("arcana"), попадает в сохранения.
@@ -356,9 +356,9 @@ func _register_script(api: ModApi) -> void:
 			out.append({"defender": d.id, "title": d.titles[0], "counties": [cap] if cap != null else []})
 		return out}, api.owner)
 
-	# Взгляды вер: христиане видят в разоблачённых чудовищах нечисть, а
-	# ревнители — грех и в самом даре, но чтут светлых целителей; язычники
-	# Севера уважают сейд и ульфхеднаров.
+	# Взгляды вер: дети Солнца видят в разоблачённых чудовищах нечисть, а
+	# ревнители — грех и в самом даре, но чтут светлых целителей; Культ
+	# Зимнего Волка уважает сейд и ульфхеднаров.
 	api.registries.opinion_providers.register("arcana_faith", {"fn": func(game: Game, a: Dictionary, b: Dictionary) -> Variant:
 		var bt: Array = b.traits
 		var any := false
@@ -370,7 +370,13 @@ func _register_script(api: ModApi) -> void:
 			return null
 		var faith: Variant = game.content.get_def("faiths", a.faith)
 		var rel: Variant = faith.get("religion") if faith != null else null
-		if rel == "christianity":
+		# Культ Зимнего Волка: зверь в человеке — дар, а не проклятие
+		if a.faith == "wolf_cult":
+			if bt.has("lycanthrope") and Chars.trait_visible(game, b, "lycanthrope", a.id):
+				return {"label": t(game, "opinion_ulfhednar"), "value": 15.0}
+			if bt.has("gifted") or bt.has("white_mage"):
+				return {"label": t(game, "opinion_seidr"), "value": 10.0}
+		elif rel == "solar":
 			for tr in MONSTERS:
 				if bt.has(tr) and Chars.trait_visible(game, b, tr, a.id):
 					return {"label": t(game, "opinion_abomination"), "value": game.def_num("arcana.abomination_opinion", -40)}
@@ -378,11 +384,6 @@ func _register_script(api: ModApi) -> void:
 				return {"label": t(game, "opinion_saint_healer"), "value": 10.0}
 			if bt.has("gifted") and a.traits.has("zealous"):
 				return {"label": t(game, "opinion_sinful_gift"), "value": -10.0}
-		elif rel == "germanic":
-			if bt.has("lycanthrope") and Chars.trait_visible(game, b, "lycanthrope", a.id):
-				return {"label": t(game, "opinion_ulfhednar"), "value": 15.0}
-			if bt.has("gifted") or bt.has("white_mage"):
-				return {"label": t(game, "opinion_seidr"), "value": 10.0}
 		return null}, api.owner)
 
 
@@ -443,7 +444,7 @@ static func _setup_world(game: Game) -> void:
 		if rng.chance(chance) and not c.traits.has("gifted"):
 			Chars.add_trait(game, c, "gifted")
 			c.vars["arcane_power"] = float(rng.range_int(10, 30))
-	# Древний вампир — тихий граф на краю христианского мира.
+	# Древний вампир — тихий граф на краю солнечного мира.
 	var counts := game.rulers().filter(func(c): return Titles.primary_tier(game, c) == 1 and c.liege != null and Chars.age_of(game, c) >= 25)
 	if not counts.is_empty():
 		var v: Dictionary = rng.pick(counts)

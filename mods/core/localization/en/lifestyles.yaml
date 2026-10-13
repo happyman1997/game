@@ -35,7 +35,7 @@ focus_desc:
   focus_seduction: Charm is a weapon too, and you wield it masterfully.
   focus_protection: Your informants make sure no one plots against you.
   focus_scholarship: Libraries and learned conversation are your passion.
-  focus_theology: You spend your days in prayer and reading Scripture.
+  focus_theology: You spend your days in prayer and reading the Solar Tablets.
   focus_medicine: You study herbs and the works of ancient physicians.
 
 perk_tree:
@@ -177,7 +177,7 @@ trait_desc:
   administrator: Keeps vast holdings in good order.
   schemer: Weaves webs of intrigue while staying in the shadows.
   seducer: Few can resist these charms.
-  theologian: A profound scholar of Scripture and the Church Fathers.
+  theologian: A profound scholar of the Solar Tablets and the teachings of the Lightbearers.
 
 stat:
   family_opinion: Family opinion

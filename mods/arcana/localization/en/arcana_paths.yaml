@@ -154,7 +154,7 @@ ev:
     desc: The bards sing of the Pair Dadeni — the cauldron brought from Ireland. Cast a dead warrior into it and by morning he rises alive, only mute forever. Fishermen have hauled a huge black cauldron, patterned with entwined serpents, out of the lake.
     a: Drink from the cauldron yourself
     b: Revive fallen warriors
-    c: Smash the cauldron — this is not for Christians
+    c: Smash the cauldron — this is not for children of the Sun
   arcana.0042:
     t: The Beast Won
     desc: The moon was full too many nights. You no longer remember where the man ends. In the morning they found you in the forest — naked, bloodied, among torn sheep. Now everyone knows.
@@ -177,7 +177,7 @@ ev:
     desc: The years have passed, and at midnight the music plays at your gates once more. The Fair Folk have come for their price — and will not leave empty-handed.
     a: Give them years of your life
     b: "Give them [scope:tithe.first_name] — let them dance in the hills"
-    c: Drive them off with iron and the cross
+    c: Drive them off with iron and the sun-sign
   arcana.0055:
     t: The Banshee's Wail
     desc: "For the third night a woman's wailing is heard beneath the windows — long and inhuman. The old nurse whispers that it is the banshee, and she weeps for [scope:doomed.first_name]. The banshee is never wrong."

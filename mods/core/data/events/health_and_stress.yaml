@@ -103,7 +103,7 @@ events:
           add_trait: drunkard
           add_stress: -50
         ai_chance: 20
-      - trigger: { faith: catholic, NOT: { has_trait: flagellant } }
+      - trigger: { religion: solar, NOT: { has_trait: flagellant } }
         effect:
           add_trait: flagellant
           add_stress: -50

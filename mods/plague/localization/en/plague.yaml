@@ -13,7 +13,7 @@ ev:
     t: Pestilence in the Capital!
     desc: "More and more dead are found in the streets of the capital. Physicians are helpless and priests cannot keep up with the funerals."
     a: Declare a quarantine (−40 gold)
-    b: Trust in the Lord
+    b: Trust in the Sun
 plague:
   quarantine_tip: A year of quarantine lowers mortality and slows the spread.
   widget_tip: "Provinces struck by epidemics: {n}"

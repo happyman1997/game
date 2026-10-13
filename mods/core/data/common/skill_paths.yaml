@@ -34,11 +34,11 @@ on_actions:
   on_battle_won:
     effect:
       $append:
-        # Воин веры: победа над иноверцем угодна Богу
+        # Воин веры: победа над чужим культом или еретиком угодна Солнцу
         - if:
             limit:
               has_archetype: holy_warrior
-              NOT: { same_faith_as: scope:enemy }
+              scope:enemy: { OR: { NOT: { same_faith_as: root }, is_heretic: yes } }
             add_piety: 30
 
   on_yearly_pulse:

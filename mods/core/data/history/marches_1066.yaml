@@ -20,15 +20,15 @@ dynasties:
 
 characters:
   # ================================================ Солнечная империя (до пожара)
-  otgar_burned: { name: Otgar, nickname: nick.burned, dynasty: sonning, culture: marcher, faith: catholic, birth: "958.3.1", death: "1016.6.21", spouse: adelheid_empress }
-  adelheid_empress: { name: Adelheid, female: true, culture: marcher, faith: catholic, birth: "965.1.1", death: "1031.2.1" }
-  siegmar_sonning: { name: Siegmar, dynasty: sonning, culture: marcher, faith: catholic, birth: "986.1.1", death: "1016.6.21", father: otgar_burned, mother: adelheid_empress }
-  richenza_sonning: { name: Richenza, female: true, dynasty: sonning, culture: marcher, faith: catholic, birth: "988.1.1", death: "1050.3.1", father: otgar_burned, mother: adelheid_empress, spouse: ekbert_kronwald }
-  hedwig_sonning: { name: Hedwig, female: true, dynasty: sonning, culture: marcher, faith: catholic, birth: "991.1.1", death: "1044.1.1", father: otgar_burned, mother: adelheid_empress, spouse: brun_eisenwart }
+  otgar_burned: { name: Otgar, nickname: nick.burned, dynasty: sonning, culture: marcher, faith: sun_rite, birth: "958.3.1", death: "1016.6.21", spouse: adelheid_empress }
+  adelheid_empress: { name: Adelheid, female: true, culture: marcher, faith: sun_rite, birth: "965.1.1", death: "1031.2.1" }
+  siegmar_sonning: { name: Siegmar, dynasty: sonning, culture: marcher, faith: sun_rite, birth: "986.1.1", death: "1016.6.21", father: otgar_burned, mother: adelheid_empress }
+  richenza_sonning: { name: Richenza, female: true, dynasty: sonning, culture: marcher, faith: sun_rite, birth: "988.1.1", death: "1050.3.1", father: otgar_burned, mother: adelheid_empress, spouse: ekbert_kronwald }
+  hedwig_sonning: { name: Hedwig, female: true, dynasty: sonning, culture: marcher, faith: sun_rite, birth: "991.1.1", death: "1044.1.1", father: otgar_burned, mother: adelheid_empress, spouse: brun_eisenwart }
   gisela_sonning: { name: Gisela, female: true, dynasty: sonning, culture: marcher, faith: ash_penitence, birth: "993.1.1", death: "1060.1.1", father: otgar_burned, mother: adelheid_empress, spouse: hartmut_wolfing }
   uta_sonning: { name: Uta, female: true, dynasty: sonning, culture: marcher, faith: ash_penitence, birth: "997.1.1", death: "1052.1.1", father: otgar_burned, mother: adelheid_empress, spouse: dietmar_felsen }
-  ekbert_kronwald: { name: Ekbert, dynasty: kronwald, culture: marcher, faith: catholic, birth: "982.1.1", death: "1041.1.1" }
-  brun_eisenwart: { name: Brun, dynasty: eisenwart, culture: marcher, faith: catholic, birth: "986.1.1", death: "1039.1.1" }
+  ekbert_kronwald: { name: Ekbert, dynasty: kronwald, culture: marcher, faith: sun_rite, birth: "982.1.1", death: "1041.1.1" }
+  brun_eisenwart: { name: Brun, dynasty: eisenwart, culture: marcher, faith: sun_rite, birth: "986.1.1", death: "1039.1.1" }
   hartmut_wolfing: { name: Hartmut, dynasty: wolfing, culture: marcher, faith: ash_penitence, birth: "985.1.1", death: "1058.1.1" }
   dietmar_felsen: { name: Dietmar, dynasty: felsen, culture: marcher, faith: ash_penitence, birth: "990.1.1", death: "1049.1.1" }
 
@@ -88,7 +88,7 @@ characters:
     gold: 120
     prestige: 600
   # жена-фризка: брак ради мира на побережье
-  foelke_attena: { name: Foelke, female: true, dynasty: attena, culture: frisian, faith: catholic, birth: "1034.1.1", father: okko_attena, traits: [stubborn, honest] }
+  foelke_attena: { name: Foelke, female: true, dynasty: attena, culture: frisian, faith: sun_rite, birth: "1034.1.1", father: okko_attena, traits: [stubborn, honest] }
   brun_wolfing: { name: Brun, dynasty: wolfing, culture: marcher, faith: ash_penitence, birth: "1052.3.1", father: wolfram_wolfing, mother: foelke_attena, traits: [brave, education_martial_2] }
   liutgard_wolfing: { name: Liutgard, female: true, dynasty: wolfing, culture: marcher, faith: ash_penitence, birth: "1055.1.1", father: wolfram_wolfing, mother: foelke_attena }
   hartmut_wolfing_y: { name: Hartmut, dynasty: wolfing, culture: marcher, faith: ash_penitence, birth: "1058.1.1", father: wolfram_wolfing, mother: foelke_attena }
@@ -219,7 +219,7 @@ characters:
     name: Poppo
     dynasty: ukkena
     culture: frisian
-    faith: catholic
+    faith: sun_rite
     birth: "1020.1.1"
     spouse: wendelke_ukkena
     traits: [honest, stubborn, just, education_stewardship_3]
@@ -227,15 +227,15 @@ characters:
     term_start: "1061.5.1"
     gold: 150
     prestige: 300
-  wendelke_ukkena: { name: Wendelke, female: true, culture: frisian, faith: catholic, birth: "1025.1.1", traits: [generous] }
-  ubbo_ukkena: { name: Ubbo, dynasty: ukkena, culture: frisian, faith: catholic, birth: "1046.1.1", father: poppo_ukkena, mother: wendelke_ukkena, traits: [diligent, education_stewardship_2] }
-  imke_ukkena: { name: Imke, female: true, dynasty: ukkena, culture: frisian, faith: catholic, birth: "1049.1.1", father: poppo_ukkena, mother: wendelke_ukkena }
-  okko_attena: { name: Okko, dynasty: attena, culture: frisian, faith: catholic, birth: "1000.1.1", death: "1059.1.1" }
+  wendelke_ukkena: { name: Wendelke, female: true, culture: frisian, faith: sun_rite, birth: "1025.1.1", traits: [generous] }
+  ubbo_ukkena: { name: Ubbo, dynasty: ukkena, culture: frisian, faith: sun_rite, birth: "1046.1.1", father: poppo_ukkena, mother: wendelke_ukkena, traits: [diligent, education_stewardship_2] }
+  imke_ukkena: { name: Imke, female: true, dynasty: ukkena, culture: frisian, faith: sun_rite, birth: "1049.1.1", father: poppo_ukkena, mother: wendelke_ukkena }
+  okko_attena: { name: Okko, dynasty: attena, culture: frisian, faith: sun_rite, birth: "1000.1.1", death: "1059.1.1" }
   edzard_attena:
     name: Edzard
     dynasty: attena
     culture: frisian
-    faith: catholic
+    faith: sun_rite
     birth: "1026.1.1"
     father: okko_attena
     court: poppo_ukkena
@@ -243,11 +243,11 @@ characters:
     traits: [ambitious, gregarious, deceitful, education_diplomacy_3]
     skills: { diplomacy: 15, martial: 7, stewardship: 9, intrigue: 12, learning: 6, prowess: 7 }
     gold: 180
-  gela_attena: { name: Gela, female: true, culture: frisian, faith: catholic, birth: "1030.1.1", court: poppo_ukkena }
-  enno_attena: { name: Enno, dynasty: attena, culture: frisian, faith: catholic, birth: "1050.1.1", father: edzard_attena, mother: gela_attena }
-  sicco_benninga: { name: Sicco, dynasty: benninga, culture: frisian, faith: catholic, birth: "1018.1.1", court: poppo_ukkena, traits: [generous, content, calm, education_stewardship_2], gold: 90 }
-  feike_benninga: { name: Feike, dynasty: benninga, culture: frisian, faith: catholic, birth: "1044.1.1", father: sicco_benninga, court: poppo_ukkena }
-  haio_idzinga: { name: Haio, dynasty: idzinga, culture: frisian, faith: catholic, birth: "1035.1.1", court: poppo_ukkena, traits: [brave, wrathful, honest, education_martial_3], skills: { martial: 13, prowess: 14 }, gold: 60 }
+  gela_attena: { name: Gela, female: true, culture: frisian, faith: sun_rite, birth: "1030.1.1", court: poppo_ukkena }
+  enno_attena: { name: Enno, dynasty: attena, culture: frisian, faith: sun_rite, birth: "1050.1.1", father: edzard_attena, mother: gela_attena }
+  sicco_benninga: { name: Sicco, dynasty: benninga, culture: frisian, faith: sun_rite, birth: "1018.1.1", court: poppo_ukkena, traits: [generous, content, calm, education_stewardship_2], gold: 90 }
+  feike_benninga: { name: Feike, dynasty: benninga, culture: frisian, faith: sun_rite, birth: "1044.1.1", father: sicco_benninga, court: poppo_ukkena }
+  haio_idzinga: { name: Haio, dynasty: idzinga, culture: frisian, faith: sun_rite, birth: "1035.1.1", court: poppo_ukkena, traits: [brave, wrathful, honest, education_martial_3], skills: { martial: 13, prowess: 14 }, gold: 60 }
 
   # ================================================ Подгорное царство
   # Огнедар — старший мастер уже шестьдесят лет. Цверги живут вдвое дольше

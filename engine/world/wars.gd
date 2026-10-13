@@ -210,11 +210,17 @@ static func builtin_cb_targets() -> Dictionary:
 				if h == null:
 					continue
 				var def := Titles.top_liege(game, h)
-				if def.faith == attacker.faith or def.id == attacker.id:
+				if def.id == attacker.id:
 					continue
-				# вера может заключить мир с чужой религией (no_holy_war_with)
-				if _holy_peace(game, attacker.faith, def.faith):
-					continue
+				# в одной религии священная война — только против еретиков
+				# (черта с heretic: yes — например, раскрытый договор с Князем Пепла);
+				# еретик — законная цель даже для единоверца
+				if not is_heretic(game, def):
+					if def.faith == attacker.faith or _religion(game, def.faith) == _religion(game, attacker.faith):
+						continue
+					# вера может заключить мир с чужой религией (no_holy_war_with)
+					if _holy_peace(game, attacker.faith, def.faith):
+						continue
 				var td: Variant = game.content.get_def("titles", c)
 				var duchy: Variant = td.get("liege") if td != null else null
 				var key = "%s:%s" % [def.id, duchy if duchy != null else c]
@@ -228,6 +234,15 @@ static func builtin_cb_targets() -> Dictionary:
 				out.append({"defender": def.id, "title": duchy if duchy != null else c, "counties": counties})
 			return out},
 	}
+
+
+## Еретик в глазах своей религии: есть черта с heretic: yes.
+static func is_heretic(game: Game, c: Dictionary) -> bool:
+	for t in c.traits:
+		var td: Variant = game.content.get_def("traits", t)
+		if td != null and td.get("heretic") == true:
+			return true
+	return false
 
 
 ## Вера одной из сторон запрещает священные войны с религией другой.

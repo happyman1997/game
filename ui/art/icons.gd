@@ -11,7 +11,7 @@ const STROKE := "#1c140a"
 static var BODIES := {
 	"gold": '<ellipse cx="12" cy="17.5" rx="8" ry="3.2"/><path d="M4 17.5 V14.5 A8 3.2 0 0 0 20 14.5 V17.5"/><ellipse cx="12" cy="14.5" rx="8" ry="3.2"/><path d="M4 14.5 V11.5 A8 3.2 0 0 0 20 11.5 V14.5"/><ellipse cx="12" cy="11.5" rx="8" ry="3.2"/><ellipse cx="12" cy="11.5" rx="4.5" ry="1.6" fill="none"/>',
 	"prestige": '<path d="M12 2 L14.6 8.2 L21.3 8.6 L16.2 12.9 L17.8 19.4 L12 15.9 L6.2 19.4 L7.8 12.9 L2.7 8.6 L9.4 8.2 Z"/><circle cx="12" cy="11.2" r="2.2" fill="#fff3c8"/>',
-	"piety": '<circle cx="12" cy="9" r="7.2" fill="none" stroke-width="1.2" opacity="0.8"/><path d="M10.4 3 H13.6 V7.2 H17.8 V10.4 H13.6 V21 H10.4 V10.4 H6.2 V7.2 H10.4 Z"/>',
+	"piety": '<path d="M10.5 7.2 L12.0 1.4 L13.5 7.2 Z M14.3 7.6 L19.5 4.5 L16.4 9.7 Z M16.8 10.5 L22.6 12.0 L16.8 13.5 Z M16.4 14.3 L19.5 19.5 L14.3 16.4 Z M13.5 16.8 L12.0 22.6 L10.5 16.8 Z M9.7 16.4 L4.5 19.5 L7.6 14.3 Z M7.2 13.5 L1.4 12.0 L7.2 10.5 Z M7.6 9.7 L4.5 4.5 L9.7 7.6 Z"/><circle cx="12" cy="12" r="4.6"/><circle cx="12" cy="12" r="2" fill="#fff3c8"/>',
 	"levies": '<path d="M4 3 L6.5 3 L15 12.5 L13 14.5 L4 5.5 Z"/><path d="M20 3 L17.5 3 L9 12.5 L11 14.5 L20 5.5 Z"/><path d="M11.5 14 L14 16.5 L10.5 20 L9.5 21 L8 19.5 L9 18.5 L7.5 17 L9 15.5 L10.5 16.5 Z"/><path d="M12.5 14 L10 16.5 L13.5 20 L14.5 21 L16 19.5 L15 18.5 L16.5 17 L15 15.5 L13.5 16.5 Z"/>',
 	"stress": '<path d="M12 3 C7 3 3.5 6.5 3.5 11 C3.5 16 7.5 21 12 21 C16.5 21 20.5 16 20.5 11 C20.5 6.5 17 3 12 3 Z"/><path d="M13 4 L10.5 10 L13.5 11.5 L10.5 20" fill="none" stroke-width="1.6"/>',
 	"dread": '<path d="M12 2.5 C6.5 2.5 3.5 6.5 3.5 11 C3.5 14 5 15.5 6.5 16.5 V20.5 H17.5 V16.5 C19 15.5 20.5 14 20.5 11 C20.5 6.5 17.5 2.5 12 2.5 Z"/><circle cx="8.7" cy="11" r="2.3" fill="#1c140a"/><circle cx="15.3" cy="11" r="2.3" fill="#1c140a"/><path d="M12 13.5 L13.2 16 H10.8 Z" fill="#1c140a"/>',
@@ -43,7 +43,7 @@ static var BODIES := {
 	"handshake": '<circle cx="8.5" cy="12" r="5.8" fill="none" stroke-width="2.6"/><circle cx="15.5" cy="12" r="5.8" fill="none" stroke-width="2.6"/>',
 	"mountain": '<path d="M1.5 20 L8.5 7 L12 12.5 L15 8 L22.5 20 Z"/><path d="M8.5 7 L10.5 10.6 L9.3 10 L8.2 11.2 L6.9 10 Z M15 8 L16.8 11 L15.6 10.6 L14.5 11.4 L13.6 10.2 Z" fill="#fff8e6"/>',
 	"speech": '<path d="M3 5 H21 V16 H11 L6 20.5 V16 H3 Z"/><path d="M6.5 8.5 H17.5 M6.5 12 H14" fill="none" stroke-width="1.2"/>',
-	"cross": '<path d="M10.2 2.5 H13.8 V7.5 H18.8 V11.1 H13.8 V21.5 H10.2 V11.1 H5.2 V7.5 H10.2 Z"/>',
+	"cross": '<path d="M11.0 7.7 L12.0 1.1 L13.0 7.7 Z M14.3 8.2 L17.6 6.4 L15.8 9.7 Z M16.3 11.0 L22.9 12.0 L16.3 13.0 Z M15.8 14.3 L17.6 17.6 L14.3 15.8 Z M13.0 16.3 L12.0 22.9 L11.0 16.3 Z M9.7 15.8 L6.4 17.6 L8.2 14.3 Z M7.7 13.0 L1.1 12.0 L7.7 11.0 Z M8.2 9.7 L6.4 6.4 L9.7 8.2 Z"/><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="12" r="2.2" fill="none"/>',
 	"skull": '<path d="M12 2.5 C6.5 2.5 3.5 6.5 3.5 11 C3.5 14 5 15.5 6.5 16.5 V20.5 H17.5 V16.5 C19 15.5 20.5 14 20.5 11 C20.5 6.5 17.5 2.5 12 2.5 Z"/><circle cx="8.7" cy="11" r="2.3" fill="#1c140a"/><circle cx="15.3" cy="11" r="2.3" fill="#1c140a"/><path d="M12 13.5 L13.2 16 H10.8 Z" fill="#1c140a"/>',
 	"ring": '<path d="M5.5 14 A6.5 6.5 0 1 0 18.5 14 A6.5 6.5 0 1 0 5.5 14 Z M8.4 14 A3.6 3.6 0 1 1 15.6 14 A3.6 3.6 0 1 1 8.4 14 Z" fill-rule="evenodd"/><path d="M9.3 7.6 L12 3 L14.7 7.6 Z"/>',
 	"heart": '<path d="M12 21 C5 15.5 2.5 12 2.5 8.5 C2.5 5.5 4.8 3.5 7.5 3.5 C9.5 3.5 11 4.8 12 6.5 C13 4.8 14.5 3.5 16.5 3.5 C19.2 3.5 21.5 5.5 21.5 8.5 C21.5 12 19 15.5 12 21 Z"/>',
@@ -74,11 +74,12 @@ static var BODIES := {
 	"chessmen": '<path d="M11 1.5 H13 V3 H14.5 V5 H13 V6.5 C15.5 7 16.5 9 15.5 11 H8.5 C7.5 9 8.5 7 11 6.5 V5 H9.5 V3 H11 Z"/><path d="M9 12 H15 L16 18 H8 Z"/><path d="M6 18.5 H18 V21.5 H6 Z"/>',
 	"bag": '<path d="M8 6.5 C8 3.8 9.8 2 12 2 C14.2 2 16 3.8 16 6.5" fill="none" stroke-width="1.6"/><path d="M5 7 H19 L21 20 C21 21 20.3 21.8 19.3 21.8 H4.7 C3.7 21.8 3 21 3 20 Z"/><path d="M9.5 11 H14.5" fill="none" stroke-width="1.4"/>',
 	"hammer": '<path d="M4 18.5 L13 9.5 L14.5 11 L5.5 20 Z"/><path d="M11 5 L16 2.5 L21.5 8 L19 13 Z"/>',
+	"wolf": '<path d="M3.5 2.5 L8.8 8 H15.2 L20.5 2.5 L19.4 11 C19.4 15 16.4 18.2 13.6 21.5 H10.4 C7.6 18.2 4.6 15 4.6 11 Z"/><path d="M8.2 12 L10.6 13.1 M15.8 12 L13.4 13.1" stroke-width="1.5" fill="none"/><path d="M10.9 17 H13.1 L12 18.6 Z" fill="#1c140a"/>',
 }
 
 ## Эмодзи из данных → имя нарисованной иконки.
 static var EMOJI := {
-	"💰": "gold", "🪙": "gold", "⭐": "prestige", "🌟": "prestige", "✝": "piety", "✝️": "piety", "🙏": "piety",
+	"💰": "gold", "🪙": "gold", "⭐": "prestige", "🌟": "prestige", "✝": "piety", "✝️": "piety", "🙏": "piety", "☀": "cross", "☀️": "cross", "🐺": "wolf",
 	"⚔": "swords", "⚔️": "swords", "🗡": "dagger", "🗡️": "dagger", "🔪": "dagger", "👑": "crown", "🏰": "castle",
 	"🛡": "shield", "🛡️": "shield", "🔥": "fire", "📜": "scroll", "📖": "book", "👤": "person", "🌿": "leaf",
 	"🏛": "council", "🏛️": "council", "⚖": "scales", "⚖️": "scales", "✊": "fist", "🔱": "spear", "👁": "eye",

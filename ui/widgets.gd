@@ -73,7 +73,7 @@ static func char_link(app: App, id: Variant, with_rank: bool = false) -> Control
 		return K.label("—", "MutedLabel")
 	var dead: bool = c.death != null
 	var color := Color("#b0a38a") if dead else (Color("#ffe08a") if g.is_player(c.id) else Color("#f0d48a"))
-	var name := Chars.full_name(g, c, with_rank) + (" ✝" if dead else "")
+	var name := Chars.full_name(g, c, with_rank) + (" †" if dead else "")
 	return _link(name, color, func(): app.open_character(c.id), func(): return app.character_tooltip(c.id))
 
 
@@ -434,7 +434,7 @@ class PortraitView:
 			draw_texture_rect(coa_tex, Rect2(Vector2(size.x - cw - 1, size.y - cw * 1.12 - 1), Vector2(cw, cw * 1.12)), false)
 		if dead and not round:
 			var f := Fonts.bold()
-			draw_string(f, Vector2(4, size.y - 6), "✝", HORIZONTAL_ALIGNMENT_LEFT, -1, int(size.x * 0.22), Color(1, 1, 1, 0.8))
+			draw_string(f, Vector2(4, size.y - 6), "†", HORIZONTAL_ALIGNMENT_LEFT, -1, int(size.x * 0.22), Color(1, 1, 1, 0.8))
 
 
 ## Вкладки окна (как в CK3): полоса кнопок и содержимое выбранной вкладки.

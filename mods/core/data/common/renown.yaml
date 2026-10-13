@@ -15,7 +15,7 @@ opinion_modifiers:
   witnessed_coronation: { value: 10, years: 5 }
 
 decisions:
-  # благочестие — плата за то, чтобы церковь освятила власть
+  # благочестие — плата за то, чтобы Храм Солнца освятил власть
   coronation:
     category: major
     requires_feature: renown
@@ -46,7 +46,7 @@ decisions:
     icon: "✝"
     is_shown:
       is_adult: yes
-      religion: christianity
+      religion: solar
     is_valid:
       custom_tooltip:
         text: ui.need_stress

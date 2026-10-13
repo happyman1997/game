@@ -127,14 +127,14 @@ provinces:
   c_sun_road:     { lat: 50.85, lon: 11.8, duchy: d_ash_heart, terrain: ash, culture: marcher, faith: ash_penitence, development: 1, holdings: [castle], no_generate: yes, modifiers: [ash_blight] }
 
   # ---------------------------------------------------------- Вольная Фрисия
-  # Ни одного замка: города на терпах и церкви.
-  c_terpenholm:   { lat: 53.15, lon: 6.0,  duchy: d_wadden, terrain: wetlands, culture: frisian, faith: catholic, development: 11, holdings: [city, temple], buildings: [great_dike, market] }
-  c_waddenmoor:   { lat: 53.35, lon: 7.1,  duchy: d_wadden, terrain: wetlands, culture: frisian, faith: catholic, development: 8, holdings: [city, temple] }
-  c_osterfenn:    { lat: 53.1,  lon: 8.05, duchy: d_wadden, terrain: wetlands, culture: frisian, faith: catholic, development: 7, holdings: [city] }
-  c_dijkshorn:    { lat: 52.75, lon: 4.95, duchy: d_dijkland, terrain: wetlands, culture: frisian, faith: catholic, development: 9, holdings: [city, temple] }
-  c_slijkzand:    { lat: 52.2,  lon: 4.75, duchy: d_dijkland, terrain: wetlands, culture: frisian, faith: catholic, development: 10, holdings: [city, temple], buildings: [market] }
-  c_zeewarf:      { lat: 52.95, lon: 5.75, duchy: d_dijkland, terrain: wetlands, culture: frisian, faith: catholic, development: 8, holdings: [city] }
-  c_hunnegat:     { lat: 52.5,  lon: 6.3,  duchy: d_dijkland, terrain: plains, culture: frisian, faith: catholic, development: 7, holdings: [city, temple] }
+  # Ни одного замка: города на терпах и храмы.
+  c_terpenholm:   { lat: 53.15, lon: 6.0,  duchy: d_wadden, terrain: wetlands, culture: frisian, faith: sun_rite, development: 11, holdings: [city, temple], buildings: [great_dike, market] }
+  c_waddenmoor:   { lat: 53.35, lon: 7.1,  duchy: d_wadden, terrain: wetlands, culture: frisian, faith: sun_rite, development: 8, holdings: [city, temple] }
+  c_osterfenn:    { lat: 53.1,  lon: 8.05, duchy: d_wadden, terrain: wetlands, culture: frisian, faith: sun_rite, development: 7, holdings: [city] }
+  c_dijkshorn:    { lat: 52.75, lon: 4.95, duchy: d_dijkland, terrain: wetlands, culture: frisian, faith: sun_rite, development: 9, holdings: [city, temple] }
+  c_slijkzand:    { lat: 52.2,  lon: 4.75, duchy: d_dijkland, terrain: wetlands, culture: frisian, faith: sun_rite, development: 10, holdings: [city, temple], buildings: [market] }
+  c_zeewarf:      { lat: 52.95, lon: 5.75, duchy: d_dijkland, terrain: wetlands, culture: frisian, faith: sun_rite, development: 8, holdings: [city] }
+  c_hunnegat:     { lat: 52.5,  lon: 6.3,  duchy: d_dijkland, terrain: plains, culture: frisian, faith: sun_rite, development: 7, holdings: [city, temple] }
 
   # ---------------------------------------------------------- Подгорное царство
   c_copper_mountain: { lat: 50.55, lon: 12.95, duchy: d_ore_mountains, terrain: mountains, culture: zwerg, faith: ancestor_cult, development: 14, holdings: [castle, city, temple], buildings: [deep_forges, walls] }

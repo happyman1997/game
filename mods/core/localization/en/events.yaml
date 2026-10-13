@@ -12,7 +12,7 @@ ev:
     b: Bring a learned doctor from Salerno (−50 gold)
   health.0003:
     t: Recovery
-    desc: "One morning you wake and realise the illness has passed. Praise the Lord!"
+    desc: "One morning you wake and realise the illness has passed. Praise the Sun!"
     a: Thank the heavens
   health.0004:
     t: The Weight of Years
@@ -73,8 +73,8 @@ ev:
     a: Allow it, without tolls
     b: Tax the merchants (+40 gold)
   court.0009:
-    t: The Bishop's Request
-    desc: "The bishop asks for a donation towards a new church. A refusal would not be well received."
+    t: The Priest's Request
+    desc: "A sun-priest asks for a donation towards a new temple. A refusal would not be well received."
     a: Donate 50 gold
     b: The treasury is not bottomless
   court.0010:
@@ -123,7 +123,7 @@ ev:
     t: Plot Uncovered!
     desc: "Your men caught an assassin. Under torture he confessed that he was hired by [scope:owner]!"
     a: I will not forget this!
-    b: Forgive, as the Lord commands
+    b: Forgive, as the Emperor commands
   succession.0001:
     t: A New Reign
     desc: "Your predecessor has passed on. The burden of rule now rests on your shoulders."
@@ -168,4 +168,4 @@ ev:
   pilgrimage.0002:
     t: The Pilgrim Returns
     desc: "You have returned home, renewed in body and soul."
-    a: Praise the Lord
+    a: Praise the Sun

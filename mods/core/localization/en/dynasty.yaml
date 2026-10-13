@@ -96,7 +96,7 @@ ev:
     b: Strictness builds character
   upbringing.0003:
     t: A Childish Prank
-    desc: "[scope:child] has caused an uproar at court: a terrified hen in the bishop's chambers and a broken jug of wine. The court waits for your word."
+    desc: "[scope:child] has caused an uproar at court: a terrified hen in the priest's chambers and a broken jug of wine. The court waits for your word."
     a: Punish them
     b: Laugh along with everyone
   regency.0001:

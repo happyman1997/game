@@ -130,48 +130,48 @@ titles:
 
 provinces:
   # --------------------------------------------------- Дания: Ютландия
-  c_vendsyssel: { lat: 57.3,  lon: 10.0, duchy: d_jutland, terrain: plains, culture: danish, faith: catholic, development: 6, holdings: [castle, temple] }
-  c_aarhus:     { lat: 56.15, lon: 9.9,  duchy: d_jutland, terrain: farmlands, culture: danish, faith: catholic, development: 9, holdings: [castle, city, temple] }
-  c_viborg:     { lat: 56.45, lon: 9.1,  duchy: d_jutland, terrain: plains, culture: danish, faith: catholic, development: 7, holdings: [castle, temple] }
-  c_ribe:       { lat: 55.4,  lon: 8.95, duchy: d_jutland, terrain: wetlands, culture: danish, faith: catholic, development: 8, holdings: [castle, city, temple] }
-  c_schleswig:  { lat: 54.6,  lon: 9.4,  duchy: d_jutland, terrain: farmlands, culture: danish, faith: catholic, development: 10, holdings: [castle, city] }
+  c_vendsyssel: { lat: 57.3,  lon: 10.0, duchy: d_jutland, terrain: plains, culture: danish, faith: sun_rite, development: 6, holdings: [castle, temple] }
+  c_aarhus:     { lat: 56.15, lon: 9.9,  duchy: d_jutland, terrain: farmlands, culture: danish, faith: sun_rite, development: 9, holdings: [castle, city, temple] }
+  c_viborg:     { lat: 56.45, lon: 9.1,  duchy: d_jutland, terrain: plains, culture: danish, faith: sun_rite, development: 7, holdings: [castle, temple] }
+  c_ribe:       { lat: 55.4,  lon: 8.95, duchy: d_jutland, terrain: wetlands, culture: danish, faith: sun_rite, development: 8, holdings: [castle, city, temple] }
+  c_schleswig:  { lat: 54.6,  lon: 9.4,  duchy: d_jutland, terrain: farmlands, culture: danish, faith: sun_rite, development: 10, holdings: [castle, city] }
   # Дания: острова
-  c_roskilde:   { lat: 55.55, lon: 11.95, duchy: d_zealand, terrain: farmlands, culture: danish, faith: catholic, development: 11, holdings: [castle, city, temple] }
-  c_fyn:        { lat: 55.3,  lon: 10.35, duchy: d_zealand, terrain: farmlands, culture: danish, faith: catholic, development: 9, holdings: [castle, temple] }
-  c_lolland:    { lat: 54.8,  lon: 11.5, duchy: d_zealand, terrain: farmlands, culture: danish, faith: catholic, development: 6, holdings: [castle] }
-  c_bornholm:   { lat: 55.15, lon: 14.9, duchy: d_scania, terrain: hills, culture: danish, faith: catholic, development: 4, holdings: [castle] }
+  c_roskilde:   { lat: 55.55, lon: 11.95, duchy: d_zealand, terrain: farmlands, culture: danish, faith: sun_rite, development: 11, holdings: [castle, city, temple] }
+  c_fyn:        { lat: 55.3,  lon: 10.35, duchy: d_zealand, terrain: farmlands, culture: danish, faith: sun_rite, development: 9, holdings: [castle, temple] }
+  c_lolland:    { lat: 54.8,  lon: 11.5, duchy: d_zealand, terrain: farmlands, culture: danish, faith: sun_rite, development: 6, holdings: [castle] }
+  c_bornholm:   { lat: 55.15, lon: 14.9, duchy: d_scania, terrain: hills, culture: danish, faith: sun_rite, development: 4, holdings: [castle] }
   # Дания: Сконе
-  c_lund:       { lat: 55.75, lon: 13.3, duchy: d_scania, terrain: farmlands, culture: danish, faith: catholic, development: 10, holdings: [castle, city, temple] }
-  c_halland:    { lat: 56.75, lon: 12.8, duchy: d_scania, terrain: forest, culture: danish, faith: catholic, development: 6, holdings: [castle] }
-  c_blekinge:   { lat: 56.25, lon: 15.1, duchy: d_scania, terrain: forest, culture: danish, faith: catholic, development: 5, holdings: [castle] }
+  c_lund:       { lat: 55.75, lon: 13.3, duchy: d_scania, terrain: farmlands, culture: danish, faith: sun_rite, development: 10, holdings: [castle, city, temple] }
+  c_halland:    { lat: 56.75, lon: 12.8, duchy: d_scania, terrain: forest, culture: danish, faith: sun_rite, development: 6, holdings: [castle] }
+  c_blekinge:   { lat: 56.25, lon: 15.1, duchy: d_scania, terrain: forest, culture: danish, faith: sun_rite, development: 5, holdings: [castle] }
   # --------------------------------------------------- Норвегия
-  c_nidaros:    { lat: 63.35, lon: 10.6, duchy: d_trondelag, terrain: hills, culture: norse, faith: catholic, development: 8, holdings: [castle, city, temple] }
-  c_more:       { lat: 62.55, lon: 7.4,  duchy: d_trondelag, terrain: mountains, culture: norse, faith: catholic, development: 5, holdings: [castle] }
-  c_namdalen:   { lat: 64.2,  lon: 11.8, duchy: d_trondelag, terrain: forest, culture: norse, faith: catholic, development: 3, holdings: [castle] }
-  c_bergen:     { lat: 60.45, lon: 5.7,  duchy: d_vestlandet, terrain: hills, culture: norse, faith: catholic, development: 8, holdings: [castle, city, temple] }
-  c_sogn:       { lat: 61.3,  lon: 6.6,  duchy: d_vestlandet, terrain: mountains, culture: norse, faith: catholic, development: 4, holdings: [castle] }
-  c_rogaland:   { lat: 58.85, lon: 6.0,  duchy: d_vestlandet, terrain: hills, culture: norse, faith: catholic, development: 6, holdings: [castle, temple] }
-  c_oslo:       { lat: 59.9,  lon: 10.7, duchy: d_viken, terrain: farmlands, culture: norse, faith: catholic, development: 8, holdings: [castle, city, temple] }
-  c_vestfold:   { lat: 59.3,  lon: 10.1, duchy: d_viken, terrain: farmlands, culture: norse, faith: catholic, development: 7, holdings: [castle] }
-  c_agder:      { lat: 58.4,  lon: 7.9,  duchy: d_viken, terrain: hills, culture: norse, faith: catholic, development: 5, holdings: [castle] }
-  c_ranrike:    { lat: 58.6,  lon: 11.6, duchy: d_viken, terrain: hills, culture: norse, faith: catholic, development: 5, holdings: [castle] }
-  c_oppland:    { lat: 61.2,  lon: 9.6,  duchy: d_oppland, terrain: mountains, culture: norse, faith: catholic, development: 4, holdings: [castle] }
-  c_hedmark:    { lat: 60.8,  lon: 11.5, duchy: d_oppland, terrain: forest, culture: norse, faith: catholic, development: 5, holdings: [castle, temple] }
-  c_telemark:   { lat: 59.5,  lon: 8.5,  duchy: d_oppland, terrain: mountains, culture: norse, faith: catholic, development: 4, holdings: [castle] }
+  c_nidaros:    { lat: 63.35, lon: 10.6, duchy: d_trondelag, terrain: hills, culture: norse, faith: sun_rite, development: 8, holdings: [castle, city, temple] }
+  c_more:       { lat: 62.55, lon: 7.4,  duchy: d_trondelag, terrain: mountains, culture: norse, faith: sun_rite, development: 5, holdings: [castle] }
+  c_namdalen:   { lat: 64.2,  lon: 11.8, duchy: d_trondelag, terrain: forest, culture: norse, faith: sun_rite, development: 3, holdings: [castle] }
+  c_bergen:     { lat: 60.45, lon: 5.7,  duchy: d_vestlandet, terrain: hills, culture: norse, faith: sun_rite, development: 8, holdings: [castle, city, temple] }
+  c_sogn:       { lat: 61.3,  lon: 6.6,  duchy: d_vestlandet, terrain: mountains, culture: norse, faith: sun_rite, development: 4, holdings: [castle] }
+  c_rogaland:   { lat: 58.85, lon: 6.0,  duchy: d_vestlandet, terrain: hills, culture: norse, faith: sun_rite, development: 6, holdings: [castle, temple] }
+  c_oslo:       { lat: 59.9,  lon: 10.7, duchy: d_viken, terrain: farmlands, culture: norse, faith: sun_rite, development: 8, holdings: [castle, city, temple] }
+  c_vestfold:   { lat: 59.3,  lon: 10.1, duchy: d_viken, terrain: farmlands, culture: norse, faith: sun_rite, development: 7, holdings: [castle] }
+  c_agder:      { lat: 58.4,  lon: 7.9,  duchy: d_viken, terrain: hills, culture: norse, faith: sun_rite, development: 5, holdings: [castle] }
+  c_ranrike:    { lat: 58.6,  lon: 11.6, duchy: d_viken, terrain: hills, culture: norse, faith: sun_rite, development: 5, holdings: [castle] }
+  c_oppland:    { lat: 61.2,  lon: 9.6,  duchy: d_oppland, terrain: mountains, culture: norse, faith: sun_rite, development: 4, holdings: [castle] }
+  c_hedmark:    { lat: 60.8,  lon: 11.5, duchy: d_oppland, terrain: forest, culture: norse, faith: sun_rite, development: 5, holdings: [castle, temple] }
+  c_telemark:   { lat: 59.5,  lon: 8.5,  duchy: d_oppland, terrain: mountains, culture: norse, faith: sun_rite, development: 4, holdings: [castle] }
   # --------------------------------------------------- Швеция
-  c_uppsala:    { lat: 59.9,  lon: 17.6, duchy: d_svealand, terrain: farmlands, culture: swedish, faith: norse_pagan, development: 9, holdings: [castle, temple] }
-  c_sodermanland: { lat: 59.15, lon: 16.8, duchy: d_svealand, terrain: forest, culture: swedish, faith: catholic, development: 7, holdings: [castle] }
-  c_vastmanland: { lat: 59.65, lon: 16.0, duchy: d_svealand, terrain: forest, culture: swedish, faith: norse_pagan, development: 6, holdings: [castle] }
-  c_dalarna:    { lat: 60.75, lon: 14.8, duchy: d_svealand, terrain: forest, culture: swedish, faith: norse_pagan, development: 4, holdings: [castle] }
-  c_vastergotland: { lat: 58.1, lon: 13.3, duchy: d_gotaland, terrain: farmlands, culture: swedish, faith: catholic, development: 8, holdings: [castle, temple] }
-  c_ostergotland: { lat: 58.35, lon: 15.4, duchy: d_gotaland, terrain: farmlands, culture: swedish, faith: catholic, development: 8, holdings: [castle, temple] }
-  c_smaland:    { lat: 57.0,  lon: 14.6, duchy: d_gotaland, terrain: forest, culture: swedish, faith: catholic, development: 5, holdings: [castle] }
-  c_kalmar:     { lat: 56.85, lon: 16.2, duchy: d_gotaland, terrain: plains, culture: swedish, faith: catholic, development: 6, holdings: [castle, city] }
-  c_varmland:   { lat: 59.7,  lon: 13.1, duchy: d_gotaland, terrain: forest, culture: swedish, faith: norse_pagan, development: 4, holdings: [castle] }
-  c_gotland:    { lat: 57.5,  lon: 18.5, duchy: d_gotaland, terrain: plains, culture: swedish, faith: catholic, development: 8, holdings: [castle, city] }
-  c_halsingland: { lat: 61.5, lon: 16.6, duchy: d_norrland, terrain: forest, culture: swedish, faith: norse_pagan, development: 3, holdings: [castle] }
-  c_medelpad:   { lat: 62.4,  lon: 17.0, duchy: d_norrland, terrain: forest, culture: swedish, faith: norse_pagan, development: 3, holdings: [castle] }
-  c_jamtland:   { lat: 63.15, lon: 14.3, duchy: d_norrland, terrain: mountains, culture: swedish, faith: norse_pagan, development: 3, holdings: [castle] }
+  c_uppsala:    { lat: 59.9,  lon: 17.6, duchy: d_svealand, terrain: farmlands, culture: swedish, faith: wolf_cult, development: 9, holdings: [castle, temple] }
+  c_sodermanland: { lat: 59.15, lon: 16.8, duchy: d_svealand, terrain: forest, culture: swedish, faith: sun_rite, development: 7, holdings: [castle] }
+  c_vastmanland: { lat: 59.65, lon: 16.0, duchy: d_svealand, terrain: forest, culture: swedish, faith: wolf_cult, development: 6, holdings: [castle] }
+  c_dalarna:    { lat: 60.75, lon: 14.8, duchy: d_svealand, terrain: forest, culture: swedish, faith: wolf_cult, development: 4, holdings: [castle] }
+  c_vastergotland: { lat: 58.1, lon: 13.3, duchy: d_gotaland, terrain: farmlands, culture: swedish, faith: sun_rite, development: 8, holdings: [castle, temple] }
+  c_ostergotland: { lat: 58.35, lon: 15.4, duchy: d_gotaland, terrain: farmlands, culture: swedish, faith: sun_rite, development: 8, holdings: [castle, temple] }
+  c_smaland:    { lat: 57.0,  lon: 14.6, duchy: d_gotaland, terrain: forest, culture: swedish, faith: sun_rite, development: 5, holdings: [castle] }
+  c_kalmar:     { lat: 56.85, lon: 16.2, duchy: d_gotaland, terrain: plains, culture: swedish, faith: sun_rite, development: 6, holdings: [castle, city] }
+  c_varmland:   { lat: 59.7,  lon: 13.1, duchy: d_gotaland, terrain: forest, culture: swedish, faith: wolf_cult, development: 4, holdings: [castle] }
+  c_gotland:    { lat: 57.5,  lon: 18.5, duchy: d_gotaland, terrain: plains, culture: swedish, faith: sun_rite, development: 8, holdings: [castle, city] }
+  c_halsingland: { lat: 61.5, lon: 16.6, duchy: d_norrland, terrain: forest, culture: swedish, faith: wolf_cult, development: 3, holdings: [castle] }
+  c_medelpad:   { lat: 62.4,  lon: 17.0, duchy: d_norrland, terrain: forest, culture: swedish, faith: wolf_cult, development: 3, holdings: [castle] }
+  c_jamtland:   { lat: 63.15, lon: 14.3, duchy: d_norrland, terrain: mountains, culture: swedish, faith: wolf_cult, development: 3, holdings: [castle] }
 
   # --------------------------------------------------- непроходимые земли за краем карты
   w_pomerania:    { lat: 53.9,  lon: 15.6, impassable: true, terrain: forest }

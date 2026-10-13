@@ -114,8 +114,8 @@ artifact_name:
   amulet:
     "1": Amulet “Thor's Hammer”
     "2": Amulet “Phylactery”
-    "3": Amulet “Odin's Eye”
-    "4": Amulet “Saint Christopher”
+    "3": Amulet “Eye of the Wolf”
+    "4": Amulet “The Merciful Maiden”
     "5": Amulet “Bear's Tooth”
   book:
     "1": Book “Consolation of Philosophy”
@@ -154,7 +154,7 @@ artifact_name:
     "1": Banner “White Dragon”
     "2": Banner “Raven”
     "3": Banner “Golden Lion”
-    "4": Banner “Cross and Sword”
+    "4": Banner “Sun and Sword”
     "5": Banner “Red Boar”
   trophy_shield:
     "1": Shield “Taken from the Sea”
@@ -163,7 +163,7 @@ artifact_name:
     "4": Shield “Last Stand”
   reliquary:
     "1": Reliquary “Finger of the Saint”
-    "2": Reliquary “Piece of the Cross”
+    "2": Reliquary “Coal of the Holy Pyre”
     "3": Reliquary “Virgin's Veil”
     "4": Reliquary “Martyr's Tooth”
     "5": Reliquary “The Little Ark”
@@ -173,29 +173,29 @@ artifact_name:
     "3": Goblet “Cup of Peace”
     "4": Goblet “Cornucopia”
   codex:
-    "1": Codex “Illuminated Gospels”
+    "1": Codex “Illuminated Solar Tablets”
     "2": Codex “Laws of the Forefathers”
     "3": Codex “Bestiary”
     "4": Codex “Song of Heroes”
   chessmen:
     "1": Chessmen “Walrus Ivory”
-    "2": Chessmen “Kings and Bishops”
+    "2": Chessmen “Kings and Priests”
     "3": Chessmen “Black and White”
 
 artifact:
   edward_crown: Crown of Edward the Confessor
   joyeuse: Joyeuse, Sword of Charlemagne
   landwaster: Banner “Landwaster”
-  papal_banner: Banner of Saint Peter
+  papal_banner: Banner of the Great Lightbearer
   stone_of_destiny: Stone of Destiny
   bell_of_patrick: Bell of Saint Patrick
 artifact_desc:
   edward_crown: "The crown of England's saintly king. Harold was crowned with it at Westminster — and whoever wears it may call themselves the rightful king."
   joyeuse: "Charlemagne's sword, said to change its color thirty times a day. The kings of the Franks are girded with it at their coronation."
   landwaster: "A raven on white silk. The saga says Harald Hardrada never lost a battle under this banner."
-  papal_banner: "A consecrated banner sent by Pope Alexander to the Duke of Normandy. With it, the war for the English throne is a holy cause."
+  papal_banner: "A consecrated banner sent by the Great Lightbearer to the Duke of Normandy. With it, the war for the English throne is a holy cause."
   stone_of_destiny: "The sandstone block of Scone on which the kings of Scotland are crowned. Whoever sits upon it is king."
-  bell_of_patrick: "Saint Patrick's iron bell in a golden shrine. Its ringing, they say, drove the snakes and demons out of Ireland."
+  bell_of_patrick: "Saint Patrick's iron bell in a golden shrine. Its ringing, they say, drove the snakes and ash-imps out of Ireland."
 
 opinion_modifier:
   artifact_gift: Gift

@@ -88,7 +88,7 @@ events:
             scope:province: { add_province_modifier: { id: trade_fair, years: 3 } }
           ai_chance: 80
 
-  court.0009:            # епископ просит пожертвования
+  court.0009:            # жрец просит пожертвования
     options:
       $append:
         - skill: { skill: diplomacy, check: 12 }

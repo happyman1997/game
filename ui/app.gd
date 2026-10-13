@@ -694,7 +694,7 @@ func character_tooltip(id: Variant) -> String:
 	var parts := PackedStringArray([BB.title(Chars.full_name(g, c, true))])
 	if not c.titles.is_empty():
 		parts.append(BB.esc(Titles.full_name(g, c.titles[0])))
-	parts.append(BB.muted(t("ui.age_n", {"n": Chars.age_of(g, c)}) + (" ✝" if c.death != null else "")))
+	parts.append(BB.muted(t("ui.age_n", {"n": Chars.age_of(g, c)}) + (" †" if c.death != null else "")))
 	var p: Variant = g.player
 	if p != null and p.id != c.id and c.death == null:
 		parts.append("%s: %s" % [t("ui.opinion_of_you"), BB.signed(Opinion.opinion(g, c, p))])

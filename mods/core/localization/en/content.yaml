@@ -118,10 +118,16 @@ culture:
   flemish: Flemish
   russian: Russian
 
+religion:
+  solar: Faith of the Sun Emperor
 faith:
-  catholic: Catholic
-  orthodox: Orthodox
-  norse_pagan: Ásatrú
+  sun_rite: Solar Rite
+  east_rite: Eastern Rite
+  wolf_cult: Cult of the Winter Wolf
+faith_desc:
+  sun_rite: "The chief cult of the Sun Emperor. The founder of the Solar Empire ascended in flame and became a god; his fire burns in the Sun Crown. The Temple of the Sun, its sun-priests and the Great Lightbearer. The Emperor's antipode is the Prince of Ash, cast down in the heart of the empire on the night of the fire."
+  east_rite: "The same rites of the Temple of the Sun, but the Emperor is honoured above all as the judge who weighs souls."
+  wolf_cult: "The North honours the Winter Wolf — a war god, the Emperor's sworn brother. Courage and fury are virtues here, and the beast in a man is a gift, not a curse."
 
 terrain:
   farmlands: Farmlands
@@ -200,7 +206,7 @@ modifier:
   poor_harvest: Poor Harvest
   peasant_unrest: Peasant Unrest
   trade_fair: Trade Fair
-  new_church: New Church
+  new_church: New Temple
 
 casus_belli:
   claim: Claim on a Title
@@ -213,7 +219,7 @@ casus_belli_desc:
   de_jure: Annex counties that rightfully belong to your titles.
   independence: Throw off the rule of your liege.
   county_conquest: Take a neighbouring county by the sword.
-  holy_war: Take lands from the infidels.
+  holy_war: Take lands from a heretic — one whose pact with the Prince of Ash has come to light.
 
 cb:
   claim:
@@ -280,7 +286,7 @@ decision_desc:
   hold_feast: Invite your vassals to a feast. Prestige, goodwill and some relief from worries.
   go_hunting: Hunting relieves stress and brings glory — with some luck.
   go_on_pilgrimage: A long road to the holy places will strengthen your faith.
-  give_alms: Generosity to the poor pleases God.
+  give_alms: Generosity to the poor pleases the Sun Emperor.
   seek_solitude: Withdraw from affairs to recover.
   commission_chronicle: Chroniclers will glorify your house for ages.
   emergency_taxes: Fill the treasury quickly — at the price of vassal discontent.

@@ -18,7 +18,7 @@ on_actions:
               if:
                 limit:
                   NOR: [ { is_allied_with: scope:sea_ally }, { is_at_war_with: scope:sea_ally } ]
-                  scope:sea_ally: { faith: catholic }
+                  scope:sea_ally: { faith: sun_rite }
                 then:
                   add_alliance: scope:sea_ally
               add_opinion: { target: scope:sea_ally, modifier: sea_league }

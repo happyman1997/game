@@ -117,7 +117,7 @@ skill_archetypes:
     icon: "🗡"
     modifiers: { scheme_power: 10, scheme_defense: 10 }
     trial: { goals: [ { deed: schemes, count: 2 }, { deed: hunts, count: 1 } ] }
-  # победы над иноверцами дают благочестие; священная война вдвое дешевле
+  # победы над чужими культами и еретиками дают благочестие; священная война вдвое дешевле
   holy_warrior:
     skills: [learning, prowess]
     min: 14

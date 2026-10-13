@@ -106,9 +106,9 @@ secret_types:
     discovery_chance: 0.7
     on_expose:
       - reveal_trait: lycanthrope
-      # на Севере зверь в человеке — не проклятие, а дар Одина
+      # на Севере зверь в человеке — не проклятие, а дар Зимнего Волка
       - if:
-          limit: { religion: germanic }
+          limit: { faith: wolf_cult }
           add_prestige: 100
           else:
             - add_prestige: -200
@@ -172,7 +172,7 @@ regiment_types:
     can_recruit:
       OR:
         - has_trait: monster_bane
-        - AND: { religion: christianity, piety: ">= 100" }
+        - AND: { religion: solar, piety: ">= 100" }
     ai_will_do: { value: 3, if: { limit: { has_trait: zealous }, add: 6 } }
 
 casus_belli:
@@ -215,7 +215,7 @@ decisions:
     category: arcane
     icon: "✝"
     is_shown:
-      religion: christianity
+      religion: solar
       has_trait: [hexed, lycanthrope]
     is_valid:
       piety: 150
@@ -258,7 +258,7 @@ decisions:
     icon: "✝"
     is_shown:
       is_ruler: yes
-      religion: christianity
+      religion: solar
       realm_has_restless_dead: yes
     is_valid:
       piety: 200
