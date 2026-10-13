@@ -62,6 +62,8 @@ decisions:
       is_adult: yes
       religion: solar
       karma: "< 0"
+      # Наместнику Пепла дороги назад нет
+      NOT: { has_trait: ash_viceroy }
     is_valid:
       is_at_war: no
       is_imprisoned: no
@@ -69,6 +71,11 @@ decisions:
     cooldown: { years: 5 }
     effect:
       - cleanse_ash: { value: 40, deed: ash_pilgrimage }
+      # до третьей печати Пепелище ещё отпускает
+      - if:
+          limit: { has_trait: ash_marked }
+          leave_ash_path: yes
+          send_message: { text: msg.ash_path_left, kind: good }
       - add_piety: 50
       - add_stress: 15
       - add_deed: devotions

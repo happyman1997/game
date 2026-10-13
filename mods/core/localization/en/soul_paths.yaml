@@ -1,0 +1,90 @@
+# The Path of Ash and the Path of Light.
+trait:
+  ash_marked: Ash-Marked
+  ash_pact: Pact with the Prince of Ash
+  ash_iron_ward: Iron Will Not Bite
+  ash_voice: Voice of Command
+  ash_gold: Gold from Ash
+  ash_viceroy: Viceroy of Ash
+  ash_heretic: Heretic
+  living_saint: Living Saint
+trait_desc:
+  ash_marked: "They answered the whisper from the ash. Cruelty no longer weighs on them, fear of them grows faster, and prayers come harder."
+  ash_pact: "Sealed with ash and blood: the Prince of Ash has given his gift. The eyes smoulder like embers — but only the initiated see it."
+  ash_iron_ward: "A gift of the pact: the blade slips, the arrow goes astray."
+  ash_voice: "A gift of the pact: before this voice there are no defiant — even the brave and the blood-kin bow."
+  ash_gold: "A gift of the pact: every execution turns into gold from the ash."
+  ash_viceroy: "The Prince of Ash has made them his viceroy on earth. They do not age, fear of them never falls below Horror, enemy hosts melt away before battle, and the Sun Crown burns them twice over. The Faith of the Sun Emperor rises against them."
+  ash_heretic: "A pact with the Prince of Ash has come to light. Coreligionists and the Ash Wardens may wage holy war on them."
+  living_saint: "Has made a vow to the Sun and keeps it. Sees souls and hidden seals, works great miracles, prays for others' souls and leads the Crusade of Light. A grave sin — and the Light departs."
+
+secret_type:
+  secret_ash_pact: Pact with the Prince of Ash
+secret_type_desc:
+  secret_ash_pact: "This person has answered the Prince of Ash. If the truth comes out, they are a heretic, and holy war will come for them."
+
+karma_deed:
+  resisted_prince: Turned from the whisper
+  answered_prince: Answered the Prince of Ash
+  pact: Pact with the Prince of Ash
+  refused_pact: Refused the pact
+  viceroy: Became the Viceroy of Ash
+  vow: Vow to the Sun
+  humility: Humility
+  soul_saved: A soul prayed back
+  crusade: Crusade of Light
+  miracle: Miracle
+
+interaction:
+  pray_for_soul: Pray for a Soul
+interaction_desc:
+  pray_for_soul: "A Living Saint prays for a soul on which the Prince's ash has settled: the seals break backwards and the ash falls away. A Viceroy of Ash cannot be saved this way — save by a miracle."
+
+casus_belli:
+  light_crusade: Crusade of Light
+casus_belli_desc:
+  light_crusade: "A Living Saint leads the faithful against a heretic, wherever they may be — and against the realm that shelters them. Victory takes the heretic's capital and sends a Viceroy of Ash to the stake."
+cb:
+  light_crusade:
+    war_name: "Crusade of Light against [scope:defender]"
+
+opinion_modifier:
+  viceroy_of_ash: Viceroy of Ash
+
+msg:
+  viceroy_saved: "The saint has prayed back the Viceroy of Ash: the smouldering eyes have gone out."
+  viceroy_resists: "The Prince of Ash did not release his viceroy. The prayer broke against the ash."
+  ash_spawn: "On the night all the candles went out, the ruler went into the ash as a spawn of the Prince. Power passes to the heir."
+  ash_path_left: "At the edge of the Ashlands you cast your mark into the ash. The Prince has let you go — for now."
+
+ev:
+  ashpath.0001:
+    t: The Whisper
+    desc: "At night one ember in the hearth will not die. It looks at you — and whispers. The voice is warm as ash and knows your name. “You are already mine,” it says. “All that is left is to answer.”"
+    a: Turn away
+    b: Answer
+  ashpath.0002:
+    t: The Pact
+    desc: "The Prince of Ash has come himself — a shadow in the corner of the hall where no candles burn. “I will give you a gift. Choose. The price is only a secret between us.”"
+    a: Let iron never bite me
+    b: Let all bow before me
+    c: Let executions bring gold
+    d: No. Into the ash with the mark
+  ashpath.0003:
+    t: The Night All the Candles Went Out
+    desc: "That night every candle in the castle went out at once. The ash rose from the floor and stood around you like a wall. “It is time,” says the Prince. “Step to me. I will make you my viceroy — if you endure.”"
+    a: Step into the ash
+    b: Draw back while there is time
+  ashpath.0004:
+    t: The Viceroy of Ash
+    desc: "You came out of the ash changed. Your skin is grey as cinders, embers smoulder in your eyes, and time no longer has power over you. Across the Faith of the Sun Emperor the alarm bells ring."
+    a: Let there be ash
+  lightpath.0001:
+    t: A Vow to the Sun
+    desc: "At dawn a ray of sunlight fell on the altar and stayed there while you prayed. The sun-priests fell on their faces. The Sun Emperor calls you to make a vow — and become his light on earth."
+    a: Make the vow
+    b: I am unworthy
+  lightpath.0002:
+    t: The Light Has Gone
+    desc: "In the morning you understood: the Light has gone. Prayer rings hollow, and people no longer reach out to touch your cloak."
+    a: The fault is mine

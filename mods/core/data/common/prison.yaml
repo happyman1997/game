@@ -122,6 +122,10 @@ interactions:
           add_karma: { value: -15, deed: unjust_execution }
       - else:
           add_karma: { value: -2, deed: execution }
+      # дар договора: золото из пепла казнённых
+      - if:
+          limit: { has_trait: ash_gold }
+          add_gold: 75
       # казнь внушает страх, а казнь знатного — вдвойне
       - add_dread: 15
       - if:

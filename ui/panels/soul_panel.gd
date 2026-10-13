@@ -55,6 +55,10 @@ static func build(app: App, c: Dictionary) -> Control:
 		if not exact:
 			box.add_child(K.para(app.t("ui.soul_hidden"), "MutedLabel"))
 		root.add_child(K.panel(box, "InsetPanel"))
+	# печати Пепла — тем, кто их видит (сам, посвящённые в тайну, святой)
+	var seals: Variant = _seals_box(app, c, p)
+	if seals != null:
+		root.add_child(seals)
 	# Книга деяний
 	if exact:
 		var lines := K.vbox([], 3)
@@ -72,6 +76,78 @@ static func build(app: App, c: Dictionary) -> Control:
 		lines.add_child(K.para(app.t("ui.soul_cleanse_hint"), "MutedLabel"))
 		root.add_child(K.section(app.t("ui.soul_book"), [lines], "book"))
 	return root
+
+
+const SEALS := [["ash_marked", "ashpath.0001"], ["ash_pact", "ashpath.0002"], ["ash_viceroy", "ashpath.0003"]]
+
+
+## Печати Пути Пепла и обет Пути Света.
+static func _seals_box(app: App, c: Dictionary, viewer: Variant) -> Variant:
+	var g := app.game
+	var vid: Variant = viewer.id if viewer != null else null
+	var broken := []
+	for pair in SEALS:
+		broken.append(c.traits.has(pair[0]) and Chars.trait_visible(g, c, pair[0], vid))
+	# договор и наместничество подразумевают сломанные печати до них
+	if broken[2]:
+		broken[0] = true
+		broken[1] = true
+	if broken[1]:
+		broken[0] = true
+	var box := K.vbox([], 6)
+	if broken.has(true):
+		var row := K.hbox([], 18)
+		for i in SEALS.size():
+			var tex := TextureRect.new()
+			tex.texture = seal_texture(broken[i])
+			tex.custom_minimum_size = Vector2(56, 56)
+			tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			var name := g.loc.t_or("ev.%s.t" % SEALS[i][1], SEALS[i][1])
+			var l1 := K.label(name, "SmallLabel")
+			var l2 := K.label(app.t("ui.seal_broken") if broken[i] else app.t("ui.seal_whole"), "BadLabel" if broken[i] else "MutedLabel")
+			for l in [l1, l2]:
+				l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			var col := K.vbox([_centered(tex), l1, l2], 2)
+			col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			row.add_child(col)
+		K.tip(row, BB.title(app.t("ui.soul_seals")) + "\n" + BB.esc(app.t("ui.soul_seals_tip")))
+		box.add_child(row)
+		return K.section(app.t("ui.soul_seals"), [box], "fire")
+	if c.traits.has("living_saint"):
+		var l := K.hbox([K.icon("cross", 24), K.label(g.name_of("traits", "living_saint"), "GoldLabel")], 6)
+		K.tip(l, BB.title(app.t("ui.soul_vow")) + "\n" + BB.esc(app.t("ui.soul_vow_tip")))
+		box.add_child(l)
+		box.add_child(K.para(app.t("ui.soul_vow_tip"), "MutedLabel"))
+		return K.section(app.t("ui.soul_vow"), [box], "cross")
+	return null
+
+
+## Сургучная печать: целая (алый сургуч с солнцем) или сломанная (пепел, трещина).
+static func seal_texture(broken: bool) -> Texture2D:
+	var key := "seal|%s" % broken
+	if _tex.has(key):
+		return _tex[key]
+	var wax := "#5a524c" if broken else "#a8231a"
+	var rim := "#2b2420" if broken else "#6a1410"
+	var svg := '<svg xmlns="http://www.w3.org/2000/svg" width="112" height="112" viewBox="0 0 56 56">'
+	svg += '<path d="M28 4 C36 5 40 3 44 9 C50 13 52 18 51 26 C53 34 49 40 45 45 C40 51 34 52 28 52 C20 53 14 50 10 45 C5 40 4 33 5 26 C4 18 8 12 13 8 C18 4 22 5 28 4 Z" fill="%s" stroke="%s" stroke-width="1.5"/>' % [wax, rim]
+	svg += '<circle cx="28" cy="28" r="15" fill="none" stroke="%s" stroke-width="1.6" opacity="0.8"/>' % rim
+	for i in 12:
+		var a := TAU * i / 12.0
+		svg += '<path d="M%.1f %.1f L%.1f %.1f" stroke="%s" stroke-width="1.6" stroke-linecap="round" opacity="0.85"/>' % [28 + cos(a) * 7, 28 + sin(a) * 7, 28 + cos(a) * 12, 28 + sin(a) * 12, rim]
+	svg += '<circle cx="28" cy="28" r="5" fill="%s"/>' % rim
+	if broken:
+		svg += '<path d="M24 3 L30 17 L24 26 L33 34 L27 53" fill="none" stroke="#120d0b" stroke-width="2.6" stroke-linejoin="round"/>'
+		svg += '<path d="M24 3 L30 17 L24 26 L33 34 L27 53" fill="none" stroke="#ff6a1a" stroke-width="0.9" stroke-linejoin="round" opacity="0.9"/>'
+	svg += '</svg>'
+	var img := Image.new()
+	if img.load_svg_from_string(svg, 1.0) != OK:
+		img = Image.create(112, 112, false, Image.FORMAT_RGBA8)
+	var tex := ImageTexture.create_from_image(img)
+	_tex[key] = tex
+	return tex
 
 
 ## Середина ступени — куда клонятся весы для того, кто видит лишь ступень.
@@ -223,7 +299,10 @@ static func _scales(s: PackedStringArray, g: Game, k: float) -> void:
 	var rad := 62.0
 	var top := PIVOT + Vector2(0, -8)
 	# шкала-полукруг над осью: слева — Свет, справа — Пепел
-	s.append('<path d="M%s A%.1f %.1f 0 0 1 %s" stroke="#6b4a1c" stroke-width="13" fill="none" stroke-linecap="round"/>' % [_pt(top + _rot(Vector2(0, -rad), _dial(g, mx))), rad, rad, _pt(top + _rot(Vector2(0, -rad), _dial(g, -mx)))])
+	var arc0 := _pt(top + _rot(Vector2(0, -rad), _dial(g, mx)))
+	var arc1 := _pt(top + _rot(Vector2(0, -rad), _dial(g, -mx)))
+	s.append('<path d="M%s A%.1f %.1f 0 0 1 %s" stroke="#4a3010" stroke-width="15" fill="none" stroke-linecap="round"/>' % [arc0, rad, rad, arc1])
+	s.append('<path d="M%s A%.1f %.1f 0 0 1 %s" stroke="#efe3c2" stroke-width="12" fill="none" stroke-linecap="round"/>' % [arc0, rad, rad, arc1])
 	for i in ts.size():
 		var lo: float = Data.num(ts[i].get("min"), -mx)
 		var hi: float = Data.num(ts[i + 1].get("min"), mx) if i + 1 < ts.size() else mx

@@ -44,7 +44,8 @@ static func trait_def(game: Game, t: String) -> Variant:
 
 ## Видна ли черта персонажа наблюдателю viewer_id. Черта с полем
 ## concealed: <тип секрета> скрыта: её видят сам носитель, знающие этот его
-## секрет и все — после разоблачения (reveal_trait / флаг revealed:<черта>).
+## секрет, носители черт с sees_concealed: [<тип секрета>] (святые видят
+## души) и все — после разоблачения (reveal_trait / флаг revealed:<черта>).
 static func trait_visible(game: Game, c: Dictionary, t: String, viewer_id: Variant = null) -> bool:
 	var d: Variant = trait_def(game, t)
 	var sec: Variant = d.get("concealed") if d != null else null
@@ -56,6 +57,13 @@ static func trait_visible(game: Game, c: Dictionary, t: String, viewer_id: Varia
 		return false
 	if viewer_id == c.id:
 		return true
+	# кто видит души (черта с sees_concealed: [типы секретов]), видит и скрытое
+	var viewer: Variant = game.ch(viewer_id)
+	if viewer != null:
+		for vt in viewer.traits:
+			var vd: Variant = trait_def(game, vt)
+			if vd != null and vd.get("sees_concealed") != null and Data.as_array(vd.sees_concealed).has(sec):
+				return true
 	for s in Secrets.known_secrets_of(game, c, str(viewer_id)):
 		if s.type == sec:
 			return true

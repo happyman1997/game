@@ -290,6 +290,10 @@ static func stance(game: Game, c: Dictionary, liege: Variant = null) -> String:
 		return "obedient"
 	if Data.as_array(c.vars.get("broken_by")).has(liege.id):
 		return "broken"
+	# «голос повелителя»: перед таким сюзереном дерзких не бывает
+	for t in game.def_val("politics.commanding_traits", []):
+		if liege.traits.has(t):
+			return "obedient"
 	for t in game.def_val("politics.defiant_traits", ["brave", "wrathful"]):
 		if c.traits.has(t):
 			return "defiant"
@@ -342,7 +346,7 @@ static func mark_broken(game: Game, c: Dictionary, jailer_id: String) -> void:
 ## ступень с silence — молчат все, что бы ни было).
 static func complaint_mult(game: Game, c: Dictionary) -> float:
 	var t: Variant = tier_of(game, c) if c.vars.has("dread_tier") else null
-	if t != null and t.get("silence", false):
+	if t != null and t.get("silence") != null and ScriptContext.is_yes(t.silence):
 		return 0.0
 	return clampf(1.0 + Stats.stat(game, c, "complaint_mult"), 0.0, 1.0)
 
@@ -417,7 +421,8 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 			decay = game.def_num("politics.dread_decay_compassionate", 1.5)
 		# dread_decay_mult — например, тень мастерства дипломата: страх перед ним быстро тает
 		decay *= maxf(0.0, 1.0 + Stats.stat(game, c, "dread_decay_mult"))
-		c.vars["dread"] = d - decay
+		# dread_floor — ниже страх не опускается (Наместник Пепла)
+		c.vars["dread"] = maxf(d - decay, Stats.stat(game, c, "dread_floor"))
 		if dread(c) <= 0.0:
 			c.vars.erase("dread")
 		if level_for(game, dread(c)) != int(Data.num(c.vars.get("dread_tier"), 0.0)):
@@ -429,7 +434,7 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 		if sm > 0.0 and not Data.as_array(tier.get("stress_immune")).any(func(t): return c.traits.has(t)):
 			Chars.change_stress(game, c, sm, "dread_tier")
 		# террор: фракции распадаются — остаются лишь дерзкие
-		if tier.get("dissolve_factions", false) and game.engine.has_feature("factions"):
+		if tier.get("dissolve_factions") != null and ScriptContext.is_yes(tier.dissolve_factions) and game.engine.has_feature("factions"):
 			for f in Factions.against(game, c.id):
 				if f.get("popular", false) or game.state.wars.values().any(func(w): return w.get("faction") == f.id):
 					continue
@@ -510,6 +515,16 @@ func install(engine: GameEngine) -> void:
 		var tid: String = t.id
 		return [{"label": func(): return game.loc.t("ui.dread_tier_mod", {"tier": game.name_of("dread_tiers", tid)}), "modifiers": t.modifiers}]
 	}, OWNER)
+	# enemy_thinning: перед боем войско врага тает от страха (Наместник Пепла)
+	engine.hooks.on("army.power_bonus", func(p):
+		var game: Game = p.game
+		var thin := 0.0
+		for e in p.get("enemies", []):
+			var o: Variant = game.ch(e.get("owner"))
+			if o != null:
+				thin = maxf(thin, Stats.stat(game, o, "enemy_thinning"))
+		return -float(p.army.size) * minf(thin, 0.9) if thin > 0.0 else null
+	, 0, OWNER)
 	# Темница ломает: вышедший из неё боится тюремщика сильнее и не бунтует.
 	engine.hooks.on("prison.released", func(p):
 		var game: Game = p.game

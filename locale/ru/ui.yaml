@@ -139,6 +139,8 @@ ui:
     plague: от чумы
     execution: казнён(а)
     duel: в поединке
+    ash_spawn: ушёл(ушла) в пепел порождением Князя
+    burned: сожжён(а) на костре Света
   courtier_of: "Придворный: {who}"
   wanderer: Странник
   lowborn: Безродный

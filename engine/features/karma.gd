@@ -19,7 +19,9 @@ extends EngineFeature
 ##   её (trait_drift — повседневные мелкие дела; не больше drift_max за год,
 ##   без записи в Книге деяний).
 ##   Название деяния в «Книге деяний» — karma_deed.<deed>.
-##   on_actions: on_karma_tier_up / on_karma_tier_down (root — персонаж).
+##   on_actions: on_karma_tier_up / on_karma_tier_down (root — персонаж);
+##   on_sin / on_virtue — после каждого записанного деяния (не нрава души),
+##   отсюда растут Путь Пепла и Путь Света.
 ## Видимость: сам персонаж знает свою карму точно, другие видят лишь
 ## ступень; точное число видят и носители черт defines.karma.known_by.
 ## Состояние: c.vars.karma, c.vars.karma_tier (id ступени, кроме нейтральной
@@ -123,6 +125,8 @@ static func add(game: Game, c: Dictionary, v: float, deed: String = "", quiet: b
 		Chars.change_stress(game, c, -d * game.def_num("karma.conscience_stress", 1.0), "karma")
 	game.emit("karma.changed", {"character": c, "value": d, "deed": deed})
 	_check_tier(game, c)
+	if not quiet:
+		game.on_action("on_sin" if d < 0.0 else "on_virtue", {"type": "character", "id": c.id})
 
 
 ## Снять пепел: поднять отрицательную карму к нулю не больше чем на v.

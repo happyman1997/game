@@ -609,7 +609,7 @@
 ## Реестры движка
 
 - **succession_algorithms**: `primogeniture`, `partition`, `seniority`, `elected_member`, `best_master`, `republic_election`, `elective`
-- **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `faction`, `artifact_holder`, `monster_hunt`
+- **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `heretic_realm`, `faction`, `artifact_holder`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`, `own_artifacts`, `claimed_artifacts`
 - **interaction_deciders**: `payer`
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `grafts`, `plague_fear`

@@ -149,6 +149,9 @@ decisions:
       - raise_dread_tier: 1
       - capital: { add_county_opinion: executions_witnessed }
       - add_karma: { value: -10, deed: public_execution }
+      - if:
+          limit: { has_trait: ash_gold }
+          add_gold: 75
       - add_deed: executions
       - every_vassal:
           limit: { fear_stance: defiant }
@@ -252,6 +255,16 @@ decisions:
           add_county_opinion: miracle_witnessed
       - add_prestige: 100
       - add_stress: -30
+      # Живой святой: чудо сильнее — исцеляет и вассалов, а душа светлеет
+      - if:
+          limit: { has_trait: living_saint }
+          every_vassal:
+            - remove_trait: wounded
+            - remove_trait: ill
+            - remove_trait: pneumonic
+            - add_opinion: { target: root, modifier: miracle_witnessed }
+          add_karma: { value: 5, deed: miracle }
+          add_prestige: 100
     ai_check_months: 6
     ai_will_do:
       value: 5

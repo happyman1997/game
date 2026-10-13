@@ -1,0 +1,240 @@
+# Путь Пепла и Путь Света («Свет и Пепел», механика karma).
+#
+# Путь Пепла: Пепельная душа + страх не ниже «Ужаса» + Садист. После каждого
+# греха (on_sin) — шанс, что сломается следующая печать (таймера нет):
+#   I  «Шёпот» — ответить Князю и стать Меченым пеплом (скрытая черта);
+#   II «Договор» — дар на выбор (не берёт железо, голос повелителя, золото
+#      из пепла) ценой тайны договора: раскроют — станешь еретиком, и на тебя
+#      пойдут священной войной; можно и отказаться — метка сойдёт;
+#   III «Ночь, когда погасли все свечи» — бросок: Наместник Пепла (не
+#      стареет, страх не ниже ужаса, войско врага тает перед боем, Солнечный
+#      венец жжёт вдвойне, вера встаёт против) или Порождение пепла (уходит
+#      чудовищем, власть — наследнику). Доблесть и учёность — лучший расклад.
+# Назад: до третьей печати — паломничество к Пепелищу; после — лишь смерть
+# или молитва Живого святого. События — events/soul_paths.yaml.
+#
+# Путь Света: Солнечная душа + стезя Святого (черта theologian) → «Обет
+# Солнцу» → Живой святой: видит души (и скрытые печати), творит сильные
+# чудеса, отмаливает чужие печати и ведёт крестовый поход Света на еретика.
+# Тяжкий грех — и Свет уходит.
+
+defines:
+  politics:
+    commanding_traits: [ash_voice]     # перед таким сюзереном дерзких нет
+  karma:
+    known_by: [living_saint]           # святой видит души точно
+
+traits:
+  ash_marked:
+    category: supernatural
+    concealed: secret_ash_pact
+    icon: "🔥"
+    color: "#7a3a1a"
+    modifiers: { dread_gain_mult: 0.25, monthly_piety: -0.5 }
+    # жестокость больше не тяготит
+    stress_reactions: { execute_prisoner: -15, public_execution: -15, imprison: -10 }
+  ash_pact:
+    category: supernatural
+    concealed: secret_ash_pact
+    icon: "🌑"
+    color: "#5a1a0a"
+    modifiers: { dread_gain_mult: 0.25, monthly_piety: -1, intrigue: 2 }
+    portrait: { eyes: "#ff8a2a", glow: "#ff5a12" }
+  # дары договора
+  ash_iron_ward:
+    category: supernatural
+    concealed: secret_ash_pact
+    icon: "🛡"
+    modifiers: { battle_survival: 0.75, prowess: 6, health: 1 }
+  ash_voice:
+    category: supernatural
+    concealed: secret_ash_pact
+    icon: "🗣"
+    modifiers: { diplomacy: 2 }
+  ash_gold:
+    category: supernatural
+    concealed: secret_ash_pact
+    icon: "💰"
+    modifiers: { monthly_income: 0.5 }
+  ash_viceroy:
+    category: supernatural
+    heretic: yes
+    icon: "☠"
+    color: "#3a1a10"
+    modifiers: { lifespan_mult: 4, dread_gain_mult: 0.5, dread_floor: 60, enemy_thinning: 0.2, prowess: 6, martial: 3, monthly_piety: -3, general_opinion: -25 }
+    portrait: { skin: "#a6a39e", skin_amount: 0.75, eyes: "#ff8a2a", glow: "#ff5a12", aura: "#4a423c", ageless: 45 }
+    ai: { compassion: -5, aggression: 2 }
+  # раскрытый договор
+  ash_heretic:
+    category: fame
+    heretic: yes
+    icon: "🌑"
+    modifiers: { general_opinion: -20, monthly_piety: -1 }
+  living_saint:
+    category: fame
+    icon: "☀"
+    good: true
+    sees_concealed: [secret_ash_pact]
+    modifiers: { monthly_piety: 2, learning: 2, general_opinion: 15, stress_gain_mult: -0.2 }
+    portrait: { aura: "#ffe9a0" }
+
+secret_types:
+  secret_ash_pact:
+    icon: "🔥"
+    hook: strong
+    severity: 200
+    discovered_by: [spouse, courtier, close_family]
+    discovery_chance: 0.25
+    on_expose:
+      - reveal_trait: ash_marked
+      - reveal_trait: ash_pact
+      - reveal_trait: ash_iron_ward
+      - reveal_trait: ash_voice
+      - reveal_trait: ash_gold
+      - add_trait: ash_heretic
+      - add_piety: -300
+      - add_prestige: -200
+      - if:
+          limit: { exists: liege }
+          mark_criminal: { target: liege, years: 20 }
+
+scripted_effects:
+  # Сойти с Пути Пепла: печати сломаны назад (до Наместника).
+  leave_ash_path:
+    effect:
+      - remove_trait: ash_marked
+      - remove_trait: ash_pact
+      - remove_trait: ash_iron_ward
+      - remove_trait: ash_voice
+      - remove_trait: ash_gold
+
+interactions:
+  # Живой святой отмаливает чужую душу: снимает печати Пепла.
+  pray_for_soul:
+    requires_feature: karma
+    icon: "☀"
+    category: friendly
+    is_shown:
+      scope:actor: { has_trait: living_saint }
+      scope:recipient:
+        OR:
+          - has_trait: ash_marked
+          - has_trait: ash_pact
+          - has_trait: ash_viceroy
+    is_valid:
+      scope:actor:
+        custom_tooltip: { text: ui.need_piety_300, trigger: { piety: 300 } }
+    auto_accept: yes
+    cooldown: { years: 3 }
+    on_accept:
+      - scope:actor: { add_piety: -300 }
+      - scope:recipient:
+          if:
+            limit: { has_trait: ash_viceroy }
+            random_list:
+              - weight: 30
+                remove_trait: ash_viceroy
+                leave_ash_path: yes
+                cleanse_ash: { value: 50, deed: soul_saved }
+                send_message: { text: msg.viceroy_saved, kind: good }
+              - weight: 70
+                scope:actor:
+                  add_stress: 40
+                  send_message: { text: msg.viceroy_resists, kind: bad }
+          else:
+            leave_ash_path: yes
+            cleanse_ash: { value: 30, deed: soul_saved }
+      - scope:actor: { add_karma: { value: 8, deed: soul_saved } }
+    ai_targets: [vassal, courtier, neighboring_ruler, liege]
+    ai_frequency_months: 12
+    ai_will_do: 80
+
+casus_belli:
+  # Крестовый поход Света: Живой святой ведёт верных на еретика, где бы тот ни был.
+  light_crusade:
+    requires_feature: karma
+    category: faith
+    icon: "☀"
+    targets: heretic_realm
+    is_shown: { has_trait: living_saint }
+    cost:
+      piety: 100
+    on_victory:
+      - scope:attacker:
+          annex_war_targets: yes
+          add_piety: 300
+          add_prestige: 200
+          add_karma: { value: 15, deed: crusade }
+      # Наместника Пепла — на костёр: его уносит лишь смерть
+      - scope:defender:
+          add_piety: -200
+          every_realm_vassal:
+            limit: { has_trait: ash_viceroy }
+            death: { reason: burned, killer: scope:attacker }
+      - scope:defender:
+          if:
+            limit: { has_trait: ash_viceroy }
+            death: { reason: burned, killer: scope:attacker }
+    on_white_peace:
+      - scope:attacker: { add_piety: -50 }
+    on_defeat:
+      - scope:attacker: { add_piety: -150, add_prestige: -100 }
+    ai_will_do:
+      value: 80
+    truce_years: 5
+    war_name: cb.light_crusade.war_name
+
+on_actions:
+  # каждый грех ломает следующую печать — если душа уже на краю
+  on_sin:
+    effect:
+      - if:
+          limit:
+            has_trait: ash_pact
+            NOR: [ { has_trait: ash_viceroy }, { has_flag: turned_from_prince } ]
+          random: { chance: 10, trigger_event: ashpath.0003 }
+      - else_if:
+          limit:
+            has_trait: ash_marked
+            NOR: [ { has_trait: ash_pact }, { has_flag: turned_from_prince } ]
+          random: { chance: 20, trigger_event: ashpath.0002 }
+      - else_if:
+          limit:
+            karma_tier: ashen
+            dread_tier: ">= horror"
+            has_trait: sadistic
+            NOR: [ { has_trait: ash_marked }, { has_trait: ash_viceroy }, { has_flag: turned_from_prince } ]
+          random: { chance: 25, trigger_event: ashpath.0001 }
+  # Свет зовёт к обету того, кто светел и свят
+  on_virtue:
+    effect:
+      - if:
+          limit:
+            is_adult: yes
+            karma_tier: solar
+            has_trait: theologian
+            NOR: [ { has_trait: living_saint }, { has_flag: declined_vow } ]
+          random: { chance: 25, trigger_event: lightpath.0001 }
+  # грех снял душу с солнечной ступени — Свет уходит
+  on_karma_tier_down:
+    effect:
+      - if:
+          limit:
+            has_trait: living_saint
+            NOT: { karma_tier: solar }
+          remove_trait: living_saint
+          trigger_event: lightpath.0002
+  on_yearly_pulse:
+    effect:
+      $append:
+        # Солнечный венец жжёт Наместника Пепла вдвойне
+        - if:
+            limit: { has_artifact: sun_crown, has_trait: ash_viceroy }
+            add_stress: 15
+            add_health: -0.5
+        - if:
+            limit:
+              karma_tier: solar
+              has_trait: theologian
+              NOR: [ { has_trait: living_saint }, { has_flag: declined_vow } ]
+            random: { chance: 15, trigger_event: lightpath.0001 }

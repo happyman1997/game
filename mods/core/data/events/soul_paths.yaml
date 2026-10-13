@@ -1,0 +1,125 @@
+# Печати Пути Пепла и обет Пути Света (см. common/soul_paths.yaml).
+events:
+  # ------------------------------------------------------------ печать I: шёпот
+  ashpath.0001:
+    requires_feature: karma
+    cooldown: { months: 6 }
+    theme: death
+    icon: "🔥"
+    triggered_only: true
+    options:
+      # отвернуться
+      - effect:
+          - set_flag: { name: turned_from_prince, years: 5 }
+          - add_stress: 10
+          - add_karma: { value: 3, deed: resisted_prince }
+        ai_chance: { value: 40, add: { value: ai_compassion, multiply: 10 } }
+      # ответить
+      - effect:
+          - add_trait: ash_marked
+          - add_secret: secret_ash_pact
+          - add_karma: { value: -5, deed: answered_prince }
+        ai_chance: { value: 40, if: { limit: { has_trait: sadistic }, add: 30 } }
+
+  # ------------------------------------------------------------ печать II: договор
+  ashpath.0002:
+    requires_feature: karma
+    cooldown: { months: 6 }
+    theme: death
+    icon: "🌑"
+    triggered_only: true
+    options:
+      # не берёт железо
+      - effect:
+          - add_trait: ash_pact
+          - add_trait: ash_iron_ward
+          - add_karma: { value: -10, deed: pact }
+        ai_chance: { value: 25, add: { value: prowess, multiply: 1 } }
+      # голос повелителя
+      - effect:
+          - add_trait: ash_pact
+          - add_trait: ash_voice
+          - add_karma: { value: -10, deed: pact }
+        ai_chance: { value: 25, if: { limit: { any_vassal: { fear_stance: defiant } }, add: 15 } }
+      # золото из пепла
+      - effect:
+          - add_trait: ash_pact
+          - add_trait: ash_gold
+          - add_karma: { value: -10, deed: pact }
+        ai_chance: { value: 20, if: { limit: { has_trait: greedy }, add: 30 } }
+      # отказаться — метка сойдёт
+      - effect:
+          - remove_trait: ash_marked
+          - set_flag: { name: turned_from_prince, years: 10 }
+          - add_stress: 20
+          - add_karma: { value: 10, deed: refused_pact }
+        ai_chance: { value: 15, add: { value: ai_compassion, multiply: 10 } }
+
+  # ------------------------------------------------------------ печать III: ночь, когда погасли все свечи
+  ashpath.0003:
+    requires_feature: karma
+    cooldown: { months: 6 }
+    theme: death
+    icon: "☠"
+    triggered_only: true
+    options:
+      # шагнуть в пепел: Наместник или Порождение
+      - effect:
+          random_list:
+            - weight: { value: 40, add: [ { value: prowess }, { value: learning } ], max: 85 }
+              add_trait: ash_viceroy
+              reveal_trait: ash_pact
+              add_dread: 40
+              add_karma: { value: -20, deed: viceroy }
+              every_independent_ruler:
+                limit: { religion: solar, NOT: { is_same_as: root } }
+                add_opinion: { target: root, modifier: viceroy_of_ash }
+              trigger_event: ashpath.0004
+            - weight: 50
+              send_message: { text: msg.ash_spawn, kind: bad }
+              death: { reason: ash_spawn }
+        ai_chance: 70
+      # отступить, пока не поздно
+      - effect:
+          - set_flag: { name: turned_from_prince, years: 5 }
+          - add_stress: 40
+        ai_chance: { value: 30, add: { value: ai_compassion, multiply: 10 } }
+
+  # Наместник Пепла явился
+  ashpath.0004:
+    requires_feature: karma
+    theme: death
+    icon: "☠"
+    triggered_only: true
+    options:
+      - effect: { add_prestige: 50 }
+
+  # ------------------------------------------------------------ Путь Света: обет Солнцу
+  lightpath.0001:
+    requires_feature: karma
+    cooldown: { months: 6 }
+    theme: faith
+    icon: "☀"
+    triggered_only: true
+    options:
+      - effect:
+          - add_trait: living_saint
+          - add_karma: { value: 10, deed: vow }
+          - add_prestige: 100
+        ai_chance: 80
+      - effect:
+          - set_flag: { name: declined_vow, years: 10 }
+          - add_karma: { value: 3, deed: humility }
+        ai_chance: 20
+
+  # Свет ушёл: грех снял святого с солнечной ступени
+  lightpath.0002:
+    requires_feature: karma
+    theme: faith
+    icon: "🌑"
+    triggered_only: true
+    options:
+      - effect: { add_stress: 30, add_piety: -100 }
+
+opinion_modifiers:
+  viceroy_of_ash: { value: -50, years: 30 }

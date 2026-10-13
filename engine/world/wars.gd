@@ -233,6 +233,20 @@ static func builtin_cb_targets() -> Dictionary:
 				var counties = (Titles.de_jure_counties(game, duchy) if duchy != null else [c]).filter(func(x): return realm.has(x))
 				out.append({"defender": def.id, "title": duchy if duchy != null else c, "counties": counties})
 			return out},
+		# крестовый поход: любой еретик, где бы он ни был; война — с державой,
+		# что его укрывает (его высшим сюзереном), цель — столица еретика
+		"heretic_realm": {"targets": func(game: Game, attacker: Dictionary) -> Array:
+			var out := []
+			if attacker.liege != null:
+				return out
+			for r in game.rulers():
+				if r.capital == null or not is_heretic(game, r):
+					continue
+				var def := Titles.top_liege(game, r)
+				if def.id == attacker.id or r.id == attacker.id:
+					continue
+				out.append({"defender": def.id, "title": r.titles[0] if not r.titles.is_empty() else r.capital, "counties": [r.capital]})
+			return out},
 	}
 
 
@@ -240,7 +254,7 @@ static func builtin_cb_targets() -> Dictionary:
 static func is_heretic(game: Game, c: Dictionary) -> bool:
 	for t in c.traits:
 		var td: Variant = game.content.get_def("traits", t)
-		if td != null and td.get("heretic") == true:
+		if td != null and td.get("heretic") != null and ScriptContext.is_yes(td.heretic):
 			return true
 	return false
 

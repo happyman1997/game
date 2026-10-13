@@ -137,6 +137,8 @@ ui:
     stress: of a broken heart
     plague: of the plague
     execution: executed
+    ash_spawn: became a spawn of ash
+    burned: burned at the stake of the Light
     duel: in a duel
   courtier_of: "Courtier of {who}"
   wanderer: Wanderer
