@@ -6,7 +6,7 @@
 # (самая тяжёлая обида графства). Чем выше ступень страха, тем реже ходоки:
 # опасение — вдвое, страх — вчетверо, ужас и террор — никогда (complaint_mult).
 #
-# События ступеней (игроку, из on_monthly_pulse): опасение — «Донос», страх —
+# События ступеней (любому правителю — и ИИ, из on_monthly_pulse): опасение — «Донос», страх —
 # «Дары без повода» и «Пустое место за столом», ужас — «Ворота открыты» и «Сон
 # о казнённых», террор — «Опустевшие деревни», «Кинжал под подушкой», «Шут».
 # Амнистия — только выбором в событиях («Сон о казнённых», «Шут»).
@@ -192,7 +192,6 @@ events:
     theme: intrigue
     icon: "👁"
     trigger:
-      is_player: yes
       dread_tier: ">= unease"
       any_courtier: { is_adult: yes, is_ruler: no }
       any_vassal: { fear_stance: obedient, opinion: { target: root, value: "< 10" } }
@@ -232,7 +231,6 @@ events:
     theme: court
     icon: "🎁"
     trigger:
-      is_player: yes
       dread_tier: ">= fear"
       num_vassals: ">= 2"
     cooldown: { years: 4 }
@@ -253,7 +251,6 @@ events:
     theme: court
     icon: "🍷"
     trigger:
-      is_player: yes
       dread_tier: ">= fear"
       any_courtier: { has_trait: [just, honest, compassionate], is_adult: yes, is_ruler: no, NOT: { is_close_family_of: root } }
       any_neighboring_ruler: { always: yes }
@@ -286,7 +283,6 @@ events:
     theme: war
     icon: "🏰"
     trigger:
-      is_player: yes
       dread_tier: ">= horror"
       is_at_war: yes
     cooldown: { years: 3 }
@@ -303,7 +299,6 @@ events:
     theme: stress
     icon: "🌑"
     trigger:
-      is_player: yes
       dread_tier: ">= horror"
       deeds_executions: ">= 1"
     cooldown: { years: 3 }
@@ -339,7 +334,6 @@ events:
     theme: realm
     icon: "🏚"
     trigger:
-      is_player: yes
       dread_tier: terror
       any_domain_province: { development: ">= 4" }
     cooldown: { years: 3 }
@@ -372,7 +366,6 @@ events:
     theme: intrigue
     icon: "🗡"
     trigger:
-      is_player: yes
       dread_tier: terror
     cooldown: { years: 4 }
     options:
@@ -399,7 +392,6 @@ events:
     theme: court
     icon: "🃏"
     trigger:
-      is_player: yes
       dread_tier: terror
     cooldown: { years: 5 }
     options:
@@ -424,6 +416,19 @@ events:
           - every_vassal: { add_opinion: { target: root, modifier: amnesty } }
         ai_chance: { value: 5, add: { value: ai_compassion, multiply: 10 } }
 
+# Вести мира: о ком игроку стоит знать (root — правитель ИИ) — о соседях,
+# о правителях своей державы (сюзерен, вассалы и их вассалы), о королях и
+# императорах.
+scripted_triggers:
+  known_to_player:
+    is_ai: yes
+    is_ruler: yes
+    exists: player
+    OR:
+      - tier: ">= 3"
+      - top_liege: { is_same_as: player.top_liege }
+      - player: { any_neighboring_ruler: { is_same_as: root } }
+
 # прозвище за террор (не за деяния — эффектом give_nickname)
 nicknames:
   terrible: { priority: 7 }
@@ -447,6 +452,20 @@ on_actions:
               - has_nickname: bloody
               - has_nickname: jailer
           give_nickname: terrible
+      # вести мира: в соседних землях правит ужас
+      - if:
+          limit:
+            dread_tier: ">= horror"
+            known_to_player: yes
+            NOT: { has_flag: dread_news }
+          set_flag: { name: dread_news, years: 10 }
+          save_scope_as: news_subject
+          player:
+            if:
+              limit: { scope:news_subject: { dread_tier: terror } }
+              send_message: { text: msg.news_terror, kind: event }
+            else:
+              send_message: { text: msg.news_horror, kind: event }
   on_monthly_pulse:
     random_events:
       events:

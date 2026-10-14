@@ -123,7 +123,7 @@ perk_desc:
   master_strategist: "Unlocks the Grand Muster: for two years levies, regiments and command are on the rise."
   stern_gaze: "Dread of you fades half as fast and grows faster."
   bloody_justice: "Executions inspire 15 more dread. You enjoy executions and imprisonment — they relieve stress."
-  dungeon_dread: "Each prisoner in your dungeon inspires 1 dread a month (up to five). You hate releasing prisoners."
+  dungeon_dread: "Each prisoner in your dungeon inspires 1 dread a month (up to five), but only up to horror — terror is forged by executions. You hate releasing prisoners."
   iron_fist: "Unlocks Intimidate (tribute through fear; a refusal gives you a lawful reason to imprison) and the Public Execution."
   knightly_vow: "Refusing your duel challenge is a double disgrace. You enjoy challenging others to duels."
   trophy_taker: "When you win a duel you take the loser's weapon (he will claim it back). A won battle has a 20% chance to bring a trophy shield."

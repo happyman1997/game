@@ -11,6 +11,8 @@ defines:
     dread_max: 100
     dread_decay: 0.75               # страх в месяц
     dread_decay_compassionate: 1.5
+    dread_prisoners_cap: 5          # пленников в счёт dread_per_prisoner (не больше)
+    dread_prisoners_max: 60         # темница держит страх лишь до ужаса — террор куют казни
     intimidated_per_dread: 0.3      # робкие подданные: + мнение за очко страха
     defiant_per_dread: -0.15        # храбрые и гневливые: − мнение
     defiant_traits: [brave, wrathful]

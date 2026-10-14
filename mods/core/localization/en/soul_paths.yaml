@@ -56,6 +56,8 @@ msg:
   viceroy_resists: "The Prince of Ash did not release his viceroy. The prayer broke against the ash."
   ash_spawn: "On the night all the candles went out, the ruler went into the ash as a spawn of the Prince. Power passes to the heir."
   ash_path_left: "At the edge of the Ashlands you cast your mark into the ash. The Prince has let you go — for now."
+  news_living_saint: "News: [scope:news_subject] has taken the Vow to the Sun. There is a Living Saint in the world again — pilgrims flock to them, and heretics fear their crusade."
+  news_viceroy: "News: on the night all the candles went out, [scope:news_subject] became a Viceroy of Ash. The faith of the Sun Emperor rises against them."
 
 ev:
   ashpath.0001:

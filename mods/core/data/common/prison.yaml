@@ -58,6 +58,17 @@ interactions:
       if:
         - limit: { has_imprisonment_reason: scope:recipient }
           add: 40
+        # жестокий нрав: неугодных — в темницу и без вины
+        - limit:
+            ai_cruelty: ">= 1"
+            NOT: { has_imprisonment_reason: scope:recipient }
+            scope:recipient:
+              NOT: { is_close_family_of: scope:actor }
+              OR:
+                - is_in_faction: yes
+                - opinion: { target: scope:actor, value: "< -15" }
+                - AND: [ { is_powerful_vassal: yes }, { opinion: { target: scope:actor, value: "< 0" } } ]
+          add: { value: ai_cruelty, multiply: 4 }
         - limit: { has_trait: [wrathful, vengeful, paranoid] }
           multiply: 1.5
         - limit: { has_trait: [forgiving, compassionate] }
@@ -91,6 +102,9 @@ interactions:
           add: -20
         - limit: { has_trait: [forgiving, compassionate, just] }
           add: 10
+        # праведный нрав милует и виновных
+        - limit: { ai_righteousness: ">= 3" }
+          add: { value: ai_righteousness, multiply: 2 }
 
   execute_prisoner:
     requires_feature: prison
@@ -142,6 +156,11 @@ interactions:
             has_trait: [wrathful, vengeful, arbitrary]
             NOT: { scope:recipient: { is_close_family_of: scope:actor } }
           add: 15
+        # жестокий нрав казнит и без суда
+        - limit:
+            ai_cruelty: ">= 1"
+            NOT: { scope:recipient: { is_close_family_of: scope:actor } }
+          add: { value: ai_cruelty, multiply: 4 }
         - limit: { has_trait: [compassionate, forgiving, just] }
           multiply: 0
 

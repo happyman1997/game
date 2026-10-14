@@ -42,6 +42,8 @@ focuses:
     lifestyle: martial_lifestyle
     icon: "🔨"
     modifiers: { martial: 1, levy_mult: 0.05 }
+    # жестокий нрав тянется к власти страхом (Стезя Тирана)
+    ai_will_do: { value: 1, add: { value: ai_cruelty, multiply: 0.5, min: 0 } }
   # управление
   focus_wealth:
     lifestyle: stewardship_lifestyle
@@ -78,6 +80,8 @@ focuses:
     lifestyle: learning_lifestyle
     icon: "⛪"
     modifiers: { learning: 1, monthly_piety: 0.5 }
+    # праведный нрав — к Стезе Светоча
+    ai_will_do: { value: 1, add: { value: ai_righteousness, multiply: 0.5, min: 0 } }
   focus_medicine:
     lifestyle: learning_lifestyle
     icon: "⚕"
@@ -187,8 +191,10 @@ perks:
     ai_will_do:
       value: 4
       if:
-        - limit: { has_trait: [wrathful, callous, arbitrary, vengeful, paranoid] }
+        - limit: { has_trait: [sadistic, wrathful, callous, arbitrary, vengeful, paranoid] }
           add: 25
+        - limit: { ai_cruelty: ">= 3" }
+          add: 40
         - limit: { has_trait: [compassionate, forgiving, just] }
           multiply: 0
   bloody_justice:
@@ -400,14 +406,20 @@ perks:
     unlocks: [magnum_opus]
     ai_will_do: 40
 
-  # ================================================ учёность: Святой — благочестие, мощи, чудеса
+  # ================================================ учёность: Светоч — благочестие, мощи, чудеса
   devout_prayer:
     lifestyle: learning_lifestyle
     tree: theology
     icon: "🙏"
     modifiers: { monthly_piety: 0.5 }
     stress_reactions: { go_on_pilgrimage: -20, give_alms: -5 }
-    ai_will_do: { value: 8, if: { limit: { has_trait: [zealous, humble, compassionate, chaste] }, add: 20 } }
+    ai_will_do:
+      value: 8
+      if:
+        - limit: { has_trait: [zealous, humble, compassionate, chaste] }
+          add: 20
+        - limit: { ai_righteousness: ">= 3" }
+          add: 30
   inner_peace:
     lifestyle: learning_lifestyle
     tree: theology

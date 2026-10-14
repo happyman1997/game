@@ -91,6 +91,12 @@ events:
     theme: death
     icon: "☠"
     triggered_only: true
+    # весть о Наместнике облетает весь мир
+    immediate:
+      - if:
+          limit: { is_ai: yes, exists: player }
+          save_scope_as: news_subject
+          player: { send_message: { text: msg.news_viceroy, kind: bad } }
     options:
       - effect: { add_prestige: 50 }
 
@@ -106,6 +112,11 @@ events:
           - add_trait: living_saint
           - add_karma: { value: 10, deed: vow }
           - add_prestige: 100
+          # вести мира: явился Живой святой
+          - if:
+              limit: { is_ai: yes, exists: player }
+              save_scope_as: news_subject
+              player: { send_message: { text: msg.news_living_saint, kind: good } }
         ai_chance: 80
       - effect:
           - set_flag: { name: declined_vow, years: 10 }

@@ -74,6 +74,9 @@ decisions:
       if:
         - limit: { gold: 300 }
           add: 20
+        # праведный нрав подаёт и не из избытка
+        - limit: { gold: 120, ai_righteousness: ">= 2" }
+          add: { value: ai_righteousness, multiply: 4 }
 
   seek_solitude:
     category: personal

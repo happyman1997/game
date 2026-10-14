@@ -6,6 +6,19 @@
 #     условие (desc — ключ локализации «когда», для подсказки черты).
 # ИИ избегает того, что ему претит (defines.personality.ai_weight).
 
+# Нрав для ИИ: из личности черт (ai_compassion, ai_vengefulness…). Жестокий
+# правитель (садист, чёрствый) сажает неугодных без вины и казнит пленников;
+# праведный (сострадательный, ревностный, честный) милует, раздаёт милостыню
+# и идёт по Стезе Светоча. Так ИИ живёт по тем же правилам, что и игрок.
+script_values:
+  ai_cruelty:
+    value: ai_compassion
+    multiply: -1
+    add: { value: ai_vengefulness, multiply: 0.5 }
+  ai_righteousness:
+    value: ai_compassion
+    add: [ { value: ai_zeal, multiply: 0.5 }, { value: ai_honor, multiply: 0.5 } ]
+
 defines:
   personality:
     ai_weight: 0.5            # воли ИИ за очко стресса (претит — меньше, по душе — больше)

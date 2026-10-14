@@ -427,6 +427,7 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 	if c.death != null or c.titles.is_empty():
 		return
 	var d := dread(c)
+	var nd := d
 	if d > 0.0:
 		var decay := game.def_num("politics.dread_decay", 0.75)
 		if c.traits.has("compassionate"):
@@ -434,11 +435,27 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 		# dread_decay_mult — например, тень мастерства дипломата: страх перед ним быстро тает
 		decay *= maxf(0.0, 1.0 + Stats.stat(game, c, "dread_decay_mult"))
 		# dread_floor — ниже страх не опускается (Наместник Пепла)
-		c.vars["dread"] = maxf(d - decay, Stats.stat(game, c, "dread_floor"))
-		if dread(c) <= 0.0:
-			c.vars.erase("dread")
-		if level_for(game, dread(c)) != int(Data.num(c.vars.get("dread_tier"), 0.0)):
-			_check_tier(game, c)
+		nd = maxf(d - decay, Stats.stat(game, c, "dread_floor"))
+	# Тиран: каждый пленник в темнице — немного страха в месяц, но лишь до
+	# dread_prisoners_max (темница доводит до ужаса, террор куют казни).
+	# Считается вместе со спадом, чтобы страх у порога не прыгал по ступеням.
+	var per_prisoner := Stats.stat(game, c, "dread_per_prisoner")
+	var pmax := game.def_num("politics.dread_prisoners_max", 60)
+	if per_prisoner > 0.0 and nd < pmax and game.engine.has_feature("prison"):
+		var n := Prison.prisoners_of(game, c.id).size()
+		if n > 0:
+			var gain := minf(float(n), game.def_num("politics.dread_prisoners_cap", 5)) * per_prisoner
+			gain *= maxf(0.0, 1.0 + Stats.stat(game, c, "dread_gain_mult"))
+			nd = minf(nd + gain, pmax)
+	if nd != d:
+		if nd > d:
+			_set_dread(game, c, nd)
+		else:
+			c.vars["dread"] = nd
+			if nd <= 0.0:
+				c.vars.erase("dread")
+			if level_for(game, nd) != int(Data.num(c.vars.get("dread_tier"), 0.0)):
+				_check_tier(game, c)
 	var tier: Variant = tier_of(game, c) if c.vars.has("dread_tier") else null
 	if tier != null:
 		# бессонница: кто внушает ужас, тот и сам не спит (кроме бессердечных)
@@ -454,12 +471,6 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 					var m: Variant = game.ch(mid)
 					if m != null and stance(game, m, c) != "defiant":
 						Factions.leave(game, m)
-	# Тиран: каждый пленник в темнице — немного страха в месяц
-	var per_prisoner := Stats.stat(game, c, "dread_per_prisoner")
-	if per_prisoner > 0.0 and game.engine.has_feature("prison"):
-		var n := Prison.prisoners_of(game, c.id).size()
-		if n > 0:
-			add_dread(game, c, minf(float(n), game.def_num("politics.dread_prisoners_cap", 5)) * per_prisoner)
 	if game.vassals_of(c.id).is_empty() or c.get("prison") != null:
 		return
 	# Прошения вассалов: игрок — с небольшим шансом каждый месяц, остальные

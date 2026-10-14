@@ -1,7 +1,7 @@
 # Путь Пепла и Путь Света («Свет и Пепел», механика karma).
 #
-# Путь Пепла: Пепельная душа + страх не ниже «Ужаса» + Садист. После каждого
-# греха (on_sin) — шанс, что сломается следующая печать (таймера нет):
+# Путь Пепла: Пепельная душа (Садисту и внушающему страх — чаще). После
+# каждого греха (on_sin) — шанс, что сломается следующая печать (таймера нет):
 #   I  «Шёпот» — ответить Князю и стать Меченым пеплом (скрытая черта);
 #   II «Договор» — дар на выбор (не берёт железо, голос повелителя, золото
 #      из пепла) ценой тайны договора: раскроют — станешь еретиком, и на тебя
@@ -13,8 +13,8 @@
 # Назад: до третьей печати — паломничество к Пепелищу; после — лишь смерть
 # или молитва Живого святого. События — events/soul_paths.yaml.
 #
-# Путь Света: Солнечная душа + Стезя Светоча (черта theologian) → «Обет
-# Солнцу» → Живой святой: видит души (и скрытые печати), творит сильные
+# Путь Света: Солнечная душа + (Стезя Светоча — черта theologian — или
+# ревностный) → «Обет Солнцу» → Живой святой: видит души (и скрытые печати), творит сильные
 # чудеса, отмаливает чужие печати и ведёт крестовый поход Света на еретика.
 # Тяжкий грех — и Свет уходит.
 
@@ -201,10 +201,11 @@ on_actions:
       - else_if:
           limit:
             karma_tier: ashen
-            dread_tier: ">= horror"
-            has_trait: sadistic
             NOR: [ { has_trait: ash_marked }, { has_trait: ash_viceroy }, { has_flag: turned_from_prince } ]
-          random: { chance: 25, trigger_event: ashpath.0001 }
+          # садизм и страх зовут Князя громче
+          random:
+            chance: { value: 15, if: { limit: { OR: [ { has_trait: sadistic }, { dread_tier: ">= fear" } ] }, add: 20 } }
+            trigger_event: ashpath.0001
   # Свет зовёт к обету того, кто светел и свят
   on_virtue:
     effect:
@@ -212,7 +213,7 @@ on_actions:
           limit:
             is_adult: yes
             karma_tier: solar
-            has_trait: theologian
+            has_trait: [theologian, zealous]
             NOR: [ { has_trait: living_saint }, { has_flag: declined_vow } ]
           random: { chance: 25, trigger_event: lightpath.0001 }
   # грех снял душу с солнечной ступени — Свет уходит
@@ -235,6 +236,6 @@ on_actions:
         - if:
             limit:
               karma_tier: solar
-              has_trait: theologian
+              has_trait: [theologian, zealous]
               NOR: [ { has_trait: living_saint }, { has_flag: declined_vow } ]
             random: { chance: 15, trigger_event: lightpath.0001 }
