@@ -32,7 +32,7 @@ static func opinion_for(game: Game, kind: String, lv: int) -> float:
 	return Data.num(arr[clampi(lv, 0, arr.size() - 1)]) if not arr.is_empty() else 0.0
 
 
-## Стезя усиливает добрую славу: <kind>_opinion_mult (Государь, Святой).
+## Стезя усиливает добрую славу: <kind>_opinion_mult (Государь, Светоч).
 static func boosted(game: Game, c: Dictionary, kind: String, v: float) -> float:
 	if v <= 0.0:
 		return v

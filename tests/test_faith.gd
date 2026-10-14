@@ -29,8 +29,11 @@ func _holy_targets(g: Game, r: Dictionary) -> Array:
 func test_holy_war_only_against_heretics() -> void:
 	var g := _game()
 	var kings: Array = g.rulers().filter(func(c): return c.liege == null)
+	# культы друг с другом не воюют: священная война — только на еретиков
+	# (в начале игры — Восточная марка с её ересью)
 	for r in kings:
-		check(_holy_targets(g, r).is_empty(), "%s: культы не воюют друг с другом" % r.id)
+		for t in _holy_targets(g, r):
+			check(Wars.is_heretic(g, g.ch(t.defender)), "%s: культы не воюют друг с другом (цель %s)" % [r.id, t.defender])
 	# еретик — законная цель и для единоверца
 	var sven: Dictionary = g.ch("sweyn_estridsen")
 	g.content.set_def("traits", "_test_heretic", {"heretic": true, "group": "_test"})

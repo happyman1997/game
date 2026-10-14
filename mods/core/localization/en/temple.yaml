@@ -1,0 +1,56 @@
+# The Temple of the Sun and the Great Lightbearer (data/common/temple.yaml).
+government:
+  temple: Temple Throne
+government_desc:
+  temple: "The Great Lightbearer is elected by the sun-priests of the Throne; all take a vow of celibacy, and each year new priests come to the Temple. The Temple does not conquer — it wages only holy wars, and the faithful are loath to raise a hand against it: that is sacrilege."
+succession_law:
+  temple_election: Election by the Sun-Priests
+succession_law_desc:
+  temple_election: "The sun-priests elect the most learned and eloquent among them as the new Great Lightbearer."
+trait:
+  sun_priest: Sun-Priest
+trait_desc:
+  sun_priest: "Serves the Temple of the Sun under a vow of celibacy. The Great Lightbearer is elected from among the sun-priests."
+interaction:
+  temple_gift: Gift to the Temple
+  beg_absolution: Beg for Absolution
+interaction_desc:
+  temple_gift: "Gold for the Temple of the Sun — piety for the giver and the favour of the Great Lightbearer. A soul cannot be bought, but a face can."
+  beg_absolution: "Repent publicly before the Great Lightbearer: a hundred gold and a hundred piety, if he accepts your penance. He accepts it from those he trusts."
+decision:
+  request_divorce: Ask the Temple for a Divorce
+decision_desc:
+  request_divorce: "Your cult does not recognise divorce without the Temple's leave. If the Great Lightbearer favours you, he will dissolve the marriage; your former spouse and their kin will not forgive it."
+casus_belli:
+  liberate_temple: Liberation of the Temple
+casus_belli_desc:
+  liberate_temple: "Reims is in a stranger's hands and the Throne of the Lightbearer stands empty. Victory returns the Temple to the priests and seats a new Great Lightbearer — the faithful will not forget it."
+cb:
+  liberate_temple:
+    war_name: "Liberation of the Temple of the Sun"
+opinion_modifier:
+  temple_gift: Gift to the Temple
+  crowned_by_me: Anointed by me
+  absolved: Penance accepted
+  divorced_me: Divorced me
+  divorced_relative: Divorced my kin
+  freed_the_temple: Freed the Temple
+karma_deed:
+  temple_freed: Freed the Temple
+  temple_desecrated: Raised a hand against the Temple
+doctrine:
+  divorce:
+    approval: divorce by the Temple's leave
+  polygamy:
+    "true": polygamy
+    "false": monogamy
+tr:
+  faith_doctrine: "Cult teaching: {value}"
+ui:
+  coronation_needs_head: "The Great Lightbearer anoints: he must favour you (opinion 0 or more). If the Throne is empty, there is no one to anoint you."
+  divorce_needs_head: "The Great Lightbearer must favour you (opinion 20 or more)"
+msg:
+  news_temple_attacked: "News: [scope:news_subject] has waged war on the Temple of the Sun. The Great Lightbearer has cast the blasphemer out of the Light."
+  news_temple_taken: "News: [scope:news_subject] has seized Reims. The Throne of the Lightbearer stands empty, the blasphemer is cast out of the Light — the faithful call to free the Temple."
+  news_temple_freed: "News: the Temple of the Sun is free. The sun-priests have elected a new Great Lightbearer."
+  saint_recognized: "The Great Lightbearer has recognised your sanctity: every temple speaks of the Living Saint."

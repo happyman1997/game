@@ -47,6 +47,7 @@ modifier:
   bad_omen: Ill Omen
 
 msg:
+  news_east_rite: "News: cast out of the Light, [scope:news_subject] has gone over to the Eastern Rite. The heresy grows."
   news_cast_out: "News: the Great Lightbearer has cast [scope:news_subject] out of the Light. The faithful may wage holy war upon them."
   ash_pilgrimage_back: "You have returned from the Ashlands. Your soul is lighter."
   ash_pilgrimage_storm: "An ash storm caught the pilgrims at the very edge. You returned — but not whole."
@@ -79,3 +80,4 @@ ev:
     desc_tyrant: "A messenger of the Great Lightbearer brought a charter with a black seal. The blood shed by your executioners has reached the Temple steps: a ruler who holds his people by terror is no son of the Sun. You are cast out of the Light, and any neighbour of your faith may raise a holy war against you."
     a: Repent and pay
     b: Let them cast me out
+    c: Go over to the Eastern Rite

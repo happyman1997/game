@@ -87,7 +87,9 @@ events:
         ai_chance: { value: 10, add: { value: ai_zeal, multiply: -10 } }
 
   # ------------------------------------------------------------ изгнание из Света
-  # Пепельную душу — и тирана, правящего террором, с пеплом на душе.
+  # Пепельную душу — и тирана, правящего террором, с пеплом на душе. Решает
+  # Великий Светоч: кому он благоволит (лицо — благочестие, дары), того не
+  # отлучают; пустой престол не отлучает никого.
   soul.0005:
     requires_feature: karma
     theme: faith
@@ -95,10 +97,13 @@ events:
     trigger:
       is_ruler: yes
       religion: solar
+      is_heretic: no
+      is_faith_head: no
       OR:
         - karma_tier: ashen
         - AND: [ { dread_tier: terror }, { karma_tier: "<= tainted" } ]
       NOT: { has_modifier: cast_out_of_light }
+      faith_head: { opinion: { target: root, value: "< 0" } }
     cooldown: { years: 8 }
     desc:
       - trigger: { dread_tier: terror }
@@ -123,6 +128,16 @@ events:
               save_scope_as: news_subject
               player: { send_message: { text: msg.news_cast_out, kind: event } }
         ai_chance: 50
+      # уйти в Восточный обряд: Император — судья, а Храм нам не указ
+      - effect:
+          - change_faith: east_rite
+          - capital: { change_faith: east_rite }
+          - add_prestige: -50
+          - if:
+              limit: { known_to_player: yes }
+              save_scope_as: news_subject
+              player: { send_message: { text: msg.news_east_rite, kind: event } }
+        ai_chance: { value: 5, if: { limit: { has_trait: [cynical, arrogant, ambitious] }, add: 10 } }
 
 on_actions:
   on_yearly_pulse:

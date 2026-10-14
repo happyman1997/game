@@ -1,0 +1,264 @@
+# Храм Солнца и Великий Светоч (механика temple).
+#
+# Престол Светоча — малый домен Храма в Реймсе (титул d_sun_throne). Его
+# держатель — Великий Светоч, глава веры для культов с head_title; его
+# избирают жрецы-светочи (правление temple). Он судит единоверцев по «лицу»:
+# благочестию, страху и ереси (defines.faith) — и от его мнения зависят:
+#   отлучение (soul.0005: пепельную душу или тирана отлучают, лишь если
+#     Великий Светоч не благоволит им — лицо спасает и лицемера);
+#   коронация (помазывает он — нужно, чтобы благоволил; часть платы — Храму);
+#   развод (у культов с doctrines.divorce: approval — «Просить Храм о разводе»);
+#   признание Живого святого (слава и благочестие).
+# Задобрить Храм — «Дар Храму»; отлучённому — «Просить о снятии отлучения».
+# Поднять руку на Храм — святотатство: нападающего отлучают, а захватчика
+# Реймса — тоже; престол пустеет, и единоверцы идут «Освобождать Храм».
+
+defines:
+  faith:
+    virtue_opinion: 5            # единоверец о видимой добродетели культа
+    sin_opinion: -5              # и о видимом грехе
+    # мнение главы веры о единоверце по уровню благочестия (0 — нечестие … 5 — подвижник)
+    head_piety_opinion: [-25, 0, 8, 16, 24, 32]
+    # и по ступени страха (спокойствие, опасение, страх, ужас, террор)
+    head_dread_opinion: [0, 0, -5, -15, -30]
+    head_heretic_opinion: -50
+
+governments:
+  # Храмовый престол: Великого Светоча избирают жрецы-светочи, все дают обет
+  # безбрачия; каждый год к Престолу приходят новые жрецы. Храм не
+  # завоёвывает — он ведёт лишь священные войны.
+  temple:
+    requires_feature: governments
+    icon: "☀"
+    order: 5
+    succession: temple_election
+    celibate: yes
+    war_cbs: [holy_war, liberate_temple]
+    ai_war_mult: 0.3
+    # святыню трогают лишь безбожники: ИИ-единоверец нападает на Храм неохотно
+    ai_attacked_mult: 0.05
+    ruler_modifiers: { domain_limit: 2, monthly_piety: 3, monthly_income: 1 }
+    county_modifiers: { development_growth: 0.1, fort: 1 }
+    members:
+      trait: sun_priest
+      per_year: [0, 1]
+      age: [25, 45]
+      max: 6
+      skills: { learning: [8, 16], diplomacy: [5, 12] }
+      cultures: [french, french, french, norman, english, flemish, marcher, danish]
+
+succession_laws:
+  temple_election:
+    requires_feature: governments
+    algorithm: elected_member
+    gender: equal
+    government_only: yes
+    election_skills: { learning: 2, diplomacy: 1 }
+
+traits:
+  # Жрец-светоч: служитель Храма Солнца, дал обет безбрачия.
+  sun_priest:
+    requires_feature: governments
+    category: lifestyle
+    icon: "☀"
+    celibate: yes
+    modifiers: { learning: 1, monthly_piety: 0.3 }
+
+opinion_modifiers:
+  temple_gift: { value: 20, years: 10 }
+  crowned_by_me: { value: 10, years: 10 }
+  absolved: { value: 10, years: 10 }
+  divorced_me: { value: -40, years: 20 }
+  divorced_relative: { value: -20, years: 10 }
+  freed_the_temple: { value: 25, years: 20 }
+
+interactions:
+  # Дар Храму: золото — лицу, а не душе. Великий Светоч благоволит дарителю.
+  temple_gift:
+    requires_feature: temple
+    icon: "☀"
+    category: diplomacy
+    is_shown:
+      scope:recipient: { is_faith_head: yes }
+      scope:actor:
+        is_ruler: yes
+        is_faith_head: no
+        faith_head: { is_same_as: scope:recipient }
+    cost:
+      gold: { value: 50, add: { value: "scope:actor.tier", multiply: 25 } }
+    auto_accept: yes
+    cooldown: { years: 2 }
+    on_accept:
+      - scope:recipient:
+          add_gold: { value: 50, add: { value: "scope:actor.tier", multiply: 25 } }
+          add_opinion: { target: scope:actor, modifier: temple_gift }
+      - add_piety: 40
+    ai_targets: [faith_head]
+    ai_frequency_months: 12
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { gold: 300 }
+          add: 10
+        # кто боится отлучения — задабривает Храм
+        - limit:
+            gold: 150
+            OR: [ { karma_tier: "<= tainted" }, { dread_tier: ">= horror" }, { has_modifier: cast_out_of_light } ]
+            scope:recipient: { opinion: { target: scope:actor, value: "< 10" } }
+          add: 40
+        - limit: { has_trait: [zealous, generous] }
+          add: 10
+        - limit: { has_trait: greedy }
+          multiply: 0.3
+
+  # Покаяться перед Великим Светочем: он снимает отлучение с тех, кому верит.
+  beg_absolution:
+    requires_feature: temple
+    icon: "🕯"
+    category: diplomacy
+    is_shown:
+      scope:recipient: { is_faith_head: yes }
+      scope:actor:
+        has_modifier: cast_out_of_light
+        faith_head: { is_same_as: scope:recipient }
+    is_valid:
+      scope:actor: { gold: 100, piety: 100 }
+    cooldown: { years: 2 }
+    ai_accept:
+      value: 40
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 1 } }
+    on_accept:
+      - scope:actor:
+          remove_modifier: cast_out_of_light
+          add_gold: -100
+          add_piety: -100
+          add_prestige: -50
+      - scope:recipient: { add_opinion: { target: scope:actor, modifier: absolved } }
+    on_decline:
+      - scope:actor: { add_prestige: -30 }
+    ai_targets: [faith_head]
+    ai_frequency_months: 12
+    ai_will_do: { value: 40, add: { value: ai_zeal, multiply: 10 } }
+
+decisions:
+  # Помазание — дело Великого Светоча: если он не благоволит, не помажет,
+  # а если престол пуст, помазать некому. Часть платы уходит Храму.
+  coronation:
+    is_valid:
+      custom_tooltip:
+        text: ui.coronation_needs_head
+        trigger: { faith_head: { opinion: { target: root, value: ">= 0" } } }
+    effect:
+      $append:
+        - faith_head:
+            add_gold: 50
+            add_opinion: { target: root, modifier: crowned_by_me }
+
+  # Развод — с дозволения Храма (у культов с doctrines.divorce: approval).
+  request_divorce:
+    requires_feature: temple
+    category: personal
+    icon: "💔"
+    is_shown:
+      is_married: yes
+      faith_doctrine: { divorce: approval }
+    is_valid:
+      custom_tooltip:
+        text: ui.divorce_needs_head
+        trigger: { faith_head: { opinion: { target: root, value: ">= 20" } } }
+    cost: { piety: 150, gold: 50 }
+    cooldown: { years: 5 }
+    effect:
+      - random_spouse: { save_scope_as: former_spouse }
+      - scope:former_spouse:
+          add_opinion: { target: root, modifier: divorced_me }
+          every_close_family:
+            limit: { NOT: { is_same_as: root } }
+            add_opinion: { target: root, modifier: divorced_relative }
+      - divorce: scope:former_spouse
+      - add_prestige: -50
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { any_spouse: { opinion: { target: root, value: "< -50" } } }
+          add: 5
+
+casus_belli:
+  # Освобождение Храма: Реймс в руках чужака, престол пуст — единоверцы идут
+  # вернуть Храм жрецам. Победа сажает на Престол нового Великого Светоча.
+  liberate_temple:
+    requires_feature: temple
+    category: faith
+    icon: "☀"
+    targets: independent_ruler
+    is_shown:
+      religion: solar
+      is_heretic: no
+    is_valid:
+      title:c_reims:
+        holder:
+          top_liege: { is_same_as: scope:defender }
+          is_faith_head: no
+    on_victory:
+      - scope:attacker:
+          add_piety: 300
+          add_prestige: 200
+          add_karma: { value: 10, deed: temple_freed }
+          create_character:
+            age: 55
+            culture: french
+            faith: sun_rite
+            traits: [sun_priest, zealous, education_learning_3]
+            dynasty: none
+            save_scope_as: new_lightbearer
+      - scope:new_lightbearer:
+          - gain_title: title:d_sun_throne
+          - gain_title: title:c_reims
+          - become_independent: yes
+      - every_independent_ruler:
+          limit: { religion: solar, is_heretic: no, NOT: { is_same_as: scope:attacker } }
+          add_opinion: { target: scope:attacker, modifier: freed_the_temple }
+      - if:
+          limit: { exists: player }
+          player: { send_message: { text: msg.news_temple_freed, kind: good } }
+    on_white_peace:
+      - scope:attacker: { add_piety: -50 }
+    on_defeat:
+      - scope:attacker: { add_piety: -100, add_prestige: -100 }
+    ai_will_do:
+      value: 60
+      add: { value: ai_zeal, multiply: 15 }
+    truce_years: 5
+    war_name: cb.liberate_temple.war_name
+
+on_actions:
+  # Поднять войну на Храм — святотатство: единоверца отлучают сразу.
+  on_war_started:
+    effect:
+      $append:
+        - if:
+            limit:
+              scope:defender: { is_faith_head: yes }
+              faith_head: { is_same_as: scope:defender }
+              is_heretic: no
+            add_modifier: { id: cast_out_of_light, years: 20 }
+            add_karma: { value: -15, deed: temple_desecrated }
+            save_scope_as: news_subject
+            player: { send_message: { text: msg.news_temple_attacked, kind: bad } }
+  # Захватить Реймс у Престола — святотатство; престол пустеет до освобождения.
+  on_title_gained:
+    effect:
+      $append:
+        - if:
+            limit:
+              holds_title: c_reims
+              is_faith_head: no
+              is_heretic: no
+              religion: solar
+              NOT: { has_modifier: cast_out_of_light }
+              exists: title:d_sun_throne.holder
+            add_modifier: { id: cast_out_of_light, years: 20 }
+            add_karma: { value: -15, deed: temple_desecrated }
+            save_scope_as: news_subject
+            player: { send_message: { text: msg.news_temple_taken, kind: bad } }

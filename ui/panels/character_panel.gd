@@ -130,10 +130,15 @@ static func _header(app: App, c: Dictionary) -> Control:
 		var d := g.desc_of("faiths", c.faith)
 		if d != "":
 			bb += "\n" + BB.i(d)
+		if fdef != null and fdef.get("heretic") != null and ScriptContext.is_yes(fdef.heretic):
+			bb += "\n" + BB.bad(app.t("ui.faith_heretic"))
 		if fdef != null and not Data.as_array(fdef.get("virtues")).is_empty():
-			bb += "\n" + BB.good("+ ") + ", ".join(Data.as_array(fdef.virtues).map(func(x): return g.name_of("traits", x)))
+			bb += "\n" + BB.good(app.t("ui.faith_virtues")) + " " + ", ".join(Data.as_array(fdef.virtues).map(func(x): return g.name_of("traits", x)))
 		if fdef != null and not Data.as_array(fdef.get("sins")).is_empty():
-			bb += "\n" + BB.bad("− ") + ", ".join(Data.as_array(fdef.sins).map(func(x): return g.name_of("traits", x)))
+			bb += "\n" + BB.bad(app.t("ui.faith_sins")) + " " + ", ".join(Data.as_array(fdef.sins).map(func(x): return g.name_of("traits", x)))
+		if g.engine.has_feature("temple") and Temple.head_title_of(g, c) != null:
+			var head: Variant = Temple.head_of(g, c)
+			bb += "\n" + (BB.muted(app.t("ui.faith_head")) + " " + Chars.full_name(g, head, true) if head != null else BB.bad(app.t("ui.faith_head_none")))
 		return bb)
 	var cdef: Variant = g.content.get_def("cultures", c.culture)
 	var cul_l := K.hbox([K.icon("speech", 16), K.label(g.name_of("cultures", c.culture))], 4)

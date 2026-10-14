@@ -127,29 +127,37 @@ cultures:
 # Основатель Солнечной империи вознёсся в пламени и стал богом; его
 # антипод — Князь Пепла, низвергнутый в сердце империи в ночь пожара.
 # Веры ниже — культы этой веры: между ними соперничество, а не священные
-# войны (священная война — только против еретиков, см. traits.heretic).
+# войны (священная война — только против еретиков: еретического культа с
+# heretic: yes, черт и модификаторов с heretic: yes).
+# virtues / sins — что культ чтит и осуждает: единоверцы того же культа
+# судят по ним правителя (механика temple). head_title — Престол Светоча:
+# его держатель, Великий Светоч, — глава веры для культов, признающих Храм.
 faiths:
   # Солнечный обряд: главный культ — Храм Солнца, жрецы-светочи, Великий Светоч
   sun_rite:
     religion: solar
     color: "#e0c070"
     icon: "☀"
+    head_title: d_sun_throne
     doctrines: { polygamy: false, divorce: approval }
     virtues: [chaste, temperate, humble, just, patient, generous, diligent]
     sins: [lustful, gluttonous, arrogant, arbitrary, impatient, greedy, lazy]
-  # Восточный обряд: те же таинства, но Император чтится прежде всего как судья
+  # Восточный обряд — ересь: Император не бог, а лишь судья, что взвешивает
+  # души; Храм и Великий Светоч ему не нужны. Исповедует Восточная марка.
   east_rite:
     religion: solar
+    heretic: yes
     color: "#b07a3a"
-    icon: "☀"
+    icon: "⚖"
     doctrines: { polygamy: false }
-    virtues: [chaste, temperate, humble, zealous]
-    sins: [lustful, gluttonous, arrogant, cynical]
+    virtues: [just, honest, zealous, temperate]
+    sins: [arbitrary, deceitful, cynical, gluttonous]
   # Культ Зимнего Волка: бог-воин севера, побратим Императора
   wolf_cult:
     religion: solar
     color: "#5a6a8a"
     icon: "🐺"
+    head_title: d_sun_throne
     doctrines: { polygamy: true }
     virtues: [brave, wrathful, gregarious]
     sins: [craven, shy, content]

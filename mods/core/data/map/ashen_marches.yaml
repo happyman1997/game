@@ -102,15 +102,15 @@ provinces:
   c_dannfurt:     { lat: 49.8,  lon: 9.9,  duchy: d_talgau, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 10, holdings: [castle, city, temple] }
 
   # ---------------------------------------------------------- Восточная марка
-  c_grenzburg:    { lat: 52.45, lon: 13.35, duchy: d_grenzmark, terrain: plains, culture: marcher, faith: ash_penitence, development: 10, holdings: [castle, city, temple], buildings: [border_citadel, walls] }
-  c_kohlheide:    { lat: 52.9,  lon: 12.4, duchy: d_grenzmark, terrain: forest, culture: marcher, faith: ash_penitence, development: 5, holdings: [castle] }
-  c_osterau:      { lat: 52.4,  lon: 14.5, duchy: d_grenzmark, terrain: wetlands, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle, city], buildings: [walls] }
-  c_wachtholm:    { lat: 53.5,  lon: 13.3, duchy: d_seemark, terrain: plains, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle, temple] }
-  c_seewacht:     { lat: 54.0,  lon: 12.45, duchy: d_seemark, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 8, holdings: [castle, city] }
-  c_erzfurt:      { lat: 51.4,  lon: 12.65, duchy: d_erzgau, terrain: farmlands, culture: marcher, faith: ash_penitence, development: 12, holdings: [castle, city, temple] }
-  c_brandwacht:   { lat: 51.95, lon: 12.1, duchy: d_erzgau, terrain: plains, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle] }
-  c_marchenfeld:  { lat: 51.85, lon: 13.3, duchy: d_erzgau, terrain: plains, culture: marcher, faith: ash_penitence, development: 7, holdings: [castle, temple] }
-  c_schwarzwacht: { lat: 51.7,  lon: 14.3, duchy: d_erzgau, terrain: forest, culture: marcher, faith: ash_penitence, development: 6, holdings: [castle], buildings: [walls] }
+  c_grenzburg:    { lat: 52.45, lon: 13.35, duchy: d_grenzmark, terrain: plains, culture: marcher, faith: east_rite, development: 10, holdings: [castle, city, temple], buildings: [border_citadel, walls] }
+  c_kohlheide:    { lat: 52.9,  lon: 12.4, duchy: d_grenzmark, terrain: forest, culture: marcher, faith: east_rite, development: 5, holdings: [castle] }
+  c_osterau:      { lat: 52.4,  lon: 14.5, duchy: d_grenzmark, terrain: wetlands, culture: marcher, faith: east_rite, development: 6, holdings: [castle, city], buildings: [walls] }
+  c_wachtholm:    { lat: 53.5,  lon: 13.3, duchy: d_seemark, terrain: plains, culture: marcher, faith: east_rite, development: 6, holdings: [castle, temple] }
+  c_seewacht:     { lat: 54.0,  lon: 12.45, duchy: d_seemark, terrain: farmlands, culture: marcher, faith: east_rite, development: 8, holdings: [castle, city] }
+  c_erzfurt:      { lat: 51.4,  lon: 12.65, duchy: d_erzgau, terrain: farmlands, culture: marcher, faith: east_rite, development: 12, holdings: [castle, city, temple] }
+  c_brandwacht:   { lat: 51.95, lon: 12.1, duchy: d_erzgau, terrain: plains, culture: marcher, faith: east_rite, development: 6, holdings: [castle] }
+  c_marchenfeld:  { lat: 51.85, lon: 13.3, duchy: d_erzgau, terrain: plains, culture: marcher, faith: east_rite, development: 7, holdings: [castle, temple] }
+  c_schwarzwacht: { lat: 51.7,  lon: 14.3, duchy: d_erzgau, terrain: forest, culture: marcher, faith: east_rite, development: 6, holdings: [castle], buildings: [walls] }
 
   # ---------------------------------------------------------- Орден Стражей Пепла
   c_aschenwacht:  { lat: 50.85, lon: 9.9,  duchy: d_ashwatch, terrain: hills, culture: marcher, faith: ash_penitence, development: 8, holdings: [castle, temple], buildings: [ash_citadel, monastery] }

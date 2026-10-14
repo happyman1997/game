@@ -33,7 +33,7 @@ provinces:
   # --------------------------------------------------- Шампань и Блуа
   c_troyes:     { lat: 48.3,  lon: 4.1,   duchy: d_champagne, terrain: farmlands, culture: french, faith: sun_rite, development: 11, holdings: [castle, city] }
   c_meaux:      { lat: 48.95, lon: 3.05,  duchy: d_champagne, terrain: farmlands, culture: french, faith: sun_rite, development: 10, holdings: [castle, city] }
-  c_reims:      { lat: 49.25, lon: 4.05,  duchy: d_champagne, terrain: farmlands, culture: french, faith: sun_rite, development: 13, holdings: [castle, city, temple] }
+  c_reims:      { lat: 49.25, lon: 4.05,  duchy: d_sun_throne, terrain: farmlands, culture: french, faith: sun_rite, development: 13, holdings: [castle, city, temple] }
   c_blois:      { lat: 47.6,  lon: 1.3,   duchy: d_blois, terrain: forest, culture: french, faith: sun_rite, development: 9, holdings: [castle, temple] }
   c_chartres:   { lat: 48.45, lon: 1.5,   duchy: d_blois, terrain: farmlands, culture: french, faith: sun_rite, development: 11, holdings: [castle, city, temple] }
   # --------------------------------------------------- Анжу

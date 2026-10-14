@@ -161,7 +161,7 @@ defines:
 | `skill_archetypes` | `core/data/common/archetypes.yaml` | Связки навыков: `{ skills: [..], min, icon, modifiers }`. |
 | `traits` | `core/data/common/traits.yaml` | Черты: `category`, `icon`, `modifiers`, `opposites`, `compatibility`, `genetic`/`birth_chance`/`inherit_chance`, `education`, `ai`, `monthly_death_chance`, `monthly_cure_chance`, `duration_days`, `group`, `color` (цвет плашки), `concealed` (скрытая черта — см. «Крюки и секреты»), `portrait` (как черта меняет портрет — см. ниже). |
 | `cultures` | `core/data/common/cultures.yaml` | `color`, `male_names`, `female_names`, `dynasty_pattern` (`name`/`place`), `succession_law`, `skin`/`hair`, `modifiers`, `traits` (врождённые черты всех людей этой культуры — например, раса `dwarf`), `government` (правление по умолчанию). |
-| `faiths` | там же | `religion`, `color`, `icon`, `doctrines` (`polygamy`), `virtues`, `sins`, `modifiers`, `no_holy_war_with` (религии, с которыми эта вера не ведёт священных войн — в обе стороны). Священная война возможна против другой религии, а внутри своей — только против еретика: персонажа с чертой или модификатором `heretic: yes` (условие `is_heretic`; в ядре — раскрытый договор с Князем Пепла и изгнание из Света `cast_out_of_light`); еретик — законная цель даже для единоверца. В базовой игре весь мир исповедует одну религию `solar` (Вера Солнечного Императора), а веры — её культы. |
+| `faiths` | там же | `religion`, `color`, `icon`, `doctrines` (`polygamy`, `divorce: approval`), `virtues`, `sins` (единоверцы того же культа судят по ним правителя — см. «Храм»), `head_title` (титул главы веры), `heretic` (еретический культ), `modifiers`, `no_holy_war_with` (религии, с которыми эта вера не ведёт священных войн — в обе стороны). Священная война возможна против другой религии, а внутри своей — только против еретика: последователя культа с `heretic: yes` или персонажа с чертой или модификатором `heretic: yes` (условие `is_heretic`; в ядре — Восточный обряд, раскрытый договор с Князем Пепла и изгнание из Света `cast_out_of_light`); еретик — законная цель даже для единоверца. В базовой игре весь мир исповедует одну религию `solar` (Вера Солнечного Императора), а веры — её культы. |
 | `terrain`, `holdings`, `buildings` | `core/data/common/economy.yaml` | Местность (оборона, скорость, высота рельефа, `attrition` — потери армий в месяц), владения (налог, ополчение, крепость), постройки (`holding`, `requires`, `cost`, `days`, `modifiers`, `owner_modifiers`, `trigger`; `special: yes` — особая постройка: не строится и не занимает места, её дают графству данные карты или эффект `add_building`, а действует она на того, кто держит графство). |
 | `map`, `landmasses`, `provinces`, `map_links` | `core/data/map/` | Карта — см. раздел 7. |
 | `titles` | `core/data/map/titles.yaml` | Иерархия де-юре: `tier`, `liege`, `color`, `capital`, `coa` (герб), `no_create`. Графства создаются из провинций автоматически. |
@@ -1082,7 +1082,7 @@ skill_archetypes:                                              # связки н
 (доля опыта — `secondary_share`, по умолчанию половина; в `arcana` колдовство
 учится и учёностью).
 
-### Испытания путей
+### Испытания призваний
 
 Механика `trials`. Для каждой связки движок сам создаёт решение
 `trial_<id>` («Испытание призвания: …»; своё решение с таким id в данных его
@@ -1366,6 +1366,35 @@ karma_tiers:
 `num_foreign_culture_counties`, эффекты графства `convert_to_holder_faith`,
 `convert_to_holder_culture`. Хук `lands.converted` — `{province, kind, from, to, holder}`.
 
+### Храм: культы и глава веры
+
+Механика `temple` (данные — `core/data/common/temple.yaml`, культы —
+`cultures.yaml` и `ashen_marches.yaml`). У культа:
+
+- `virtues` / `sins` — черты, которые культ чтит и осуждает. Единоверец того же
+  культа получает к мнению о правителе `defines.faith.virtue_opinion` за каждую
+  видимую добродетель и `sin_opinion` за каждый видимый грех («лицо»: судят по
+  чертам, а не по душе).
+- `head_title` — титул главы веры. Его держатель — глава веры для всех культов с
+  этим полем (в ядре — Великий Светоч, Престол Светоча `d_sun_throne` в Реймсе с
+  правлением `temple`). Пустой титул — престол пуст. Глава веры судит
+  единоверцев по благочестию (`defines.faith.head_piety_opinion` по уровням),
+  страху (`head_dread_opinion` по ступеням) и ереси (`head_heretic_opinion`).
+- `heretic: yes` — культ-ересь (в ядре — Восточный обряд Восточной марки):
+  его последователи — законная цель священной войны.
+
+Скрипт: ссылка и список `faith_head` (глава веры персонажа; список — цель
+`ai_targets` для взаимодействий ИИ), условия `is_faith_head`,
+`faith_doctrine: { divorce: approval }`. В ядре мнение Великого Светоча решает:
+отлучение (`soul.0005` — пепельную душу или тирана отлучают, лишь если он не
+благоволит), коронацию (`coronation` — помазывает он, часть платы — Храму),
+развод (`request_divorce` у культов с `divorce: approval`) и признание Живого
+святого. Взаимодействия `temple_gift` («Дар Храму») и `beg_absolution`
+(«Просить о снятии отлучения»). Поднять войну на главу веры или захватить
+Реймс — святотатство (отлучение, on_actions `on_war_started`,
+`on_title_gained`); когда престол пустеет, единоверцы идут войной
+`liberate_temple`, и победа сажает на Престол нового Великого Светоча.
+
 ### Народ: мнение графств, контроль, народные фракции
 
 Механика `populace` (данные — `core/data/common/populace.yaml`), по образцу CK3.
@@ -1467,7 +1496,7 @@ county_grievances:
 `faction_county`; эффект `take_faction_counties`. Режимы карты
 `county_opinion` и `control`.
 
-### Правления: орден, народная республика, совет мастеров
+### Правления: орден, народная республика, совет мастеров, храмовый престол
 
 Механика `governments` (данные — `core/data/common/governments.yaml`). Правление
 правителя берётся из поля `government` его основного титула, затем его
@@ -1488,6 +1517,7 @@ governments:
     war_assembly: 0.5               # наступательная война — если довольна половина графств
     ai_war_mult: 0.5                # ИИ воюет вдвое реже
     war_cbs: [holy_war]             # наступательные войны — только по этим поводам
+    ai_attacked_mult: 0.05          # ИИ-единоверец нападает на такого правителя в 20 раз реже (Храм)
     celibate: no                    # правитель не женится (орден)
     ruler_modifiers: { domain_limit: 8, knight_cap: -20 }
     county_modifiers: { tax_mult: -0.15, levy_mult: 0.35 }   # графствам домена
@@ -1502,8 +1532,9 @@ governments:
 
 Законы с `government_only: yes` не выбираются в законах державы — их ставит
 правление. Алгоритмы наследования механики: `elected_member` (лучший из
-персонажей с чертой `members.trait`: воинское ×2, личная доблесть, учёность,
-престиж), `best_master` (лучший по `master_skill` и половине `second_skill`
+персонажей с чертой `members.trait` по навыкам закона `election_skills` — по
+умолчанию воинское ×2, личная доблесть, учёность — и престижу; у Храма —
+`{ learning: 2, diplomacy: 1 }`), `best_master` (лучший по `master_skill` и половине `second_skill`
 закона среди своей культуры при дворе и детей) и `republic_election` (кандидаты —
 старший взрослый мужчина каждого рода при дворе и в вассалах; каждое графство
 домена голосует по престижу, дипломатии, агитации `add_campaign`, мнению о

@@ -138,12 +138,14 @@ characters:
   # ================================================ Восточная марка
   # Геро Старый — сын второй дочери, старейший из внуков Отгара. Строит
   # крепости, торгует с цвергами и не верит никому — особенно своему наследнику.
+  # Марка держится Восточного обряда: Император для неё — судья, а не бог,
+  # и Храм Солнца проклял её как ересь.
   gero_eisenwart:
     name: Gero
     nickname: nick.old
     dynasty: eisenwart
     culture: marcher
-    faith: ash_penitence
+    faith: east_rite
     birth: "1012.2.1"
     father: brun_eisenwart
     mother: hedwig_sonning
@@ -155,19 +157,19 @@ characters:
     gold: 250
     prestige: 600
   ermentrud_eisenwart: { name: Ermentrud, female: true, culture: marcher, faith: ash_penitence, birth: "1014.1.1", death: "1050.1.1" }
-  irmgard_eisenwart: { name: Irmgard, female: true, dynasty: eisenwart, culture: marcher, faith: ash_penitence, birth: "1030.1.1", father: gero_eisenwart, mother: ermentrud_eisenwart, traits: [compassionate, patient] }
+  irmgard_eisenwart: { name: Irmgard, female: true, dynasty: eisenwart, culture: marcher, faith: east_rite, birth: "1030.1.1", father: gero_eisenwart, mother: ermentrud_eisenwart, traits: [compassionate, patient] }
   dietrich_eisenwart:
     name: Dietrich
     dynasty: eisenwart
     culture: marcher
-    faith: ash_penitence
+    faith: east_rite
     birth: "1036.1.1"
     father: gero_eisenwart
     mother: ermentrud_eisenwart
     traits: [ambitious, deceitful, brave, education_intrigue_2]
     skills: { intrigue: 12, martial: 10 }
     claims: [c_gem_mines]
-  hermann_eisenwart: { name: Hermann, dynasty: eisenwart, culture: marcher, faith: ash_penitence, birth: "1040.1.1", father: gero_eisenwart, mother: ermentrud_eisenwart, traits: [humble, diligent, education_stewardship_3] }
+  hermann_eisenwart: { name: Hermann, dynasty: eisenwart, culture: marcher, faith: east_rite, birth: "1040.1.1", father: gero_eisenwart, mother: ermentrud_eisenwart, traits: [humble, diligent, education_stewardship_3] }
   # цверг-мастер на службе маркграфа: ведёт казну и торг с Подгорьем
   kremen_master:
     name: Kremen

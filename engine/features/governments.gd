@@ -27,7 +27,8 @@ extends EngineFeature
 ## браки только внутри своей расы (без поля — люди).
 ## Алгоритмы наследования (succession_laws.algorithm):
 ##   elected_member — избирают из членов (черта members.trait) при дворе и
-##     среди вассалов: военное дело ×2, доблесть, учёность, престиж;
+##     среди вассалов: по навыкам (закон election_skills, по умолчанию
+##     военное дело ×2, доблесть, учёность) и престижу;
 ##   best_master — правит лучший мастер своей культуры в державе
 ##     (законы: master_skill, second_skill);
 ##   republic_election — сход: каждое графство домена голосует за одного из
@@ -108,7 +109,7 @@ static func _members(game: Game, ruler: Dictionary) -> Array:
 	return out
 
 
-static func _order_heirs(game: Game, ruler: Dictionary, _law: Dictionary) -> Array:
+static func _order_heirs(game: Game, ruler: Dictionary, law: Dictionary) -> Array:
 	var mdef: Dictionary = def_of(game, ruler).get("members", {})
 	var tr := str(mdef.get("trait", ""))
 	var cands := _members(game, ruler).filter(func(x): return tr == "" or x.traits.has(tr))
@@ -116,7 +117,12 @@ static func _order_heirs(game: Game, ruler: Dictionary, _law: Dictionary) -> Arr
 		var v: Variant = recruit(game, ruler)
 		if v != null:
 			cands = [v]
-	Data.sort_by(cands, func(x): return Stats.skill(game, x, "martial") * 2.0 + Stats.skill(game, x, "prowess") + Stats.skill(game, x, "learning") + float(x.prestige) / 100.0, true)
+	var w: Dictionary = law.get("election_skills") if law.get("election_skills") is Dictionary else {"martial": 2.0, "prowess": 1.0, "learning": 1.0}
+	Data.sort_by(cands, func(x):
+		var score := float(x.prestige) / 100.0
+		for k in w:
+			score += Stats.skill(game, x, str(k)) * Data.num(w[k])
+		return score, true)
 	return cands.map(func(x): return x.id)
 
 

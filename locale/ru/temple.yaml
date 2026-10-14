@@ -1,0 +1,16 @@
+# Механика «Храм»: строки движка и интерфейса.
+opinion:
+  faith_virtue: "Чтит культ: {trait}"
+  faith_sin: "Осуждает культ: {trait}"
+  head_piety: "Благочестие в глазах Храма: {name}"
+  head_dread: "Страх в глазах Храма: {tier}"
+  head_heretic: Еретик в глазах Храма
+tr:
+  is_faith_head: Глава веры
+  is_faith_head.not: Не глава веры
+ui:
+  faith_heretic: "Еретический культ: на его последователей идут священной войной."
+  faith_virtues: "Чтит (+5 к мнению единоверцев):"
+  faith_sins: "Осуждает (−5):"
+  faith_head: "Глава веры:"
+  faith_head_none: "Престол главы веры пуст."

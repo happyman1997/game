@@ -30,6 +30,7 @@
 | `education_focus` | character | Направление воспитания: education_focus: martial | core/upbringing |
 | `faction_type` | faction | Тип фракции | core/factions |
 | `faith` | character, province | Вера равна | core |
+| `faith_doctrine` | character | Учение культа персонажа (faiths.doctrines): faith_doctrine: { divorce: approval } | core/temple |
 | `fear_stance` | character | Как подданный относится к страху сюзерена: defiant (дерзкий), broken (сломленный), obedient (покорный) | core/politics |
 | `felt_dread_tier` | character | Ступень страха, которую подданный чувствует перед сюзереном (дерзкие — нижняя, сломленные — выше): felt_dread_tier: "< unease" | core/politics |
 | `global_var` | любой | Сравнение глобальной переменной | core |
@@ -101,11 +102,12 @@
 | `is_dynasty_head` | character | Глава своего рода | core/dynasties |
 | `is_dynasty_head_of` | character | Глава рода этого персонажа: is_dynasty_head_of: scope:recipient | core/dynasties |
 | `is_faction_leader` | character | Возглавляет фракцию | core/factions |
+| `is_faith_head` | character | Глава веры (держит титул head_title какого-либо культа): is_faith_head: yes | core/temple |
 | `is_female` | character | Женщина | core |
 | `is_guardian_of` | character | Опекун этого ребёнка: is_guardian_of: scope:child | core/upbringing |
 | `is_heir_of` | character | Основной наследник персонажа | core |
 | `is_held` | title | У титула есть владелец | core |
-| `is_heretic` | character | Еретик в глазах своей религии (черта с heretic: yes): is_heretic: yes | core |
+| `is_heretic` | character | Еретик в глазах своей религии (еретический культ, черта или модификатор с heretic: yes): is_heretic: yes | core |
 | `is_house_head` | character | Глава своего дома (ветви или рода) | core/dynasties |
 | `is_imprisoned` | character | В темнице | core/prison |
 | `is_imprisoned_by` | character | В темнице у персонажа | core/prison |
@@ -493,6 +495,7 @@
 | `faction_claimant` | faction | Претендент фракции | core/factions |
 | `faction_leader` | faction | Лидер фракции | core/factions |
 | `faction_target` | faction | Сюзерен, против которого фракция | core/factions |
+| `faith_head` | character | Глава веры персонажа (Великий Светоч); нет — престол пуст | core/temple |
 | `father` | character | Отец | core |
 | `founder` | dynasty | Основатель династии | core |
 | `guardian` | character | Опекун ребёнка | core/upbringing |
@@ -535,6 +538,7 @@
 | `faction_against` | character | Фракции против персонажа | core/factions |
 | `faction_county` | faction | Графства народной фракции | core/populace |
 | `faction_member` | faction | Члены фракции | core/factions |
+| `faith_head` | character | Глава веры персонажа (список из одного или пустой) | core/temple |
 | `grandchild` | character | Внуки | core |
 | `grantable_title` | character | Титулы, которые персонаж может пожаловать (графства домена кроме столицы, лишние герцогства) | core/ambitions |
 | `held_title` | character | Титулы | core |
@@ -605,6 +609,7 @@
 | `dynasties` | Династия: известность рода, наследия, глава рода и младшие ветви | да |
 | `ambitions` | Желания персонажей: цели из характера, благодарность и обида сюзерену | да |
 | `karma` | Свет и Пепел: карма от деяний, ступени, Последнее на весах | да |
+| `temple` | Вера: добродетели и грехи культов, глава веры | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -616,7 +621,7 @@
 - **interaction_deciders**: `payer`
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `grafts`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `arcana_faith`, `grafts`
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `faith_morals`, `faith_head`, `arcana_faith`, `grafts`
 - **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`, `karma`
 - **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

@@ -100,6 +100,12 @@ static func _consider_war(game: Game, c: Dictionary) -> void:
 		if t.get("title") != null:
 			ctx.scopes["target"] = {"type": "title", "id": t.title}
 		var will = Interp.eval_value(ctx, ctx.root, cb.ai_will_do) if (cb != null and cb.get("ai_will_do") != null) else 50.0
+		# правление цели может отпугивать единоверцев (Храм: ai_attacked_mult) —
+		# еретику и иноверцу святыня не указ
+		if game.engine.has_feature("governments"):
+			var am := Data.num(Governments.rule(game, def, "ai_attacked_mult", 1.0), 1.0)
+			if am != 1.0 and not Wars.is_heretic(game, c) and Wars._religion(game, c.faith) == Wars._religion(game, def.faith):
+				will *= am
 		var score = will * minf(3.0, ratio) * (1.0 + t.counties.size() * 0.1)
 		if score > 0.0 and (best == null or score > best_score):
 			best = t

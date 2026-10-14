@@ -169,6 +169,24 @@ characters:
   robert_mortain: { name: Robert, dynasty: conteville, culture: norman, faith: sun_rite, birth: "1031.1.1", father: herluin, mother: herleva, traits: [content, honest, education_martial_2] }
   roger_montgomery: { name: Roger, dynasty: montgomery, culture: norman, faith: sun_rite, birth: "1030.1.1", traits: [diligent, ambitious, education_stewardship_3] }
 
+  # =========================================================== Храм Солнца
+  # Великий Светоч Жерве, архиепископ Реймса: помазывает королей, отлучает
+  # грешников; его преемника изберут жрецы-светочи при Престоле.
+  gervais_reims:
+    name: Gervais
+    culture: french
+    faith: sun_rite
+    birth: "1007.3.1"
+    traits: [sun_priest, zealous, diligent, education_learning_4]
+    skills: { diplomacy: 12, martial: 4, stewardship: 10, intrigue: 9, learning: 18, prowess: 3 }
+    gold: 300
+    piety: 1200
+    prestige: 500
+  # Бруно — наставник соборной школы, будущий отшельник и святой
+  bruno_reims: { name: Bruno, culture: french, faith: sun_rite, birth: "1030.1.1", court: gervais_reims, traits: [sun_priest, humble, zealous, education_learning_4], skills: { learning: 16, diplomacy: 9 } }
+  # Манассия — честолюбец, что купит себе Престол, если сможет
+  manasses_reims: { name: Manasses, culture: french, faith: sun_rite, birth: "1035.1.1", court: gervais_reims, traits: [sun_priest, ambitious, greedy, education_intrigue_3], skills: { learning: 12, intrigue: 13, diplomacy: 11 } }
+
   # =========================================================== Франция
   henry_i_france: { name: Henri, dynasty: capet, culture: french, faith: sun_rite, birth: "1008.5.4", death: "1060.8.4", spouse: anne_kiev }
   anne_kiev: { name: Anne, female: true, dynasty: rurikid, culture: russian, faith: sun_rite, birth: "1030.1.1", father: yaroslav_wise, court: philip, traits: [education_learning_3, zealous, beautiful] }
@@ -309,6 +327,8 @@ bookmarks:
       c_boulogne: eustace_ii
       c_ponthieu: guy_ponthieu
       c_vermandois: herbert_vermandois
+      d_sun_throne: gervais_reims
+      c_reims: gervais_reims
       d_champagne: theobald_blois
       d_blois: theobald_blois
       c_blois: theobald_blois

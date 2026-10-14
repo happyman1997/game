@@ -41,6 +41,10 @@ titles:
   d_munster: { tier: duchy, liege: k_ireland, color: "#5cae62", capital: c_ormond }
 
   k_france: { tier: kingdom, color: "#2f4ea0", capital: c_paris }
+  # Престол Светоча: малый домен Храма Солнца в Реймсе. Держатель — Великий
+  # Светоч, глава веры (faiths.head_title); правление temple — его избирают
+  # жрецы-светочи. Независим: вне королевств.
+  d_sun_throne: { tier: duchy, government: temple, color: "#e8c25a", capital: c_reims }
   d_normandy: { tier: duchy, liege: k_france, color: "#c9982e", capital: c_rouen }
   d_brittany: { tier: duchy, liege: k_france, color: "#2a8a7f", capital: c_rennes }
   d_flanders: { tier: duchy, liege: k_france, color: "#d9bf3a", capital: c_bruges }

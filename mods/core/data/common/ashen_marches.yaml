@@ -42,6 +42,7 @@ faiths:
     religion: solar
     color: "#8c8478"
     icon: "⚱"
+    head_title: d_sun_throne
     doctrines: { polygamy: false, divorce: approval }
     virtues: [humble, patient, temperate, chaste, just]
     sins: [arrogant, ambitious, wrathful, greedy]
@@ -51,6 +52,7 @@ faiths:
     religion: solar
     color: "#6a5a8a"
     icon: "🕯"
+    head_title: d_sun_throne
     doctrines: { polygamy: false }
     virtues: [diligent, patient, honest, stubborn]
     sins: [lazy, fickle, deceitful, greedy]

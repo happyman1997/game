@@ -62,7 +62,7 @@ ui:
 
 msg:
   broken_promises: "The county remembered your last promise. Broken hopes are not forgiven."
-  news_horror: "News: horror rules the lands of [scope:news_subject]. The dungeons are full, and the court speaks in whispers."
+  news_horror: "News: [scope:news_subject] rules through horror. The dungeons are full, and the court speaks in whispers."
   news_terror: "News: [scope:news_subject] rules by terror — villages empty, and the defiant vanish in the night."
 
 ev:

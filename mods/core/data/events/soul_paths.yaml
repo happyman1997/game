@@ -112,6 +112,12 @@ events:
           - add_trait: living_saint
           - add_karma: { value: 10, deed: vow }
           - add_prestige: 100
+          # Великий Светоч признаёт святость тех, кому благоволит
+          - if:
+              limit: { faith_head: { opinion: { target: root, value: ">= 0" } } }
+              add_prestige: 100
+              add_piety: 100
+              send_message: { text: msg.saint_recognized, kind: good }
           # вести мира: явился Живой святой
           - if:
               limit: { is_ai: yes, exists: player }

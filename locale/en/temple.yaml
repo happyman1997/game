@@ -1,0 +1,16 @@
+# Temple feature: engine and UI strings.
+opinion:
+  faith_virtue: "Honoured by the cult: {trait}"
+  faith_sin: "Condemned by the cult: {trait}"
+  head_piety: "Piety in the Temple's eyes: {name}"
+  head_dread: "Dread in the Temple's eyes: {tier}"
+  head_heretic: A heretic in the Temple's eyes
+tr:
+  is_faith_head: Head of the faith
+  is_faith_head.not: Not the head of the faith
+ui:
+  faith_heretic: "A heretical cult: its followers may be fought in holy war."
+  faith_virtues: "Honours (+5 opinion of coreligionists):"
+  faith_sins: "Condemns (−5):"
+  faith_head: "Head of the faith:"
+  faith_head_none: "The throne of the head of the faith stands empty."
