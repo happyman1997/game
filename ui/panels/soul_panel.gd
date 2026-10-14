@@ -74,7 +74,7 @@ static func build(app: App, c: Dictionary) -> Control:
 		if log.is_empty():
 			lines.add_child(K.label(app.t("ui.soul_book_empty"), "MutedLabel"))
 		lines.add_child(K.para(app.t("ui.soul_cleanse_hint"), "MutedLabel"))
-		root.add_child(K.section(app.t("ui.soul_book"), [lines], "book"))
+		root.add_child(K.section(app.t("ui.soul_book"), [lines], "scales"))
 	return root
 
 
@@ -295,7 +295,7 @@ static func _rift(s: PackedStringArray) -> void:
 static func _scales(s: PackedStringArray, g: Game, k: float) -> void:
 	var mx := Karma.max_value(g)
 	var ts := Karma.tiers(g)
-	var cols := {"ashen": "#2e2622", "tainted": "#7d7670", "common": "#d9c69a", "pious": "#ecc95e", "solar": "#ffd23a"}
+	var cols := {"ashen": "#2e2622", "tainted": "#7d7670", "common": "#d9c69a", "bright": "#ecc95e", "solar": "#ffd23a"}
 	var rad := 62.0
 	var top := PIVOT + Vector2(0, -8)
 	# шкала-полукруг над осью: слева — Свет, справа — Пепел

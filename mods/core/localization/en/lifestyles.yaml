@@ -39,17 +39,17 @@ focus_desc:
   focus_medicine: You study herbs and the works of ancient physicians.
 
 perk_tree:
-  august: Path of the Sovereign
-  family_first: Path of the Dynast
-  strategist: Path of the Commander
-  tyranny: Path of the Tyrant
-  chivalry: Path of the Knight
-  architect: Path of the Architect
-  administrator: Path of the Treasurer
-  schemer: Path of the Spider
-  seducer: Path of the Seducer
-  scholarship: Path of the Scholar
-  theology: Path of the Saint
+  august: Way of the Sovereign
+  family_first: Way of the Dynast
+  strategist: Way of the Commander
+  tyranny: Way of the Tyrant
+  chivalry: Way of the Knight
+  architect: Way of the Architect
+  administrator: Way of the Treasurer
+  schemer: Way of the Spider
+  seducer: Way of the Seducer
+  scholarship: Way of the Scholar
+  theology: Way of the Lightbearer
 perk_tree_desc:
   august: "Rules by glory: feasts, royal progresses, neighbours who ask to kneel."
   family_first: "The house is the pillar: children add renown, legacies cost less, kin bring gifts."
@@ -60,7 +60,7 @@ perk_tree_desc:
   administrator: "Gold as a weapon: taxes, a Lombard loan and bribery."
   schemer: "Secrets and hooks: ears everywhere, silver for silence, secrets for sale."
   seducer: "Love as a weapon: pillow talk, lovers on a hook, a pact of hearts."
-  scholarship: "Knowledge speeds everything: experience for every deed, paths open earlier."
+  scholarship: "Knowledge speeds everything: experience for every deed, callings open earlier."
   theology: "Piety and relics: pilgrimages, veneration of relics, miracles and holy war."
 
 perk:
@@ -147,7 +147,7 @@ perk_desc:
   irresistible: "Unlocks the Pact of Hearts: a ruling lover allies with you, or makes peace if you are at war."
   avid_reader: "Every deed (a victory, a building, a duel…) brings 25 experience in your current lifestyle."
   natural_philosophy: "Development grows faster and lifestyle experience accrues sooner."
-  polymath: "+1 to all skills, and paths (archetypes) open 2 skill points earlier."
+  polymath: "+1 to all skills, and callings open 2 skill points earlier."
   renowned_scholar: "Unlocks the Magnum Opus: a book of famed rarity (illustrious at learning 20), renown for your house."
   devout_prayer: "Pilgrimage washes away all stress and has a 35% chance to bring a reliquary. You enjoy pilgrimages and almsgiving."
   inner_peace: "Stress grows slower, and piety levels raise coreligionists' opinion half again as much."

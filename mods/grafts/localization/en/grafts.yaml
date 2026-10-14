@@ -89,13 +89,13 @@ graft_desc:
 trait:
   iron_possession: Possession
 trait_desc:
-  iron_possession: "There is more iron than soul now. At night a whisper rises from the metal, rage comes without cause and pity leaves — the court makes the sun-sign and whispers that it is the voice of the Prince of Ash."
+  iron_possession: "There is more iron than man now. At night a whisper rises from the metal, rage comes without cause and pity leaves — the court makes the sun-sign and whispers that it is the voice of the Prince of Ash."
 
 opinion_modifier:
   graft_rampage: Harmed by the possessed
 
 stat:
-  soul: Soul
+  fortitude: Fortitude
 stress_src:
   grafts: Iron in the flesh
 
@@ -109,23 +109,23 @@ grafts:
   tier_4: masterwork
   tier_5: wondrous work
   ui_cures: "Replaces a lost arm or leg (cures maimed)"
-  ui_soul_cost: "Burdens the soul: −{n}"
+  ui_fortitude_cost: "Wears down fortitude: −{n}"
   ui_effects: "Effects of grafts ({n})"
   ui_no_grafts: The flesh is whole — not a drop of iron
   ui_workshop: Barber-Surgeon's Workshop
-  ui_workshop_info: "Risk of complications: {risk}% (learning lowers it) · soul: {soul} · gold: {gold}"
+  ui_workshop_info: "Risk of complications: {risk}% (learning lowers it) · fortitude: {fortitude} · gold: {gold}"
   ui_empty: "Free place: {part}"
   ui_click_install: Click to call the barber-surgeon
-  ui_soul: Soul
-  ui_soul_tip: "Every graft burdens the soul. Below {t} — torment and stress each month, below {p} — risk of possession. The calm, compassionate and zealous endure more, the wrathful and callous less."
-  ui_soul_parts: "Base {base}, traits {traits}, burdened by grafts {used}"
+  ui_fortitude: Fortitude
+  ui_fortitude_tip: "Every graft wears down fortitude — how much iron body and mind can bear. Below {t} — torment and stress each month, below {p} — risk of possession. The calm, compassionate and zealous endure more, the wrathful and callous less."
+  ui_fortitude_parts: "Base {base}, traits {traits}, burdened by grafts {used}"
   ui_installed_on: "Grafted: {date}"
   ui_remove: "Remove ({n} gold)"
   ui_all: Whole body
   ui_install: Graft
   ui_exorcism: "Call an exorcist ({n} gold)"
   ui_exorcism_tip: "A sun-priest prays over the possessed for three days and three nights. The possession leaves and piety grows — but so does stress. If much iron remains in the body, the Prince of Ash's whisper will return."
-  status_whole: Soul whole
+  status_whole: Fortitude intact
   status_troubled: Troubled
   status_brink: On the brink
   status_possessed: Possessed
@@ -133,12 +133,12 @@ grafts:
   err_have: Already grafted
   err_full: "No free place: {part}"
   err_gold: "Needs {n} gold"
-  err_soul: The soul would not bear it
+  err_fortitude: Not enough fortitude
   err_child: Too young for surgery
   msg_installed: "The barber-surgeon is done: “{name}” is in place."
   msg_installed_bad: "“{name}” is in place, but the surgery went hard — you are wounded."
   msg_recovered: "The whisper of iron fell silent: the possession has receded."
-  msg_possessed: "{who}: possessed! There is more iron than soul."
+  msg_possessed: "{who}: possessed! There is more iron than man."
   msg_possessed_own: "Possession. You are no longer sure where the iron ends and you begin."
   opinion_iron: Iron in the flesh
   tr_has_any: Has grafts
@@ -147,9 +147,9 @@ grafts:
   fx_install: "{who}: grafted “{value}”"
   fx_remove: "{who}: removed “{value}”"
   fx_remove_random: "{who} loses one of their grafts"
-  alert_troubled: "Soul {n}: the iron weighs heavy"
-  alert_brink: "Soul {n}: on the brink of possession!"
-  alert_possessed: "Possessed! Soul {n}"
+  alert_troubled: "Fortitude {n}: the iron weighs heavy"
+  alert_brink: "Fortitude {n}: on the brink of possession!"
+  alert_possessed: "Possessed! Fortitude {n}"
 
 ev:
   graft.0001:

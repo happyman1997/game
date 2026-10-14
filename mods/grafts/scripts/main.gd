@@ -3,7 +3,7 @@ extends RefCounted
 ## звёздное железо, серебро, руны и эликсиры: в голову, очи, уста, сердце,
 ## кровь, жилы, кожу, кости, руки и ноги; каждая часть тела вмещает
 ## несколько вживлений. Их модификаторы действуют на носителя, но каждое
-## отягощает душу: ниже troubled_below — смятение и стресс, ниже
+## подтачивает стойкость: ниже troubled_below — смятение и стресс, ниже
 ## possession_below — риск одержимости. Операция стоит золота и грозит
 ## осложнениями; железная рука или нога заменяет потерянную (лечит maimed).
 ## Набожные косятся на тех, в ком много железа; одержимого отчитывает
@@ -55,29 +55,29 @@ static func capacity(game: Game, part: String) -> int:
 	return int(Data.num(d.get("slots"), 1)) if d != null else 0
 
 
-## Крепость души (с поправкой черт) и сколько её отягощают вживления.
-static func soul_max(game: Game, c: Dictionary) -> float:
-	return _n(game, "soul_base", 100) + Stats.stat(game, c, "soul")
+## Стойкость (с поправкой черт) и сколько её подтачивают вживления.
+static func fortitude_max(game: Game, c: Dictionary) -> float:
+	return _n(game, "fortitude_base", 100) + Stats.stat(game, c, "fortitude")
 
 
-static func soul_used(game: Game, c: Dictionary) -> float:
+static func fortitude_used(game: Game, c: Dictionary) -> float:
 	var s := 0.0
 	for x in grafts_of(game, c):
 		var d: Variant = def_of(game, x.id)
 		if d != null:
-			s += Data.num(d.get("soul"))
+			s += Data.num(d.get("fortitude"))
 	return s
 
 
-static func soul(game: Game, c: Dictionary) -> float:
-	return soul_max(game, c) - soul_used(game, c)
+static func fortitude(game: Game, c: Dictionary) -> float:
+	return fortitude_max(game, c) - fortitude_used(game, c)
 
 
-## Состояние души: whole | troubled | brink | possessed.
+## Состояние стойкости: whole | troubled | brink | possessed.
 static func status(game: Game, c: Dictionary) -> String:
 	if c.traits.has("iron_possession"):
 		return "possessed"
-	var h := soul(game, c)
+	var h := fortitude(game, c)
 	if h < _n(game, "possession_below", 20):
 		return "brink"
 	if h < _n(game, "troubled_below", 40):
@@ -103,8 +103,8 @@ static func blockers(game: Game, c: Dictionary, gid: String, free: bool = false)
 		out.append(g.loc.t("grafts.err_full", {"part": g.name_of("body_parts", part)}))
 	if not free and float(c.gold) < Data.num(d.get("price")):
 		out.append(g.loc.t("grafts.err_gold", {"n": roundi(Data.num(d.get("price")))}))
-	if soul(g, c) - Data.num(d.get("soul")) < 0.0:
-		out.append(g.loc.t("grafts.err_soul"))
+	if fortitude(g, c) - Data.num(d.get("fortitude")) < 0.0:
+		out.append(g.loc.t("grafts.err_fortitude"))
 	if not Chars.is_adult(g, c):
 		out.append(g.loc.t("grafts.err_child"))
 	return out
@@ -206,9 +206,9 @@ static func _monthly_char(game: Game, c: Dictionary) -> void:
 		_ai_buy(game, c)
 
 
-## Душа на исходе: смятение, одержимость; вернувшему душу — облегчение.
+## Стойкость на исходе: смятение, одержимость; вернувшему стойкость — облегчение.
 static func _condition(game: Game, c: Dictionary) -> void:
-	var h := soul(game, c)
+	var h := fortitude(game, c)
 	if c.traits.has("iron_possession"):
 		if h >= _n(game, "troubled_below", 40) and game.rng.chance(_n(game, "recovery_chance", 0.12)):
 			Chars.remove_trait(game, c, "iron_possession")
@@ -243,12 +243,12 @@ static func _ai_trait(game: Game, c: Dictionary, k: String) -> float:
 ## ИИ: вживление по характеру — смелым боевое, интриганам руны и тушь,
 ## увечным — железную руку или ногу.
 static func _ai_buy(game: Game, c: Dictionary) -> void:
-	# смелые и гневливые меньше боятся за душу
-	var minh := _n(game, "ai_min_soul", 55) - 25.0 * clampf(_ai_trait(game, c, "boldness"), 0.0, 1.0)
+	# смелые и гневливые меньше боятся железа
+	var minh := _n(game, "ai_min_fortitude", 55) - 25.0 * clampf(_ai_trait(game, c, "boldness"), 0.0, 1.0)
 	var opts := []
 	for d in game.content.all("grafts"):
 		var price := Data.num(d.get("price"))
-		if float(c.gold) < price * 1.5 + 30.0 or soul(game, c) - Data.num(d.get("soul")) < minh:
+		if float(c.gold) < price * 1.5 + 30.0 or fortitude(game, c) - Data.num(d.get("fortitude")) < minh:
 			continue
 		if not blockers(game, c, d.id).is_empty():
 			continue
@@ -321,9 +321,9 @@ func init(api: ModApi) -> void:
 		var c: Variant = ctx.game.ch(s.id)
 		return float(grafts_of(ctx.game, c).size()) if c != null else 0.0
 	})
-	api.value("soul", {"scopes": ["character"], "doc": "Сколько души осталось (вживления её отягощают)", "get": func(ctx, s, _a):
+	api.value("fortitude", {"scopes": ["character"], "doc": "Сколько стойкости осталось (вживления её подтачивают)", "get": func(ctx, s, _a):
 		var c: Variant = ctx.game.ch(s.id)
-		return soul(ctx.game, c) if c != null else 0.0
+		return fortitude(ctx.game, c) if c != null else 0.0
 	})
 	api.effect("install_graft", {"scopes": ["character"], "doc": "Вживить бесплатно: install_graft: glass_eye", "apply": func(ctx, s, arg):
 		var c: Variant = ctx.game.ch(s.id)
@@ -361,13 +361,13 @@ func init(api: ModApi) -> void:
 		"badge": func(game: Game, c: Dictionary) -> int: return grafts_of(game, c).size(),
 		"render": func(game: Game, cid: String, ui: Object) -> Control: return AnatomyUI.build(game, cid, ui),
 	}, api.owner)
-	api.ui.alerts.register("grafts_soul", {"id": "grafts_soul", "order": 18, "check": func(game: Game) -> Variant:
+	api.ui.alerts.register("grafts_fortitude", {"id": "grafts_fortitude", "order": 18, "check": func(game: Game) -> Variant:
 		var p: Variant = game.player
 		if p == null or not state_of(game).grafts.has(p.id):
 			return null
 		var stt := status(game, p)
 		if stt == "whole":
 			return null
-		return {"icon": "skull", "kind": "bad", "text": game.loc.t("grafts.alert_" + stt, {"n": roundi(soul(game, p))}), "action": {"tab": "mod:grafts"}},
+		return {"icon": "skull", "kind": "bad", "text": game.loc.t("grafts.alert_" + stt, {"n": roundi(fortitude(game, p))}), "action": {"tab": "mod:grafts"}},
 	}, api.owner)
 	api.log("вживления: %d в %d частях тела" % [api.content.all("grafts").size(), api.content.all("body_parts").size()])

@@ -1,6 +1,4 @@
 # Light and Ash feature: engine and UI strings.
-opinion:
-  karma_zealot: "Zealot: a soul “{tier}”"
 tr:
   karma_tier: "Soul: {cond}"
 fx:
@@ -18,15 +16,15 @@ ui:
   ctab:
     soul: Light and Ash
   soul: Light and Ash
-  soul_tip: "The soul is weighed on the scales of the Sun Emperor. Every deed falls into the pan of Light or of Ash — not by words, but by deeds."
+  soul_tip: "The soul is weighed on the scales of the Sun Emperor. Every deed falls into the pan of Light or of Ash — not by words, but by deeds. People judge by the face — by piety, and piety can be bought. The soul is the truth: it does not change what others think of you, yet it decides omens, pangs of conscience, the afterlife and the Paths of Ash and Light."
   soul_light: Light
   soul_ash: Ash
   soul_value_light: "Light: {n}"
   soul_value_ash: "Ash: {n}"
   soul_value_none: The scales are balanced
   soul_hidden: "Another's soul is darkness: only its tier can be seen."
-  soul_book: Book of Deeds
-  soul_book_empty: The book is still clean.
+  soul_book: Last on the Scales
+  soul_book_empty: Nothing lies on the scales yet.
   soul_cleanse_hint: "Ash does not fade on its own: confession and a pilgrimage to the Ashlands remove it. Light is gathered by mercy, just judgment, alms and pilgrimage."
   need_stress_or_ash: Requires at least 30 stress or ash on the soul
   need_piety_300: Requires 300 piety

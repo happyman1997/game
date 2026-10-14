@@ -44,7 +44,7 @@ func test_deeds_and_tiers() -> void:
 	check_eq(Karma.value(h), 100.0, "предел — сто")
 
 
-func test_conscience_and_zealots() -> void:
+func test_conscience_and_soul_is_hidden() -> void:
 	var g := _game()
 	var h: Dictionary = g.ch("harold")
 	for t in ["callous", "sadistic"]:
@@ -55,11 +55,15 @@ func test_conscience_and_zealots() -> void:
 	check(float(h.stress) >= s0 + 15.0, "совестливого мучает грех (%.0f → %.0f)" % [s0, h.stress])
 	Karma.add(g, h, -45.0, "murder")
 	check_eq(str(Karma.tier_of(g, h).id), "ashen", "пепельный")
+	# душа — правда, а не лицо: чужое мнение по ней не меняется, даже у ревнителя
 	var z: Dictionary = g.vassals_of("harold")[0]
-	var op0 := Opinion.opinion(g, z, h)
 	Chars.add_trait(g, z, "zealous")
 	g.stat_cache.erase("op:%s>%s" % [z.id, h.id])
-	check(Opinion.opinion(g, z, h) < op0, "ревнитель веры холоден к пепельному")
+	var op0 := Opinion.opinion(g, z, h)
+	Karma.set_value(g, h, 80.0)
+	check_eq(str(Karma.tier_of(g, h).id), "solar", "солнечный")
+	g.stat_cache.erase("op:%s>%s" % [z.id, h.id])
+	check_eq(Opinion.opinion(g, z, h), op0, "душа не меняет мнения ревнителя")
 	check(Karma.knows_exact(g, h, h), "свою душу знаешь точно")
 	check(not Karma.knows_exact(g, h, z), "чужую — лишь по ступени")
 

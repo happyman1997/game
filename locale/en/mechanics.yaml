@@ -1,8 +1,8 @@
 # Personality, Renown and Faith & Culture of the Land mechanics.
 msg:
-  trial_started: "You have set out on the path of the {name}. You have {years} years to prove yourself worthy."
-  trial_completed: "{who} has passed the trial and become a {name}."
-  trial_failed: "The trial of the {name} has failed: time ran out."
+  trial_started: "You have taken up the trial of the calling «{name}». You have {years} years to prove yourself worthy."
+  trial_completed: "{who} has passed the trial and found a calling: {name}."
+  trial_failed: "The trial of the calling «{name}» has failed: time ran out."
   scapegoat: "The scheme was discovered, but suspicion fell on {who}."
   wounded_in_front: "{who} led from the front — and took a wound."
   escaped_by_passage: "{place} has fallen, but you slipped out through a secret passage and avoided capture."
@@ -16,14 +16,14 @@ msg:
   converted_faith: "{place} adopts a new faith: {value}."
   converted_culture: "{place} adopts a new culture: {value}."
 ui:
-  trial_have: You already walk this path
-  trial_max: "No more than {n} paths"
+  trial_have: This calling is already yours
+  trial_max: "No more than {n} callings"
   trial_busy: Another trial is under way
   trial_skills: Your skills fall short
-  trial_chip: "Path: {name} ({done}/{total})"
+  trial_chip: "Calling: {name} ({done}/{total})"
   trial_title: "Trial: {name}"
   trial_left: "Months left: {months}"
-  trial_fail_note: "Fail to finish in time — stress +{stress} and a pause on this path."
+  trial_fail_note: "Fail to finish in time — stress +{stress} and a pause on this calling."
   hook_income: Hush money (hooks)
   spouse_must_like: Your spouse must not dislike you
   stress_recent: "Recently:"
@@ -35,7 +35,7 @@ ui:
   check_success: "If it succeeds:"
   check_failure: "If it fails:"
   voice_needs_skill: "Requires {skill} {min}+"
-  voice_needs_archetype: "Requires the «{name}» archetype"
+  voice_needs_archetype: "Requires the «{name}» calling"
   per_skill_point_ruler: "For a ruler, per point:"
   archetype_needs: "{skills} — {min}+"
   per_skill_point: "Per skill point:"
@@ -70,7 +70,7 @@ renown:
   piety_2: Pious
   piety_3: Devout
   piety_4: Righteous
-  piety_5: Saintly
+  piety_5: Ascetic
 opinion:
   renown_prestige: "Renown: {name}"
   renown_piety: "Piety: {name}"
@@ -83,8 +83,8 @@ ai:
   wounded: Wounded
   faction_leader: Faction leader
 tr:
-  can_begin_trial: "Can set out on the path of the {name}"
-  has_archetype: "Archetype: {value}"
+  can_begin_trial: "Can take up the trial of the calling «{name}»"
+  has_archetype: "Calling: {value}"
   has_mastery: "Shadow of mastery: {value}"
   has_holder_faith: County shares its holder's faith
   not_holder_faith: County of a foreign faith
@@ -93,9 +93,9 @@ tr:
 fx:
   stress_reaction: "Character reacts: {value} stress"
   give_nickname: "Nickname: {nick}"
-  begin_trial: "Trial of the {name}, {years} years. Goals:"
-  trial_fail: "Fail — stress +{stress} and {years} years before you may try this path again"
-  grant_archetype: "The path of the {name} is yours"
+  begin_trial: "Trial of the calling «{name}», {years} years. Goals:"
+  trial_fail: "Fail — stress +{stress} and {years} years before you may try this calling again"
+  grant_archetype: "The calling «{name}» is yours"
   make_white_peace: "{who} makes white peace in all of their wars"
   duel: "Duel: {a} vs {b}, {chance}% to win"
   faction_negotiate: "The {faction} disbands without concessions"
@@ -139,7 +139,7 @@ stat:
   attrition_mult: Attrition losses
   dread_per_prisoner: Dread per prisoner (monthly)
   deed_lifestyle_xp: Lifestyle experience per deed
-  archetype_skill_reduction: Paths open earlier (skill)
+  archetype_skill_reduction: Callings open earlier (skill)
   commission_cost_mult: Commission cost
   commission_quality: Commission craftsmanship
 mastery:
@@ -169,4 +169,4 @@ stress_src:
   dread_tier: Sleepless nights of a dread ruler
   dragon: Fight with a dragon
 decision:
-  begin_trial: "Set out on the path: {name}"
+  begin_trial: "Trial of a calling: {name}"

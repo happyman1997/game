@@ -11,8 +11,7 @@ defines:
     conscience_traits: [just, honest, compassionate, zealous]   # грех — стресс
     conscience_immune: [callous, sadistic]
     conscience_stress: 1.0      # стресса за очко пепла
-    zealot_traits: [zealous]    # ревнители веры судят по душе
-    log_size: 12                # записей в Книге деяний
+    log_size: 12                # записей «Последнее на весах»
     known_by: []                # кто видит чужую карму точно
     # нрав души: с чего начинают взрослые в начале игры...
     trait_seed:
@@ -45,12 +44,15 @@ defines:
     drift_max: 3
 
 # Ступени кармы: min — нижний порог (у нижней ступени его нет).
+# Душа — «правда», а не «лицо»: чужое мнение она не меняет (о человеке
+# судят по благочестию и видимым чертам). Её дело — доход благочестия,
+# знамения, муки совести, холод жрецов, изгнание из Света, Пути и посмертие.
 karma_tiers:
-  ashen:   { icon: "🔥", modifiers: { monthly_piety: -0.8, general_opinion: -5 }, zealot_opinion: -25 }
-  tainted: { min: -59, icon: "🌫", modifiers: { monthly_piety: -0.3 }, zealot_opinion: -10 }
+  ashen:   { icon: "🔥", modifiers: { monthly_piety: -0.8 } }
+  tainted: { min: -59, icon: "🌫", modifiers: { monthly_piety: -0.3 } }
   common:  { min: -19, icon: "⚖" }
-  pious:   { min: 20, icon: "🕯", modifiers: { monthly_piety: 0.5 }, zealot_opinion: 10 }
-  solar:   { min: 60, icon: "☀", modifiers: { monthly_piety: 1, general_opinion: 5, stress_gain_mult: -0.1 }, zealot_opinion: 20 }
+  bright:  { min: 20, icon: "🕯", modifiers: { monthly_piety: 0.5 } }
+  solar:   { min: 60, icon: "☀", modifiers: { monthly_piety: 1, stress_gain_mult: -0.1 } }
 
 decisions:
   # Пепел снимают у самого Пепелища: тяжёлый путь сквозь пепельные бури.

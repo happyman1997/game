@@ -1,12 +1,12 @@
-# «Железо и плоть»: части тела, вживления, душа и одержимость.
+# «Железо и плоть»: части тела, вживления, стойкость и одержимость.
 # Логика — scripts/main.gd, анатомический лист — scripts/anatomy_ui.gd.
 defines:
   grafts:
-    soul_base: 100            # душа без вживлений
+    fortitude_base: 100       # стойкость без вживлений
     troubled_below: 40        # ниже — смятение и стресс каждый месяц
     possession_below: 20      # ниже — риск одержимости
-    possession_chance: 0.06   # в месяц, если душа ниже possession_below
-    recovery_chance: 0.12     # шанс, что одержимость отступит, если душа вернулась
+    possession_chance: 0.06   # в месяц, если стойкость ниже possession_below
+    recovery_chance: 0.12     # шанс, что одержимость отступит, если стойкость вернулась
     troubled_stress: 4
     surgery_risk: 0.12        # шанс осложнения операции (минус учёность × 0.005)
     surgery_risk_min: 0.03
@@ -16,26 +16,26 @@ defines:
     zealot_opinion: -15       # набожные о тех, в ком много железа
     zealot_threshold: 2
     ai_chance: 0.03           # ИИ-правитель решается на вживление (в месяц)
-    ai_min_soul: 55           # смелые идут дальше — до 30
+    ai_min_fortitude: 55           # смелые идут дальше — до 30
 
-# черты меняют крепость души
+# черты меняют стойкость
 traits:
-  calm: { modifiers: { soul: 10 } }
-  compassionate: { modifiers: { soul: 10 } }
-  zealous: { modifiers: { soul: 10 } }
-  content: { modifiers: { soul: 5 } }
-  wrathful: { modifiers: { soul: -10 } }
-  callous: { modifiers: { soul: -10 } }
+  calm: { modifiers: { fortitude: 10 } }
+  compassionate: { modifiers: { fortitude: 10 } }
+  zealous: { modifiers: { fortitude: 10 } }
+  content: { modifiers: { fortitude: 5 } }
+  wrathful: { modifiers: { fortitude: -10 } }
+  callous: { modifiers: { fortitude: -10 } }
   iron_possession:
     category: health
     icon: skull
     modifiers: { prowess: 4, diplomacy: -4, stewardship: -2, general_opinion: -20, dread_gain_mult: 0.5, stress_gain_mult: 0.25, monthly_piety: -0.5 }
 
-# стези основного мода: душевный покой святого крепит душу, а чудо
+# стези основного мода: душевный покой святого крепит стойкость, а чудо
 # изгоняет беса из железа
 perks:
-  inner_peace: { modifiers: { soul: 15 } }
-  relic_keeper: { modifiers: { soul: 10 } }
+  inner_peace: { modifiers: { fortitude: 15 } }
+  relic_keeper: { modifiers: { fortitude: 10 } }
 
 decisions:
   miracle:
@@ -72,55 +72,55 @@ graft_tiers:
   "5": { color: "#8a1c2a" }
 
 # ---------------------------------------------------------------- вживления
-# part, tier (1–5), price (золото), soul (сколько отягощает душу),
+# part, tier (1–5), price (золото), fortitude (сколько подтачивает стойкость),
 # modifiers, cures — какие черты лечит (железная рука вместо потерянной)
 grafts:
   # голова
-  trepan_plate:   { part: head, tier: 1, price: 50,  soul: 4,  icon: skull, modifiers: { learning: 1, stress_gain_mult: -0.1 } }
-  lead_seal:      { part: head, tier: 2, price: 120, soul: 6,  icon: seal,  modifiers: { stewardship: 2, tax_mult: 0.05 } }
-  skull_runes:    { part: head, tier: 2, price: 130, soul: 7,  icon: rune,  modifiers: { intrigue: 2, scheme_defense: 15 } }
-  rune_of_tyr:    { part: head, tier: 3, price: 220, soul: 8,  icon: rune,  modifiers: { martial: 3, commander_advantage: 4 } }
-  wisdom_stone:   { part: head, tier: 5, price: 600, soul: 14, icon: gem,   modifiers: { learning: 3, diplomacy: 2, stewardship: 2, lifestyle_xp_mult: 0.1 } }
+  trepan_plate:   { part: head, tier: 1, price: 50,  fortitude: 4,  icon: skull, modifiers: { learning: 1, stress_gain_mult: -0.1 } }
+  lead_seal:      { part: head, tier: 2, price: 120, fortitude: 6,  icon: seal,  modifiers: { stewardship: 2, tax_mult: 0.05 } }
+  skull_runes:    { part: head, tier: 2, price: 130, fortitude: 7,  icon: rune,  modifiers: { intrigue: 2, scheme_defense: 15 } }
+  rune_of_tyr:    { part: head, tier: 3, price: 220, fortitude: 8,  icon: rune,  modifiers: { martial: 3, commander_advantage: 4 } }
+  wisdom_stone:   { part: head, tier: 5, price: 600, fortitude: 14, icon: gem,   modifiers: { learning: 3, diplomacy: 2, stewardship: 2, lifestyle_xp_mult: 0.1 } }
   # очи
-  glass_eye:      { part: eyes, tier: 1, price: 50,  soul: 2, icon: eye, modifiers: { diplomacy: 1, attraction_opinion: 5 } }
-  crystal_eye:    { part: eyes, tier: 2, price: 130, soul: 4, icon: eye, modifiers: { intrigue: 2, scheme_defense: 10 } }
-  ruby_eye:       { part: eyes, tier: 3, price: 240, soul: 5, icon: eye, modifiers: { diplomacy: 1, monthly_prestige: 0.3, dread_gain_mult: 0.1 } }
-  raven_eye:      { part: eyes, tier: 4, price: 380, soul: 8, icon: eye, modifiers: { intrigue: 3, scheme_defense: 20, learning: 1 } }
+  glass_eye:      { part: eyes, tier: 1, price: 50,  fortitude: 2, icon: eye, modifiers: { diplomacy: 1, attraction_opinion: 5 } }
+  crystal_eye:    { part: eyes, tier: 2, price: 130, fortitude: 4, icon: eye, modifiers: { intrigue: 2, scheme_defense: 10 } }
+  ruby_eye:       { part: eyes, tier: 3, price: 240, fortitude: 5, icon: eye, modifiers: { diplomacy: 1, monthly_prestige: 0.3, dread_gain_mult: 0.1 } }
+  raven_eye:      { part: eyes, tier: 4, price: 380, fortitude: 8, icon: eye, modifiers: { intrigue: 3, scheme_defense: 20, learning: 1 } }
   # уста
-  gold_teeth:     { part: mouth, tier: 1, price: 60,  soul: 2, icon: tooth, modifiers: { monthly_prestige: 0.2, attraction_opinion: 3 } }
-  iron_jaw:       { part: mouth, tier: 2, price: 120, soul: 5, icon: tooth, modifiers: { prowess: 2, dread_gain_mult: 0.15 } }
-  silver_tongue:  { part: mouth, tier: 3, price: 240, soul: 7, icon: tooth, modifiers: { diplomacy: 3, general_opinion: 5 } }
+  gold_teeth:     { part: mouth, tier: 1, price: 60,  fortitude: 2, icon: tooth, modifiers: { monthly_prestige: 0.2, attraction_opinion: 3 } }
+  iron_jaw:       { part: mouth, tier: 2, price: 120, fortitude: 5, icon: tooth, modifiers: { prowess: 2, dread_gain_mult: 0.15 } }
+  silver_tongue:  { part: mouth, tier: 3, price: 240, fortitude: 7, icon: tooth, modifiers: { diplomacy: 3, general_opinion: 5 } }
   # сердце
-  relic_heart:    { part: heart, tier: 3, price: 200, soul: 3,  icon: reliquary, modifiers: { monthly_piety: 0.5, stress_gain_mult: -0.15 } }
-  lion_heart:     { part: heart, tier: 4, price: 400, soul: 12, icon: heart, modifiers: { prowess: 5, martial: 1, battle_survival: 0.1 } }
-  star_iron_heart: { part: heart, tier: 5, price: 600, soul: 14, icon: heart, modifiers: { health: 1.5, battle_survival: 0.25 } }
+  relic_heart:    { part: heart, tier: 3, price: 200, fortitude: 3,  icon: reliquary, modifiers: { monthly_piety: 0.5, stress_gain_mult: -0.15 } }
+  lion_heart:     { part: heart, tier: 4, price: 400, fortitude: 12, icon: heart, modifiers: { prowess: 5, martial: 1, battle_survival: 0.1 } }
+  star_iron_heart: { part: heart, tier: 5, price: 600, fortitude: 14, icon: heart, modifiers: { health: 1.5, battle_survival: 0.25 } }
   # кровь
-  galen_humors:   { part: blood, tier: 1, price: 50,  soul: 2,  icon: drop, modifiers: { health: 0.5, stress_gain_mult: -0.05 } }
-  theriac:        { part: blood, tier: 2, price: 120, soul: 4,  icon: vial, modifiers: { scheme_defense: 15, health: 0.2 } }
-  quicksilver:    { part: blood, tier: 3, price: 220, soul: 8,  icon: vial, modifiers: { prowess: 3, march_speed: 0.05 } }
-  dragon_blood:   { part: blood, tier: 4, price: 420, soul: 10, icon: drop, modifiers: { health: 0.8, prowess: 2, battle_survival: 0.1 } }
+  galen_humors:   { part: blood, tier: 1, price: 50,  fortitude: 2,  icon: drop, modifiers: { health: 0.5, stress_gain_mult: -0.05 } }
+  theriac:        { part: blood, tier: 2, price: 120, fortitude: 4,  icon: vial, modifiers: { scheme_defense: 15, health: 0.2 } }
+  quicksilver:    { part: blood, tier: 3, price: 220, fortitude: 8,  icon: vial, modifiers: { prowess: 3, march_speed: 0.05 } }
+  dragon_blood:   { part: blood, tier: 4, price: 420, fortitude: 10, icon: drop, modifiers: { health: 0.8, prowess: 2, battle_survival: 0.1 } }
   # жилы
-  gut_tendons:    { part: sinews, tier: 1, price: 60,  soul: 3, icon: spine, modifiers: { prowess: 1, pursuit: 0.1 } }
-  wire_sinews:    { part: sinews, tier: 2, price: 130, soul: 6, icon: spine, modifiers: { prowess: 3 } }
-  stag_sinews:    { part: sinews, tier: 3, price: 220, soul: 6, icon: spine, modifiers: { march_speed: 0.05, orderly_retreat: 0.1, prowess: 1 } }
+  gut_tendons:    { part: sinews, tier: 1, price: 60,  fortitude: 3, icon: spine, modifiers: { prowess: 1, pursuit: 0.1 } }
+  wire_sinews:    { part: sinews, tier: 2, price: 130, fortitude: 6, icon: spine, modifiers: { prowess: 3 } }
+  stag_sinews:    { part: sinews, tier: 3, price: 220, fortitude: 6, icon: spine, modifiers: { march_speed: 0.05, orderly_retreat: 0.1, prowess: 1 } }
   # кожа
-  rune_tattoos:   { part: skin, tier: 2, price: 140, soul: 5,  icon: rune, modifiers: { battle_survival: 0.15, prowess: 1 } }
-  saint_relic:    { part: skin, tier: 3, price: 200, soul: 3,  icon: reliquary, modifiers: { monthly_piety: 0.4, scheme_defense: 10 } }
-  shadow_ink:     { part: skin, tier: 3, price: 260, soul: 8,  icon: vial, modifiers: { intrigue: 3, scheme_power: 10 } }
-  dragon_scales:  { part: skin, tier: 4, price: 420, soul: 10, icon: scales_hide, modifiers: { prowess: 2, battle_survival: 0.25, health: 0.2 } }
+  rune_tattoos:   { part: skin, tier: 2, price: 140, fortitude: 5,  icon: rune, modifiers: { battle_survival: 0.15, prowess: 1 } }
+  saint_relic:    { part: skin, tier: 3, price: 200, fortitude: 3,  icon: reliquary, modifiers: { monthly_piety: 0.4, scheme_defense: 10 } }
+  shadow_ink:     { part: skin, tier: 3, price: 260, fortitude: 8,  icon: vial, modifiers: { intrigue: 3, scheme_power: 10 } }
+  dragon_scales:  { part: skin, tier: 4, price: 420, fortitude: 10, icon: scales_hide, modifiers: { prowess: 2, battle_survival: 0.25, health: 0.2 } }
   # кости
-  iron_splints:   { part: bones, tier: 1, price: 60,  soul: 3,  icon: bone, modifiers: { health: 0.3, prowess: 1 } }
-  silver_ribs:    { part: bones, tier: 2, price: 140, soul: 5,  icon: bone, modifiers: { battle_survival: 0.15, health: 0.3 } }
-  giant_bones:    { part: bones, tier: 4, price: 400, soul: 10, icon: bone, modifiers: { prowess: 3, knight_effectiveness: 0.1 } }
+  iron_splints:   { part: bones, tier: 1, price: 60,  fortitude: 3,  icon: bone, modifiers: { health: 0.3, prowess: 1 } }
+  silver_ribs:    { part: bones, tier: 2, price: 140, fortitude: 5,  icon: bone, modifiers: { battle_survival: 0.15, health: 0.3 } }
+  giant_bones:    { part: bones, tier: 4, price: 400, fortitude: 10, icon: bone, modifiers: { prowess: 3, knight_effectiveness: 0.1 } }
   # руки
-  hook_hand:      { part: arms, tier: 1, price: 50,  soul: 5,  icon: hook,     cures: [maimed], modifiers: { prowess: 2, dread_gain_mult: 0.1 } }
-  iron_hand:      { part: arms, tier: 2, price: 150, soul: 8,  icon: gauntlet, cures: [maimed], modifiers: { prowess: 3, siege_speed: 0.05 } }
-  blade_arm:      { part: arms, tier: 4, price: 420, soul: 12, icon: sword,    cures: [maimed], modifiers: { prowess: 6, dread_gain_mult: 0.2 } }
-  clockwork_arm:  { part: arms, tier: 5, price: 600, soul: 12, icon: gear,     cures: [maimed], modifiers: { prowess: 3, stewardship: 1, learning: 1, knight_effectiveness: 0.05 } }
+  hook_hand:      { part: arms, tier: 1, price: 50,  fortitude: 5,  icon: hook,     cures: [maimed], modifiers: { prowess: 2, dread_gain_mult: 0.1 } }
+  iron_hand:      { part: arms, tier: 2, price: 150, fortitude: 8,  icon: gauntlet, cures: [maimed], modifiers: { prowess: 3, siege_speed: 0.05 } }
+  blade_arm:      { part: arms, tier: 4, price: 420, fortitude: 12, icon: sword,    cures: [maimed], modifiers: { prowess: 6, dread_gain_mult: 0.2 } }
+  clockwork_arm:  { part: arms, tier: 5, price: 600, fortitude: 12, icon: gear,     cures: [maimed], modifiers: { prowess: 3, stewardship: 1, learning: 1, knight_effectiveness: 0.05 } }
   # ноги
-  peg_leg:        { part: legs, tier: 1, price: 30,  soul: 3, icon: pegleg, cures: [maimed], modifiers: { health: 0.1 } }
-  iron_leg:       { part: legs, tier: 2, price: 140, soul: 5, icon: pegleg, cures: [maimed], modifiers: { prowess: 1, pursuit: 0.05, battle_survival: 0.1 } }
-  stag_legs:      { part: legs, tier: 3, price: 230, soul: 6, icon: pegleg, cures: [maimed], modifiers: { pursuit: 0.15, orderly_retreat: 0.1, prowess: 1 } }
+  peg_leg:        { part: legs, tier: 1, price: 30,  fortitude: 3, icon: pegleg, cures: [maimed], modifiers: { health: 0.1 } }
+  iron_leg:       { part: legs, tier: 2, price: 140, fortitude: 5, icon: pegleg, cures: [maimed], modifiers: { prowess: 1, pursuit: 0.05, battle_survival: 0.1 } }
+  stag_legs:      { part: legs, tier: 3, price: 230, fortitude: 6, icon: pegleg, cures: [maimed], modifiers: { pursuit: 0.15, orderly_retreat: 0.1, prowess: 1 } }
 
 # ---------------------------------------------------------------- события
 on_actions:

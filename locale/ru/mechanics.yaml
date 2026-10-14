@@ -1,8 +1,8 @@
 # Механики «Характер», «Слава и благочестие», «Вера и культура земель».
 msg:
-  trial_started: "Вы встали на путь «{name}». У вас {years} лет, чтобы доказать, что достойны его."
-  trial_completed: "{who} прошёл(а) испытание и стал(а) — «{name}»."
-  trial_failed: "Испытание пути «{name}» провалено: срок вышел."
+  trial_started: "Вы приняли испытание призвания «{name}». У вас {years} лет, чтобы доказать, что достойны его."
+  trial_completed: "{who} прошёл(а) испытание и обрёл(а) призвание — «{name}»."
+  trial_failed: "Испытание призвания «{name}» провалено: срок вышел."
   scapegoat: "Интрига раскрыта, но подозрение пало на {who}."
   wounded_in_front: "{who} вёл войско в первых рядах — и получил рану."
   escaped_by_passage: "Столица {place} пала, но вы ушли тайным ходом и не попали в плен."
@@ -16,14 +16,14 @@ msg:
   converted_faith: "{place} принимает веру: {value}."
   converted_culture: "{place} перенимает культуру: {value}."
 ui:
-  trial_have: Этот путь уже пройден
-  trial_max: "Путей не больше {n}"
+  trial_have: Это призвание уже обретено
+  trial_max: "Призваний не больше {n}"
   trial_busy: Уже идёт другое испытание
   trial_skills: Навыки не дотягивают до порога
-  trial_chip: "Путь: {name} ({done}/{total})"
+  trial_chip: "Призвание: {name} ({done}/{total})"
   trial_title: "Испытание: {name}"
   trial_left: "Осталось месяцев: {months}"
-  trial_fail_note: "Не успеете — стресс +{stress} и перерыв на этот путь."
+  trial_fail_note: "Не успеете — стресс +{stress} и перерыв на это призвание."
   hook_income: Плата за молчание (крюки)
   spouse_must_like: Супруг должен относиться к вам хотя бы ровно
   stress_recent: "Недавно:"
@@ -35,7 +35,7 @@ ui:
   check_success: "Если удастся:"
   check_failure: "Если не удастся:"
   voice_needs_skill: "Нужно: {skill} не ниже {min}"
-  voice_needs_archetype: "Нужен архетип «{name}»"
+  voice_needs_archetype: "Нужно призвание «{name}»"
   per_skill_point_ruler: "Правителю — за каждое очко:"
   archetype_needs: "{skills} — от {min}"
   per_skill_point: "За каждое очко навыка:"
@@ -70,7 +70,7 @@ renown:
   piety_2: Благочестивый
   piety_3: Набожный
   piety_4: Праведный
-  piety_5: Святой
+  piety_5: Подвижник
 opinion:
   renown_prestige: "Слава: {name}"
   renown_piety: "Благочестие: {name}"
@@ -83,8 +83,8 @@ ai:
   wounded: Ранен
   faction_leader: Глава фракции
 tr:
-  can_begin_trial: "Может встать на путь «{name}»"
-  has_archetype: "Архетип: {value}"
+  can_begin_trial: "Может принять испытание призвания «{name}»"
+  has_archetype: "Призвание: {value}"
   has_mastery: "Тень мастерства: {value}"
   has_holder_faith: Графство одной веры с владельцем
   not_holder_faith: Графство чужой веры
@@ -93,9 +93,9 @@ tr:
 fx:
   stress_reaction: "Отклик характера: {value} стресса"
   give_nickname: "Прозвище: {nick}"
-  begin_trial: "Испытание пути «{name}» на {years} лет. Цели:"
-  trial_fail: "Не успеете — стресс +{stress} и {years} лет перерыва на этот путь"
-  grant_archetype: "Путь «{name}» пройден"
+  begin_trial: "Испытание призвания «{name}» на {years} лет. Цели:"
+  trial_fail: "Не успеете — стресс +{stress} и {years} лет перерыва на это призвание"
+  grant_archetype: "Призвание «{name}» обретено"
   make_white_peace: "{who} заключает белый мир во всех своих войнах"
   duel: "Поединок: {a} — {b}, шанс победы {chance}%"
   faction_negotiate: "Фракция «{faction}» расходится без уступок"
@@ -139,7 +139,7 @@ stat:
   attrition_mult: Потери от истощения
   dread_per_prisoner: Страх от каждого пленника (в месяц)
   deed_lifestyle_xp: Опыт образа жизни за деяние
-  archetype_skill_reduction: Пути открываются раньше (навык)
+  archetype_skill_reduction: Призвания открываются раньше (навык)
   commission_cost_mult: Цена заказа вещей
   commission_quality: Мастерство заказанных вещей
 mastery:
@@ -169,4 +169,4 @@ stress_src:
   dread_tier: Бессонница грозного правителя
   dragon: Схватка с драконом
 decision:
-  begin_trial: "Встать на путь: {name}"
+  begin_trial: "Испытание призвания: {name}"

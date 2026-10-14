@@ -1,7 +1,7 @@
-# Paths: capstone actions and rules (data/common/stezi.yaml).
+# Ways: capstone actions and rules (data/common/stezi.yaml).
 ui_category:
   decisions:
-    stezi: Paths of Rule
+    stezi: Ways of Rule
 
 decision:
   royal_progress: Royal Progress

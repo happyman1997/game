@@ -8,17 +8,18 @@ extends EngineFeature
 ## носителей conscience_immune) мучаются от греха — стресс за очко пепла.
 ##
 ## Данные:
-##   karma_tiers: { <id>: { min, icon, modifiers, zealot_opinion } } —
-##     ступени по порогу min (нижняя — с самым малым): modifiers — носителю,
-##     zealot_opinion — мнение ревнителей веры (zealot_traits) о нём.
+##   karma_tiers: { <id>: { min, icon, modifiers } } — ступени по порогу min
+##     (нижняя — с самым малым): modifiers — носителю. Душа — «правда» о
+##     человеке, а не его «лицо»: чужое мнение она не меняет (лицо — это
+##     благочестие, его уровни и видимые черты).
 ##   defines.karma: { max, conscience_traits, conscience_immune,
-##     conscience_stress, zealot_traits, log_size, known_by,
+##     conscience_stress, log_size, known_by,
 ##     trait_seed, trait_drift, drift_max }
 ##   Нрав души: в начале игры карма взрослых складывается из trait_seed
 ##   их черт (с небольшим разбросом), а каждый год черты понемногу двигают
 ##   её (trait_drift — повседневные мелкие дела; не больше drift_max за год,
-##   без записи в Книге деяний).
-##   Название деяния в «Книге деяний» — karma_deed.<deed>.
+##   без записи на весах).
+##   Название деяния на «Последнем на весах» — karma_deed.<deed>.
 ##   on_actions: on_karma_tier_up / on_karma_tier_down (root — персонаж);
 ##   on_sin / on_virtue — после каждого записанного деяния (не нрава души),
 ##   отсюда растут Путь Пепла и Путь Света.
@@ -32,7 +33,7 @@ const OWNER := "core/karma"
 
 func _init() -> void:
 	id = "karma"
-	doc = "Свет и Пепел: карма от деяний, ступени, Книга деяний"
+	doc = "Свет и Пепел: карма от деяний, ступени, Последнее на весах"
 
 
 static func value(c: Variant) -> float:
@@ -103,8 +104,8 @@ static func knows_exact(game: Game, c: Dictionary, viewer: Variant) -> bool:
 
 # ------------------------------------------------------------ изменение
 
-## Изменить карму. deed — ключ деяния для «Книги деяний» (karma_deed.<deed>);
-## quiet — без записи в книгу и без мук совести (повседневный нрав души).
+## Изменить карму. deed — ключ деяния для «Последнего на весах» (karma_deed.<deed>);
+## quiet — без записи на весах и без мук совести (повседневный нрав души).
 static func add(game: Game, c: Dictionary, v: float, deed: String = "", quiet: bool = false) -> void:
 	if v == 0.0 or c.death != null:
 		return
@@ -256,23 +257,6 @@ func install(engine: GameEngine) -> void:
 		var tid: String = t.id
 		return [{"label": func(): return game.loc.t("ui.karma_tier_mod", {"tier": game.name_of("karma_tiers", tid)}), "modifiers": t.modifiers}]
 	}, OWNER)
-	# ревнители веры холодны к запятнанным пеплом и чтут праведников
-	engine.opinion_providers.register("karma", {"fn": func(game: Game, a: Dictionary, b: Dictionary) -> Variant:
-		if not b.vars.has("karma_tier") or a.id == b.id:
-			return null
-		var zealot := false
-		for t in game.def_val("karma.zealot_traits", ["zealous"]):
-			if a.traits.has(t):
-				zealot = true
-				break
-		if not zealot:
-			return null
-		var t: Variant = game.content.get_def("karma_tiers", str(b.vars.karma_tier))
-		var v := Data.num(t.get("zealot_opinion")) if t != null else 0.0
-		if v == 0.0:
-			return null
-		return {"label": game.loc.t("opinion.karma_zealot", {"tier": game.name_of("karma_tiers", t.id)}), "value": v}
-	}, OWNER)
 
 
 func register_script(engine: GameEngine) -> void:
@@ -288,7 +272,7 @@ func register_script(engine: GameEngine) -> void:
 		var c: Variant = ch.call(ctx, s)
 		return float(maxi(0, Karma.tier_level(ctx.game, c))) if c != null else 0.0
 	}, OWNER)
-	r.triggers.register("karma_tier", {"scopes": CH, "doc": "Ступень кармы: karma_tier: ashen или karma_tier: \">= pious\"", "eval": func(ctx, s, arg):
+	r.triggers.register("karma_tier", {"scopes": CH, "doc": "Ступень кармы: karma_tier: ashen или karma_tier: \">= bright\"", "eval": func(ctx, s, arg):
 		var c: Variant = ch.call(ctx, s)
 		return c != null and Karma.compare_tier(ctx.game, Karma.tier_level(ctx.game, c), arg),
 		"describe": func(ctx, _s, arg):
@@ -296,7 +280,7 @@ func register_script(engine: GameEngine) -> void:
 			var op: String = {">=": "ge", ">": "gt", "<=": "le", "<": "lt", "!=": "ne", "==": "eq"}[p[0]]
 			return ctx.game.loc.t("tr.karma_tier", {"cond": ctx.game.loc.t("tr.tier_cmp." + op, {"tier": ctx.game.name_of("karma_tiers", p[1])})}),
 	}, OWNER)
-	r.effects.register("add_karma", {"scopes": CH, "doc": "Изменить карму: add_karma: -15 или { value: -15, deed: unjust_execution, quiet: yes } (deed — запись в Книге деяний; quiet — без записи, мук совести и on_sin/on_virtue)",
+	r.effects.register("add_karma", {"scopes": CH, "doc": "Изменить карму: add_karma: -15 или { value: -15, deed: unjust_execution, quiet: yes } (deed — запись на весах; quiet — без записи, мук совести и on_sin/on_virtue)",
 		"apply": func(ctx, s, arg):
 			var c: Variant = ch.call(ctx, s)
 			if c == null:

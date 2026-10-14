@@ -174,7 +174,7 @@ modsrc:
   skill: "Skill «{name}»"
   spouse: "Spouse: {name}"
   mastery: "Shadow of mastery: {name}"
-  archetype: "Archetype: {name}"
+  archetype: "Calling: {name}"
 
 list:
   vassal: vassals

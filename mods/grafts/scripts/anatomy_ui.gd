@@ -3,7 +3,7 @@ extends RefCounted
 ## вживлениями прямо на теле (железная рука, деревянная нога, пластина в
 ## черепе, стеклянный глаз, руны, драконья чешуя…), части тела по полям —
 ## медальоны с вживлениями и пунктир к месту на теле, красные пометки,
-## «Душа» рядом ромбов-лазуритов. Окно вживления и мастерская
+## «Стойкость» рядом ромбов-лазуритов. Окно вживления и мастерская
 ## цирюльника-хирурга — в обычном оформлении игры.
 
 const Main := preload("main.gd")
@@ -108,7 +108,7 @@ static func graft_tip(game: Game, gid: String, head: bool = true) -> String:
 	bb += "\n" + BB.modifiers(game, d.get("modifiers"))
 	if not Data.as_array(d.get("cures")).is_empty():
 		bb += "\n" + BB.good(game.loc.t("grafts.ui_cures"))
-	bb += "\n" + BB.bad(game.loc.t("grafts.ui_soul_cost", {"n": roundi(Data.num(d.get("soul")))}))
+	bb += "\n" + BB.bad(game.loc.t("grafts.ui_fortitude_cost", {"n": roundi(Data.num(d.get("fortitude")))}))
 	return bb
 
 
@@ -153,8 +153,8 @@ static func initial_texture() -> Texture2D:
 	return _tex.initial
 
 
-## Весы души: в левой чаше — душа, в правой — железо; коромысло клонится
-## к железу, когда вживления тяжелее оставшейся души.
+## Весы стойкости: в левой чаше — человек, в правой — железо; коромысло
+## клонится к железу, когда вживления тяжелее оставшейся стойкости.
 static func scales_texture(tilt: int) -> Texture2D:
 	var key := "scales%d" % tilt
 	if _tex.has(key):
@@ -173,7 +173,7 @@ static func scales_texture(tilt: int) -> Texture2D:
 		var py := pt.y + 24.0
 		svg += '<path d="M%s %s L%s %s M%s %s L%s %s" stroke="%s" stroke-width="0.7"/>' % [_f(pt.x), _f(pt.y), _f(pt.x - 9), _f(py), _f(pt.x), _f(pt.y), _f(pt.x + 9), _f(py), ink]
 		if e[1]:
-			# душа — маленькая белая фигурка
+			# человек — маленькая белая фигурка
 			svg += '<circle cx="%s" cy="%s" r="2.2" fill="#fbf6ea" stroke="%s" stroke-width="0.6"/><path d="M%s %s q3 0 3 6 h-6 q0 -6 3 -6 Z" fill="#fbf6ea" stroke="%s" stroke-width="0.6"/>' % [_f(pt.x), _f(py - 9), ink, _f(pt.x), _f(py - 6.5), ink]
 		else:
 			# железо — гиря
@@ -537,7 +537,7 @@ class InkLines extends Control:
 				draw_arc(b, 4.2, 0.0, TAU, 20, Color("#9a1c1c"), 1.6, true)
 
 
-## «Душа»: ромбы-лазуриты, пороги смятения и одержимости — крестиками.
+## «Стойкость»: ромбы-лазуриты, пороги смятения и одержимости — крестиками.
 class SoulBar extends Control:
 	var value := 100.0
 	var max_value := 100.0
@@ -612,8 +612,8 @@ static func build(game: Game, cid: String, app: Object) -> Control:
 	var cc := CenterContainer.new()
 	cc.add_child(_body(game, c, app, is_me))
 	root.add_child(cc)
-	# душа
-	root.add_child(_soul_block(game, c))
+	# стойкость
+	root.add_child(_fortitude_block(game, c))
 	# свойства
 	var mods := Main.total_modifiers(game, c)
 	var box := VBoxContainer.new()
@@ -748,18 +748,18 @@ static func _medallion(game: Game, c: Dictionary, s: Dictionary, x: Variant, app
 	return b
 
 
-static func _soul_block(game: Game, c: Dictionary) -> Control:
+static func _fortitude_block(game: Game, c: Dictionary) -> Control:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
-	var h := Main.soul(game, c)
-	var mx := Main.soul_max(game, c)
+	var h := Main.fortitude(game, c)
+	var mx := Main.fortitude_max(game, c)
 	var st := Main.status(game, c)
-	var used := Main.soul_used(game, c)
+	var used := Main.fortitude_used(game, c)
 	var scales := TextureRect.new()
 	scales.texture = scales_texture(roundi(clampf((used - h) / maxf(1.0, mx) * 25.0, -25.0, 25.0)))
 	scales.custom_minimum_size = Vector2(84, 66)
 	var row := HBoxContainer.new()
-	row.add_child(_label(game.loc.t("grafts.ui_soul"), INK, 17))
+	row.add_child(_label(game.loc.t("grafts.ui_fortitude"), INK, 17))
 	row.add_child(_label("  %d / %d" % [roundi(h), roundi(mx)], INK_SOFT, 16))
 	var sp := Control.new()
 	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -772,8 +772,8 @@ static func _soul_block(game: Game, c: Dictionary) -> Control:
 	bar.max_value = mx
 	bar.troubled = Main._n(game, "troubled_below", 40)
 	bar.possession = Main._n(game, "possession_below", 20)
-	var tip := BB.title(game.loc.t("grafts.ui_soul")) + "\n" + BB.i(game.loc.t("grafts.ui_soul_tip", {"t": roundi(bar.troubled), "p": roundi(bar.possession)})) + \
-		"\n" + BB.muted(game.loc.t("grafts.ui_soul_parts", {"base": roundi(Main._n(game, "soul_base", 100)), "traits": K.signed(roundi(mx - Main._n(game, "soul_base", 100))), "used": roundi(used)}))
+	var tip := BB.title(game.loc.t("grafts.ui_fortitude")) + "\n" + BB.i(game.loc.t("grafts.ui_fortitude_tip", {"t": roundi(bar.troubled), "p": roundi(bar.possession)})) + \
+		"\n" + BB.muted(game.loc.t("grafts.ui_fortitude_parts", {"base": roundi(Main._n(game, "fortitude_base", 100)), "traits": K.signed(roundi(mx - Main._n(game, "fortitude_base", 100))), "used": roundi(used)}))
 	K.tip(bar, tip)
 	K.tip(scales, tip)
 	box.add_child(bar)
@@ -832,7 +832,7 @@ static func open_shop(game: Game, app: Object, part: String) -> void:
 		if p == null:
 			return
 		box.add_child(K.label(game.loc.t("grafts.ui_workshop"), "HeaderLabel"))
-		box.add_child(K.para(game.loc.t("grafts.ui_workshop_info", {"risk": roundi(Main.surgery_risk(game, p) * 100.0), "soul": roundi(Main.soul(game, p)), "gold": roundi(float(p.gold))}), "MutedLabel"))
+		box.add_child(K.para(game.loc.t("grafts.ui_workshop_info", {"risk": roundi(Main.surgery_risk(game, p) * 100.0), "fortitude": roundi(Main.fortitude(game, p)), "gold": roundi(float(p.gold))}), "MutedLabel"))
 		var fl := K.flow([], 4)
 		fl.add_child(K.button(game.loc.t("grafts.ui_all"), func():
 			st.part = ""
@@ -878,7 +878,7 @@ static func _shop_card(game: Game, d: Dictionary, on_change: Callable) -> Contro
 			on_change.call(), {"variation": "GoldButton", "icon": "hammer", "disabled": not blk.is_empty(), "min_w": 140})
 	if not blk.is_empty():
 		K.tip(b, BB.reasons(blk))
-	var right := K.vbox([K.rich(BB.cost(game, {"gold": Data.num(d.get("price"))})), K.label(game.loc.t("grafts.ui_soul_cost", {"n": roundi(Data.num(d.get("soul")))}), "BadLabel"), b], 4)
+	var right := K.vbox([K.rich(BB.cost(game, {"gold": Data.num(d.get("price"))})), K.label(game.loc.t("grafts.ui_fortitude_cost", {"n": roundi(Data.num(d.get("fortitude")))}), "BadLabel"), b], 4)
 	var row := K.hbox([Icons.node(d.get("icon", "star"), 40), info, right], 10)
 	var pc := K.panel(K.margin(row, 10, 6), "RowPanel")
 	K.tip(info, func(): return graft_tip(game, gid))

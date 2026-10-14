@@ -1,15 +1,15 @@
-# Light and Ash: tiers of the soul, the Book of Deeds, the pilgrimage to the Ashlands, omens.
+# Light and Ash: tiers of the soul, deeds on the scales, the pilgrimage to the Ashlands, omens.
 karma_tier:
   ashen: Ashen
   tainted: Ash-stained
   common: Like Everyone
-  pious: Devout
+  bright: Bright
   solar: Sunlit
 karma_tier_desc:
   ashen: "The soul is black with ash. Omens are ill, priests turn away, and the Great Lightbearer may cast you out of the Light. The Prince of Ash has long been looking this way."
   tainted: "There is ash on the soul. Priests are cold, and bad dreams come at night."
   common: "Sins and repents like everyone. The scales are balanced."
-  pious: "A clean soul: piety gathers faster and zealots honour you."
+  bright: "A bright soul: piety gathers faster. People judge by the face, the scales by deeds."
   solar: "The soul is bright as the noonday sun. Omens are kind, and after death such souls leave relics and glory for their house."
 karma_deed:
   other: A deed

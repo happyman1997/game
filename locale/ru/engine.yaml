@@ -175,7 +175,7 @@ modsrc:
   skill: "Навык «{name}»"
   spouse: "Супруг(а): {name}"
   mastery: "Тень мастерства: {name}"
-  archetype: "Архетип: {name}"
+  archetype: "Призвание: {name}"
 
 list:
   vassal: вассалы

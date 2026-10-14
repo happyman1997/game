@@ -53,6 +53,6 @@ msg:
   nickname_gained: "{who} has earned a nickname: {nick}."
 ui:
   deeds: Chronicle
-  deeds_tip: "What has been done in a lifetime. Deeds earn nicknames (names only, no effects) and fulfil the goals of path trials."
+  deeds_tip: "What has been done in a lifetime. Deeds earn nicknames (names only, no effects) and fulfil the goals of calling trials."
   next_nickname: "Nickname “{nick}”: {deed} {have}/{need}"
   nickname_from: "Nickname earned by: {deed}"
