@@ -510,7 +510,7 @@ static func register(engine: GameEngine) -> void:
 		var f: Variant = ctx.game.content.get_def("faiths", c.faith) if c != null else null
 		return f != null and f.get("religion") == arg
 	)
-	ct.call("is_heretic", "Еретик в глазах своей религии (черта с heretic: yes): is_heretic: yes", func(g, c, arg, _ctx, _s): return Wars.is_heretic(g, c) == ScriptContext.is_yes(arg))
+	ct.call("is_heretic", "Еретик в глазах своей религии (черта или модификатор с heretic: yes): is_heretic: yes", func(g, c, arg, _ctx, _s): return Wars.is_heretic(g, c) == ScriptContext.is_yes(arg))
 	ct.call("dynasty", "Из этой династии (или её младшей ветви)", func(g, c, arg, _ctx, _s): return c.dynasty != null and (c.dynasty == arg or Chars.dynasty_root(g, c.dynasty) == arg))
 	rel.call("same_culture_as", "Та же культура", func(_g, c, o): return o.culture == c.culture)
 	rel.call("same_faith_as", "Та же вера", func(_g, c, o): return o.faith == c.faith, "tr.same_faith_as")

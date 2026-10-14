@@ -135,3 +135,29 @@ func test_dungeon_holds_fear_only_to_horror() -> void:
 	g.engine.hooks.off("politics.dread_tier", fn)
 	check_eq(changes[0], 0, "ступень у порога не прыгает")
 	check_eq(Politics.tier_level(g, h), 3, "держится ужас")
+
+
+func test_light_against_tyrant() -> void:
+	var g := _game()
+	var lord := _ai_lord(g)
+	check(not Wars.is_heretic(g, lord), "поначалу не еретик")
+	# тиран с пеплом на душе — Великий Светоч его отлучает
+	Politics._set_dread(g, lord, 85.0)
+	Karma.set_value(g, lord, -30.0)
+	var def: Dictionary = g.content.get_def("events", "soul.0005")
+	var ctx := ScriptContext.make(g, {"type": "character", "id": lord.id})
+	check(g.events.can_fire(def, {"type": "character", "id": lord.id}, ctx), "тирана с пеплом на душе отлучают")
+	Interp.run_effect(ctx, ctx.root, {"add_modifier": {"id": "cast_out_of_light", "years": 10}})
+	check(Wars.is_heretic(g, lord), "изгнанный из Света — еретик")
+	# единоверный сосед вправе идти на него священной войной
+	var found := false
+	for r in g.rulers():
+		if r.liege != null or r.id == lord.id:
+			continue
+		for t in Wars.available_war_targets(g, r):
+			if t.cb == "holy_war" and t.defender == lord.id:
+				found = true
+				break
+		if found:
+			break
+	check(found, "у единоверного соседа есть повод к священной войне")

@@ -250,11 +250,16 @@ static func builtin_cb_targets() -> Dictionary:
 	}
 
 
-## Еретик в глазах своей религии: есть черта с heretic: yes.
+## Еретик в глазах своей религии: черта или модификатор с heretic: yes
+## (раскрытый договор с Князем Пепла, изгнание из Света).
 static func is_heretic(game: Game, c: Dictionary) -> bool:
 	for t in c.traits:
 		var td: Variant = game.content.get_def("traits", t)
 		if td != null and td.get("heretic") != null and ScriptContext.is_yes(td.heretic):
+			return true
+	for m in c.modifiers:
+		var md: Variant = game.content.get_def("modifiers", str(m.id))
+		if md != null and md.get("heretic") != null and ScriptContext.is_yes(md.heretic):
 			return true
 	return false
 

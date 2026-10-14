@@ -114,4 +114,8 @@ casus_belli:
     ai_will_do:
       value: 50
       add: { value: ai_zeal, multiply: 15 }
+      # Свет против тирана: на изгнанного из Света верные идут охотнее
+      if:
+        limit: { scope:defender: { has_modifier: cast_out_of_light } }
+        add: 30
     war_name: cb.holy_war.war_name

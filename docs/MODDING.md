@@ -161,7 +161,7 @@ defines:
 | `skill_archetypes` | `core/data/common/archetypes.yaml` | Связки навыков: `{ skills: [..], min, icon, modifiers }`. |
 | `traits` | `core/data/common/traits.yaml` | Черты: `category`, `icon`, `modifiers`, `opposites`, `compatibility`, `genetic`/`birth_chance`/`inherit_chance`, `education`, `ai`, `monthly_death_chance`, `monthly_cure_chance`, `duration_days`, `group`, `color` (цвет плашки), `concealed` (скрытая черта — см. «Крюки и секреты»), `portrait` (как черта меняет портрет — см. ниже). |
 | `cultures` | `core/data/common/cultures.yaml` | `color`, `male_names`, `female_names`, `dynasty_pattern` (`name`/`place`), `succession_law`, `skin`/`hair`, `modifiers`, `traits` (врождённые черты всех людей этой культуры — например, раса `dwarf`), `government` (правление по умолчанию). |
-| `faiths` | там же | `religion`, `color`, `icon`, `doctrines` (`polygamy`), `virtues`, `sins`, `modifiers`, `no_holy_war_with` (религии, с которыми эта вера не ведёт священных войн — в обе стороны). Священная война возможна против другой религии, а внутри своей — только против еретика: персонажа с чертой `heretic: yes` (условие `is_heretic`); еретик — законная цель даже для единоверца. В базовой игре весь мир исповедует одну религию `solar` (Вера Солнечного Императора), а веры — её культы. |
+| `faiths` | там же | `religion`, `color`, `icon`, `doctrines` (`polygamy`), `virtues`, `sins`, `modifiers`, `no_holy_war_with` (религии, с которыми эта вера не ведёт священных войн — в обе стороны). Священная война возможна против другой религии, а внутри своей — только против еретика: персонажа с чертой или модификатором `heretic: yes` (условие `is_heretic`; в ядре — раскрытый договор с Князем Пепла и изгнание из Света `cast_out_of_light`); еретик — законная цель даже для единоверца. В базовой игре весь мир исповедует одну религию `solar` (Вера Солнечного Императора), а веры — её культы. |
 | `terrain`, `holdings`, `buildings` | `core/data/common/economy.yaml` | Местность (оборона, скорость, высота рельефа, `attrition` — потери армий в месяц), владения (налог, ополчение, крепость), постройки (`holding`, `requires`, `cost`, `days`, `modifiers`, `owner_modifiers`, `trigger`; `special: yes` — особая постройка: не строится и не занимает места, её дают графству данные карты или эффект `add_building`, а действует она на того, кто держит графство). |
 | `map`, `landmasses`, `provinces`, `map_links` | `core/data/map/` | Карта — см. раздел 7. |
 | `titles` | `core/data/map/titles.yaml` | Иерархия де-юре: `tier`, `liege`, `color`, `capital`, `coa` (герб), `no_create`. Графства создаются из провинций автоматически. |
@@ -1326,7 +1326,7 @@ karma_tiers:
 
 | Поле или характеристика | Что делает |
 |---|---|
-| `heretic: yes` у черты | носитель — еретик своей религии: на него идут священной войной |
+| `heretic: yes` у черты или модификатора | носитель — еретик своей религии: на него идут священной войной (изгнание из Света `cast_out_of_light` — так Великий Светоч отлучает пепельную душу и тирана, правящего террором) |
 | `sees_concealed: [<тип секрета>]` у черты | носитель видит чужие скрытые черты с этим `concealed` |
 | `dread_floor` | ниже этого страх правителя не опускается |
 | `enemy_thinning` | доля вражеского войска, что тает перед боем |

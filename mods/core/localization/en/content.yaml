@@ -219,7 +219,7 @@ casus_belli_desc:
   de_jure: Annex counties that rightfully belong to your titles.
   independence: Throw off the rule of your liege.
   county_conquest: Take a neighbouring county by the sword.
-  holy_war: Take lands from a heretic — one whose pact with the Prince of Ash has come to light.
+  holy_war: Take lands from a heretic — one whose pact with the Prince of Ash has come to light, or one cast out of the Light.
 
 cb:
   claim:

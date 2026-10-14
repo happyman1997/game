@@ -99,7 +99,9 @@ decisions:
           multiply: 0
 
 modifiers:
-  # изгнание из Света: Великий Светоч отлучил грешника от Храма
-  cast_out_of_light: { icon: "🌑", modifiers: { monthly_piety: -2, vassal_opinion: -10, general_opinion: -10 } }
+  # изгнание из Света: Великий Светоч отлучил грешника или тирана от Храма.
+  # heretic: yes — единоверцы вправе идти на него священной войной, а Живой
+  # святой — крестовым походом Света («Свет против тирана»)
+  cast_out_of_light: { icon: "🌑", heretic: yes, modifiers: { monthly_piety: -2, vassal_opinion: -10, general_opinion: -10 } }
   good_omen: { icon: "☀", good: true, modifiers: { monthly_prestige: 0.5, county_opinion: 5 } }
   bad_omen: { icon: "🌑", modifiers: { county_opinion: -5, stress_gain_mult: 0.1 } }

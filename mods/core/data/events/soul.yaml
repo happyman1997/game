@@ -87,6 +87,7 @@ events:
         ai_chance: { value: 10, add: { value: ai_zeal, multiply: -10 } }
 
   # ------------------------------------------------------------ изгнание из Света
+  # Пепельную душу — и тирана, правящего террором, с пеплом на душе.
   soul.0005:
     requires_feature: karma
     theme: faith
@@ -94,9 +95,15 @@ events:
     trigger:
       is_ruler: yes
       religion: solar
-      karma_tier: ashen
+      OR:
+        - karma_tier: ashen
+        - AND: [ { dread_tier: terror }, { karma_tier: "<= tainted" } ]
       NOT: { has_modifier: cast_out_of_light }
     cooldown: { years: 8 }
+    desc:
+      - trigger: { dread_tier: terror }
+        desc: ev.soul.0005.desc_tyrant
+      - desc: ev.soul.0005.desc
     options:
       # покаяться: золото и благочестие Храму
       - trigger: { gold: 150 }
@@ -108,7 +115,13 @@ events:
       # пусть отлучают
       - effect:
           - add_modifier: { id: cast_out_of_light, years: 10 }
+          - custom_tooltip: ui.cast_out_holy_war
           - add_prestige: 20
+          # вести мира: Свет отвернулся от правителя
+          - if:
+              limit: { known_to_player: yes }
+              save_scope_as: news_subject
+              player: { send_message: { text: msg.news_cast_out, kind: event } }
         ai_chance: 50
 
 on_actions:
