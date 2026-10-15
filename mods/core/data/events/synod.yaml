@@ -1,0 +1,28 @@
+# Собор: голос игрока (механика synod, вопросы — common/synod.yaml).
+# Событие приходит за defines.synod.vote_event_days до Собора тому, у кого
+# есть голос; scope:synod_head — Великий Светоч, scope:synod_target — цель
+# вопроса, scope:synod_faith_ruler — правитель культа-цели.
+events:
+  synod.0001:
+    requires_feature: synod
+    theme: faith
+    icon: "☀"
+    triggered_only: true
+    desc:
+      - trigger: { synod_question: anathema }
+        desc: ev.synod.0001.desc_anathema
+      - trigger: { synod_question: reconcile }
+        desc: ev.synod.0001.desc_reconcile
+      - trigger: { synod_question: peace_of_the_sun }
+        desc: ev.synod.0001.desc_peace
+      - trigger: { synod_question: tithe }
+        desc: ev.synod.0001.desc_tithe
+      - trigger: { synod_question: excommunicate_tyrant }
+        desc: ev.synod.0001.desc_tyrant
+      - trigger: { synod_question: canonize }
+        desc: ev.synod.0001.desc_canonize
+      - desc: ev.synod.0001.desc
+    options:
+      - effect: { synod_vote: for }
+      - effect: { synod_vote: against }
+      - effect: { synod_vote: abstain }

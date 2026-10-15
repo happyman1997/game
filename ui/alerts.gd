@@ -47,6 +47,18 @@ static func register_builtin(engine: GameEngine) -> void:
 			if Dynasties.legacy_blockers(g, p, l.id).is_empty():
 				return {"icon": "dynasty", "kind": "good", "text": g.loc.t("alert.legacy_available", {"n": roundi(Dynasties.renown(g, root))}), "action": {"tab": "dynasty"}}
 		return null)
+	# созван Собор: вопрос, срок и нынешний расклад голосов
+	reg.call("synod", 14, func(g: Game):
+		var p: Dictionary = g.player
+		if not g.engine.has_feature("synod") or p.titles.is_empty():
+			return null
+		var a: Variant = Synod.active_for(g, p)
+		var head: Variant = Temple.head_of(g, p)
+		if a == null or head == null:
+			return null
+		var pv := Synod.preview(g, head, a)
+		var months := maxi(0, roundi((int(a.convene) - g.date) / 30.0))
+		return {"icon": "piety", "kind": "info", "text": g.loc.t("alert.synod", {"question": Synod.question_name(g, str(a.question), a), "months": months, "for": roundi(pv["for"]), "against": roundi(pv.against)}), "action": {"character": head.id}})
 	reg.call("child_no_guardian", 15, func(g: Game):
 		var p: Dictionary = g.player
 		if not g.engine.has_feature("upbringing"):

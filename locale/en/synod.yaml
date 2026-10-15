@@ -1,0 +1,39 @@
+# Synod feature: engine and UI strings.
+synod_question:
+  anathema: "Anathema: {faith}"
+  reconcile: "Back into the Light: {faith}"
+  peace_of_the_sun: The Peace of the Sun
+  tithe: The Temple Tithe
+  excommunicate_tyrant: "Excommunicate {target}"
+  canonize: "Canonise {target}"
+msg:
+  synod_called: "{head} calls a Synod at Reims. The question: “{question}”. The Synod will meet in a year."
+  synod_passed: "The Synod has passed: “{question}” (for {for}, against {against})."
+  synod_failed: "The Synod has rejected: “{question}” (for {for}, against {against})."
+  synod_decree_expired: "A decree of the Synod has expired: “{decree}”."
+alert:
+  synod: "Synod in {months} months: “{question}”. For {for}, against {against} so far."
+ui:
+  synod_decree_mod: "Decree of the Synod: {decree}"
+  synod_called_line: "A Synod is called: “{question}” — in {months} months."
+  synod_decree_line: "Decree of the Synod: “{decree}”"
+  synod_decree_until: "Decree of the Synod: “{decree}” — until {date}"
+  synod_your_weight: "Your vote at the Synod weighs {n}"
+tr:
+  synod_active: A Synod is called
+  synod_active.not: No Synod is called
+  is_synod_voter: Votes at the Synod
+  is_synod_voter.not: Does not vote at the Synod
+  has_synod_decree: "The Synod's decree “{decree}” is in force"
+fx:
+  synod_vote:
+    for: Vote “for”
+    against: Vote “against”
+    abstain: Abstain
+  synod_sway:
+    for: "{who} will vote “for”"
+    against: "{who} will vote “against”"
+  set_faith_heresy: "The cult “{faith}” is declared a heresy"
+  lift_faith_heresy: "The heresy is lifted from the cult “{faith}”"
+ai:
+  synod_conviction: Convictions at the Synod

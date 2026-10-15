@@ -1,0 +1,247 @@
+# Собор (механика synod): раз в 10–15 лет Великий Светоч созывает единоверцев
+# в Реймс и ставит на голосование один вопрос. Голос весит по уровню
+# благочестия (королям +1), голоса можно склонить золотом или крюком
+# («Склонить голос на Соборе»). Принятый вопрос с decree — указ на срок.
+# Событие голосования игрока — events/synod.yaml.
+
+defines:
+  synod:
+    years_min: 10
+    years_max: 15
+    first_years: [3, 6]            # первый Собор после начала игры
+    after_election_years: 2        # новый Великий Светоч созывает не позже
+    notice_days: 365               # от созыва до Собора
+    vote_event: synod.0001
+    vote_event_days: 60
+    vote_threshold: 5              # слабее — воздерживается
+    head_opinion_weight: 0.3       # верность Храму: мнение о Великом Светоче склоняет к его предложению
+    # кто голосует (root — правитель, scope:synod_head — глава веры)
+    voter:
+      is_heretic: no
+      faith_head: { is_same_as: scope:synod_head }
+      OR: [ { tier: ">= 2" }, { is_independent: yes } ]
+    # вес голоса: уровень благочестия, королям и императорам +1; нечестивых не слушают
+    vote_weight:
+      value: piety_level
+      if:
+        - limit: { piety_level: ">= 1", tier: ">= 3" }
+          add: 1
+
+synod_questions:
+  # Анафема: 20 лет культ — ересь, на его последователей идут священной войной.
+  # Свои голосуют против, ревнители — за, соседи — за (земли еретика — добыча).
+  anathema:
+    icon: "🔥"
+    target: { type: faith, heretic: no, prefer: small }
+    weight: 1
+    ai_vote:
+      value: 0
+      add: { value: ai_zeal, multiply: 8 }
+      if:
+        - limit: { of_synod_target_faith: yes }
+          add: -200
+        - limit: { has_trait: zealous }
+          add: 20
+        - limit: { any_neighboring_ruler: { of_synod_target_faith: yes } }
+          add: 12
+        - limit: { has_trait: [compassionate, forgiving] }
+          add: -20
+        - limit: { any_spouse: { of_synod_target_faith: yes } }
+          add: -40
+    on_pass:
+      - set_faith_heresy: { faith: synod_target_faith, heretic: yes, years: 20 }
+    decree: { years: 20 }
+
+  # Примирение: ересь снята, на культ больше не идут священной войной.
+  reconcile:
+    icon: "🕊"
+    target: { type: faith, heretic: yes }
+    weight: 1
+    ai_vote:
+      value: 0
+      add:
+        - { value: ai_zeal, multiply: -6 }
+        - { value: ai_compassion, multiply: 5 }
+      if:
+        - limit: { has_trait: [forgiving, compassionate] }
+          add: 20
+        - limit: { has_trait: zealous }
+          add: -25
+        - limit: { any_neighboring_ruler: { of_synod_target_faith: yes } }
+          add: -10
+        - limit: { any_spouse: { of_synod_target_faith: yes } }
+          add: 30
+    on_pass:
+      - set_faith_heresy: { faith: synod_target_faith, heretic: no }
+
+  # Божий мир: 10 лет война с единоверцем (не еретиком) — грех перед Храмом;
+  # ИИ воюет с единоверцами втрое реже.
+  peace_of_the_sun:
+    icon: "☀"
+    weight: 1
+    ai_vote:
+      value: 0
+      add:
+        - { value: ai_aggression, multiply: -10 }
+        - { value: ai_compassion, multiply: 4 }
+      if:
+        - limit: { has_trait: [content, craven, compassionate] }
+          add: 15
+        - limit: { has_trait: [ambitious, wrathful] }
+          add: -15
+        - limit: { is_at_war: yes }
+          add: 5
+    decree: { years: 10, ai_war_mult: 0.3 }
+
+  # Десятина: единоверцы отдают Храму долю податей, Храм молится за них.
+  tithe:
+    icon: "🪙"
+    weight: { value: 1, if: { limit: { gold: "< 200" }, add: 1 } }
+    ai_vote:
+      value: 0
+      add:
+        - { value: ai_zeal, multiply: 8 }
+        - { value: ai_greed, multiply: -8 }
+      if:
+        - limit: { has_trait: zealous }
+          add: 20
+        - limit: { has_trait: greedy }
+          add: -25
+        - limit: { gold: "< 50" }
+          add: -10
+    decree:
+      years: 20
+      ruler_modifiers: { tax_mult: -0.05, monthly_piety: 0.5 }
+      head_modifiers: { monthly_income: 6, monthly_piety: 3 }
+
+  # Отлучение тирана: Собор разом отлучает самого грозного из тех, кому
+  # Великий Светоч не благоволит, но кого отлучение до сих пор обходило.
+  excommunicate_tyrant:
+    icon: "🌑"
+    weight: 2
+    target:
+      type: character
+      trigger:
+        is_heretic: no
+        faith_head: { is_same_as: scope:synod_head }
+        NOT: { has_modifier: cast_out_of_light }
+        scope:synod_head: { opinion: { target: root, value: "< -10" } }
+      order: { value: dread }
+    ai_vote:
+      value: 0
+      add:
+        - { value: "opinion(scope:synod_target)", multiply: -0.5 }
+        - { value: ai_zeal, multiply: 4 }
+      if:
+        - limit: { is_same_as: scope:synod_target }
+          add: -300
+        - limit: { is_close_family_of: scope:synod_target }
+          add: -40
+        - limit: { is_vassal_of: scope:synod_target }
+          add: -25
+        - limit: { is_allied_with: scope:synod_target }
+          add: -30
+    on_pass:
+      - scope:synod_target:
+          add_modifier: { id: cast_out_of_light, years: 20 }
+
+  # Канонизация: праведник, умерший за последние 30 лет, объявлен святым —
+  # слава его роду, а мощи хранит Храм.
+  canonize:
+    icon: "✨"
+    weight: 2
+    target:
+      type: dead
+      years: 30
+      trigger:
+        OR: [ { karma_tier: solar }, { has_trait: living_saint } ]
+        NOT: { has_flag: canonized }
+        religion: solar
+        is_heretic: no
+    ai_vote:
+      value: 10
+      add: { value: ai_zeal, multiply: 5 }
+      if:
+        - limit: { same_dynasty_as: scope:synod_target }
+          add: 30
+        - limit: { has_trait: cynical }
+          add: -25
+    on_pass:
+      - scope:synod_target:
+          set_flag: canonized
+          add_dynasty_prestige: 300
+      - create_relics: { of: scope:synod_target, rarity: illustrious }
+
+opinion_modifiers:
+  broke_the_peace: { value: -30, years: 10 }
+
+interactions:
+  # Склонить голос на Соборе — золотом, дружбой или крюком.
+  synod_sway_for:
+    requires_feature: synod
+    icon: "⚖"
+    category: diplomacy
+    is_shown:
+      scope:actor: { is_ruler: yes, synod_active: yes }
+      scope:recipient: { synod_active: yes, is_synod_voter: yes }
+    is_valid:
+      scope:recipient: { synod_swayed: no }
+    cost:
+      gold: { value: "scope:recipient.synod_vote_weight", multiply: 40, min: 40 }
+    ai_accept:
+      value: 10
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.5 } }
+        - { desc: ai.synod_conviction, value: { value: synod_preference, multiply: 0.5 } }
+    on_accept:
+      - scope:recipient: { synod_sway: for }
+    decline_text: msg.synod_sway_refused
+    ai_targets: [neighboring_ruler, vassal, liege]
+    ai_frequency_months: 4
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { synod_preference: ">= 30", gold: 300 }
+          add: 20
+  synod_sway_against:
+    requires_feature: synod
+    icon: "⚖"
+    category: diplomacy
+    is_shown:
+      scope:actor: { is_ruler: yes, synod_active: yes }
+      scope:recipient: { synod_active: yes, is_synod_voter: yes }
+    is_valid:
+      scope:recipient: { synod_swayed: no }
+    cost:
+      gold: { value: "scope:recipient.synod_vote_weight", multiply: 40, min: 40 }
+    ai_accept:
+      value: 10
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.5 } }
+        - { desc: ai.synod_conviction, value: { value: synod_preference, multiply: -0.5 } }
+    on_accept:
+      - scope:recipient: { synod_sway: against }
+    decline_text: msg.synod_sway_refused
+    ai_targets: [neighboring_ruler, vassal, liege]
+    ai_frequency_months: 4
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { synod_preference: "<= -30", gold: 300 }
+          add: 20
+
+on_actions:
+  # Божий мир: напасть на единоверца (не еретика) — грех перед Храмом
+  on_war_started:
+    effect:
+      $append:
+        - if:
+            limit:
+              has_synod_decree: peace_of_the_sun
+              is_heretic: no
+              scope:defender:
+                is_heretic: no
+                faith_head: { is_same_as: root.faith_head }
+            add_piety: -150
+            faith_head: { add_opinion: { target: root, modifier: broke_the_peace } }
+            send_message: { text: msg.broke_the_peace, kind: bad }

@@ -31,6 +31,7 @@
 | `faction_type` | faction | Тип фракции | core/factions |
 | `faith` | character, province | Вера равна | core |
 | `faith_doctrine` | character | Учение культа персонажа (faiths.doctrines): faith_doctrine: { divorce: approval } | core/temple |
+| `faith_heretic` | character | Культ персонажа сейчас еретический (поле культа или указ Собора): faith_heretic: yes | core/temple |
 | `fear_stance` | character | Как подданный относится к страху сюзерена: defiant (дерзкий), broken (сломленный), obedient (покорный) | core/politics |
 | `felt_dread_tier` | character | Ступень страха, которую подданный чувствует перед сюзереном (дерзкие — нижняя, сломленные — выше): felt_dread_tier: "< unease" | core/politics |
 | `global_var` | любой | Сравнение глобальной переменной | core |
@@ -74,6 +75,7 @@
 | `has_snubbed_powerful_vassal` | character | Кто-то из влиятельных вассалов не получил места в совете | core/politics |
 | `has_strong_hook_on` | character | Есть сильный крюк на персонажа | core |
 | `has_succession_law` | character | Закон наследования | core |
+| `has_synod_decree` | character | Действует указ Собора веры персонажа: has_synod_decree: <вопрос> | core/synod |
 | `has_trait` | character | Есть черта | core |
 | `has_trait_category` | character | Есть черта категории | core |
 | `has_truce_with` | character | Перемирие с персонажем | core |
@@ -134,11 +136,13 @@
 | `is_scheme_target` | character | Является целью интриги | core |
 | `is_sibling_of` | character | Брат/сестра персонажа | core |
 | `is_spouse_of` | character | Супруг(а) персонажа | core |
+| `is_synod_voter` | character | Голосует на Соборе своей веры (defines.synod.voter, вес больше нуля) | core/synod |
 | `is_vassal` | character | Вассал | core |
 | `is_vassal_of` | character | Прямой вассал персонажа | core |
 | `karma_tier` | character | Ступень кармы: karma_tier: ashen или karma_tier: ">= bright" | core/karma |
 | `knows_secret_of` | character | Знает какой-то секрет персонажа | core/secrets |
 | `near_dragon_lair` | character | Логово дракона в державе персонажа или по соседству | arcana |
+| `of_synod_target_faith` | character | Персонаж исповедует культ — цель вопроса Собора (анафема, примирение) | core/synod |
 | `province_has_disease` | province | В провинции эпидемия. Аргумент: yes или id болезни. | plague |
 | `province_restless` | province | В провинции бродят мертвецы | arcana |
 | `random_chance` | любой | Случайный шанс в процентах (используйте осторожно в триггерах) | core |
@@ -151,6 +155,9 @@
 | `same_dynasty_as` | character | Та же династия (с младшими ветвями) | core |
 | `same_faith_as` | character | Та же вера | core |
 | `spirit_state` | character | Состояние духа (id из spirit_states, список или yes/no) | core/spirit |
+| `synod_active` | character | Созван Собор веры персонажа: synod_active: yes | core/synod |
+| `synod_question` | character | Вопрос созванного Собора: synod_question: anathema | core/synod |
+| `synod_swayed` | character | Голос уже склонён на созванном Соборе | core/synod |
 | `terrain` | province | Местность | core |
 | `tier_is` | title | Ранг титула: county/duchy/kingdom/empire | core |
 | `var` | любой | Сравнение переменной: var: { name: x, value: ">= 2" } | core |
@@ -205,6 +212,7 @@
 | `blackmail` | Шантажировать персонажа его самым тяжёлым известным секретом (получить крюк) | core/secrets |
 | `bless_domain` | Светлый чародей благословляет земли домена | arcana |
 | `break_alliance` | Разорвать союз | core |
+| `call_synod` | Глава веры созывает Собор: call_synod: yes или <вопрос> (root — глава веры) | core/synod |
 | `calm_factions` | Снизить недовольство всех фракций против правителя: calm_factions: 40 | core/politics |
 | `cast_curse_on` | Проклясть персонажа (со стоимостью и риском разоблачения) | arcana |
 | `change_culture` | Сменить культуру | core |
@@ -286,6 +294,7 @@
 | `seize_realm_artifacts` | Забрать спорные реликвии из державы персонажа from: seize_realm_artifacts: scope:defender | core/artifacts |
 | `send_message` | Сообщение игроку (если этот персонаж — игрок) | core |
 | `set_education_focus` | Направление воспитания: set_education_focus: martial | core/upbringing |
+| `set_faith_heresy` | Объявить культ ересью или снять ересь: set_faith_heresy: { faith: wolf_cult \| synod_target_faith, heretic: yes, years: 20 } (years: 0 — бессрочно) | core/temple |
 | `set_flag` | Установить флаг: name или { name, days/months/years } | core |
 | `set_focus` | Сменить фокус образа жизни (без перерыва) | core/lifestyles |
 | `set_global_flag` | Глобальный флаг | core |
@@ -306,6 +315,8 @@
 | `start_disease` | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
 | `start_scheme` | Начать интригу: { type, target } | core |
 | `stress_reaction` | Отклик характера на поступок из события: stress_reaction: <id из defines.personality.event_actions> | core/personality |
+| `synod_sway` | Склонить голос персонажа на созванном Соборе: synod_sway: for \| against | core/synod |
+| `synod_vote` | Голос игрока на созванном Соборе: synod_vote: for \| against \| abstain | core/synod |
 | `take_faction_counties` | Вожак народной фракции (scope:faction) забирает её графства и правит сам: yes или { create_titles: yes } | core/populace |
 | `take_title` | Отобрать титул себе: { title, from? } | core |
 | `transfer_artifact` | Отдать вещь персонажу: transfer_artifact: { artifact: scope:target, to: scope:recipient, how: gift } | core/artifacts |
@@ -464,6 +475,8 @@
 | `stress` | character | Стресс | core |
 | `stress_for` | character | Сколько стресса принесёт поступок (по чертам): stress_for(drive_away_petitioners) | core/personality |
 | `stress_level` | character | Уровень стресса (стресс / 100) | core |
+| `synod_preference` | character | Насколько персонаж за вопрос созванного Собора (больше нуля — за) | core/synod |
+| `synod_vote_weight` | character | Вес голоса на Соборе (0 — нет голоса) | core/synod |
 | `tax` | province | Налог провинции | core |
 | `tier` | character | Ранг основного титула (0 — нет земель, 1 — граф ... 4 — император) | core |
 | `title_tier` | title | Ранг титула | core |
@@ -610,6 +623,7 @@
 | `ambitions` | Желания персонажей: цели из характера, благодарность и обида сюзерену | да |
 | `karma` | Свет и Пепел: карма от деяний, ступени, Последнее на весах | да |
 | `temple` | Вера: добродетели и грехи культов, глава веры | да |
+| `synod` | Собор: голосование единоверцев по вопросам веры, указы | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -619,9 +633,9 @@
 - **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `heretic_realm`, `faction`, `artifact_holder`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`, `own_artifacts`, `claimed_artifacts`
 - **interaction_deciders**: `payer`
-- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `grafts`, `plague_fear`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `synod_decrees`, `grafts`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `faith_morals`, `faith_head`, `arcana_faith`, `grafts`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`, `karma`
-- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `construction` (60), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`, `karma`, `synod`
+- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

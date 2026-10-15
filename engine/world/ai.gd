@@ -106,6 +106,9 @@ static func _consider_war(game: Game, c: Dictionary) -> void:
 			var am := Data.num(Governments.rule(game, def, "ai_attacked_mult", 1.0), 1.0)
 			if am != 1.0 and not Wars.is_heretic(game, c) and Wars._religion(game, c.faith) == Wars._religion(game, def.faith):
 				will *= am
+		# механики и моды сдвигают желание войны (ai.war_will — множители; Божий мир Собора)
+		for m in game.engine.hooks.collect("ai.war_will", {"game": game, "attacker": c, "defender": def, "cb": t.cb}):
+			will *= Data.num(m, 1.0)
 		var score = will * minf(3.0, ratio) * (1.0 + t.counties.size() * 0.1)
 		if score > 0.0 and (best == null or score > best_score):
 			best = t

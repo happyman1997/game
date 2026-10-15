@@ -1395,6 +1395,49 @@ karma_tiers:
 `on_title_gained`); когда престол пустеет, единоверцы идут войной
 `liberate_temple`, и победа сажает на Престол нового Великого Светоча.
 
+### Собор
+
+Механика `synod` (данные — `core/data/common/synod.yaml`, событие голосования —
+`events/synod.yaml`). Раз в `defines.synod.years_min`…`years_max` лет (и не
+позже чем через `after_election_years` после избрания нового главы) глава
+веры созывает Собор: выбирает по весу `weight` один из подходящих вопросов
+`synod_questions`, и через `notice_days` дней Собор собирается.
+
+```yaml
+synod_questions:
+  tithe:
+    icon: "🪙"
+    weight: 1                       # вес выбора (root — глава веры)
+    is_valid: { ... }               # можно ли ставить вопрос (root — глава)
+    target: { type: faith, heretic: no, prefer: small }   # культ-цель (synod_target_faith); small — чаще малые
+    # или { type: character, trigger, order }   # правитель (scope:synod_target)
+    # или { type: dead, years: 30, trigger }    # умерший
+    ai_vote: { value: ai_zeal, multiply: 8 }    # root — голосующий: > 0 — за
+    on_pass: [ ... ]                # root — глава веры
+    on_fail: [ ... ]
+    decree:                         # принятый вопрос — указ
+      years: 20                     # 0 — бессрочно
+      ruler_modifiers: { tax_mult: -0.05 }   # единоверцам главы
+      head_modifiers: { monthly_income: 6 }  # самому главе
+      ai_war_mult: 0.3              # ИИ реже воюет с единоверцами (Божий мир)
+```
+
+Голосуют правители, прошедшие `defines.synod.voter`, с весом
+`defines.synod.vote_weight` (в ядре — уровень благочестия, королям +1). ИИ
+голосует по `ai_vote` плюс мнение о главе веры × `head_opinion_weight`
+(слабее `vote_threshold` — воздерживается), игрок — в
+событии `vote_event` (эффект `synod_vote: for|against|abstain`). Голоса
+склоняют взаимодействия `synod_sway_for` / `synod_sway_against` (эффект
+`synod_sway`). Скрипт: условия `synod_active`, `synod_question`,
+`is_synod_voter`, `synod_swayed`, `of_synod_target_faith`, `has_synod_decree`,
+`faith_heretic`; значения `synod_vote_weight`, `synod_preference`; эффекты
+`call_synod`, `set_faith_heresy` (`faith: synod_target_faith` — культ-цель
+Собора). В текстах — `[scope:synod_head]`, `[scope:synod_target]`,
+`[scope:synod_faith_ruler.faith_name]`. Хуки `synod.called`, `synod.result`,
+`ai.war_will` (множитель желания ИИ воевать); on_actions `on_synod_called`,
+`on_synod_result`. В ядре шесть вопросов: анафема культу, примирение с
+ересью, Божий мир, десятина, отлучение тирана и канонизация праведника.
+
 ### Народ: мнение графств, контроль, народные фракции
 
 Механика `populace` (данные — `core/data/common/populace.yaml`), по образцу CK3.

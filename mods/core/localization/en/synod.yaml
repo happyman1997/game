@@ -1,0 +1,25 @@
+# The Synod (data/common/synod.yaml, events/synod.yaml).
+interaction:
+  synod_sway_for: Sway a Vote “For” at the Synod
+  synod_sway_against: Sway a Vote “Against” at the Synod
+interaction_desc:
+  synod_sway_for: "Gold, friendship or a hook — and this ruler will vote “for” at the Synod. The weightier their vote, the dearer it costs."
+  synod_sway_against: "Gold, friendship or a hook — and this ruler will vote “against” at the Synod. The weightier their vote, the dearer it costs."
+opinion_modifier:
+  broke_the_peace: Broke the Peace of the Sun
+msg:
+  broke_the_peace: "You have broken the Peace of the Sun by attacking a coreligionist. The Temple will not forgive it."
+  synod_sway_refused: "The ruler would not change their vote at the Synod."
+ev:
+  synod.0001:
+    t: The Synod at Reims
+    desc: "The sun-priests have lit a thousand candles beneath the vaults of the Temple of the Sun. [scope:synod_head] opens the Synod, and the rulers of the faith await your word."
+    desc_anathema: "Beneath the vaults of the Temple of the Sun, [scope:synod_head] puts the question: shall the [scope:synod_faith_ruler.faith_name] be anathematised? If the Synod agrees, for twenty years its followers will be heretics — and holy war will be waged on them."
+    desc_reconcile: "Beneath the vaults of the Temple of the Sun, [scope:synod_head] puts the question: shall the [scope:synod_faith_ruler.faith_name] be received back into the Light? If the Synod agrees, the heresy will be lifted and holy wars against its followers will cease."
+    desc_peace: "Beneath the vaults of the Temple of the Sun, [scope:synod_head] proposes the Peace of the Sun: for ten years war between coreligionists will be a sin before the Temple. Holy war on heretics will remain permitted."
+    desc_tithe: "Beneath the vaults of the Temple of the Sun, [scope:synod_head] asks for a tithe: for twenty years the faithful will give the Temple a share of their taxes, and the Temple will pray for them. The treasury grows lighter; piety grows."
+    desc_tyrant: "Beneath the vaults of the Temple of the Sun, [scope:synod_head] denounces [scope:synod_target]: blood, lies and fear are their rule. Shall the whole Synod cast them out of the Light?"
+    desc_canonize: "Beneath the vaults of the Temple of the Sun, [scope:synod_head] recalls the righteous life of [scope:synod_target.name]. Shall the righteous one be proclaimed a saint? Glory to their house, and a place in the Temple for their relics."
+    a: Vote “for”
+    b: Vote “against”
+    c: Abstain

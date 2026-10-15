@@ -15,7 +15,9 @@ extends EngineFeature
 ##     Его мнение решает в данных отлучение, коронацию, развод.
 ##   heretic: yes — еретический культ: его последователи — законная цель
 ##     священной войны (Wars.is_heretic).
-## Скрипт: ссылка и список faith_head, условия is_faith_head, faith_doctrine.
+## Ересь по указу (Собор): game.state.faith_heresy — см. faith_heretic.
+## Скрипт: ссылка и список faith_head, условия is_faith_head, faith_doctrine,
+## faith_heretic; эффект set_faith_heresy.
 
 const OWNER := "core/temple"
 
@@ -62,6 +64,26 @@ static func head_of(game: Game, c: Dictionary) -> Variant:
 		return null
 	var h: Variant = game.ch(t.holder)
 	return h if Chars.is_alive(h) else null
+
+
+## Еретичен ли культ: поле heretic культа, поверх него — указ (Собор:
+## анафема или примирение) в game.state.faith_heresy = { культ: {heretic, until} }
+## (until: 0 — бессрочно).
+static func faith_heretic(game: Game, faith_id: String) -> bool:
+	var ov: Variant = game.state.get("faith_heresy", {}).get(faith_id)
+	if ov is Dictionary and (int(ov.get("until", 0)) == 0 or int(ov.until) > game.date):
+		return bool(ov.get("heretic", false))
+	var f: Variant = game.content.get_def("faiths", faith_id)
+	return f != null and f.get("heretic") != null and ScriptContext.is_yes(f.heretic)
+
+
+## Объявить культ ересью (или снять ересь) на years лет (0 — бессрочно).
+static func set_faith_heresy(game: Game, faith_id: String, heretic: bool, years: float = 0.0) -> void:
+	if not game.state.has("faith_heresy"):
+		game.state["faith_heresy"] = {}
+	game.state.faith_heresy[faith_id] = {"heretic": heretic, "until": game.date + roundi(years * 365.0) if years > 0.0 else 0}
+	game.stat_cache.clear()
+	game.realm_cache.clear()
 
 
 ## Держит ли персонаж титул главы какой-либо веры.
@@ -136,6 +158,29 @@ func register_script(engine: GameEngine) -> void:
 		var c: Variant = ch.call(ctx, s)
 		var h: Variant = Temple.head_of(ctx.game, c) if c != null else null
 		return [{"type": "character", "id": h.id}] if h != null else []
+	}, OWNER)
+	r.triggers.register("faith_heretic", {"scopes": CH, "doc": "Культ персонажа сейчас еретический (поле культа или указ Собора): faith_heretic: yes", "eval": func(ctx, s, arg):
+		var c: Variant = ch.call(ctx, s)
+		return c != null and Temple.faith_heretic(ctx.game, str(c.faith)) == ScriptContext.is_yes(arg),
+	}, OWNER)
+	r.effects.register("set_faith_heresy", {"doc": "Объявить культ ересью или снять ересь: set_faith_heresy: { faith: wolf_cult | synod_target_faith, heretic: yes, years: 20 } (years: 0 — бессрочно)",
+		"apply": func(ctx, _s, arg):
+			if not (arg is Dictionary):
+				return
+			var fid := str(arg.get("faith", ""))
+			if fid == "synod_target_faith" and ctx.game.engine.has_feature("synod"):
+				fid = Synod.target_faith_now(ctx.game)
+			if fid == "" or not ctx.game.content.has("faiths", fid):
+				return
+			Temple.set_faith_heresy(ctx.game, fid, ScriptContext.is_yes(arg.get("heretic", true)), Data.num(arg.get("years"), 0.0)),
+		"describe": func(ctx, _s, arg):
+			if not (arg is Dictionary):
+				return null
+			var fid := str(arg.get("faith", ""))
+			if fid == "synod_target_faith" and ctx.game.engine.has_feature("synod"):
+				fid = Synod.target_faith_now(ctx.game)
+			var key := "fx.set_faith_heresy" if ScriptContext.is_yes(arg.get("heretic", true)) else "fx.lift_faith_heresy"
+			return ctx.game.loc.t(key, {"faith": ctx.game.name_of("faiths", fid)}),
 	}, OWNER)
 	# учение культа: faith_doctrine: { divorce: approval, polygamy: no }
 	r.triggers.register("faith_doctrine", {"scopes": CH, "doc": "Учение культа персонажа (faiths.doctrines): faith_doctrine: { divorce: approval }", "eval": func(ctx, s, arg):

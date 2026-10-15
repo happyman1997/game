@@ -130,7 +130,7 @@ static func _header(app: App, c: Dictionary) -> Control:
 		var d := g.desc_of("faiths", c.faith)
 		if d != "":
 			bb += "\n" + BB.i(d)
-		if fdef != null and fdef.get("heretic") != null and ScriptContext.is_yes(fdef.heretic):
+		if Temple.faith_heretic(g, str(c.faith)):
 			bb += "\n" + BB.bad(app.t("ui.faith_heretic"))
 		if fdef != null and not Data.as_array(fdef.get("virtues")).is_empty():
 			bb += "\n" + BB.good(app.t("ui.faith_virtues")) + " " + ", ".join(Data.as_array(fdef.virtues).map(func(x): return g.name_of("traits", x)))
@@ -139,6 +139,15 @@ static func _header(app: App, c: Dictionary) -> Control:
 		if g.engine.has_feature("temple") and Temple.head_title_of(g, c) != null:
 			var head: Variant = Temple.head_of(g, c)
 			bb += "\n" + (BB.muted(app.t("ui.faith_head")) + " " + Chars.full_name(g, head, true) if head != null else BB.bad(app.t("ui.faith_head_none")))
+		# Собор: созванный и действующие указы
+		if g.engine.has_feature("synod") and Temple.head_title_of(g, c) != null:
+			var sy: Dictionary = Synod.state_for(g, c)
+			if sy.active != null:
+				bb += "\n" + BB.c(app.t("ui.synod_called_line", {"question": Synod.question_name(g, str(sy.active.question), sy.active), "months": maxi(0, roundi((int(sy.active.convene) - g.date) / 30.0))}), BB.GOLD)
+			for qid in sy.decrees:
+				var dd: Dictionary = sy.decrees[qid]
+				var dn := Synod.question_name(g, qid, dd)
+				bb += "\n" + BB.muted(app.t("ui.synod_decree_until", {"decree": dn, "date": fmt_date(app, int(dd.until))}) if int(dd.until) > 0 else app.t("ui.synod_decree_line", {"decree": dn}))
 		return bb)
 	var cdef: Variant = g.content.get_def("cultures", c.culture)
 	var cul_l := K.hbox([K.icon("speech", 16), K.label(g.name_of("cultures", c.culture))], 4)

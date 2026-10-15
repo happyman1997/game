@@ -1,0 +1,39 @@
+# Механика «Собор»: строки движка и интерфейса.
+synod_question:
+  anathema: "Анафема: {faith}"
+  reconcile: "Вернуть в Свет: {faith}"
+  peace_of_the_sun: Божий мир
+  tithe: Десятина Храму
+  excommunicate_tyrant: "Отлучить {target}"
+  canonize: "Канонизировать {target}"
+msg:
+  synod_called: "{head} созывает Собор в Реймсе. Вопрос: «{question}». Собор соберётся через год."
+  synod_passed: "Собор принял: «{question}» (за {for}, против {against})."
+  synod_failed: "Собор отверг: «{question}» (за {for}, против {against})."
+  synod_decree_expired: "Указ Собора истёк: «{decree}»."
+alert:
+  synod: "Собор через {months} мес.: «{question}». Сейчас за {for}, против {against}."
+ui:
+  synod_decree_mod: "Указ Собора: {decree}"
+  synod_called_line: "Созван Собор: «{question}» — через {months} мес."
+  synod_decree_line: "Указ Собора: «{decree}»"
+  synod_decree_until: "Указ Собора: «{decree}» — до {date}"
+  synod_your_weight: "Ваш голос на Соборе весит {n}"
+tr:
+  synod_active: Созван Собор
+  synod_active.not: Собор не созван
+  is_synod_voter: Голосует на Соборе
+  is_synod_voter.not: Не голосует на Соборе
+  has_synod_decree: "Действует указ Собора «{decree}»"
+fx:
+  synod_vote:
+    for: Голосовать «за»
+    against: Голосовать «против»
+    abstain: Воздержаться
+  synod_sway:
+    for: "{who} будет голосовать «за»"
+    against: "{who} будет голосовать «против»"
+  set_faith_heresy: "Культ «{faith}» объявлен ересью"
+  lift_faith_heresy: "С культа «{faith}» снята ересь"
+ai:
+  synod_conviction: Убеждения на Соборе
