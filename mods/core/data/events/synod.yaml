@@ -22,7 +22,11 @@ events:
       - trigger: { synod_question: canonize }
         desc: ev.synod.0001.desc_canonize
       - desc: ev.synod.0001.desc
+    # ai_chance — за игрока на автопилоте: голос по убеждению, как у всех
     options:
       - effect: { synod_vote: for }
+        ai_chance: { value: 1, if: { limit: { synod_preference: ">= 5" }, add: 100 } }
       - effect: { synod_vote: against }
+        ai_chance: { value: 1, if: { limit: { synod_preference: "<= -5" }, add: 100 } }
       - effect: { synod_vote: abstain }
+        ai_chance: { value: 1, if: { limit: { synod_preference: "> -5", NOT: { synod_preference: ">= 5" } }, add: 100 } }

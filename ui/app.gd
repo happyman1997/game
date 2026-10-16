@@ -288,12 +288,9 @@ func start_new_game(bookmark: String, player_id: Variant = null) -> void:
 
 func set_player(id: String) -> void:
 	var g := game
-	g.state.player = id
-	g.state.player_dynasty = g.ch(id).dynasty
+	g.select_player(id)
 	pick_mode = false
 	map_view.overlay.highlighted = {}
-	g.emit("player.selected", {"character": id})
-	g.on_action("on_player_start", {"type": "character", "id": id})
 	var cap: Variant = g.ch(id).capital
 	if cap != null:
 		map_view.focus(cap, maxf(map_view.zoom, 1.6))

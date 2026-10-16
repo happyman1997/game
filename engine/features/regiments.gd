@@ -221,7 +221,7 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 		if victim == null:
 			victim = regs_of(c)[regs_of(c).size() - 1]
 		disband(game, c, victim.id)
-	if game.is_player(c.id) or c.get("prison") != null:
+	if not game.ai_controls(c.id) or c.get("prison") != null:
 		return
 	# ИИ: нанять или распустить
 	if c.gold < game.def_num("regiments.ai_disband_below_gold", -30) and not regs_of(c).is_empty():

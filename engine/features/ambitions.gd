@@ -164,7 +164,7 @@ static func years_of(game: Game, c: Dictionary) -> float:
 static func frustration(game: Game, c: Dictionary) -> float:
 	var a: Variant = current(c)
 	var d: Variant = def_of(game, a.id) if a != null else null
-	if d == null or d.get("credit") != "liege" or game.is_player(c.id):
+	if d == null or d.get("credit") != "liege" or not game.ai_controls(c.id):
 		return 0.0
 	var over := years_of(game, c) - Data.num(d.get("patience"), 3)
 	if over <= 0.0:
@@ -218,7 +218,7 @@ static func finish(game: Game, c: Dictionary, result: String, patron_override: V
 		Interp.run_effect(ctx, ctx.root, d.get("on_" + result))
 		# благодарность и обида — сюзерену (или тому, кто исполнил)
 		var credit: bool = d.get("credit") == "liege" or patron_override != null
-		if credit and patron != null and Chars.is_alive(patron) and patron.id != c.id and not game.is_player(c.id):
+		if credit and patron != null and Chars.is_alive(patron) and patron.id != c.id and game.ai_controls(c.id):
 			if result == "fulfilled":
 				if d.get("credit_if") == null or patron_override != null or Interp.eval_trigger(ctx, ctx.root, d.credit_if):
 					Opinion.add_opinion(game, c, patron, "ambition_fulfilled")
@@ -254,7 +254,7 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 	var cd: Variant = c.vars.get("ambition_cd")
 	if cd != null and int(cd) > game.date:
 		return
-	if game.is_player(c.id):
+	if not game.ai_controls(c.id):
 		if not (c.vars.get("ambition_offers") is Array):
 			_make_offers(game, c)
 		return
@@ -310,7 +310,7 @@ static func abandon(game: Game, c: Dictionary) -> void:
 static func grantable_by(game: Game, c: Dictionary, patron: Dictionary) -> bool:
 	var a: Variant = current(c)
 	var d: Variant = def_of(game, a.id) if a != null else null
-	return d != null and d.get("grant") is Dictionary and c.liege == patron.id and not game.is_player(c.id)
+	return d != null and d.get("grant") is Dictionary and c.liege == patron.id and game.ai_controls(c.id)
 
 
 static func grant_cost(game: Game, c: Dictionary, kind: String) -> float:

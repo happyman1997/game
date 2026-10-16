@@ -48,14 +48,14 @@ static func daily_ai(game: Game) -> void:
 	var vassal_period := int(game.def_num("ai.vassal_think_days", 56))
 	var day := game.date % 365
 	for c in game.rulers():
-		if game.is_player(c.id) or c.death != null:
+		if not game.ai_controls(c.id) or c.death != null:
 			continue
 		var per := period if c.liege == null else vassal_period
 		if _think_hash(c) % per != day % per:
 			continue
 		think_ruler(game, c)
 	for a in game.state.armies.values():
-		if game.is_player(a.owner) or not game.state.armies.has(a.id):
+		if not game.ai_controls(a.owner) or not game.state.armies.has(a.id):
 			continue
 		army_ai(game, a)
 
@@ -144,7 +144,7 @@ static func _manage_peace(game: Game, c: Dictionary) -> void:
 		if mine >= 100.0:
 			Wars.end_war(game, w, "victory" if side == "att" else "defeat")
 			return
-		if game.is_player(enemy_leader):
+		if not game.ai_controls(enemy_leader):
 			if mine <= -game.def_num("ai.surrender_to_player_at", 90):
 				Wars.end_war(game, w, "defeat" if side == "att" else "victory")
 			continue
@@ -370,7 +370,7 @@ static func _consider_interactions(game: Game, c: Dictionary) -> void:
 					# если только нет крюка, которым можно заставить согласиться. Исключение —
 					# ai_send_if_declined: сам отказ чего-то стоит (вызов на поединок).
 					var decider := Interactions.decider_of(game, def, r)
-					if not game.is_player(decider.id) and not ScriptContext.is_yes(def.get("ai_send_if_declined", false)):
+					if game.ai_controls(decider.id) and not ScriptContext.is_yes(def.get("ai_send_if_declined", false)):
 						var acc := Interactions.acceptance(game, def, c, r, args)
 						if not acc.auto and acc.total <= 0.0:
 							if not Interactions.hook_available(game, def, c, r) or will < game.def_num("ai.use_hook_min_will", 30):

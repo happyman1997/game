@@ -110,7 +110,7 @@ static func change(game: Game, c: Dictionary, law_id: String, free: bool = false
 
 static func yearly_ai(game: Game) -> void:
 	for c in game.rulers().duplicate():
-		if game.is_player(c.id) or c.get("prison") != null or c.death != null:
+		if not game.ai_controls(c.id) or c.get("prison") != null or c.death != null:
 			continue
 		for gd in groups(game):
 			if not is_group_shown(game, c, gd):

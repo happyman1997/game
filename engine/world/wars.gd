@@ -356,7 +356,7 @@ static func ally_will_join(game: Game, ally: Dictionary, leader: Dictionary, ene
 		return false
 	if is_at_war_with(game, ally.id, leader.id) or ally.id == enemy:
 		return false
-	if game.is_player(ally.id):
+	if not game.ai_controls(ally.id):
 		return true
 	if is_allied(game, ally.id, enemy):
 		return false
@@ -549,7 +549,7 @@ static func end_war(game: Game, w: Dictionary, outcome: String) -> void:
 	game.mark_chars_dirty(w.attackers + w.defenders)
 	# ИИ распускает войска, если больше ни с кем не воюет.
 	for id in w.attackers + w.defenders:
-		if game.is_player(id) or is_at_war(game, id):
+		if not game.ai_controls(id) or is_at_war(game, id):
 			continue
 		for a in game.state.armies.values():
 			if a.owner == id:

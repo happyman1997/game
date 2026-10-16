@@ -315,7 +315,7 @@ static func monthly_char(game: Game, v: Dictionary) -> void:
 	var types := game.content.all("factions")
 	if types.is_empty() or v.titles.is_empty():
 		return
-	if v.liege == null or game.is_player(v.id) or v.get("prison") != null or v.death != null:
+	if v.liege == null or not game.ai_controls(v.id) or v.get("prison") != null or v.death != null:
 		return
 	var liege: Variant = game.ch(v.liege)
 	if liege == null or not Chars.is_alive(liege):
@@ -394,7 +394,7 @@ static func monthly(game: Game) -> void:
 		else:
 			f.discontent = maxf(0.0, float(f.discontent) - game.def_num("factions.discontent_decay", 4))
 		if f.discontent >= 100.0:
-			if game.is_player(f.leader):
+			if not game.ai_controls(f.leader):
 				if not f.get("ultimatum", false):
 					f.ultimatum = true
 					game.message(game.loc.t("msg.faction_ready"), "war")

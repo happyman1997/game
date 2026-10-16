@@ -250,7 +250,7 @@ static func monthly_char(game: Game, liege: Dictionary) -> void:
 				seat.holder = null
 				seat.since = null
 				_invalidate(game, liege)
-	var is_player := game.is_player(liege.id)
+	var is_player := not game.ai_controls(liege.id)
 	if not liege.flags.has("council_init"):
 		liege.flags["council_init"] = 0
 		fill(game, liege)

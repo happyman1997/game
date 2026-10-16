@@ -333,7 +333,7 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 	var pt := Titles.primary_tier(game, c)
 	if pt < by_tier.size():
 		Chars.add_dynasty_renown(game, c.dynasty, Data.num(by_tier[pt]))
-	if not game.is_player(c.id) and is_head(game, c):
+	if game.ai_controls(c.id) and is_head(game, c):
 		ai_legacies(game, c)
 
 

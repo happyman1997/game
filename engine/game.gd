@@ -29,6 +29,11 @@ var realm_cache := {}
 var _reported_errors := {}
 ## Во время генерации мира on_action и сообщения отключены.
 var quiet := false
+## Автопилот: ИИ ведёт и персонажа игрока (наблюдение, замер интереса
+## tools/fun_report.gd). Игрок остаётся игроком — ему идут сообщения, вести
+## и его события, — но выбор в событиях, ответы на предложения и все решения
+## принимает ИИ по тем же правилам, что за всех остальных.
+var autopilot := false
 
 
 func _init(e: GameEngine, st: Dictionary) -> void:
@@ -434,12 +439,37 @@ func is_player(id: Variant) -> bool:
 	return id != null and id == state.player
 
 
+## Выбрать персонажа игрока в начале партии: его род, хук player.selected и
+## on_action on_player_start.
+func select_player(id: String) -> void:
+	state.player = id
+	state.player_dynasty = ch(id).dynasty
+	emit("player.selected", {"character": id})
+	on_action("on_player_start", {"type": "character", "id": id})
+
+
+## Автопилот включили, когда игрока уже ждали окна и запросы: их решает ИИ.
+func _autopilot_resolve() -> void:
+	while not state.pending_events.is_empty():
+		events.ai_choose(state.pending_events[0].uid)
+	while not state.pending_requests.is_empty():
+		var r: Dictionary = state.pending_requests[0]
+		Interactions.resolve_request(self, r.uid, Interactions.ai_would_accept(self, r))
+
+
+## Решает ли за персонажа ИИ: за всех, кроме игрока, а на автопилоте — и за него.
+func ai_controls(id: Variant) -> bool:
+	return id != null and (autopilot or id != state.player)
+
+
 # ------------------------------------------------------------ время
 
 ## Продвигает игру на один день.
 func tick() -> void:
 	if state.get("game_over") != null:
 		return
+	if autopilot and not (state.pending_events.is_empty() and state.pending_requests.is_empty()):
+		_autopilot_resolve()
 	state.date = int(state.date) + 1
 	# Характеристики кэшируются до конца месяца: всё, что их меняет (черты,
 	# модификаторы, титулы, перки, законы), сбрасывает кэш явно.

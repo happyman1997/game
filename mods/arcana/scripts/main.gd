@@ -544,7 +544,7 @@ static func _vampire_month(game: Game, c: Dictionary) -> void:
 		c.modifiers = c.modifiers.filter(func(m): return m.id != "bloodthirst")
 		game.stat_cache.erase(c.id)
 	# ИИ-вампир (в том числе придворный, у которого нет решений) кормится сам
-	if not game.is_player(c.id) and th >= 50.0 and game.rng.chance(0.7):
+	if game.ai_controls(c.id) and th >= 50.0 and game.rng.chance(0.7):
 		feed(game, c)
 	elif th >= 100.0:
 		if tier >= 4:

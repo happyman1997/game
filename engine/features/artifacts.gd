@@ -270,7 +270,7 @@ static func _auto_equip(game: Game, c: Dictionary, it: Dictionary) -> bool:
 	if cur.size() < cap:
 		it.slot = slot
 		return true
-	if game.is_player(c.id):
+	if not game.ai_controls(c.id):
 		return false
 	cur.sort_custom(func(a, b): return score(game, a) < score(game, b))
 	if score(game, it) > score(game, cur[0]) * 1.1:
@@ -658,7 +658,7 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 	var o: Variant = commission_of(c)
 	if o != null and int(o.done) <= game.date:
 		_finish_commission(game, c)
-	if game.is_player(c.id):
+	if not game.ai_controls(c.id):
 		return
 	var items := items_of(game, c)
 	if not items.is_empty():

@@ -1,0 +1,129 @@
+# Пороги интереса для замера tools/fun_report.gd.
+#
+# Замер играет партии из кресла игрока (ИИ на автопилоте ведёт его по тем же
+# правилам, что всех) и сводит показатели (tools/fun_probe.gd, metrics()).
+# Каждый порог сверяет среднее по партиям (agg: mean | min | max) с min/max.
+#   level: must — здравый смысл: провал значит, что что-то сломано
+#                 (с --strict инструмент выходит с кодом 1);
+#   level: goal — цель дизайна: в отчёте помечается, но ошибкой не считается.
+# Числа целей — первая прикидка, их стоит подстраивать по мере игры.
+
+# Старты и сиды по умолчанию: разные по силе и положению правители.
+starts: [harold, william, bleddyn, gero_eisenwart]
+seeds: [1]
+years: 50
+
+gates:
+  # ---- здравый смысл
+  sees_events:
+    metric: novelty.distinct
+    min: 15
+    level: must
+    doc: Игрок вообще видит события
+  has_choices:
+    metric: rhythm.choices_per_year
+    min: 1
+    level: must
+    doc: Хотя бы один выбор в год
+  no_world_eater:
+    metric: snowball.world_max_share
+    agg: max
+    max: 0.8
+    level: must
+    doc: Ни одна держава не съедает почти всю карту
+  survives:
+    metric: threat.game_over
+    max: 0.5
+    level: must
+    doc: Большинство партий не кончается вымиранием рода
+  keeps_realm:
+    metric: threat.realm_lost
+    max: 0.25
+    level: goal
+    doc: Держава теряется не чаще чем в каждой четвёртой партии — угроза есть, но не приговор
+
+  # ---- новизна
+  variety:
+    metric: novelty.distinct
+    min: 60
+    level: goal
+    doc: За партию — не меньше 60 разных окон событий
+  fresh_late:
+    metric: novelty.new_last_decade
+    min: 5
+    level: goal
+    doc: И в последнее десятилетие встречается новое
+  no_spam:
+    metric: novelty.top_share
+    max: 0.15
+    level: goal
+    doc: Самое частое окно — не больше 15% всех окон
+
+  # ---- ритм
+  choices_enough:
+    metric: rhythm.choices_per_year
+    min: 4
+    level: goal
+    doc: Не меньше 4 выборов в год
+  choices_not_flood:
+    metric: rhythm.choices_per_year
+    max: 20
+    level: goal
+    doc: Не больше 20 выборов в год — окна не превращаются в рутину
+  no_long_quiet:
+    metric: rhythm.longest_quiet_months
+    max: 12
+    level: goal
+    doc: Мир не молчит дольше года подряд
+  late_still_busy:
+    metric: rhythm.calls_late_vs_early
+    min: 0.6
+    level: goal
+    doc: В последнее десятилетие вызовов не меньше 60% от первого
+
+  # ---- выбор
+  ai_knows_why:
+    metric: choice.flat_share
+    max: 0.25
+    level: goal
+    doc: В трёх выборах из четырёх у варианта есть причина (ai_chance), а не жребий
+  not_obvious:
+    metric: choice.obvious_share
+    max: 0.5
+    level: goal
+    doc: Не больше половины выборов решены заранее (один вариант — 85% веса)
+
+  # ---- дела игрока
+  things_to_do:
+    metric: agency.deeds_per_year
+    min: 3
+    level: goal
+    doc: Игрок делает хотя бы 3 дела в год (решения, предложения, войны)
+  late_things_to_do:
+    metric: agency.late_vs_early
+    min: 0.6
+    level: goal
+    doc: Дел в конце партии не меньше 60% от начала
+
+  # ---- снежный ком и угрозы
+  no_runaway:
+    metric: snowball.world_max_share
+    agg: max
+    max: 0.45
+    level: goal
+    doc: Крупнейшая держава мира — меньше 45% графств
+  gold_has_use:
+    metric: late.hoard_months
+    max: 36
+    level: goal
+    doc: К концу партии золото не лежит мёртвым грузом (меньше 3 лет дохода)
+  threatened:
+    metric: threat.defensive_wars
+    min: 1
+    level: goal
+    doc: На игрока нападают хотя бы раз за партию
+  inner_trouble:
+    metric: threat.internal
+    min: 1
+    level: goal
+    doc: Внутри державы бывают беды — фракции, бунты, заговоры

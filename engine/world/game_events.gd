@@ -57,19 +57,20 @@ func fire(id: String, target: Dictionary, scopes: Dictionary = {}, force: bool =
 		Interp.run_effect(ctx, target, d.get("after"))
 		game.emit("event.fired", {"event": id, "target": target})
 		return true
-	if target.type == "character" and game.is_player(target.id):
+	if target.type == "character" and not game.ai_controls(target.id):
 		var pe := {"uid": game.new_id("ev"), "event": id, "target": target, "scopes": ctx.scopes.duplicate()}
 		game.state.pending_events.append(pe)
 		game.emit("event.player", {"pending": pe})
 		game.notify("event")
 		return true
-	# ИИ
-	var pick: Variant = game.rng.weighted(opts, func(o): return maxf(0.0, Interp.eval_value(ctx, target, o.opt.get("ai_chance", 1))))
-	var chosen: Variant = pick if pick != null else (opts[0] if not opts.is_empty() else null)
+	# ИИ (и игрок на автопилоте): вариант по весам ai_chance
+	var ws := opts.map(func(o): return maxf(0.0, Interp.eval_value(ctx, target, o.opt.get("ai_chance", 1))))
+	var k: Variant = game.rng.weighted(range(opts.size()), func(i): return ws[i])
+	var chosen: Variant = opts[k] if k != null else (opts[0] if not opts.is_empty() else null)
 	if chosen != null:
 		run_option(ctx, target, chosen.opt, id)
 	Interp.run_effect(ctx, target, d.get("after"))
-	game.emit("event.fired", {"event": id, "target": target, "option": chosen.index if chosen != null else null})
+	game.emit("event.fired", {"event": id, "target": target, "option": chosen.index if chosen != null else null, "weights": ws})
 	return true
 
 
@@ -149,8 +150,25 @@ func context_for(pe: Dictionary) -> ScriptContext:
 	return ScriptContext.make(game, pe.target, pe.scopes)
 
 
-## Игрок выбрал вариант события.
-func choose(uid: String, option_index: int) -> void:
+## Выбрать вариант ожидающего события за игрока, как выбрал бы ИИ (автопилот).
+func ai_choose(uid: String) -> void:
+	var pe: Variant = null
+	for x in game.state.pending_events:
+		if x.uid == uid:
+			pe = x
+	var d: Variant = def(pe.event) if pe != null else null
+	if d == null or not game.exists(pe.target):
+		choose(uid, -1)
+		return
+	var ctx := context_for(pe)
+	var opts := visible_options(d, ctx, pe.target)
+	var ws := opts.map(func(o): return maxf(0.0, Interp.eval_value(ctx, pe.target, o.opt.get("ai_chance", 1))))
+	var k: Variant = game.rng.weighted(range(opts.size()), func(i): return ws[i])
+	choose(uid, opts[k].index if k != null else (opts[0].index if not opts.is_empty() else -1), ws)
+
+
+## Игрок выбрал вариант события (weights — веса ИИ, если выбирал автопилот).
+func choose(uid: String, option_index: int, weights: Variant = null) -> void:
 	var i := -1
 	for k in game.state.pending_events.size():
 		if game.state.pending_events[k].uid == uid:
@@ -170,7 +188,10 @@ func choose(uid: String, option_index: int) -> void:
 	if option_index >= 0 and option_index < options.size():
 		run_option(ctx, pe.target, options[option_index], str(pe.event))
 	Interp.run_effect(ctx, pe.target, d.get("after"))
-	game.emit("event.fired", {"event": pe.event, "target": pe.target, "option": option_index})
+	var info := {"event": pe.event, "target": pe.target, "option": option_index}
+	if weights != null:
+		info["weights"] = weights
+	game.emit("event.fired", info)
 	game.notify("event")
 
 

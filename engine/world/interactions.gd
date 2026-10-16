@@ -239,7 +239,7 @@ static func execute(game: Game, def: Dictionary, actor: Dictionary, recipient: D
 		Interp.run_effect(ctx, ctx.root, def.get("on_accept"))
 		game.emit("interaction", {"interaction": def.id, "actor": actor.id, "recipient": recipient.id, "accepted": true})
 		return "accepted"
-	if game.is_player(decider_of(game, def, recipient).id):
+	if not game.ai_controls(decider_of(game, def, recipient).id):
 		game.state.pending_requests.append({
 			"uid": game.new_id("rq"), "interaction": def.id, "actor": actor.id, "recipient": recipient.id,
 			"secondary": args.get("secondary"), "target": args.get("target"),
@@ -254,6 +254,16 @@ static func execute(game: Game, def: Dictionary, actor: Dictionary, recipient: D
 		game.message(game.text(txt, ctx, {"who": game.scope_name({"type": "character", "id": recipient.id}), "what": game.name_of("interactions", def.id)}), "good" if ok else "bad", {"type": "character", "id": recipient.id})
 	game.emit("interaction", {"interaction": def.id, "actor": actor.id, "recipient": recipient.id, "accepted": ok})
 	return "accepted" if ok else "declined"
+
+
+## Как ответил бы ИИ на запрос, ждущий игрока (автопилот).
+static func ai_would_accept(game: Game, r: Dictionary) -> bool:
+	var def: Variant = game.content.get_def("interactions", r.interaction)
+	var actor: Variant = game.ch(r.actor)
+	var recipient: Variant = game.ch(r.recipient)
+	if def == null or not Chars.is_alive(actor) or not Chars.is_alive(recipient):
+		return false
+	return acceptance(game, def, actor, recipient, {"secondary": r.get("secondary"), "target": r.get("target")}).total > 0.0
 
 
 ## Игрок ответил на предложение ИИ.

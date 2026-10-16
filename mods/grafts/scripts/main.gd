@@ -199,7 +199,7 @@ static func _monthly_char(game: Game, c: Dictionary) -> void:
 	var st: Dictionary = state_of(game).grafts
 	if st.has(c.id):
 		_condition(game, c)
-	if c.titles.is_empty() or game.is_player(c.id):
+	if c.titles.is_empty() or not game.ai_controls(c.id):
 		return
 	var need := 250.0 if st.has(c.id) else 110.0
 	if float(c.gold) > need and game.rng.chance(_n(game, "ai_chance", 0.03)):

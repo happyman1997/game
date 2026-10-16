@@ -296,7 +296,7 @@ static func monthly(game: Game) -> void:
 		# ИИ-кандидаты агитируют перед выборами: тратят золото на голоса
 		if yearly and d.get("term_years") != null:
 			for cand in republic_candidates(game, c):
-				if game.is_player(cand.id) or float(cand.gold) < 60.0:
+				if not game.ai_controls(cand.id) or float(cand.gold) < 60.0:
 					continue
 				var will := 0.25 + (0.25 if cand.traits.has("ambitious") else 0.0) - (0.15 if cand.traits.has("content") else 0.0)
 				if game.rng.chance(will):

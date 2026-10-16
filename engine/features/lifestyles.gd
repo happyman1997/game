@@ -263,7 +263,7 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 	st.xp[l.id] = xp_of(c, l.id) + monthly_xp(game, c)
 	if st.xp[l.id] < perk_cost(game, c, l.id):
 		return
-	if game.is_player(c.id):
+	if not game.ai_controls(c.id):
 		if not c.flags.has("tmp:perk_notified"):
 			c.flags["tmp:perk_notified"] = game.date + 3650
 			game.message(game.loc.t("msg.perk_available", {"lifestyle": game.name_of("lifestyles", l.id)}), "good")

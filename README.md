@@ -424,7 +424,12 @@ func init(api: ModApi) -> void:
 godot --headless --path . -s tools/validate.gd                       # проверить моды: синтаксис, ссылки, скрипты, закладки, переводы
 godot --headless --path . -s tools/sim.gd -- --years 50 --verbose    # прогнать мир без игрока и посмотреть статистику
 godot --headless --path . -s tools/script_docs.gd                    # пересобрать справочник скриптового языка
+godot --headless --path . -s tools/fun_report.gd -- --out docs/FUN_REPORT.md  # замер интереса: партии из кресла игрока на автопилоте
 ```
+
+Последний замер интереса — [`docs/FUN_REPORT.md`](docs/FUN_REPORT.md): что игрок
+видит и делает за 50 лет (новизна, ритм, затишья, снежный ком, поздняя игра,
+угрозы) и какие пороги из `tools/fun_gates.yaml` не достигнуты.
 
 ## Архитектура
 

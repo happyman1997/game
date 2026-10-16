@@ -355,7 +355,7 @@ static func _guardian_ok(game: Game, c: Dictionary) -> bool:
 ## ИИ правителя (и бездействующий игрок — только для чужих детей при дворе):
 ## назначить опекунов детям, у которых их нет.
 static func ai_assign_guardians(game: Game, ruler: Dictionary) -> void:
-	var player := game.is_player(ruler.id)
+	var player := not game.ai_controls(ruler.id)
 	for x in game.courtiers_of(ruler.id) + [ruler]:
 		if not in_education(game, x) or x.vars.get("guardian") != null:
 			continue

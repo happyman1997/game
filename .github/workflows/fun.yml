@@ -1,0 +1,65 @@
+# Замер интереса: партии из кресла игрока на автопилоте (tools/fun_report.gd).
+# Партии долгие (около 20 минут), поэтому не на каждый пуш, а раз в неделю
+# и по кнопке. Отчёт — во вкладке Actions (артефакт fun-report); провал
+# порога уровня must (tools/fun_gates.yaml) делает запуск красным.
+name: fun
+
+on:
+  workflow_dispatch:
+    inputs:
+      years:
+        description: "Лет в партии"
+        default: "50"
+      seeds:
+        description: "Сиды через запятую"
+        default: "1"
+  schedule:
+    - cron: "17 3 * * 1"
+
+env:
+  GODOT_VERSION: "4.7.2"
+
+jobs:
+  fun:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      # свой ключ: в кэше сборки (build.yml) лежат ещё и шаблоны экспорта
+      - name: Кэш Godot
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-bin-${{ env.GODOT_VERSION }}
+
+      - name: Установка Godot
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/godot && cd ~/godot
+          base="https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable"
+          wget -q "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q "Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" godot
+          rm -f *.zip
+
+      - name: Подключение Godot
+        run: echo "$HOME/godot" >> "$GITHUB_PATH"
+
+      - name: Импорт ресурсов
+        run: godot --headless --path . --import || true
+
+      - name: Замер интереса
+        run: |
+          godot --headless --path . -s tools/fun_report.gd -- \
+            --years "${{ github.event.inputs.years || '50' }}" \
+            --seeds "${{ github.event.inputs.seeds || '1' }}" \
+            --dir "$RUNNER_TEMP/fun_runs" --out fun_report.md --strict
+          cat fun_report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fun-report
+          path: fun_report.md

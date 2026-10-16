@@ -624,7 +624,7 @@ static func _manage_revolts(game: Game) -> void:
 		var ws: float = Wars.warscore(game, w).total
 		if ws >= 100.0:
 			Wars.end_war(game, w, "victory")
-		elif ws >= game.def_num("ai.enforce_at", 50) and not game.is_player(w.defender) and Wars.ai_will_accept_surrender(game, w, "def"):
+		elif ws >= game.def_num("ai.enforce_at", 50) and game.ai_controls(w.defender) and Wars.ai_will_accept_surrender(game, w, "def"):
 			Wars.end_war(game, w, "victory")
 
 
