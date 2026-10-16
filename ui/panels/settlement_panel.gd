@@ -189,8 +189,10 @@ static func building_tip(app: App, id: String, b: String, k: float, cost: Varian
 	var desc := g.desc_of("buildings", b)
 	if desc != "":
 		bb += "\n" + BB.i(desc)
+	if bd.get("unique") != null:
+		bb += "\n" + BB.gold(app.t("ui.unique_" + str(bd.unique)))
 	var did: Variant = Districts.building_district(g, b)
-	if did != null:
+	if did != null and not Districts._unscaled(g).has(b):
 		bb += "\n" + BB.muted(app.t("ui.district_scaled", {"value": K.fmt(k, 2)}))
 	bb += "\n" + BB.modifiers(g, Districts.scaled(bd.get("modifiers"), k)) + BB.modifiers(g, Districts.scaled(bd.get("owner_modifiers"), k))
 	if bd.get("yearly") != null:

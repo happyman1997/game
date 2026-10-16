@@ -204,6 +204,28 @@ buildings:
     trigger:
       scope:builder: { has_trait: [gifted, changeling, necromancer, lich] }
 
+  # Дом стражей: охотники на нечисть при детинце — чудовищ при дворе видно,
+  # проклятия слабее
+  warden_lodge:
+    category: arcane
+    icon: eye
+    district: citadel
+    cost: { gold: 120 }
+    days: 300
+    owner_modifiers: { monster_sight: 5, curse_resistance: 10 }
+  # Склеп: усыпальница под храмом, где некромант черпает силу
+  crypt:
+    category: arcane
+    icon: skull
+    district: temple_quarter
+    level: 2
+    cost: { gold: 160 }
+    days: 360
+    modifiers: { county_opinion: -3 }
+    owner_modifiers: { arcane_regen: 2, dread_gain_mult: 0.1 }
+    trigger:
+      scope:builder: { has_trait: [necromancer, lich] }
+
 modifiers:
   storm_blessing: { icon: "🌩", modifiers: { commander_advantage: 12 }, good: true }
   restored_vigor: { icon: "🌿", modifiers: { health: 1 }, good: true }

@@ -30,6 +30,8 @@ extends EngineFeature
 ## был заложен (level: N — не ниже уровня N), и мест в районе —
 ## defines.districts.slots_by_level[уровень]. Их modifiers и owner_modifiers
 ## умножаются на силу района; yearly — эффект раз в год со scope:power.
+## Великие стройки: unique: world (одна в мире) или realm (одна на державу
+## верховного сюзерена); scale: no — бонусы постройки не зависят от силы.
 ## Участков под районы сверх данных владениями: plots_base +
 ## развитие × plots_per_development (не больше max_plots).
 ## Состояние: province.districts = { район: уровень }; стройка района —
@@ -169,6 +171,18 @@ static func building_district(game: Game, bid: String) -> Variant:
 				map[bd.id] = str(bd.district)
 		game.engine.cache["districts:bmap"] = map
 	return map.get(bid)
+
+
+## Постройки, бонусы которых сила района не меняет (scale: no — великие стройки).
+static func _unscaled(game: Game) -> Dictionary:
+	var hit: Variant = game.engine.cache.get("districts:unscaled")
+	if hit == null:
+		hit = {}
+		for bd in game.content.all("buildings"):
+			if bd.get("scale") != null and not ScriptContext.is_yes(bd.scale):
+				hit[bd.id] = true
+		game.engine.cache["districts:unscaled"] = hit
+	return hit
 
 
 ## Постройки графства в районе (и стройка в нём, если with_construction).
@@ -344,7 +358,7 @@ static func scaled(mods: Variant, k: float) -> Dictionary:
 ## Множитель построек: сила их района (1 — у построек без района или без механики).
 static func building_scale(game: Game, prov_id: String, bid: String) -> float:
 	var did: Variant = building_district(game, bid) if on(game) else null
-	if did == null:
+	if did == null or _unscaled(game).has(bid):
 		return 1.0
 	var pw := power(game, prov_id, did)
 	return pw if pw > 0.0 else 1.0
@@ -676,7 +690,10 @@ func install(engine: GameEngine) -> void:
 		for b in e.content.all("buildings"):
 			if b.get("district") != null and not e.content.has("districts", str(b.district)):
 				v.issue("buildings/%s: нет района \"%s\"" % [b.id, str(b.district)])
+			if b.get("unique") != null and not ["world", "realm"].has(str(b.unique)):
+				v.issue("buildings/%s: unique — world или realm, а не \"%s\"" % [b.id, str(b.unique)])
 			v.effect(b.get("yearly"), "buildings/" + str(b.id))
+			v.value(b.get("ai_will_do"), "buildings/" + str(b.id))
 	, OWNER)
 
 

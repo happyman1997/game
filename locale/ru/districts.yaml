@@ -36,6 +36,10 @@ ui:
   special_buildings: Достопримечательности
   mapmode:
     districts: Застройка
+  unique_world: Великая стройка — единственная в мире
+  unique_realm: Великая стройка — одна на державу
+  unique_taken_world: "Уже стоит в мире: {place}"
+  unique_taken_realm: "Уже есть в державе: {place}"
   districts_total: "Районов: {n}, построек: {b}"
 msg:
   district_done: "Завершено строительство: {district} {level} в {place}."

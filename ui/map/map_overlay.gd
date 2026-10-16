@@ -212,6 +212,7 @@ static func settlements_of(g: Game) -> Dictionary:
 		var bmap := {}
 		var special := []
 		var other := []
+		var great := []
 		for b in p.buildings:
 			var bd: Variant = g.content.get_def("buildings", b)
 			if bd == null:
@@ -219,6 +220,8 @@ static func settlements_of(g: Game) -> Dictionary:
 			if bd.get("special", false):
 				special.append(b)
 				continue
+			if bd.get("unique") != null:
+				great.append(b)
 			var did: Variant = Districts.building_district(g, b) if g.engine.has_feature("districts") else null
 			if did != null and ds.has(did):
 				if not bmap.has(did):
@@ -234,7 +237,7 @@ static func settlements_of(g: Game) -> Dictionary:
 		var levels := 0
 		for x in dl:
 			levels += int(x[1])
-		out[p.id] = {"main": main, "districts": dl, "bmap": bmap, "special": special, "other": other, "levels": levels, "count": p.buildings.size()}
+		out[p.id] = {"main": main, "districts": dl, "bmap": bmap, "special": special, "great": great, "other": other, "levels": levels, "count": p.buildings.size()}
 	_settle_key = key
 	_settle_data = out
 	return out
@@ -314,16 +317,22 @@ func _draw_landmarks(data: Dictionary) -> void:
 	var m := view.map
 	for pid in data:
 		var s: Dictionary = data[pid]
-		if s.special.is_empty():
+		var marks: Array = s.special + s.get("great", [])
+		if marks.is_empty():
 			continue
 		var c := view.map_to_screen(m.center_of(pid)) + Vector2(0, -6)
 		if c.x < -20 or c.y < -20 or c.x > size.x + 20 or c.y > size.y + 20:
 			continue
-		draw_circle(c + Vector2(1, 2), 8.5, Color(0, 0, 0, 0.45))
-		draw_circle(c, 8.5, Color(0.12, 0.08, 0.04, 0.92))
-		draw_arc(c, 8.5, 0, TAU, 24, Color("#e8c060"), 1.6, true)
-		var icon := Icons.resolve(view.game.content.get_def("buildings", s.special[0]).get("icon", "star"))
-		draw_texture(Icons.texture(icon if icon != "" else "star", 12), c - Vector2(6, 6))
+		for k in marks.size():
+			var mc := c + Vector2((k - (marks.size() - 1) / 2.0) * 19.0, 0)
+			var great: bool = k >= s.special.size()
+			draw_circle(mc + Vector2(1, 2), 8.5, Color(0, 0, 0, 0.45))
+			draw_circle(mc, 8.5, Color(0.12, 0.08, 0.04, 0.92))
+			if great:
+				draw_arc(mc, 10.5, 0, TAU, 28, Color(1.0, 0.85, 0.4, 0.35), 3.0, true)
+			draw_arc(mc, 8.5, 0, TAU, 24, Color("#ffd36a") if great else Color("#e8c060"), 1.6, true)
+			var icon := Icons.resolve(view.game.content.get_def("buildings", marks[k]).get("icon", "star"))
+			draw_texture(Icons.texture(icon if icon != "" else "star", 12), mc - Vector2(6, 6))
 
 
 ## Печать поселения: герб владения в круге, по нижней дуге — точки районов
@@ -332,7 +341,7 @@ func _draw_seal(g: Game, s: Dictionary, c: Vector2, build: Variant) -> void:
 	var r := 10.0
 	draw_circle(c + Vector2(1, 2), r + 1, Color(0, 0, 0, 0.42))
 	draw_circle(c, r, Color(0.11, 0.08, 0.05, 0.9))
-	var rim := Color("#f0c860") if not s.special.is_empty() else Color(0.8, 0.67, 0.42, 0.95)
+	var rim := Color("#f0c860") if not (s.special.is_empty() and s.get("great", []).is_empty()) else Color(0.8, 0.67, 0.42, 0.95)
 	draw_arc(c, r, 0, TAU, 28, rim, 1.5, true)
 	var icon: String = HOLDING_ICON.get(s.main, "castle")
 	draw_texture(Icons.texture(icon, 14), c - Vector2(7, 7.5))
@@ -415,9 +424,12 @@ func _draw_vignette(g: Game, s: Dictionary, c: Vector2, build: Variant, with_bui
 			var bl: Array = s.bmap.get(did, [])
 			for j in bl.size():
 				var bp := Vector2(hc.x, hc.y + hr + 9.0 * sc + br + j * (br * 2.0 + 2.0 * sc))
+				var is_great: bool = s.get("great", []).has(bl[j])
 				draw_circle(bp + Vector2(1, 1.5), br, Color(0, 0, 0, 0.45))
+				if is_great:
+					draw_circle(bp, br + 2.5 * sc, Color(1.0, 0.82, 0.35, 0.3))
 				draw_circle(bp, br, Color(0.12, 0.09, 0.05, 0.93))
-				draw_arc(bp, br, 0, TAU, 20, col.lightened(0.15), 1.3, true)
+				draw_arc(bp, br, 0, TAU, 20, Color("#ffd36a") if is_great else col.lightened(0.15), 2.0 if is_great else 1.3, true)
 				var bi := Icons.resolve(g.content.get_def("buildings", bl[j]).get("icon", "castle"))
 				draw_texture(Icons.texture(bi if bi != "" else "castle", bsz), bp - Vector2(bsz, bsz) * 0.5)
 	# стройка — леса с кольцом готовности справа от ряда

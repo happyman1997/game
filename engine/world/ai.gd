@@ -546,8 +546,14 @@ static func _consider_building(game: Game, c: Dictionary) -> void:
 	var opts := Decisions.domain_build_options(game, c).filter(func(o):
 		var cost: Variant = o.def.get("cost")
 		return (Data.num(cost.get("gold")) if cost is Dictionary else 0.0) + reserve <= c.gold)
+	# вес постройки — её ai_will_do (root — строитель, scope:province), по умолчанию 10
 	for o in opts:
-		o["weight"] = 10.0
+		var ai: Variant = o.def.get("ai_will_do")
+		if ai == null:
+			o["weight"] = 10.0
+		else:
+			var actx := ScriptContext.make(game, {"type": "character", "id": c.id}, {"province": {"type": "province", "id": o.province}})
+			o["weight"] = Interp.eval_value(actx, actx.root, ai)
 	# районы: заложить новый или поднять тесный (Districts.domain_options)
 	for o in Districts.domain_options(game, c):
 		if float(o.cost.gold) + reserve <= c.gold:

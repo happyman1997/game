@@ -87,8 +87,12 @@ council_task_desc:
   arcane_research: The mage seeks hidden lore — the ruler learns secrets and gathers arcane power.
 
 building:
+  warden_lodge: Wardens' Lodge
+  crypt: Crypt
   mage_tower: Wizard's Tower
 building_desc:
+  warden_lodge: "Monster hunters live by the citadel: monsters at court are spotted more often, and curses are weaker."
+  crypt: "A vault under the temple where a necromancer draws strength from the bones of the dead. Townsfolk give it a wide berth."
   mage_tower: A tall tower with an observatory and a library of forbidden books. Only one who wields sorcery may build it.
 
 modifier:

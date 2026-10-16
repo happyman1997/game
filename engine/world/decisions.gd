@@ -127,11 +127,36 @@ static func building_candidates(game: Game, c: Dictionary, prov_id: String) -> A
 				bl.append(game.loc.t("ui.district_full", {"district": game.name_of("districts", did)}))
 		elif full:
 			bl.append(game.loc.t("ui.no_slots"))
+		# великие стройки: одна в мире (unique: world) или одна на державу (unique: realm)
+		if b.get("unique") != null and bl.is_empty():
+			var where: Variant = unique_taken(game, b.id, str(b.unique), c)
+			if where != null:
+				bl.append(game.loc.t("ui.unique_taken_" + str(b.unique), {"place": game.name_of("provinces", where)}))
 		var ctx = ScriptContext.make(game, {"type": "province", "id": prov_id}, {"builder": {"type": "character", "id": c.id}})
 		bl.append_array(Interp.failed_triggers(ctx, ctx.root, b.get("trigger")))
 		bl.append_array(Economy.cost_blockers(game, c, building_cost(game, b, c, prov_id)))
 		out.append({"def": b, "blockers": bl})
 	return out
+
+
+## Где уже стоит (или строится) единственная постройка: графство или null.
+## kind: world — во всём мире; realm — в державе верховного сюзерена c.
+static func unique_taken(game: Game, bid: String, kind: String, c: Dictionary) -> Variant:
+	var pool: Array
+	if kind == "realm":
+		pool = Titles.realm_counties(game, Titles.top_liege(game, c))
+	else:
+		pool = game.state.provinces.keys()
+	for pid in pool:
+		var p: Variant = game.state.provinces.get(pid)
+		if p == null:
+			continue
+		if p.buildings.has(bid):
+			return pid
+		var cons: Variant = p.get("construction")
+		if cons is Dictionary and cons.get("building") == bid:
+			return pid
+	return null
 
 
 static func building_cost(game: Game, b: Dictionary, c: Dictionary, prov_id: String) -> Dictionary:

@@ -36,6 +36,10 @@ ui:
   special_buildings: Landmarks
   mapmode:
     districts: Settlements
+  unique_world: Great work — the only one in the world
+  unique_realm: Great work — one per realm
+  unique_taken_world: "Already stands in the world: {place}"
+  unique_taken_realm: "Already in the realm: {place}"
   districts_total: "Districts: {n}, buildings: {b}"
 msg:
   district_done: "Construction finished: {district} {level} in {place}."

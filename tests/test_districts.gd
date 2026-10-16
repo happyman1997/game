@@ -127,3 +127,47 @@ func test_ai_builds_districts() -> void:
 			levels += int(p.districts[did])
 	check(builds > 0, "ИИ строит в районах (%d построек)" % builds)
 	check(levels > Titles.domain_counties(g, h).size() * 2, "и закладывает или поднимает районы (сумма уровней %d)" % levels)
+
+
+func test_great_works() -> void:
+	var g := _game()
+	var h: Dictionary = g.ch("harold")
+	h.gold = 5000.0
+	var pid := "c_winchester"
+	var p: Dictionary = g.state.provinces[pid]
+	var mint := func(where: String) -> Variant:
+		var xs := Decisions.building_candidates(g, h, where).filter(func(x): return x.def.id == "mint")
+		return xs[0] if not xs.is_empty() else null
+	# монетный двор: посад III и гильдия
+	check(mint.call(pid) == null or not mint.call(pid).blockers.is_empty(), "без посада III монетного двора нет")
+	Districts.set_level(g, pid, "market", 3)
+	p.buildings.append("guild_hall")
+	check(mint.call(pid) != null and mint.call(pid).blockers.is_empty(), "посад III с гильдией — можно ставить")
+	g.stat_cache.clear()
+	var inc0 := Stats.stat(g, h, "monthly_income")
+	check(Decisions.start_building(g, h, pid, "mint"), "монетный двор заложен")
+	# второй в той же державе — нельзя, пока стоит или строится первый
+	var other := ""
+	for cid in Titles.domain_counties(g, h):
+		if cid != pid:
+			other = cid
+			break
+	Districts.set_level(g, other, "market", 3)
+	g.state.provinces[other].buildings.append("guild_hall")
+	check(mint.call(other) != null and not mint.call(other).blockers.is_empty(), "монетный двор — один на державу")
+	check_eq(Decisions.unique_taken(g, "mint", "realm", h), pid, "занят Винчестером")
+	p.construction.done = g.date
+	Decisions.daily_construction(g)
+	check(p.buildings.has("mint"), "монетный двор построен")
+	# великая стройка от силы района не зависит
+	check_eq(Districts.building_scale(g, pid, "mint"), 1.0, "scale: no — множитель 1")
+	g.stat_cache.clear()
+	var inc := Stats.stat(g, h, "monthly_income")
+	check(inc >= inc0 + 2.0 - 0.01, "монетный двор: +2 в месяц (%.2f → %.2f)" % [inc0, inc])
+	Districts.set_level(g, pid, "market", 1)
+	g.stat_cache.clear()
+	check(is_equal_approx(Stats.stat(g, h, "monthly_income"), inc), "бонус монетного двора тот же при посаде I")
+	# одна в мире: великий торг у Гарольда — Вильгельму уже не построить
+	var w: Dictionary = g.ch("william")
+	p.buildings.append("great_market")
+	check(Decisions.unique_taken(g, "great_market", "world", w) == pid, "великий торг один на весь мир")

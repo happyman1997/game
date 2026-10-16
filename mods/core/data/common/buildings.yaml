@@ -1,0 +1,367 @@
+# Постройки сверх основных (основные — economy.yaml): ещё по нескольку на
+# каждый район, местные (по культуре, вере и местности графства) и великие
+# стройки. Великая стройка (unique: world — одна в мире, realm — одна на
+# державу) стоит в районе III уровня, строится годами, а её бонусы от силы
+# района не зависят (scale: no).
+
+buildings:
+  # ---------------------------------------------------------- Детинец
+  # Оружейная: ополчение вооружено лучше, а отрядов можно держать больше
+  armory:
+    district: citadel
+    category: military
+    icon: swords
+    cost: { gold: 110 }
+    days: 300
+    modifiers: { levy_mult: 0.1 }
+    owner_modifiers: { regiment_cap: 0.5 }
+  # Лобное место: казни и порка при всём народе — меньше жалоб, больше страха
+  gallows:
+    district: citadel
+    category: military
+    icon: gallows
+    cost: { gold: 80 }
+    days: 180
+    modifiers: { county_opinion: -3 }
+    owner_modifiers: { complaint_mult: -0.1, dread_gain_mult: 0.1 }
+    # только жестокие: прочим народ дороже
+    ai_will_do: { value: ai_cruelty, multiply: 3, min: 0 }
+  # Палаты: пиршественный зал, где владелец принимает вассалов
+  great_hall:
+    district: citadel
+    level: 2
+    category: other
+    icon: goblet
+    cost: { gold: 180 }
+    days: 450
+    owner_modifiers: { vassal_opinion: 2, monthly_prestige: 0.2 }
+  # Донжон: последняя башня крепости
+  donjon:
+    district: citadel
+    level: 3
+    category: fortification
+    icon: tower
+    requires: [walls]
+    cost: { gold: 260 }
+    days: 600
+    modifiers: { fort: 3 }
+    owner_modifiers: { capital_defense: 0.2 }
+
+  # ---------------------------------------------------------- Торговый посад
+  # Гостиный двор: заезжие купцы везут товар и слухи — порой и чужие тайны
+  caravanserai:
+    district: market
+    category: economy
+    icon: bag
+    cost: { gold: 120 }
+    days: 300
+    modifiers: { tax_mult: 0.08 }
+    yearly:
+      - random:
+          chance: { value: scope:power, multiply: 12 }
+          discover_secret: yes
+  # Мыльня: пар и веники — здоровье и покой
+  bathhouse:
+    district: market
+    category: other
+    icon: bath
+    cost: { gold: 80 }
+    days: 200
+    modifiers: { county_opinion: 1 }
+    owner_modifiers: { health: 0.1, stress_gain_mult: -0.02 }
+  # Монетный двор: своя монета — и вассалы платят исправнее
+  mint:
+    district: market
+    level: 3
+    unique: realm
+    scale: no
+    category: economy
+    icon: coins
+    requires: [guild_hall]
+    cost: { gold: 500 }
+    days: 720
+    owner_modifiers: { monthly_income: 2, vassal_tax_mult: 0.1 }
+    ai_will_do: { value: 0, if: { limit: { gold: ">= 700" }, add: 25 } }
+
+  # ---------------------------------------------------------- Соборная сторона
+  # Звонница: колокол созывает и на молитву, и в ополчение
+  bell_tower:
+    district: temple_quarter
+    category: faith
+    icon: bell
+    cost: { gold: 90 }
+    days: 240
+    modifiers: { county_opinion: 2, levy_mult: 0.05 }
+    owner_modifiers: { monthly_piety: 0.1 }
+  # Школа светочей: жрецы учат детей двора и наставников
+  sun_school:
+    district: temple_quarter
+    level: 2
+    category: faith
+    icon: scroll
+    cost: { gold: 180 }
+    days: 420
+    owner_modifiers: { learning: 1, ward_education_mult: 0.1, lifestyle_xp_mult: 0.03 }
+
+  # ---------------------------------------------------------- Угодья
+  vineyard:
+    district: fields
+    category: economy
+    icon: grapes
+    trigger: { OR: [ { terrain: farmlands }, { terrain: plains }, { terrain: hills } ] }
+    cost: { gold: 100 }
+    days: 300
+    modifiers: { tax_mult: 0.1 }
+    owner_modifiers: { monthly_prestige: 0.1 }
+  orchards:
+    district: fields
+    category: economy
+    icon: tree
+    cost: { gold: 70 }
+    days: 240
+    modifiers: { development_growth: 0.04, county_opinion: 1 }
+  sheepfold:
+    district: fields
+    category: economy
+    icon: sheep
+    trigger: { OR: [ { terrain: hills }, { terrain: plains } ] }
+    cost: { gold: 80 }
+    days: 240
+    modifiers: { tax_mult: 0.12 }
+
+  # ---------------------------------------------------------- Ремесленная слобода
+  tannery:
+    district: crafts
+    category: military
+    icon: armor
+    cost: { gold: 100 }
+    days: 270
+    modifiers: { tax_mult: 0.08 }
+    owner_modifiers: { regiment_power: 0.02 }
+  weavers:
+    district: crafts
+    category: economy
+    icon: tapestry
+    cost: { gold: 110 }
+    days: 300
+    modifiers: { tax_mult: 0.15 }
+  # Осадная мастерская: тараны и метательные машины — крепости падают быстрее
+  siege_workshop:
+    district: crafts
+    level: 2
+    category: military
+    icon: catapult
+    cost: { gold: 170 }
+    days: 420
+    owner_modifiers: { siege_speed: 0.08 }
+
+  # ---------------------------------------------------------- Пристань
+  fishery:
+    district: harbor
+    category: economy
+    icon: fish
+    cost: { gold: 80 }
+    days: 240
+    modifiers: { tax_mult: 0.1, development_growth: 0.02, county_opinion: 1 }
+  # Таможня: пошлины с чужих кораблей — казне хорошо, горожанам не очень
+  customs:
+    district: harbor
+    level: 2
+    category: economy
+    icon: seal
+    cost: { gold: 160 }
+    days: 360
+    modifiers: { tax_mult: 0.25, county_opinion: -2 }
+
+  # ---------------------------------------------------------- местные
+  # Длинный дом северян: дружина живёт набегами
+  longhouse:
+    district: citadel
+    category: military
+    icon: axe
+    trigger: { culture: [norse, danish, swedish] }
+    cost: { gold: 90 }
+    days: 240
+    modifiers: { levy_mult: 0.1 }
+    owner_modifiers: { loot_mult: 0.2 }
+  # Польдеры: земля, отвоёванная у моря и болот
+  polders:
+    district: fields
+    category: economy
+    icon: waves
+    trigger: { terrain: wetlands }
+    cost: { gold: 110 }
+    days: 360
+    modifiers: { tax_mult: 0.2, development_growth: 0.05 }
+  # Рудник: руда и серебро холмов и гор — доход каждый год
+  mine:
+    district: crafts
+    category: economy
+    icon: pickaxe
+    trigger: { OR: [ { terrain: hills }, { terrain: mountains } ] }
+    cost: { gold: 130 }
+    days: 360
+    modifiers: { tax_mult: 0.05 }
+    yearly:
+      - add_gold: { value: scope:power, multiply: 6 }
+  # Пепельный дозор: застава у края Пепелища
+  ash_watch:
+    district: citadel
+    category: fortification
+    icon: ash
+    trigger: { any_neighbor: { terrain: ash } }
+    cost: { gold: 100 }
+    days: 300
+    modifiers: { fort: 1 }
+    owner_modifiers: { attrition_mult: -0.15, monthly_piety: 0.2 }
+  # Волчье капище: клыки и кровь — дружина свирепее, а соседи боятся
+  wolf_shrine:
+    district: temple_quarter
+    category: faith
+    icon: wolf
+    trigger: { faith: wolf_cult }
+    cost: { gold: 90 }
+    days: 240
+    owner_modifiers: { prowess: 1, dread_gain_mult: 0.1 }
+  # Зал предков: память рода в камне — наследие дешевле
+  ancestor_hall:
+    district: temple_quarter
+    category: faith
+    icon: pillars
+    trigger: { faith: ancestor_cult }
+    cost: { gold: 120 }
+    days: 300
+    owner_modifiers: { legacy_cost_mult: -0.08, monthly_prestige: 0.2 }
+  # Восточная обитель: еретики держатся друг за друга
+  east_cloister:
+    district: temple_quarter
+    category: faith
+    icon: church
+    trigger: { faith: east_rite }
+    cost: { gold: 90 }
+    days: 240
+    modifiers: { county_opinion: 3 }
+    owner_modifiers: { complaint_mult: -0.05, monthly_piety: 0.2 }
+
+  # ---------------------------------------------------------- великие стройки
+  # Солнечный собор: величайший храм Солнца в мире
+  sun_cathedral:
+    district: temple_quarter
+    level: 3
+    unique: world
+    scale: no
+    category: faith
+    icon: piety
+    requires: [cathedral]
+    trigger: { scope:builder: { religion: solar, tier: ">= 3" } }
+    cost: { gold: 1500 }
+    days: 1800
+    modifiers: { county_opinion: 10, development_growth: 0.1 }
+    owner_modifiers: { monthly_piety: 3, monthly_prestige: 2, general_opinion: 5 }
+    ai_will_do: { value: 0, if: { limit: { gold: ">= 1800" }, add: 30 } }
+  # Университет: учёные со всей округи — двор умнеет
+  university:
+    district: temple_quarter
+    level: 3
+    unique: realm
+    scale: no
+    category: other
+    icon: book
+    requires: [scriptorium]
+    trigger: { scope:builder: { tier: ">= 2" } }
+    cost: { gold: 900 }
+    days: 1200
+    owner_modifiers: { learning: 2, education_gain_mult: 0.2, lifestyle_xp_mult: 0.1 }
+    ai_will_do: { value: 0, if: { limit: { gold: ">= 1100" }, add: 25 } }
+  # Великий торг: ярмарка, на которую съезжается полмира
+  great_market:
+    district: market
+    level: 3
+    unique: world
+    scale: no
+    category: economy
+    icon: stall
+    requires: [fairground]
+    trigger: { scope:builder: { tier: ">= 3" } }
+    cost: { gold: 1200 }
+    days: 1440
+    modifiers: { county_opinion: 5 }
+    owner_modifiers: { monthly_prestige: 0.5 }
+    yearly:
+      - add_gold: 60
+      - random: { chance: 50, trigger_event: artifact.0001 }
+    ai_will_do: { value: 0, if: { limit: { gold: ">= 1500" }, add: 30 } }
+  # Пограничный вал: цепь стен и застав по всему рубежу
+  border_wall:
+    district: citadel
+    level: 3
+    unique: realm
+    scale: no
+    category: fortification
+    icon: walls
+    requires: [walls]
+    cost: { gold: 1000 }
+    days: 1440
+    owner_modifiers: { domain_fort: 2, capital_defense: 0.3, attrition_mult: -0.1 }
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { gold: ">= 1300" }
+          add: 10
+        - limit: { gold: ">= 1300", is_at_war: yes }
+          add: 15
+  # Палата правосудия: суд владельца — вассалы ропщут меньше
+  hall_of_justice:
+    district: citadel
+    level: 3
+    unique: realm
+    scale: no
+    category: other
+    icon: scales
+    requires: [great_hall]
+    trigger: { scope:builder: { tier: ">= 2" } }
+    cost: { gold: 900 }
+    days: 1200
+    owner_modifiers: { faction_discontent_mult: -0.25, vassal_opinion: 5, complaint_mult: -0.15 }
+    ai_will_do: { value: 0, if: { limit: { gold: ">= 1100" }, add: 25 } }
+  # Королевские конюшни: лучшие кони державы
+  royal_stables:
+    district: fields
+    level: 3
+    unique: realm
+    scale: no
+    category: military
+    icon: horse
+    requires: [stud_farm]
+    cost: { gold: 800 }
+    days: 1080
+    owner_modifiers: { march_speed: 0.1, knight_effectiveness: 0.15, pursuit: 0.1 }
+    ai_will_do: { value: 0, if: { limit: { gold: ">= 1000" }, add: 20 } }
+  # Великая кузня: горн, что не гаснет
+  great_forge:
+    district: crafts
+    level: 3
+    unique: realm
+    scale: no
+    category: military
+    icon: anvil
+    requires: [forge]
+    cost: { gold: 1000 }
+    days: 1200
+    owner_modifiers: { regiment_power: 0.1, army_upkeep_mult: -0.1, commission_quality: 0.1 }
+    ai_will_do: { value: 0, if: { limit: { gold: ">= 1300" }, add: 25 } }
+  # Великий маяк: огонь, видный за день пути под парусом
+  great_lighthouse:
+    district: harbor
+    level: 3
+    unique: world
+    scale: no
+    category: other
+    icon: lighthouse
+    requires: [lighthouse]
+    trigger: { scope:builder: { tier: ">= 3" } }
+    cost: { gold: 1200 }
+    days: 1440
+    modifiers: { development_growth: 0.15, county_opinion: 3 }
+    owner_modifiers: { monthly_prestige: 1.5, general_opinion: 3 }
+    ai_will_do: { value: 0, if: { limit: { gold: ">= 1500" }, add: 25 } }

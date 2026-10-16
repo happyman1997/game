@@ -18,6 +18,38 @@ district_desc:
   crafts: "Forges and workshops. Ore lies in hills and mountains; the guilds of a domain support each other."
   harbor: "Quays and warehouses by the sea. The harbours of a domain form one sea trade, and neighbouring markets bring them goods."
 building:
+  armory: Armory
+  gallows: Place of Execution
+  great_hall: Great Hall
+  donjon: Donjon
+  caravanserai: Merchants' Inn
+  bathhouse: Bathhouse
+  mint: Mint
+  bell_tower: Bell Tower
+  sun_school: School of Lightbearers
+  vineyard: Vineyards
+  orchards: Orchards
+  sheepfold: Sheepfolds
+  tannery: Tanneries
+  weavers: Weavers' Row
+  siege_workshop: Siege Workshop
+  fishery: Fisheries
+  customs: Customs House
+  longhouse: Longhouse
+  polders: Polders
+  mine: Mine
+  ash_watch: Ash Watch
+  wolf_shrine: Wolf Shrine
+  ancestor_hall: Hall of Ancestors
+  east_cloister: Eastern Cloister
+  sun_cathedral: Cathedral of the Sun
+  university: University
+  great_market: Great Market
+  border_wall: Border Wall
+  hall_of_justice: Hall of Justice
+  royal_stables: Royal Stables
+  great_forge: Great Forge
+  great_lighthouse: Great Lighthouse
   dungeon: Oubliette
   watchtower: Watchtower
   secret_passage: Secret Passage
@@ -37,6 +69,38 @@ building:
   shipyard: Shipyard
   lighthouse: Lighthouse
 building_desc:
+  armory: "Stores of spears, shields and helmets: the levy is better armed and more regiments can be kept."
+  gallows: "Executions and floggings before the whole town. Fewer petitions, more dread — but the county dislikes its lord."
+  great_hall: "A feasting hall where the lord receives vassals. Honour for the vassals, renown for the lord."
+  donjon: "The last and tallest tower of the fortress. Requires walls; the owner's capital holds out longer under siege."
+  caravanserai: "Visiting merchants bring goods and rumours. Once a year, the stronger the quarter, the likelier the lord learns someone's secret."
+  bathhouse: "Steam and birch twigs: the lord is healthier and calmer."
+  mint: "The realm's own coin. Income for the treasury, and vassals pay their taxes more faithfully. One per realm."
+  bell_tower: "The bell calls to prayer and to arms alike."
+  sun_school: "Lightbearer priests teach the children of the court and their tutors. Wards learn faster."
+  vineyard: "Wine for the table and for sale: taxes and a little renown for the lord."
+  orchards: "Apple and pear trees around the villages: the county grows and is content."
+  sheepfold: "Sheep on the hills and plains: wool is silver."
+  tannery: "Leather for armour and harness: taxes and slightly stronger regiments."
+  weavers: "Cloth and linen for sale."
+  siege_workshop: "Rams and siege engines: enemy fortresses fall faster."
+  fishery: "Fish for towns and fasts: taxes, growth and full bellies."
+  customs: "Duties on foreign ships. Good for the treasury, less so for the townsfolk."
+  longhouse: "The longhouse of a northern war band that lives by raiding: more loot from every fortress taken."
+  polders: "Land won from sea and marsh by dikes and ditches. Wetlands only."
+  mine: "Ore and silver of the hills and mountains: taxes and income once a year by the quarter's power."
+  ash_watch: "An outpost on the edge of the Ashlands. The lord's army loses fewer men in the ash; the watchmen pray for him."
+  wolf_shrine: "Fangs and blood on the altar of the Winter Wolf. The war band is fiercer and the neighbours afraid."
+  ancestor_hall: "The memory of the house in stone: dynasty legacies are cheaper and the house more renowned."
+  east_cloister: "A cloister of the Eastern Rite. Heretics stick together."
+  sun_cathedral: "The greatest temple of the Sun in the world. Piety and renown for its lord, respect from all around. The only one in the world; built by kings of the Sun faith."
+  university: "Scholars from all around: the ruler and court grow wiser, children learn faster. One per realm."
+  great_market: "A fair half the world comes to: great income every year, and curio merchants visit constantly. The only one in the world."
+  border_wall: "A chain of walls and outposts along the whole frontier: every domain fortress is sturdier, the capital holds out longer, campaigns are easier. One per realm."
+  hall_of_justice: "The lord's court for the whole realm. Factions build discontent more slowly, vassals are calmer. One per realm."
+  royal_stables: "The finest horses of the realm: faster armies, stronger knights. One per realm."
+  great_forge: "A forge that never goes out: stronger regiments, cheaper upkeep, better commissions. One per realm."
+  great_lighthouse: "A fire seen a day's sail away. Renown for its lord and growth for the town. The only one in the world."
   walls: "Stone instead of a palisade: the fortress holds out twice as long."
   barracks: "The county levy lives and drills here."
   training_grounds: "A field for mounted jousts. The owner's commanders and knights fight better."
