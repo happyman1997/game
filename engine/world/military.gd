@@ -440,10 +440,7 @@ static func province_fort(game: Game, prov_id: String) -> float:
 				fort = maxf(fort, Data.num(hd.get("fort")))
 	var st: Variant = game.state.provinces.get(prov_id)
 	if st != null:
-		for b in st.buildings:
-			var bd: Variant = game.content.get_def("buildings", b)
-			if bd != null and bd.get("modifiers") is Dictionary:
-				fort += Data.num(bd.modifiers.get("fort"))
+		fort += Districts.prov_bonus(game, st, "fort")
 	# domain_fort владельца (военный зодчий): крепости его домена крепче
 	var t: Variant = game.state.titles.get(prov_id)
 	var h: Variant = game.ch(t.holder) if t != null and t.holder != null else null

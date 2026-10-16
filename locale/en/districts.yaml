@@ -1,0 +1,48 @@
+# Districts mechanic: engine and interface strings.
+district:
+  part:
+    level: "Level {n}"
+  factor:
+    terrain: "Terrain: {terrain}"
+    coastal: By the sea
+    border: Borderland
+    neighbors: "Trade routes: {district} in neighbouring counties — {n}"
+    domain: "Domain network: {district} — {n} more"
+  level_name:
+    "1": founded
+    "2": grown
+    "3": thriving
+ui:
+  districts: Settlement
+  district_power: "power ×{value}"
+  district_power_tip: "District power multiplies its own bonuses and those of every building in it."
+  district_slots: "Slots: {used}/{total}"
+  district_level: "{name} {level}"
+  plots: "District plots: {used}/{total}"
+  plots_tip: "Districts from holdings (castle, city, temple) are free. Others need plots: one always, plus one per 10 development."
+  district_upkeep: District upkeep
+  found_district: Found a district
+  upgrade_district: "Raise to {level}"
+  no_plots: No free plot
+  district_needs_dev: "Needs development {n}"
+  needs_district_level: "Needs a {district} of level {level}"
+  district_full: "No free slots in the {district}"
+  district_buildings: District buildings
+  district_base: The district itself
+  district_yearly: Once a year
+  district_scaled: "With district power ×{value}:"
+  district_empty_slot: Free slot
+  other_buildings: Other buildings
+  special_buildings: Landmarks
+  mapmode:
+    districts: Settlements
+  districts_total: "Districts: {n}, buildings: {b}"
+msg:
+  district_done: "Construction finished: {district} {level} in {place}."
+modsrc:
+  districts: Districts
+tr:
+  has_district: "The county has a {value} (level {level} or higher)"
+fx:
+  set_district_level: "{place}: {value} — level {level}"
+  raze_district: "{place}: {value} razed together with its buildings"

@@ -194,6 +194,8 @@ buildings:
   mage_tower:
     category: arcane
     icon: "🗼"
+    district: citadel
+    level: 2
     holding: castle
     cost: { gold: 220 }
     days: 540

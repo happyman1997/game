@@ -1,0 +1,69 @@
+# Districts and their buildings (data/common/districts.yaml, economy.yaml).
+district:
+  citadel: Citadel
+  market: Market Quarter
+  temple_quarter: Temple Quarter
+  fields: Fields
+  crafts: Crafts Quarter
+  harbor: Harbour
+  factor:
+    big_town: Large town (development 20+)
+    foreign_faith: County of a foreign faith
+    pious_owner: Pious owner
+district_desc:
+  citadel: "The fortified heart of the county: walls, barracks, a dungeon. Stronger on a border with another realm and in the mountains."
+  market: "Shops, warehouses and trade. Every neighbouring market quarter whose lord is not at war with yours is a trade route and adds power."
+  temple_quarter: "The temple and everything around it: monks, scribes, alms. Halved if the county follows another faith."
+  fields: "Ploughland, mills, stables. Farmlands and plains yield best; hills and marshes worse."
+  crafts: "Forges and workshops. Ore lies in hills and mountains; the guilds of a domain support each other."
+  harbor: "Quays and warehouses by the sea. The harbours of a domain form one sea trade, and neighbouring markets bring them goods."
+building:
+  dungeon: Oubliette
+  watchtower: Watchtower
+  secret_passage: Secret Passage
+  fairground: Fairground
+  money_changer: Money Changers
+  hospice: Hospice
+  scriptorium: Scriptorium
+  reliquary: Saint's Shrine
+  granary: Granary
+  stud_farm: Stud Farm
+  supply_depot: Supply Depot
+  forge: Forges
+  masons: Masons' Lodge
+  goldsmith: Goldsmithy
+  docks: Docks
+  salt_works: Salt Works
+  shipyard: Shipyard
+  lighthouse: Lighthouse
+building_desc:
+  walls: "Stone instead of a palisade: the fortress holds out twice as long."
+  barracks: "The county levy lives and drills here."
+  training_grounds: "A field for mounted jousts. The owner's commanders and knights fight better."
+  dungeon: "A pit under the tower that nobody leaves. Every prisoner in the owner's dungeon breeds more dread — but the county grumbles."
+  watchtower: "The watch sees an army a day away. The county is sturdier and the owner's capital holds out longer under siege."
+  secret_passage: "A tunnel under the walls known to three people. The owner may slip out of a fallen capital and escape a foreign dungeon."
+  market: "Rows of stalls and a grain measure. The quarter's main income."
+  guild_hall: "Guilds fix prices and build the town. Taxes grow, and so does the county."
+  fairground: "Once a year merchants gather from all around: the treasury takes a share of the trade, more the stronger the quarter. Sometimes a curio merchant comes along."
+  money_changer: "Money changers and lenders. Construction and commissions are cheaper, and in a hard year the changers will lend (the Lombard Loan decision)."
+  monastery: "The brethren pray for the owner and teach letters."
+  cathedral: "A cathedral of the Sun. Piety and renown for the owner."
+  hospice: "A shelter for pilgrims, orphans and cripples. The county is grateful, and every year Light falls on the owner's soul."
+  scriptorium: "Scribes copy chronicles and teach the children of the court. Wards learn faster, and so does the ruler."
+  reliquary: "A shrine with relics that pilgrims visit: piety and alms once a year. If the owner keeps a reliquary in the treasury, three times as many come."
+  farms: "Farmsteads around the county: more bread, more taxes and people."
+  hunting_grounds: "A forest reserved for the hunt. The owner is stronger and calmer."
+  granary: "Bread stored for a hungry year. A well-fed county submits faster and petitions less."
+  stud_farm: "Herds of war horses. The owner's armies march faster and cut down the fleeing."
+  supply_depot: "Carts, barrels, hardtack. On campaigns through the Ashlands and wild lands the army loses fewer men."
+  forge: "Forges make armour and blades: stronger regiments, cheaper upkeep."
+  masons: "Masons and carpenters. All construction in the domain is faster, and its fortresses sturdier."
+  goldsmith: "A jewellers' workshop. Commissions are cheaper, and pieces come out rarer."
+  docks: "Quays for merchant ships. Taxes, and dues from ships once a year."
+  salt_works: "Sea salt — the silver of the coast."
+  shipyard: "Ships are built here: the army crosses by sea, campaigns and sieges are faster."
+  lighthouse: "A fire on the cape leads ships into port. The town grows, and so does the owner's renown."
+msg:
+  fair_income: "The fair at [scope:province.name] drew merchants from all around: [scope:fair_gold] gold to the treasury."
+  pilgrims: "Pilgrims to the shrine at [scope:province.name] left [scope:pilgrim_gold] gold in alms."

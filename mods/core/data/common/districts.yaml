@@ -1,0 +1,119 @@
+# Районы (механика districts, engine/features/districts.gd): поселение графства
+# растёт кварталами. Район даёт места под свои постройки (I — одно, II — два,
+# III — три) и силу: уровень × множители места (местность, граница, торговые
+# пути). Сила умножает всё, что стоит в районе, и сам район.
+# Районы владений (free_with) даются даром; прочие — на участки, которых тем
+# больше, чем выше развитие графства. Постройки районов — common/economy.yaml.
+
+defines:
+  districts:
+    level_power: [1.0, 1.75, 2.5]   # сила района по уровням (до множителей места)
+    slots_by_level: [1, 2, 3]        # мест под постройки
+    max_level: 3
+    max_power: 5
+    plots_base: 1                    # участков под районы сверх данных владениями
+    plots_per_development: 0.1       # +1 участок на каждые 10 развития
+    max_plots: 4
+
+districts:
+  # Детинец: укреплённое сердце графства. Сильнее на рубеже с чужой державой
+  # и в горах.
+  citadel:
+    order: 1
+    icon: castle
+    color: "#b5493c"
+    free_with: castle
+    cost: [100, 260, 640]
+    days: [300, 540, 900]
+    development: [0, 10, 18]
+    upkeep: [0, 0.2, 0.5]
+    modifiers: { levy_mult: 0.05 }
+    power:
+      - { kind: border, mult: 1.4 }
+      - { kind: terrain, mult: { hills: 1.2, mountains: 1.4 } }
+    ai_will_do: { value: 6, if: { limit: { is_at_war: yes }, add: 6 } }
+
+  # Торговый посад: торг растёт торговыми путями — каждый соседний посад
+  # (если их хозяева не воюют) прибавляет силы.
+  market:
+    order: 2
+    icon: scales
+    color: "#d9a032"
+    free_with: city
+    cost: [120, 300, 700]
+    days: [300, 540, 900]
+    development: [0, 12, 20]
+    upkeep: [0, 0.25, 0.6]
+    modifiers: { tax_mult: 0.05 }
+    power:
+      - { kind: neighbors, district: market, per: 0.12, max: 0.6 }
+      - { kind: trigger, limit: { development: ">= 20" }, mult: 1.2, desc: district.factor.big_town }
+    ai_will_do: { value: 10, if: { limit: { ai_greed: ">= 1" }, add: 6 } }
+
+  # Соборная сторона: храм и всё, что при нём. Чужая вера графства вдвое
+  # ослабляет её, благочестивый владелец — укрепляет.
+  temple_quarter:
+    order: 3
+    icon: church
+    color: "#e8d6a0"
+    free_with: temple
+    cost: [100, 260, 620]
+    days: [300, 540, 900]
+    development: [0, 10, 18]
+    upkeep: [0, 0.2, 0.5]
+    modifiers: { county_opinion: 2 }
+    owner_modifiers: { monthly_piety: 0.15 }
+    power:
+      - { kind: trigger, limit: { has_holder_faith: no }, mult: 0.5, desc: district.factor.foreign_faith }
+      - { kind: trigger, limit: { scope:owner: { piety_level: ">= 3" } }, mult: 1.25, desc: district.factor.pious_owner }
+    ai_will_do: { value: 8, add: { value: ai_zeal, multiply: 3 } }
+
+  # Угодья: пашни, мельницы, конюшни. Лучше всего на пашнях и равнинах.
+  fields:
+    order: 4
+    icon: wheat
+    color: "#93ad4e"
+    trigger: { NOT: { OR: [ { terrain: mountains }, { terrain: ash } ] } }
+    cost: [80, 220, 520]
+    days: [240, 450, 720]
+    development: [0, 8, 16]
+    upkeep: [0, 0.15, 0.4]
+    modifiers: { development_growth: 0.03, tax_mult: 0.04 }
+    power:
+      - { kind: terrain, mult: { farmlands: 1.5, plains: 1.2, forest: 0.9, hills: 0.8, wetlands: 0.8 } }
+    ai_will_do: 10
+
+  # Ремесленная слобода: кузни и артели. Руда в горах и холмах; цеха домена
+  # поддерживают друг друга.
+  crafts:
+    order: 5
+    icon: anvil
+    color: "#c0703e"
+    trigger: { OR: [ { has_holding: castle }, { has_holding: city } ] }
+    cost: [110, 280, 660]
+    days: [300, 540, 900]
+    development: [0, 12, 20]
+    upkeep: [0, 0.25, 0.6]
+    modifiers: { tax_mult: 0.04 }
+    owner_modifiers: { build_cost_mult: -0.02 }
+    power:
+      - { kind: terrain, mult: { hills: 1.3, mountains: 1.6 } }
+      - { kind: domain, district: crafts, per: 0.1, max: 0.4 }
+    ai_will_do: 7
+
+  # Пристань: только у моря. Пристани домена — одна морская торговля, а
+  # соседние посады везут к ней товар.
+  harbor:
+    order: 6
+    icon: anchor
+    color: "#4a95ab"
+    trigger: { is_coastal: yes }
+    cost: [120, 300, 700]
+    days: [360, 600, 960]
+    development: [0, 10, 18]
+    upkeep: [0, 0.25, 0.6]
+    modifiers: { tax_mult: 0.06, development_growth: 0.02 }
+    power:
+      - { kind: domain, district: harbor, per: 0.15, max: 0.6 }
+      - { kind: neighbors, district: market, per: 0.1, max: 0.3 }
+    ai_will_do: 8

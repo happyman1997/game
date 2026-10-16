@@ -617,7 +617,7 @@ func _outliner_sections(p: Dictionary) -> Array:
 		for item in builds:
 			var cid: String = item[0]
 			var left := maxi(0, int(item[1].done) - g.date)
-			rows.append(row.call("%s: %s (%s)" % [g.name_of("provinces", cid), g.name_of("buildings", item[1].building), t("ui.days_left", {"n": left})],
+			rows.append(row.call("%s: %s (%s)" % [g.name_of("provinces", cid), Decisions.construction_name(g, item[1]), t("ui.days_left", {"n": left})],
 				"castle", func(): app.open_province(cid, true)))
 			sig += "%s:%d," % [cid, left / 30]
 		out.append({"id": "builds", "name": t("ui.ol.construction"), "icon": "castle", "rows": rows, "sig": sig})

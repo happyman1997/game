@@ -209,10 +209,7 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 ## поставщик налога сам спрашивает мнение графства).
 static func _county_flat(game: Game, p: Dictionary) -> float:
 	var v := 0.0
-	for b in p.buildings:
-		var bd: Variant = game.content.get_def("buildings", b)
-		if bd != null and bd.get("modifiers") is Dictionary:
-			v += Data.num(bd.modifiers.get("county_opinion"))
+	v += Districts.prov_bonus(game, p, "county_opinion")
 	for m in p.modifiers:
 		var md: Variant = game.content.get_def("modifiers", m.id)
 		if md != null and md.get("modifiers") is Dictionary:

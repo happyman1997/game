@@ -546,8 +546,18 @@ static func _consider_building(game: Game, c: Dictionary) -> void:
 	var opts := Decisions.domain_build_options(game, c).filter(func(o):
 		var cost: Variant = o.def.get("cost")
 		return (Data.num(cost.get("gold")) if cost is Dictionary else 0.0) + reserve <= c.gold)
-	var pick: Variant = game.rng.pick(opts)
-	if pick != null:
+	for o in opts:
+		o["weight"] = 10.0
+	# районы: заложить новый или поднять тесный (Districts.domain_options)
+	for o in Districts.domain_options(game, c):
+		if float(o.cost.gold) + reserve <= c.gold:
+			opts.append(o)
+	var pick: Variant = game.rng.weighted(opts, func(o): return o.weight)
+	if pick == null:
+		return
+	if pick.has("level"):
+		Districts.start(game, c, pick.province, pick.def.id)
+	else:
 		Decisions.start_building(game, c, pick.province, pick.def.id)
 
 

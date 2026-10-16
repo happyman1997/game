@@ -22,6 +22,16 @@ static func add_into(out: Dictionary, mods: Variant) -> void:
 			out[k] = float(out.get(k, 0.0)) + float(v)
 
 
+## add_into с множителем k (сила района) — без лишних словарей.
+static func add_into_scaled(out: Dictionary, mods: Variant, k: float) -> void:
+	if not (mods is Dictionary):
+		return
+	for key in mods:
+		var v: Variant = mods[key]
+		if v is int or v is float:
+			out[key] = float(out.get(key, 0.0)) + float(v) * k
+
+
 ## Источники: [{label, mods}]. labels = false — без подписей (быстрее).
 static func _sources(game: Game, c: Dictionary, with_providers: bool = true, labels: bool = true) -> Array:
 	var out := []
@@ -518,10 +528,11 @@ static func prov_stats(game: Game, prov_id: String) -> Dictionary:
 			var hd: Variant = game.content.get_def("holdings", h)
 			if hd != null:
 				add_into(out, {"tax": Data.num(hd.get("tax")), "levy": Data.num(hd.get("levy")), "fort": Data.num(hd.get("fort"))})
+		# постройки — с силой своего района (Districts)
 		for b in st.buildings:
 			var bd: Variant = game.content.get_def("buildings", b)
 			if bd != null:
-				add_into(out, bd.get("modifiers"))
+				add_into_scaled(out, bd.get("modifiers"), Districts.building_scale(game, prov_id, b))
 		for m in st.modifiers:
 			var md: Variant = game.content.get_def("modifiers", m.id)
 			if md != null:
@@ -551,7 +562,7 @@ static func building_owner_provider(game: Game, c: Dictionary) -> Variant:
 		for b in p.buildings:
 			var bd: Variant = game.content.get_def("buildings", b)
 			if bd != null:
-				add_into(out, bd.get("owner_modifiers"))
+				add_into_scaled(out, bd.get("owner_modifiers"), Districts.building_scale(game, county, b))
 	return out
 
 

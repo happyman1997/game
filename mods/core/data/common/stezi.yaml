@@ -200,11 +200,16 @@ decisions:
     ai_check_months: 12
     ai_will_do: { value: 0, if: { limit: { gold: ">= 650" }, add: 40 } }
 
-  # Казначей: ломбардский заём — золото сейчас, проценты потом
+  # Казначей: ломбардский заём — золото сейчас, проценты потом. Тот же заём
+  # открывает Меняльный двор в домене (районы, common/economy.yaml).
   take_loan:
     category: stezi
     icon: "🏦"
-    is_shown: { is_ruler: yes, has_perk: lombard_loan }
+    is_shown:
+      is_ruler: yes
+      OR:
+        - has_perk: lombard_loan
+        - any_domain_province: { has_building: money_changer }
     is_valid:
       custom_tooltip:
         text: ui.loan_unpaid

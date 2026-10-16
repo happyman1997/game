@@ -669,6 +669,13 @@ func province_tooltip(id: String) -> String:
 		if def.get("terrain") != null:
 			info.append(g.name_of("terrain", def.terrain))
 		parts.append(BB.muted(" · ".join(info)))
+		# районы поселения: «Детинец II · Торговый посад I»
+		if Districts.on(g) and st.get("districts") is Dictionary and not st.districts.is_empty():
+			var ds := PackedStringArray()
+			for d in Districts.all_defs(g):
+				if st.districts.has(d.id):
+					ds.append("%s %s" % [g.name_of("districts", d.id), Districts.roman(int(st.districts[d.id]))])
+			parts.append(BB.gold(" · ".join(ds)))
 	var reg := g.engine.ui.map_modes
 	if reg.has(map_view.mode):
 		var spec: Dictionary = reg.get_item(map_view.mode)

@@ -20,6 +20,7 @@ buildings:
   tilting_yard:
     category: military
     icon: "🎠"
+    district: citadel          # стоит в детинце (механика районов) — бонусы × сила района
     holding: castle
     cost: { gold: 90 }
     days: 200

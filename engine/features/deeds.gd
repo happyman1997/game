@@ -183,6 +183,10 @@ func install(engine: GameEngine) -> void:
 		if p.get("by") != null:
 			sig.call(p.game, "building", str(p.by))
 	, 0, OWNER)
+	H.on("district.completed", func(p):
+		if p.get("by") != null:
+			sig.call(p.game, "building", str(p.by))
+	, 0, OWNER)
 	H.on("lands.converted", func(p): sig.call(p.game, "conversion", p.holder), 0, OWNER)
 	H.on("scheme.ended", func(p):
 		if p.success:

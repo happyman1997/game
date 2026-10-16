@@ -12,75 +12,282 @@ holdings:
   city:   { icon: "🏙", tax: 1.0, levy: 80, fort: 1 }
   temple: { icon: "⛪", tax: 0.5, levy: 60, fort: 1 }
 
-# Постройки: modifiers — для провинции (tax_mult, levy_mult, fort, development_growth),
-# owner_modifiers — для владельца графства.
+# Постройки. Большинство стоит в районах графства (district — см.
+# common/districts.yaml): район даёт места, а его сила (уровень × место)
+# умножает modifiers (графству) и owner_modifiers (владельцу). level: N —
+# нужен район не ниже уровня N. yearly — эффект раз в год владельцу
+# (scope:province, scope:power — сила района). Без district — старые места
+# по владениям (buildings.slots_per_holding).
 buildings:
+  # ---------------------------------------------------------- Детинец
   walls:
+    district: citadel
     category: fortification
-    icon: "🧱"
-    holding: castle
+    icon: walls
     cost: { gold: 120 }
     days: 365
     modifiers: { fort: 2 }
+    ai_will_do: { value: 10, if: { limit: { is_at_war: yes }, add: 10 } }
   barracks:
+    district: citadel
     category: military
-    icon: "🛡"
-    holding: castle
+    icon: barracks
     cost: { gold: 100 }
     days: 300
-    modifiers: { levy_mult: 0.3 }
+    modifiers: { levy_mult: 0.25 }
   training_grounds:
+    district: citadel
+    level: 2
     category: military
-    icon: "🎯"
-    holding: castle
+    icon: tournament
     requires: [barracks]
     cost: { gold: 160 }
     days: 400
-    modifiers: { levy_mult: 0.2 }
-    owner_modifiers: { commander_advantage: 3, prowess: 1 }
-  farms:
-    category: economy
-    icon: "🌾"
+    modifiers: { levy_mult: 0.15 }
+    owner_modifiers: { commander_advantage: 3, knight_effectiveness: 0.05 }
+  # Каменный мешок: каждый узник в темнице даёт больше страха
+  dungeon:
+    district: citadel
+    category: military
+    icon: grate
+    cost: { gold: 90 }
+    days: 240
+    modifiers: { county_opinion: -2 }
+    owner_modifiers: { dread_per_prisoner: 0.5 }
+    ai_will_do: { value: 2, add: { value: ai_cruelty, multiply: 4 } }
+  # Сторожевая башня: крепость графства и стойкость столицы в осаде
+  watchtower:
+    district: citadel
+    category: fortification
+    icon: tower
     cost: { gold: 80 }
     days: 240
-    modifiers: { tax_mult: 0.15, development_growth: 0.05 }
+    modifiers: { fort: 1 }
+    owner_modifiers: { capital_defense: 0.1 }
+  # Подземный ход: уйти из павшей крепости и из чужой темницы
+  secret_passage:
+    district: citadel
+    level: 2
+    category: fortification
+    icon: tunnel
+    cost: { gold: 120 }
+    days: 360
+    owner_modifiers: { secret_passages: 0.1 }
+    ai_will_do: 4
+
+  # ---------------------------------------------------------- Торговый посад
   market:
+    district: market
     category: economy
-    icon: "⚖"
-    holding: city
+    icon: stall
     cost: { gold: 110 }
     days: 300
-    modifiers: { tax_mult: 0.3 }
+    modifiers: { tax_mult: 0.25 }
+    ai_will_do: 14
   guild_hall:
+    district: market
+    level: 2
     category: economy
-    icon: "🏛"
-    holding: city
+    icon: guild
     requires: [market]
     cost: { gold: 200 }
     days: 450
-    modifiers: { tax_mult: 0.35, development_growth: 0.05 }
+    modifiers: { tax_mult: 0.3, development_growth: 0.04 }
+    ai_will_do: 12
+  # Ярмарочное поле: торг раз в год — золото по силе посада (торговые пути
+  # соседей её растят), а с купцами порой заезжает торговец редкостями
+  fairground:
+    district: market
+    category: economy
+    icon: tent
+    cost: { gold: 120 }
+    days: 300
+    modifiers: { county_opinion: 2 }
+    yearly:
+      - save_scope_value_as: { name: fair_gold, value: { value: scope:power, multiply: 5, round: yes } }
+      - add_gold: scope:fair_gold
+      - send_message: { text: msg.fair_income, kind: good }
+      - random:
+          chance: { value: scope:power, multiply: 8 }
+          trigger_event: artifact.0001
+    ai_will_do: 10
+  # Меняльный двор: дешевле стройки и заказы мастерам; открывает ссуду у менял
+  money_changer:
+    district: market
+    category: economy
+    icon: gold
+    cost: { gold: 140 }
+    days: 360
+    owner_modifiers: { build_cost_mult: -0.04, commission_cost_mult: -0.05 }
+    ai_will_do: { value: 6, if: { limit: { ai_greed: ">= 1" }, add: 6 } }
+
+  # ---------------------------------------------------------- Соборная сторона
   monastery:
+    district: temple_quarter
     category: faith
-    icon: "📿"
-    holding: temple
+    icon: monastery
     cost: { gold: 100 }
     days: 300
     modifiers: { tax_mult: 0.1 }
     owner_modifiers: { monthly_piety: 0.3, learning: 1 }
   cathedral:
+    district: temple_quarter
+    level: 2
     category: faith
-    icon: "⛪"
-    holding: temple
+    icon: cathedral
     requires: [monastery]
     cost: { gold: 250 }
     days: 600
     modifiers: { development_growth: 0.05 }
     owner_modifiers: { monthly_piety: 0.6, monthly_prestige: 0.3 }
+  # Странноприимный дом: призрение сирых — Свет на душу владельца каждый год
+  hospice:
+    district: temple_quarter
+    category: faith
+    icon: heart
+    cost: { gold: 100 }
+    days: 300
+    modifiers: { county_opinion: 3 }
+    owner_modifiers: { stress_gain_mult: -0.03 }
+    yearly:
+      - add_karma: { value: { value: scope:power, multiply: 2 }, quiet: yes }
+    ai_will_do: { value: 6, add: { value: ai_compassion, multiply: 3 } }
+  # Скрипторий: книжники учат детей двора и самого правителя
+  scriptorium:
+    district: temple_quarter
+    category: faith
+    icon: book
+    cost: { gold: 110 }
+    days: 300
+    owner_modifiers: { education_gain_mult: 0.08, lifestyle_xp_mult: 0.03 }
+  # Рака: паломники к мощам — благочестие и подаяния; у кого в сокровищнице
+  # реликварий, к тому идут вдвое охотнее
+  reliquary:
+    district: temple_quarter
+    level: 2
+    category: faith
+    icon: reliquary
+    requires: [cathedral]
+    cost: { gold: 200 }
+    days: 480
+    yearly:
+      - add_piety: { value: scope:power, multiply: 8 }
+      - save_scope_value_as:
+          name: pilgrim_gold
+          value:
+            value: 2
+            if: { limit: { has_artifact_type: reliquary }, add: 4 }
+            multiply: scope:power
+            round: yes
+      - add_gold: scope:pilgrim_gold
+      - send_message: { text: msg.pilgrims, kind: good }
+    ai_will_do: { value: 6, add: { value: ai_zeal, multiply: 3 } }
+
+  # ---------------------------------------------------------- Угодья
+  farms:
+    district: fields
+    category: economy
+    icon: wheat
+    cost: { gold: 80 }
+    days: 240
+    modifiers: { tax_mult: 0.15, development_growth: 0.05 }
+    ai_will_do: 14
   hunting_grounds:
+    district: fields
     category: other
-    icon: "🦌"
+    icon: antlers
     cost: { gold: 70 }
     days: 200
     trigger: { OR: [{ terrain: forest }, { terrain: hills }] }
-    modifiers: {}
     owner_modifiers: { prowess: 1, stress_gain_mult: -0.05 }
+  # Житница: сытое графство быстрее покоряется и реже шлёт ходоков
+  granary:
+    district: fields
+    category: economy
+    icon: granary
+    cost: { gold: 90 }
+    days: 270
+    modifiers: { county_opinion: 1 }
+    owner_modifiers: { control_gain: 0.2, complaint_mult: -0.05 }
+  # Конный завод: войско ходит быстрее и добивает бегущих
+  stud_farm:
+    district: fields
+    level: 2
+    category: military
+    icon: horse
+    cost: { gold: 150 }
+    days: 420
+    owner_modifiers: { march_speed: 0.04, pursuit: 0.05 }
+  # Обозный двор: запасы на поход — меньше потерь в Пепелище и диких землях
+  supply_depot:
+    district: fields
+    category: military
+    icon: bag
+    cost: { gold: 90 }
+    days: 240
+    owner_modifiers: { attrition_mult: -0.1 }
+    ai_will_do: 4
+
+  # ---------------------------------------------------------- Ремесленная слобода
+  forge:
+    district: crafts
+    category: military
+    icon: anvil
+    cost: { gold: 130 }
+    days: 360
+    owner_modifiers: { regiment_power: 0.04, army_upkeep_mult: -0.03 }
+  # Артель зодчих: строят быстрее, а крепости домена — прочнее
+  masons:
+    district: crafts
+    category: economy
+    icon: hammer
+    cost: { gold: 120 }
+    days: 330
+    owner_modifiers: { build_time_mult: -0.08, domain_fort: 0.5 }
+  # Златокузня: заказы мастерам дешевле, а вещи выходят редкостнее
+  goldsmith:
+    district: crafts
+    level: 2
+    category: economy
+    icon: ring
+    cost: { gold: 180 }
+    days: 450
+    owner_modifiers: { commission_cost_mult: -0.08, commission_quality: 0.05 }
+
+  # ---------------------------------------------------------- Пристань
+  # Причалы: пошлины с кораблей раз в год
+  docks:
+    district: harbor
+    category: economy
+    icon: anchor
+    cost: { gold: 110 }
+    days: 300
+    modifiers: { tax_mult: 0.15 }
+    yearly:
+      - add_gold: { value: scope:power, multiply: 3 }
+    ai_will_do: 12
+  salt_works:
+    district: harbor
+    category: economy
+    icon: salt
+    cost: { gold: 100 }
+    days: 300
+    modifiers: { tax_mult: 0.2 }
+  # Верфь: войско переправляется морем — быстрее походы и осады с воды
+  shipyard:
+    district: harbor
+    level: 2
+    category: military
+    icon: ship
+    cost: { gold: 200 }
+    days: 480
+    owner_modifiers: { march_speed: 0.04, siege_speed: 0.05 }
+  lighthouse:
+    district: harbor
+    level: 2
+    category: other
+    icon: lighthouse
+    cost: { gold: 180 }
+    days: 450
+    modifiers: { development_growth: 0.05, county_opinion: 2 }
+    owner_modifiers: { monthly_prestige: 0.2 }

@@ -47,6 +47,7 @@
 | `has_champion` | character | За персонажа в поединке бьётся поборник | core/duels |
 | `has_claim_on` | character | Есть претензия на титул | core |
 | `has_council_task` | character | Сюзерен: на какой-то должности выбрана задача (или одна из списка) | core/council |
+| `has_district` | province | В графстве есть район (не ниже уровня): has_district: market или { district: market, level: 2 } | core/districts |
 | `has_dynasty_legacy` | character | Род персонажа открыл наследие: has_dynasty_legacy: <id> | core/dynasties |
 | `has_flag` | character | Есть флаг | core |
 | `has_focus` | character | Выбран фокус образа жизни | core/lifestyles |
@@ -293,6 +294,7 @@
 | `seize_primary_title` | Забрать основной титул персонажа (претендент): прежний владелец становится вассалом | core/factions |
 | `seize_realm_artifacts` | Забрать спорные реликвии из державы персонажа from: seize_realm_artifacts: scope:defender | core/artifacts |
 | `send_message` | Сообщение игроку (если этот персонаж — игрок) | core |
+| `set_district_level` | Поднять (или снести) район графства: set_district_level: { district: market, level: 2 } (0 — снести вместе с постройками) | core/districts |
 | `set_education_focus` | Направление воспитания: set_education_focus: martial | core/upbringing |
 | `set_faith_heresy` | Объявить культ ересью или снять ересь: set_faith_heresy: { faith: wolf_cult \| synod_target_faith, heretic: yes, years: 20 } (years: 0 — бессрочно) | core/temple |
 | `set_flag` | Установить флаг: name или { name, days/months/years } | core |
@@ -384,6 +386,8 @@
 | `deeds_whispers` | character | Деяния: whispers | core/deeds |
 | `development` | province | Развитие провинции | core |
 | `diplomacy` | character | Навык: diplomacy | core |
+| `district_level` | province | Уровень района графства: district_level(market) | core/districts |
+| `district_power` | province | Сила района графства: district_power(market) | core/districts |
 | `domain_limit` | character | Лимит домена | core |
 | `dread` | character | Страх, который внушает правитель (0–100) | core/politics |
 | `dread_tier_level` | character | Номер ступени страха правителя (0 — нижняя) | core/politics |
@@ -427,6 +431,7 @@
 | `num_counties` | character | Графств в домене | core |
 | `num_courtiers` | character | Число придворных | core |
 | `num_de_jure_counties` | title | Де-юре графств в титуле | core |
+| `num_districts` | province | Сумма уровней районов графства | core/districts |
 | `num_dynasty_legacies` | character | Открыто наследий у рода | core/dynasties |
 | `num_equipped_artifacts` | character | Число надетых вещей и убранства двора | core/artifacts |
 | `num_faction_counties` | faction | Графств в народной фракции | core/populace |
@@ -624,6 +629,7 @@
 | `karma` | Свет и Пепел: карма от деяний, ступени, Последнее на весах | да |
 | `temple` | Вера: добродетели и грехи культов, глава веры | да |
 | `synod` | Собор: голосование единоверцев по вопросам веры, указы | да |
+| `districts` | Районы графства: кварталы с уровнями, сила района масштабирует постройки | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -633,9 +639,9 @@
 - **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `heretic_realm`, `faction`, `artifact_holder`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`, `own_artifacts`, `claimed_artifacts`
 - **interaction_deciders**: `payer`
-- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `synod_decrees`, `grafts`, `plague_fear`
-- **province_modifier_providers**: `lands`, `populace`, `governments`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `synod_decrees`, `districts`, `grafts`, `plague_fear`
+- **province_modifier_providers**: `lands`, `populace`, `governments`, `districts`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `faith_morals`, `faith_head`, `arcana_faith`, `grafts`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`, `karma`, `synod`
-- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`, `karma`, `synod`, `districts`
+- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

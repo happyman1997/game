@@ -94,6 +94,25 @@ static func register_builtin(engine: GameEngine) -> void:
 			if Wars.is_allied(g, pl.id, top.id):
 				return "#4a78c0"
 			return "#8a857a"})
+	# Застройка (механика districts): сумма уровней районов и постройки графства
+	if engine.has_feature("districts"):
+		add.call("districts", {"name": "ui.mapmode.districts", "icon": "castle", "order": 45,
+			"color": func(g: Game, p: String):
+				var st: Variant = g.prov(p)
+				if st == null or g.title(p) == null:
+					return null
+				var lv := 0
+				for did in st.get("districts", {}):
+					lv += int(st.districts[did])
+				return gradient_color(["#eadfc4", "#dcb86a", "#b06a2c", "#5c2814"], (lv + st.buildings.size() * 0.7) / 14.0),
+			"tooltip": func(g: Game, p: String):
+				var st: Variant = g.prov(p)
+				if st == null:
+					return null
+				var lv := 0
+				for did in st.get("districts", {}):
+					lv += int(st.districts[did])
+				return g.loc.t("ui.districts_total", {"n": lv, "b": st.buildings.size()})})
 	# Режимы из данных: map_modes { value, min, max, gradient }
 	for mm in engine.content.all("map_modes"):
 		if reg.has(mm.id):

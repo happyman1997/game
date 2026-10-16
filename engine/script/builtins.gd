@@ -1026,12 +1026,17 @@ static func _register_effects(engine: GameEngine) -> void:
 		var p: Variant = ctx.game.state.provinces.get(s.id)
 		if p != null and not p.buildings.has(arg):
 			p.buildings.append(arg)
+			# постройке района нужен сам район
+			if ctx.game.engine.has_feature("districts"):
+				Districts.ensure(ctx.game, s.id)
+			ctx.game.state["build_ver"] = int(ctx.game.state.get("build_ver", 0)) + 1
 			ctx.game.stat_cache.clear()
 	, func(ctx, s, arg): return _t(ctx.game, "fx.add_building", {"place": ctx.game.scope_name(s), "value": ctx.game.name_of("buildings", arg)}))
 	eff.call("remove_building", PROV, "Убрать постройку", func(ctx, s, arg):
 		var p: Variant = ctx.game.state.provinces.get(s.id)
 		if p != null:
 			p.buildings = p.buildings.filter(func(b): return b != arg)
+		ctx.game.state["build_ver"] = int(ctx.game.state.get("build_ver", 0)) + 1
 		ctx.game.stat_cache.clear()
 	)
 	eff.call("add_province_modifier", PROV, "Модификатор провинции", func(ctx, s, arg):

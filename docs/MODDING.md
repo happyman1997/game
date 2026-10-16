@@ -162,7 +162,7 @@ defines:
 | `traits` | `core/data/common/traits.yaml` | Черты: `category`, `icon`, `modifiers`, `opposites`, `compatibility`, `genetic`/`birth_chance`/`inherit_chance`, `education`, `ai`, `monthly_death_chance`, `monthly_cure_chance`, `duration_days`, `group`, `color` (цвет плашки), `concealed` (скрытая черта — см. «Крюки и секреты»), `portrait` (как черта меняет портрет — см. ниже). |
 | `cultures` | `core/data/common/cultures.yaml` | `color`, `male_names`, `female_names`, `dynasty_pattern` (`name`/`place`), `succession_law`, `skin`/`hair`, `modifiers`, `traits` (врождённые черты всех людей этой культуры — например, раса `dwarf`), `government` (правление по умолчанию). |
 | `faiths` | там же | `religion`, `color`, `icon`, `doctrines` (`polygamy`, `divorce: approval`), `virtues`, `sins` (единоверцы того же культа судят по ним правителя — см. «Храм»), `head_title` (титул главы веры), `heretic` (еретический культ), `modifiers`, `no_holy_war_with` (религии, с которыми эта вера не ведёт священных войн — в обе стороны). Священная война возможна против другой религии, а внутри своей — только против еретика: последователя культа с `heretic: yes` или персонажа с чертой или модификатором `heretic: yes` (условие `is_heretic`; в ядре — Восточный обряд, раскрытый договор с Князем Пепла и изгнание из Света `cast_out_of_light`); еретик — законная цель даже для единоверца. В базовой игре весь мир исповедует одну религию `solar` (Вера Солнечного Императора), а веры — её культы. |
-| `terrain`, `holdings`, `buildings` | `core/data/common/economy.yaml` | Местность (оборона, скорость, высота рельефа, `attrition` — потери армий в месяц), владения (налог, ополчение, крепость), постройки (`holding`, `requires`, `cost`, `days`, `modifiers`, `owner_modifiers`, `trigger`; `special: yes` — особая постройка: не строится и не занимает места, её дают графству данные карты или эффект `add_building`, а действует она на того, кто держит графство). |
+| `terrain`, `holdings`, `buildings` | `core/data/common/economy.yaml` | Местность (оборона, скорость, высота рельефа, `attrition` — потери армий в месяц), владения (налог, ополчение, крепость), постройки (`holding`, `requires`, `cost`, `days`, `modifiers`, `owner_modifiers`, `trigger`; `district` и `level` — район, в котором стоит постройка, и его нужный уровень; `yearly` — эффект раз в год, см. «Районы»; `special: yes` — особая постройка: не строится и не занимает места, её дают графству данные карты или эффект `add_building`, а действует она на того, кто держит графство). |
 | `map`, `landmasses`, `provinces`, `map_links` | `core/data/map/` | Карта — см. раздел 7. |
 | `titles` | `core/data/map/titles.yaml` | Иерархия де-юре: `tier`, `liege`, `color`, `capital`, `coa` (герб), `no_create`. Графства создаются из провинций автоматически. |
 | `dynasties`, `characters`, `bookmarks` | `core/data/history/` | Исторические персонажи и стартовые даты. |
@@ -267,6 +267,7 @@ events:
 | `on_siege_won` | тот, чья армия взяла крепость | `scope:province`, `scope:war`, `scope:defender` |
 | `on_duel_won` | победившая в поединке сторона (до гибели бойца) | `scope:loser` |
 | `on_building_completed` | тот, кто заказал постройку | `scope:province` |
+| `on_district_completed` | тот, кто заложил или поднял район | `scope:province` |
 | `on_war_won` | победитель войны | `scope:enemy` — побеждённый |
 | `on_scheme_discovered` | цель раскрытой враждебной интриги | `scope:plotter`, `scope:scheme` |
 | `on_councillor_pulse` | советник (раз в месяц) | `scope:liege` |
@@ -1437,6 +1438,63 @@ synod_questions:
 `ai.war_will` (множитель желания ИИ воевать); on_actions `on_synod_called`,
 `on_synod_result`. В ядре шесть вопросов: анафема культу, примирение с
 ересью, Божий мир, десятина, отлучение тирана и канонизация праведника.
+
+### Районы: поселение графства и сила построек
+
+Механика `districts` (данные — `core/data/common/districts.yaml`, постройки —
+`economy.yaml`). Поселение графства растёт **районами** с уровнями I–III. Район
+даёт места под свои постройки (`defines.districts.slots_by_level`) и **силу**:
+`level_power[уровень]` × множители места. Сила умножает числовые
+`modifiers` (графству) и `owner_modifiers` (владельцу) самого района и всех
+построек, что в нём стоят (флаги — как есть). Подсказка района показывает,
+из чего сложилась сила.
+
+```yaml
+districts:
+  market:
+    free_with: city            # район владения: уровень I даром, участок не занимает
+    trigger: { is_coastal: yes } # где можно заложить (графство; scope:builder)
+    cost: [120, 300, 700]      # цена уровней I, II, III (build_cost_mult)
+    days: [300, 540, 900]      # сроки (build_time_mult)
+    development: [0, 12, 20]   # нужное развитие графства
+    upkeep: [0, 0.25, 0.6]     # содержание в месяц (строка «Содержание районов»)
+    modifiers: { tax_mult: 0.05 }
+    owner_modifiers: {}
+    power:
+      - { kind: neighbors, district: market, per: 0.12, max: 0.6 } # торговые пути
+      - { kind: domain, district: harbor, per: 0.15, max: 0.6 }    # сеть домена
+      - { kind: terrain, mult: { farmlands: 1.5, hills: 0.8 } }
+      - { kind: coastal, mult: 1.2 }
+      - { kind: border, mult: 1.4 }       # граница с чужой (или ничейной) землёй
+      - { kind: trigger, limit: { has_holder_faith: no }, mult: 0.5, desc: ключ }
+    yearly: { ... }            # раз в год владельцу (scope:province, scope:power)
+    ai_will_do: 8              # root — строитель, scope:province
+buildings:
+  fairground:
+    district: market           # стоит в торговом посаде
+    level: 1                   # нужен посад не ниже I
+    yearly:                    # раз в год: root — владелец графства
+      - add_gold: { value: scope:power, multiply: 5 }
+```
+
+`neighbors` — +`per` за соседнее графство с таким районом, если владельцы не
+воюют; `domain` — за другое графство домена с таким районом; `trigger` —
+условие в графстве (`scope:owner` — владелец). Участков под районы, кроме
+районов владений, — `plots_base` + развитие × `plots_per_development`
+(не больше `max_plots`). Постройки без `district` занимают места по
+владениям, как прежде (`buildings.slots_per_holding`). Старые сохранения и
+стартовые постройки карты получают нужные районы сами.
+
+Скрипт: условие `has_district: market` или `{ district: market, level: 2 }`;
+значения `district_level(market)`, `district_power(market)`, `num_districts`;
+эффект `set_district_level: { district: market, level: 2 }` (0 — снести вместе
+с постройками). Хуки `district.started`, `district.completed`; on_action
+`on_district_completed`. ИИ выбирает между постройками и районами по весам
+(`ai_will_do`; поднять район он стремится, когда в нём тесно). На карте
+поселения видны по зуму: печати застроенных графств, вблизи — районы с
+уровнем и их постройки; режим карты «Застройка». В ядре шесть районов:
+детинец, торговый посад, соборная сторона, угодья, ремесленная слобода,
+пристань.
 
 ### Народ: мнение графств, контроль, народные фракции
 

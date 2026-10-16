@@ -1,0 +1,48 @@
+# Механика «Районы»: строки движка и интерфейса.
+district:
+  part:
+    level: "Уровень {n}"
+  factor:
+    terrain: "Местность: {terrain}"
+    coastal: У моря
+    border: Пограничье
+    neighbors: "Торговые пути: {district} у соседей — {n}"
+    domain: "Сеть домена: {district} — ещё {n}"
+  level_name:
+    "1": заложен
+    "2": разросся
+    "3": процветает
+ui:
+  districts: Поселение
+  district_power: "сила ×{value}"
+  district_power_tip: "Сила района умножает его бонусы и бонусы всех его построек."
+  district_slots: "Мест: {used}/{total}"
+  district_level: "{name} {level}"
+  plots: "Участков под районы: {used}/{total}"
+  plots_tip: "Районы от владений (замок, город, храм) даются даром. Остальные — на участки: один всегда и ещё по одному на каждые 10 развития."
+  district_upkeep: Содержание районов
+  found_district: Заложить район
+  upgrade_district: "Поднять до {level}"
+  no_plots: Нет свободного участка
+  district_needs_dev: "Нужно развитие {n}"
+  needs_district_level: "Нужен район «{district}» уровня {level}"
+  district_full: "В районе «{district}» нет мест"
+  district_buildings: Постройки района
+  district_base: Сам район
+  district_yearly: Раз в год
+  district_scaled: "С силой района ×{value}:"
+  district_empty_slot: Свободное место
+  other_buildings: Прочие постройки
+  special_buildings: Достопримечательности
+  mapmode:
+    districts: Застройка
+  districts_total: "Районов: {n}, построек: {b}"
+msg:
+  district_done: "Завершено строительство: {district} {level} в {place}."
+modsrc:
+  districts: Районы
+tr:
+  has_district: "В графстве есть район «{value}» (уровень {level} и выше)"
+fx:
+  set_district_level: "{place}: район «{value}» — уровень {level}"
+  raze_district: "{place}: район «{value}» снесён вместе с постройками"

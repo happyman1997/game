@@ -95,15 +95,21 @@ static func building_candidates(game: Game, c: Dictionary, prov_id: String) -> A
 	if p == null or pdef == null:
 		return []
 	var out := []
-	var used := Data.count(p.buildings, func(b): return not is_special_building(game, b))
+	# постройки без района — по старинке, места по владениям
+	var used := Data.count(p.buildings, func(b): return not is_special_building(game, b) and Districts.building_district(game, b) == null)
 	var full: bool = used >= building_slots(game, prov_id)
 	var holdings := Data.as_array(pdef.get("holdings"))
+	var districts_on := Districts.on(game)
 	for b in game.content.all("buildings"):
 		if p.buildings.has(b.id) or b.get("special", false):
 			continue
 		if b.get("holding") != null and not holdings.has(b.holding):
 			continue
 		if Data.as_array(b.get("requires")).any(func(r): return not p.buildings.has(r)):
+			continue
+		var did: Variant = Districts.building_district(game, b.id) if districts_on else null
+		# постройки района видны, когда район заложен
+		if did != null and Districts.level(game, prov_id, did) <= 0:
 			continue
 		var bl := []
 		var t: Variant = game.state.titles.get(prov_id)
@@ -113,7 +119,13 @@ static func building_candidates(game: Game, c: Dictionary, prov_id: String) -> A
 			bl.append(game.loc.t("ui.already_building"))
 		if p.occupant != null:
 			bl.append(game.loc.t("ui.occupied"))
-		if full:
+		if did != null:
+			var need := int(Data.num(b.get("level"), 1))
+			if Districts.level(game, prov_id, did) < need:
+				bl.append(game.loc.t("ui.needs_district_level", {"district": game.name_of("districts", did), "level": Districts.roman(need)}))
+			elif Districts.buildings_in(game, prov_id, did).size() >= Districts.slots(game, prov_id, did):
+				bl.append(game.loc.t("ui.district_full", {"district": game.name_of("districts", did)}))
+		elif full:
 			bl.append(game.loc.t("ui.no_slots"))
 		var ctx = ScriptContext.make(game, {"type": "province", "id": prov_id}, {"builder": {"type": "character", "id": c.id}})
 		bl.append_array(Interp.failed_triggers(ctx, ctx.root, b.get("trigger")))
@@ -145,7 +157,8 @@ static func start_building(game: Game, c: Dictionary, prov_id: String, building_
 	c.prestige -= cst.prestige
 	# build_time_mult — быстрее строят умелые управители (за очко управления)
 	var days := Data.num(cand.def.get("days"), 365) * maxf(0.3, 1.0 + Stats.stat(game, c, "build_time_mult"))
-	game.state.provinces[prov_id].construction = {"building": building_id, "done": game.date + int(days), "by": c.id}
+	game.state.provinces[prov_id].construction = {"building": building_id, "done": game.date + int(days), "days": int(days), "by": c.id}
+	game.state["build_ver"] = int(game.state.get("build_ver", 0)) + 1
 	game.emit("building.started", {"province": prov_id, "building": building_id, "by": c.id})
 	return true
 
@@ -154,10 +167,14 @@ static func daily_construction(game: Game) -> void:
 	for p in game.state.provinces.values():
 		if p.construction == null or p.construction.done > game.date:
 			continue
+		if p.construction.get("district") != null:
+			Districts.complete(game, p)
+			continue
 		var b: String = p.construction.building
 		var by: Variant = p.construction.get("by")
 		p.buildings.append(b)
 		p.construction = null
+		game.state["build_ver"] = int(game.state.get("build_ver", 0)) + 1
 		game.stat_cache.clear()
 		var t: Variant = game.state.titles.get(p.id)
 		game.message(game.loc.t("msg.building_done", {"building": game.name_of("buildings", b), "place": game.name_of("provinces", p.id)}), "good", {"type": "province", "id": p.id}, [t.holder if t != null else null])
@@ -166,10 +183,20 @@ static func daily_construction(game: Game) -> void:
 			game.on_action("on_building_completed", {"type": "character", "id": str(by)}, {"province": {"type": "province", "id": p.id}})
 
 
-## [{province, def}]
+## Название того, что строится в графстве (постройка или район с уровнем).
+static func construction_name(game: Game, cons: Dictionary) -> String:
+	if cons.get("district") != null:
+		return "%s %s" % [game.name_of("districts", str(cons.district)), Districts.roman(int(cons.get("level", 1)))]
+	return game.name_of("buildings", str(cons.get("building", "")))
+
+
+## [{province, def}] — что ИИ может начать строить сейчас (графства без стройки).
 static func domain_build_options(game: Game, c: Dictionary) -> Array:
 	var out := []
 	for p in Titles.domain_counties(game, c):
+		var st: Variant = game.state.provinces.get(p)
+		if st == null or st.construction != null or st.occupant != null:
+			continue
 		for x in building_candidates(game, c, p):
 			if x.blockers.is_empty():
 				out.append({"province": p, "def": x.def})
