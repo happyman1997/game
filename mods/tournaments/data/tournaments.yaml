@@ -20,6 +20,7 @@ buildings:
   tilting_yard:
     category: military
     icon: "🎠"
+    map_sprite: yard
     district: citadel          # стоит в детинце (механика районов) — бонусы × сила района
     holding: castle
     cost: { gold: 90 }

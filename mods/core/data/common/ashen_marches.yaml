@@ -77,41 +77,49 @@ buildings:
   imperial_regalia:
     special: true
     icon: "👑"
+    map_sprite: palace
     modifiers: { tax_mult: 0.1 }
     owner_modifiers: { monthly_prestige: 1.5, vassal_opinion: 10 }
   wolf_hall:
     special: true
     icon: "🐺"
+    map_sprite: longhouse
     modifiers: { levy_mult: 0.25 }
     owner_modifiers: { knight_cap: 2, knight_effectiveness: 0.15, prowess: 2 }
   mercenary_market:
     special: true
     icon: "💰"
+    map_sprite: tents
     modifiers: { tax_mult: 0.3 }
     owner_modifiers: { army_upkeep_mult: -0.15, regiment_power: 0.1 }
   border_citadel:
     special: true
     icon: "🏯"
+    map_sprite: castle
     modifiers: { fort: 4 }
     owner_modifiers: { domain_fort: 1, commander_advantage: 2 }
   ash_citadel:
     special: true
     icon: "🛡"
+    map_sprite: castle
     modifiers: { fort: 3 }
     owner_modifiers: { monthly_piety: 1, knight_effectiveness: 0.1 }
   great_dike:
     special: true
     icon: "🌊"
+    map_sprite: dike
     modifiers: { tax_mult: 0.2, development_growth: 0.1 }
     owner_modifiers: { county_opinion: 5 }
   deep_forges:
     special: true
     icon: "⚒"
+    map_sprite: great_foundry
     modifiers: { tax_mult: 0.3, fort: 2 }
     owner_modifiers: { build_cost_mult: -0.1, regiment_power: 0.1 }
   burnt_palace:
     special: true
     icon: "🏚"
+    map_sprite: ruin
     owner_modifiers: { monthly_prestige: 2 }
 
 regiment_types:

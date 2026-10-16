@@ -11,6 +11,7 @@ buildings:
     district: citadel
     category: military
     icon: swords
+    map_sprite: armory
     cost: { gold: 110 }
     days: 300
     modifiers: { levy_mult: 0.1 }
@@ -20,6 +21,7 @@ buildings:
     district: citadel
     category: military
     icon: gallows
+    map_sprite: gallows
     cost: { gold: 80 }
     days: 180
     modifiers: { county_opinion: -3 }
@@ -32,6 +34,7 @@ buildings:
     level: 2
     category: other
     icon: goblet
+    map_sprite: great_hall
     cost: { gold: 180 }
     days: 450
     owner_modifiers: { vassal_opinion: 2, monthly_prestige: 0.2 }
@@ -41,6 +44,7 @@ buildings:
     level: 3
     category: fortification
     icon: tower
+    map_sprite: keep
     requires: [walls]
     cost: { gold: 260 }
     days: 600
@@ -53,6 +57,7 @@ buildings:
     district: market
     category: economy
     icon: bag
+    map_sprite: inn
     cost: { gold: 120 }
     days: 300
     modifiers: { tax_mult: 0.08 }
@@ -65,6 +70,7 @@ buildings:
     district: market
     category: other
     icon: bath
+    map_sprite: bath
     cost: { gold: 80 }
     days: 200
     modifiers: { county_opinion: 1 }
@@ -77,6 +83,7 @@ buildings:
     scale: no
     category: economy
     icon: coins
+    map_sprite: mint
     requires: [guild_hall]
     cost: { gold: 500 }
     days: 720
@@ -89,6 +96,7 @@ buildings:
     district: temple_quarter
     category: faith
     icon: bell
+    map_sprite: belfry
     cost: { gold: 90 }
     days: 240
     modifiers: { county_opinion: 2, levy_mult: 0.05 }
@@ -99,6 +107,7 @@ buildings:
     level: 2
     category: faith
     icon: scroll
+    map_sprite: sun_school
     cost: { gold: 180 }
     days: 420
     owner_modifiers: { learning: 1, ward_education_mult: 0.1, lifestyle_xp_mult: 0.03 }
@@ -108,6 +117,8 @@ buildings:
     district: fields
     category: economy
     icon: grapes
+    map_sprite: none
+    map_feature: vineyard
     trigger: { OR: [ { terrain: farmlands }, { terrain: plains }, { terrain: hills } ] }
     cost: { gold: 100 }
     days: 300
@@ -117,6 +128,8 @@ buildings:
     district: fields
     category: economy
     icon: tree
+    map_sprite: none
+    map_feature: orchard
     cost: { gold: 70 }
     days: 240
     modifiers: { development_growth: 0.04, county_opinion: 1 }
@@ -124,6 +137,8 @@ buildings:
     district: fields
     category: economy
     icon: sheep
+    map_sprite: none
+    map_feature: flock
     trigger: { OR: [ { terrain: hills }, { terrain: plains } ] }
     cost: { gold: 80 }
     days: 240
@@ -134,6 +149,7 @@ buildings:
     district: crafts
     category: military
     icon: armor
+    map_sprite: tannery
     cost: { gold: 100 }
     days: 270
     modifiers: { tax_mult: 0.08 }
@@ -142,6 +158,7 @@ buildings:
     district: crafts
     category: economy
     icon: tapestry
+    map_sprite: weavers
     cost: { gold: 110 }
     days: 300
     modifiers: { tax_mult: 0.15 }
@@ -151,6 +168,7 @@ buildings:
     level: 2
     category: military
     icon: catapult
+    map_sprite: trebuchet
     cost: { gold: 170 }
     days: 420
     owner_modifiers: { siege_speed: 0.08 }
@@ -160,6 +178,8 @@ buildings:
     district: harbor
     category: economy
     icon: fish
+    map_sprite: fish_rack
+    map_feature: skiffs
     cost: { gold: 80 }
     days: 240
     modifiers: { tax_mult: 0.1, development_growth: 0.02, county_opinion: 1 }
@@ -169,6 +189,7 @@ buildings:
     level: 2
     category: economy
     icon: seal
+    map_sprite: customs
     cost: { gold: 160 }
     days: 360
     modifiers: { tax_mult: 0.25, county_opinion: -2 }
@@ -179,6 +200,7 @@ buildings:
     district: citadel
     category: military
     icon: axe
+    map_sprite: longhouse
     trigger: { culture: [norse, danish, swedish] }
     cost: { gold: 90 }
     days: 240
@@ -189,6 +211,8 @@ buildings:
     district: fields
     category: economy
     icon: waves
+    map_sprite: windmill
+    map_feature: polders
     trigger: { terrain: wetlands }
     cost: { gold: 110 }
     days: 360
@@ -198,6 +222,7 @@ buildings:
     district: crafts
     category: economy
     icon: pickaxe
+    map_sprite: mine
     trigger: { OR: [ { terrain: hills }, { terrain: mountains } ] }
     cost: { gold: 130 }
     days: 360
@@ -209,6 +234,7 @@ buildings:
     district: citadel
     category: fortification
     icon: ash
+    map_sprite: beacon
     trigger: { any_neighbor: { terrain: ash } }
     cost: { gold: 100 }
     days: 300
@@ -219,6 +245,7 @@ buildings:
     district: temple_quarter
     category: faith
     icon: wolf
+    map_sprite: stones
     trigger: { faith: wolf_cult }
     cost: { gold: 90 }
     days: 240
@@ -228,6 +255,7 @@ buildings:
     district: temple_quarter
     category: faith
     icon: pillars
+    map_sprite: pillared
     trigger: { faith: ancestor_cult }
     cost: { gold: 120 }
     days: 300
@@ -237,6 +265,7 @@ buildings:
     district: temple_quarter
     category: faith
     icon: church
+    map_sprite: onion
     trigger: { faith: east_rite }
     cost: { gold: 90 }
     days: 240
@@ -252,6 +281,7 @@ buildings:
     scale: no
     category: faith
     icon: piety
+    map_sprite: sun_cathedral
     requires: [cathedral]
     trigger: { scope:builder: { religion: solar, tier: ">= 3" } }
     cost: { gold: 1500 }
@@ -267,6 +297,7 @@ buildings:
     scale: no
     category: other
     icon: book
+    map_sprite: university
     requires: [scriptorium]
     trigger: { scope:builder: { tier: ">= 2" } }
     cost: { gold: 900 }
@@ -281,6 +312,7 @@ buildings:
     scale: no
     category: economy
     icon: stall
+    map_sprite: great_bazaar
     requires: [fairground]
     trigger: { scope:builder: { tier: ">= 3" } }
     cost: { gold: 1200 }
@@ -299,6 +331,7 @@ buildings:
     scale: no
     category: fortification
     icon: walls
+    map_sprite: wall_gate
     requires: [walls]
     cost: { gold: 1000 }
     days: 1440
@@ -318,6 +351,7 @@ buildings:
     scale: no
     category: other
     icon: scales
+    map_sprite: justice_hall
     requires: [great_hall]
     trigger: { scope:builder: { tier: ">= 2" } }
     cost: { gold: 900 }
@@ -332,6 +366,8 @@ buildings:
     scale: no
     category: military
     icon: horse
+    map_sprite: royal_stables
+    map_feature: paddock
     requires: [stud_farm]
     cost: { gold: 800 }
     days: 1080
@@ -345,6 +381,7 @@ buildings:
     scale: no
     category: military
     icon: anvil
+    map_sprite: great_foundry
     requires: [forge]
     cost: { gold: 1000 }
     days: 1200
@@ -358,6 +395,7 @@ buildings:
     scale: no
     category: other
     icon: lighthouse
+    map_sprite: great_lighthouse
     requires: [lighthouse]
     trigger: { scope:builder: { tier: ">= 3" } }
     cost: { gold: 1200 }

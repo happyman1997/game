@@ -93,6 +93,7 @@ func _ready() -> void:
 	map_view.army_clicked.connect(func(id): locked(select_army.bind(id)))
 	map_view.tooltip_provider = province_tooltip
 	map_view.overlay.army_tooltip = army_tooltip
+	map_view.overlay.building_tooltip = building_tooltip
 	# звуки и анимации интерфейса: кнопки, окна, переходы
 	UiFx.install(self)
 	boot.call_deferred()
@@ -703,6 +704,26 @@ func character_tooltip(id: Variant) -> String:
 	if p != null and p.id != c.id and c.death == null:
 		parts.append("%s: %s" % [t("ui.opinion_of_you"), BB.signed(Opinion.opinion(g, c, p))])
 	return "\n".join(parts)
+
+
+## Подсказка постройки, нарисованной на карте: постройка (с силой района)
+## или район (замок, ратуша, храм).
+func building_tooltip(hit: Dictionary) -> String:
+	var g := game
+	if g == null or g.prov(hit.province) == null:
+		return ""
+	var pid: String = hit.province
+	var head := BB.muted(g.name_of("provinces", pid))
+	var b: String = hit.building
+	if b != "" and g.content.get_def("buildings", b) != null:
+		return SettlementPanel.building_tip(self, pid, b, Districts.building_scale(g, pid, b) if g.engine.has_feature("districts") else 1.0) + "\n" + head
+	var did: String = hit.district
+	var d: Variant = g.content.get_def("districts", did) if did != "" else null
+	if d != null and g.engine.has_feature("districts"):
+		var lvl := Districts.level(g, pid, did)
+		if lvl > 0:
+			return SettlementPanel.district_tip(self, pid, d, lvl) + "\n" + head
+	return ""
 
 
 func army_tooltip(id: Variant) -> String:

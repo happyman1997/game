@@ -194,6 +194,7 @@ buildings:
   mage_tower:
     category: arcane
     icon: "🗼"
+    map_sprite: mage_tower
     district: citadel
     level: 2
     holding: castle
@@ -209,6 +210,7 @@ buildings:
   warden_lodge:
     category: arcane
     icon: eye
+    map_sprite: lodge
     district: citadel
     cost: { gold: 120 }
     days: 300
@@ -217,6 +219,7 @@ buildings:
   crypt:
     category: arcane
     icon: skull
+    map_sprite: mausoleum
     district: temple_quarter
     level: 2
     cost: { gold: 160 }

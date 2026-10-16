@@ -55,6 +55,8 @@ var sim: SimRunner
 ## Державы: индекс → {owner, area, cx, cy, ...}; провинция → индекс державы.
 var realm_of := PackedInt32Array()
 var realms: Array = []
+## Цвет державы (верховного сюзерена) по провинциям — для флагов на карте.
+var prov_color := PackedColorArray()
 
 static var _static_cache := {}
 
@@ -212,6 +214,9 @@ func recolor() -> void:
 	realm_of = PackedInt32Array()
 	realm_of.resize(P)
 	realm_of.fill(-1)
+	prov_color.resize(P)
+	prov_color.fill(Color("#9a8a70"))
+	var top_col := {}
 	realms = []
 	var realm_ids := {}
 	var sub_ids := {}
@@ -237,6 +242,10 @@ func recolor() -> void:
 					realms.append({"owner": top.id, "area": 0.0, "provs": []})
 				realm = realm_ids[top.id]
 				realm_of[i] = realm
+				if not top_col.has(top.id):
+					var td: Variant = g.title_def(top.titles[0]) if not top.titles.is_empty() else null
+					top_col[top.id] = Color(td.color) if td != null and td.get("color") is String else Color("#9a8a70")
+				prov_color[i] = top_col[top.id]
 				realms[realm].area += map.areas[i]
 				realms[realm].provs.append(i)
 				var s: Dictionary = holder
@@ -572,4 +581,9 @@ func _tooltip() -> Variant:
 	var army: Variant = overlay.army_at(get_local_mouse_position())
 	if army != null and overlay.army_tooltip.is_valid():
 		return overlay.army_tooltip.call(army)
+	var hit: Variant = overlay.building_at(get_local_mouse_position())
+	if hit != null and overlay.building_tooltip.is_valid():
+		var tip: Variant = overlay.building_tooltip.call(hit)
+		if tip != null and str(tip) != "":
+			return tip
 	return tooltip_provider.call(map.provinces[hover])

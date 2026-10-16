@@ -1,8 +1,8 @@
 class_name MapOverlay
 extends Control
-## Слой поверх карты: подписи держав (по дуге), поселения графств с их
-## районами и постройками, названия графств при приближении, армии, осады,
-## путь выбранной армии.
+## Слой поверх карты: подписи держав (по дуге), поселения графств — вблизи
+## нарисованные прямо на местности, в режиме «Застройка» — схемой районов,
+## названия графств при приближении, армии, осады, путь выбранной армии.
 
 var view: MapView
 var labels: Array = []
@@ -26,6 +26,7 @@ func _draw() -> void:
 	_draw_labels()
 	var snap := _snapshot()
 	_name_below.clear()
+	_hits.clear()
 	_draw_settlements(snap)
 	_draw_county_names()
 	_draw_sieges(snap)
@@ -237,7 +238,8 @@ static func settlements_of(g: Game) -> Dictionary:
 		var levels := 0
 		for x in dl:
 			levels += int(x[1])
-		out[p.id] = {"main": main, "districts": dl, "bmap": bmap, "special": special, "great": great, "other": other, "levels": levels, "count": p.buildings.size()}
+		out[p.id] = {"main": main, "districts": dl, "bmap": bmap, "special": special, "great": great, "other": other, "levels": levels, "count": p.buildings.size(),
+			"holdings": hs, "dev": int(Data.num(p.get("development"))), "terrain": str(pd.get("terrain", "")) if pd != null else ""}
 	_settle_key = key
 	_settle_data = out
 	return out
@@ -284,7 +286,12 @@ func _draw_settlements(snap: Dictionary) -> void:
 	if z < 1.25:
 		_draw_landmarks(data)
 		return
+	if not dmode and z >= TOWN_ZOOM:
+		_draw_towns(data, builds)
+		if z >= TOWN_ZOOM + 0.25:
+			return
 	var sc := clampf(view.zoom / 3.2, 0.9, 1.7)
+	var seal_a := 1.0 if dmode else 1.0 - smoothstep(TOWN_ZOOM, TOWN_ZOOM + 0.25, z)
 	for i in m.provinces.size():
 		var pid: String = m.provinces[i]
 		var s: Variant = data.get(pid)
@@ -294,10 +301,10 @@ func _draw_settlements(snap: Dictionary) -> void:
 		if c.x < -120 or c.y < -140 or c.x > size.x + 120 or c.y > size.y + 120:
 			continue
 		var span := sqrt(float(m.areas[i])) * view.zoom
-		if z >= 3.0 and span >= 70.0:
+		if dmode and z >= 3.0 and span >= 70.0:
 			_name_below[i] = _draw_vignette(g, s, c, builds.get(pid), z >= 3.6 and span >= 100.0, sc)
 		elif span >= 26.0 and (dmode or _developed(s) or builds.has(pid)):
-			_draw_seal(g, s, c + Vector2(0, -12), builds.get(pid))
+			_draw_seal(g, s, c + Vector2(0, -12), builds.get(pid), seal_a)
 
 
 ## Застроено ли графство сверх того, что дали владения.
@@ -323,21 +330,29 @@ func _draw_landmarks(data: Dictionary) -> void:
 		var c := view.map_to_screen(m.center_of(pid)) + Vector2(0, -6)
 		if c.x < -20 or c.y < -20 or c.x > size.x + 20 or c.y > size.y + 20:
 			continue
+		var t := Time.get_ticks_msec() / 1000.0
 		for k in marks.size():
-			var mc := c + Vector2((k - (marks.size() - 1) / 2.0) * 19.0, 0)
-			var great: bool = k >= s.special.size()
-			draw_circle(mc + Vector2(1, 2), 8.5, Color(0, 0, 0, 0.45))
-			draw_circle(mc, 8.5, Color(0.12, 0.08, 0.04, 0.92))
-			if great:
-				draw_arc(mc, 10.5, 0, TAU, 28, Color(1.0, 0.85, 0.4, 0.35), 3.0, true)
-			draw_arc(mc, 8.5, 0, TAU, 24, Color("#ffd36a") if great else Color("#e8c060"), 1.6, true)
-			var icon := Icons.resolve(view.game.content.get_def("buildings", marks[k]).get("icon", "star"))
-			draw_texture(Icons.texture(icon if icon != "" else "star", 12), mc - Vector2(6, 6))
+			var mc := c + Vector2((k - (marks.size() - 1) / 2.0) * 22.0, 10)
+			var nm := MapArt.for_building(view.game.content.get_def("buildings", marks[k]))
+			if nm == "none":
+				continue
+			var sp := MapArt.spec(nm)
+			var h := 24.0
+			var w := h * float(sp.w) / float(sp.h)
+			var gs := h * 1.5 * (1.0 + 0.06 * sin(t * 2.0 + k))
+			draw_texture_rect(MapArt.glow(), Rect2(mc - Vector2(gs, gs * 1.3) * 0.5 - Vector2(0, h * 0.4), Vector2(gs, gs * 1.3)), false, Color(1, 1, 1, 0.75))
+			draw_texture_rect(MapArt.shadow(), Rect2(mc - Vector2(w * 0.6, w * 0.13), Vector2(w * 1.2, w * 0.26)), false)
+			draw_texture_rect(MapArt.texture(nm, h), Rect2(mc - Vector2(w / 2, h), Vector2(w, h)), false)
 
 
 ## Печать поселения: герб владения в круге, по нижней дуге — точки районов
 ## (цвет района, размер — уровень); кольцо с молоточком — идёт стройка.
-func _draw_seal(g: Game, s: Dictionary, c: Vector2, build: Variant) -> void:
+func _draw_seal(g: Game, s: Dictionary, c: Vector2, build: Variant, alpha := 1.0) -> void:
+	if alpha <= 0.01:
+		return
+	if alpha < 0.99:
+		draw_set_transform(c, 0.0, Vector2.ONE * (0.6 + 0.4 * alpha))
+		c = Vector2.ZERO
 	var r := 10.0
 	draw_circle(c + Vector2(1, 2), r + 1, Color(0, 0, 0, 0.42))
 	draw_circle(c, r, Color(0.11, 0.08, 0.05, 0.9))
@@ -361,6 +376,7 @@ func _draw_seal(g: Game, s: Dictionary, c: Vector2, build: Variant) -> void:
 		draw_circle(bp, 6.5, Color(0.1, 0.07, 0.04, 0.92))
 		draw_arc(bp, 6.5, -PI / 2, -PI / 2 + TAU * float(build.progress), 16, Color("#ffcc55"), 1.8, true)
 		draw_texture(Icons.texture("hammer", 9, "silver"), bp - Vector2(4.5, 4.5))
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 ## Поселение вблизи: силуэт главного владения (чем застроеннее графство, тем
@@ -442,6 +458,213 @@ func _draw_vignette(g: Game, s: Dictionary, c: Vector2, build: Variant, with_bui
 		var ssz := roundi(13 * sc)
 		draw_texture(Icons.texture("scaffold", ssz, "silver"), bp - Vector2(ssz, ssz) * 0.5)
 	return c.y + height * 0.5
+
+
+# ------------------------------------------------------------ поселения на местности
+# Вне режима «Застройка» поселение рисуется прямо на земле графства
+# (TownLayout, рисунки — MapArt): с TOWN_ZOOM видно главное — замок, ратушу,
+# храм и великие стройки; ближе — постройки районов, стены, поля и пристань;
+# ещё ближе — дома, сады, стада и лодки. Дым из труб, крылья мельниц, огни
+# маяков и флаги держав движутся.
+
+const TOWN_ZOOM := 1.8
+const PRIO_ZOOM := [1.8, 2.5, 3.3]
+const MIN_PX := [16.0, 10.0, 6.0]
+
+## Подсказка постройки на карте: Callable({province, building, district}) -> String.
+var building_tooltip: Callable
+var _layouts := {}
+var _layout_map: MapData
+var _hits: Array = []
+var _layout_budget := 0
+
+
+static func _sig(s: Dictionary) -> String:
+	return var_to_str([s.districts, s.bmap, s.other, s.special, s.get("holdings", []), int(s.get("dev", 0)) / 5])
+
+
+## Раскладка поселения из кэша; новых — не больше нескольких за кадр.
+func _layout(g: Game, i: int, pid: String, s: Dictionary, cons: Variant) -> Variant:
+	var ck := "" if cons == null else "%s|%s|%d" % [cons.get("building"), cons.get("district"), int(cons.get("level", 0))]
+	var e: Variant = _layouts.get(pid)
+	if e != null and e.ck == ck:
+		if is_same(e.s, s):
+			return e.lay
+		if e.sig == _sig(s):
+			e.s = s
+			return e.lay
+	if _layout_budget <= 0:
+		return e.lay if e != null else null
+	_layout_budget -= 1
+	var lay := TownLayout.build(g, view.map, i, s, cons)
+	_layouts[pid] = {"s": s, "ck": ck, "sig": _sig(s), "lay": lay}
+	if e == null:
+		queue_redraw()
+	return lay
+
+
+func _draw_towns(data: Dictionary, builds: Dictionary) -> void:
+	var m := view.map
+	var g := view.game
+	var z := view.zoom
+	var t := Time.get_ticks_msec() / 1000.0
+	var alpha := [smoothstep(PRIO_ZOOM[0], PRIO_ZOOM[0] + 0.3, z), smoothstep(PRIO_ZOOM[1], PRIO_ZOOM[1] + 0.4, z), smoothstep(PRIO_ZOOM[2], PRIO_ZOOM[2] + 0.5, z)]
+	if _layout_map != m:
+		_layouts.clear()
+		_layout_map = m
+	_layout_budget = 10
+	for i in m.provinces.size():
+		var pid: String = m.provinces[i]
+		var s: Variant = data.get(pid)
+		if s == null:
+			continue
+		var c := view.map_to_screen(Vector2(m.centers[i * 2], m.centers[i * 2 + 1]))
+		var rr := sqrt(float(m.areas[i]) / PI) * z * 1.5 + 60.0
+		if c.x < -rr or c.y < -rr or c.x > size.x + rr or c.y > size.y + rr:
+			continue
+		var lay: Variant = _layout(g, i, pid, s, builds.get(pid))
+		if lay == null:
+			continue
+		_draw_ground(lay.ground, alpha[1], z)
+		var col: Color = view.prov_color[i] if i < view.prov_color.size() else Color("#c0483a")
+		var cons: Variant = builds.get(pid)
+		var list: Array = lay.items1 if alpha[1] <= 0.01 else (lay.items2 if alpha[2] <= 0.01 else lay.items)
+		for it in list:
+			var a: float = alpha[int(it.prio) - 1]
+			if a <= 0.01:
+				continue
+			if it.kind == "wall":
+				_draw_wall(it, a)
+			else:
+				_draw_item(pid, it, a, z, t, col, cons)
+		if alpha[0] > 0.5:
+			_name_below[i] = view.map_to_screen(Vector2(0, lay.bottom)).y + 2.0
+
+
+## Земля поселения (поля, виноградники, загоны, мостки) — сетка в
+## координатах карты, рисуется с преобразованием вида.
+func _draw_ground(gm: Dictionary, a: float, z: float) -> void:
+	if a <= 0.01 or gm.idx.is_empty():
+		return
+	var cols: PackedColorArray = gm.cols
+	var lc: PackedColorArray = gm.lc
+	if a < 0.99:
+		cols = cols.duplicate()
+		for j in cols.size():
+			cols[j].a *= a
+		lc = lc.duplicate()
+		for j in lc.size():
+			lc[j].a *= a
+	draw_set_transform(-view.origin * z, 0.0, Vector2(z, z))
+	RenderingServer.canvas_item_add_triangle_array(get_canvas_item(), gm.idx, gm.pts, cols)
+	if not gm.lp.is_empty():
+		draw_multiline_colors(gm.lp, lc, -1.0)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+## Отрезок городской стены: каменная кладка с зубцами.
+func _draw_wall(it: Dictionary, a: float) -> void:
+	var p0 := view.map_to_screen(it.a)
+	var p1 := view.map_to_screen(it.b)
+	var w := maxf(2.0, float(it.w) * view.zoom)
+	var up := Vector2(0, -w * 1.3)
+	var ink := Color(0.17, 0.11, 0.06, a)
+	draw_line(p0 + Vector2(0, w * 0.4), p1 + Vector2(0, w * 0.4), Color(0.05, 0.03, 0.01, 0.35 * a), w * 1.2)
+	var q := PackedVector2Array([p0, p1, p1 + up, p0 + up])
+	draw_colored_polygon(q, Color(0.78, 0.73, 0.62, a))
+	draw_polyline(PackedVector2Array([p0, p1, p1 + up, p0 + up, p0]), ink, 1.0, true)
+	draw_dashed_line(p0 + up * 1.15, p1 + up * 1.15, Color(0.70, 0.65, 0.55, a), w * 0.45, maxf(2.0, w * 0.55))
+
+
+func _draw_item(pid: String, it: Dictionary, a: float, z: float, t: float, flag_col: Color, cons: Variant) -> void:
+	var base: Vector2 = (it.pos - view.origin) * z
+	var h: float = float(it.h) * z
+	if h < MIN_PX[int(it.prio) - 1]:
+		h = MIN_PX[int(it.prio) - 1]
+	if base.x < -h * 3.0 or base.x > size.x + h * 3.0 or base.y < -10.0 or base.y > size.y + h:
+		return
+	# рисунок и его текстура нужного размера — в самой раскладке
+	var sp: Variant = it.get("_sp")
+	if sp == null:
+		sp = MapArt.spec(it.sprite)
+		it["_sp"] = sp
+		it["_ar"] = float(sp.w) / float(sp.h)
+		it["_bk"] = -1
+		it["_fx"] = sp.has("flag") or sp.has("smoke") or sp.has("lamp") or sp.has("hub") or it.has("scaffold")
+	var w: float = h * float(it._ar)
+	var bk := MapArt.bucket(h)
+	if bk != it._bk:
+		it["_bk"] = bk
+		it["_tex"] = MapArt.texture(it.sprite, h)
+	if it.has("bob"):
+		base.y += sin(t * 1.6 + float(it.bob)) * h * 0.04
+	var mod := Color(1, 1, 1, a)
+	if it.get("great", false):
+		var gs := h * 1.8 * (1.0 + 0.05 * sin(t * 2.0))
+		draw_texture_rect(MapArt.glow(), Rect2(base - Vector2(gs * 0.5, gs * 0.5 + h * 0.45), Vector2(gs, gs)), false, Color(1, 1, 1, a * 0.85))
+	if h >= 14.0:
+		draw_texture_rect(MapArt.shadow(), Rect2(base - Vector2(w * 0.58, w * 0.12), Vector2(w * 1.16, w * 0.24)), false, mod)
+	var rect := Rect2(base - Vector2(w * 0.5, h), Vector2(w, h))
+	draw_texture_rect(it._tex, rect, false, mod)
+	if a > 0.5 and (it.b != "" or it.d != ""):
+		_hits.append([rect, pid, it.b, it.d])
+	# флаги, дым, огни и крылья мельниц — когда их видно
+	if not it._fx or h < 20.0:
+		return
+	var ks := h / float(sp.h)
+	var ink := Color(0.17, 0.11, 0.06, a)
+	# флаг державы на древке
+	if it.get("flag", false) and sp.has("flag"):
+		var fp: Vector2 = rect.position + sp.flag * ks
+		var fw := maxf(5.0, 7.0 * ks)
+		var wave := sin(t * 3.0 + base.x * 0.1) * fw * 0.15
+		var fl := PackedVector2Array([fp, fp + Vector2(fw, fw * 0.3 + wave), fp + Vector2(0, fw * 0.62)])
+		draw_colored_polygon(fl, Color(flag_col, a))
+		draw_polyline(PackedVector2Array([fl[0], fl[1], fl[2]]), ink, 1.0, true)
+	# дым из труб
+	if sp.has("smoke"):
+		for sm in sp.smoke:
+			var o: Vector2 = rect.position + sm * ks
+			for j in 3:
+				var ph := fmod(t * 0.3 + j / 3.0 + base.x * 0.013, 1.0)
+				var pr := (1.0 + ph * 2.6) * ks
+				draw_circle(o + Vector2(sin(ph * 4.0 + j) * ks * 1.5 + ph * ks * 3.0, -ph * h * 0.5), pr, Color(0.86, 0.84, 0.8, (1.0 - ph) * 0.5 * a))
+	# огонь маяка, жаровни, окна башни мага
+	if sp.has("lamp"):
+		var lp: Vector2 = rect.position + sp.lamp[0] * ks
+		var lc: Color = sp.lamp[1]
+		var pulse := 0.85 + 0.15 * sin(t * 3.0 + base.x)
+		draw_circle(lp, 6.0 * ks * pulse, Color(lc, 0.16 * a))
+		draw_circle(lp, 3.0 * ks * pulse, Color(lc, 0.32 * a))
+	# крылья мельницы
+	if sp.has("hub"):
+		var hp: Vector2 = rect.position + sp.hub * ks
+		var L := 11.0 * ks
+		var ang := t * 1.2 + base.x * 0.05
+		for j in 4:
+			var d := Vector2.from_angle(ang + j * PI / 2.0)
+			var nrm := Vector2(-d.y, d.x)
+			var q := PackedVector2Array([hp + d * L * 0.2, hp + d * L, hp + d * L + nrm * L * 0.3, hp + d * L * 0.2 + nrm * L * 0.3])
+			draw_colored_polygon(q, Color(0.93, 0.89, 0.8, a))
+			draw_polyline(PackedVector2Array([q[0], q[1], q[2], q[3], q[0]]), ink, 1.0, true)
+			draw_line(hp, hp + d * L, Color(0.35, 0.22, 0.12, a), maxf(1.0, ks * 0.9))
+		draw_circle(hp, maxf(1.5, ks * 1.2), ink)
+	# готовность стройки
+	if it.get("scaffold", false) and cons is Dictionary:
+		var bw := w * 0.8
+		var br := Rect2(base + Vector2(-bw * 0.5, 3.0), Vector2(bw, maxf(3.0, ks * 1.5)))
+		draw_rect(br.grow(1.0), Color(0.1, 0.07, 0.04, 0.9 * a))
+		draw_rect(Rect2(br.position, Vector2(bw * float(cons.get("progress", 0.0)), br.size.y)), Color(1.0, 0.8, 0.33, a))
+
+
+## Постройка под точкой экрана: {province, building, district} или null.
+func building_at(pos: Vector2) -> Variant:
+	for j in range(_hits.size() - 1, -1, -1):
+		var hit: Array = _hits[j]
+		var r: Rect2 = hit[0]
+		if r.grow_individual(-r.size.x * 0.15, -r.size.y * 0.05, -r.size.x * 0.15, 0).has_point(pos):
+			return {"province": hit[1], "building": hit[2], "district": hit[3]}
+	return null
 
 
 func _snapshot() -> Dictionary:
