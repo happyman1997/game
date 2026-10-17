@@ -252,7 +252,7 @@ static func inherit(game: Game, c: Dictionary) -> Variant:
 	Data.sort_by(order, func(t): return Titles.tier_of(game, t), true)
 	for t in order:
 		Titles.transfer_title(game, t, distribution[t], primary.id)
-	primary.gold += c.gold
+	Treasury.add(game, primary, float(c.gold), "inheritance")
 	c.gold = 0.0
 
 	# Сюзеренитет наследников.

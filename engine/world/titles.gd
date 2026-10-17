@@ -339,7 +339,7 @@ static func create_title(game: Game, c: Dictionary, title_id: String) -> bool:
 	if not game.engine.hooks.veto("title.create", {"game": game, "character": c, "title": title_id}):
 		return false
 	var cost := title_action_cost(game, title_id, "create")
-	c.gold -= cost.gold
+	Treasury.add(game, c, -cost.gold, "titles")
 	c.prestige -= cost.prestige
 	transfer_title(game, title_id, c.id)
 	game.message(game.loc.t("msg.title_created", {"who": game.scope_name({"type": "character", "id": c.id}), "title": full_name(game, title_id)}), "good", {"type": "title", "id": title_id})
@@ -357,7 +357,7 @@ static func usurp_title(game: Game, c: Dictionary, title_id: String) -> bool:
 		return false
 	var old: Dictionary = game.ch(game.state.titles[title_id].holder)
 	var cost := title_action_cost(game, title_id, "usurp")
-	c.gold -= cost.gold
+	Treasury.add(game, c, -cost.gold, "titles")
 	c.prestige -= cost.prestige
 	transfer_title(game, title_id, c.id)
 	game.message(

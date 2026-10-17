@@ -62,10 +62,11 @@ static func _upkeep_month(game: Game) -> void:
 ## правителя, доход безземельных, снятие стресса.
 static func _economy_char(game: Game, c: Dictionary) -> void:
 	if not c.titles.is_empty():
-		var gold := Economy.monthly_income(game, c)
+		# каждая строка дохода — своя статья в книге казны
+		for part in Economy.income_breakdown(game, c):
+			Treasury.add(game, c, Data.num(part.value), str(part.get("key", "other_income")), true)
 		var prestige := Economy.monthly_prestige(game, c)
 		var piety := Economy.monthly_piety(game, c)
-		c.gold += gold
 		c.prestige += prestige
 		c.piety += piety
 		if c.dynasty != null and prestige > 0:
@@ -73,7 +74,7 @@ static func _economy_char(game: Game, c: Dictionary) -> void:
 	else:
 		var flat := Stats.stat(game, c, "monthly_income")
 		if flat != 0.0:
-			c.gold += flat
+			Treasury.add(game, c, flat, "other_income", true)
 	if c.stress > 0:
 		c.stress = maxf(0.0, float(c.stress) - game.def_num("character.stress_decay", 2))
 	var lvl = floori(float(c.stress) / 100.0)

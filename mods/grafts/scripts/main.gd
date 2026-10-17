@@ -117,7 +117,7 @@ static func install(game: Game, c: Dictionary, gid: String, free: bool = false) 
 		return ""
 	var d: Dictionary = def_of(game, gid)
 	if not free:
-		c.gold = float(c.gold) - Data.num(d.get("price"))
+		Treasury.add(game, c, -Data.num(d.get("price")), "grafts")
 	var st: Dictionary = state_of(game).grafts
 	if not st.has(c.id):
 		st[c.id] = []
@@ -152,7 +152,7 @@ static func remove(game: Game, c: Dictionary, gid: String, paid: bool = false) -
 			if paid:
 				if float(c.gold) < removal_cost(game):
 					return false
-				c.gold = float(c.gold) - removal_cost(game)
+				Treasury.add(game, c, -removal_cost(game), "grafts")
 			list.remove_at(i)
 			if list.is_empty():
 				state_of(game).grafts.erase(c.id)
@@ -172,7 +172,7 @@ static func exorcism_cost(game: Game) -> float:
 static func exorcise(game: Game, c: Dictionary) -> bool:
 	if not c.traits.has("iron_possession") or float(c.gold) < exorcism_cost(game):
 		return false
-	c.gold = float(c.gold) - exorcism_cost(game)
+	Treasury.add(game, c, -exorcism_cost(game), "grafts")
 	Chars.remove_trait(game, c, "iron_possession")
 	c.piety = float(c.piety) + 20.0
 	Chars.change_stress(game, c, 10, "grafts")

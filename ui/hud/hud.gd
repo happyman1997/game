@@ -230,6 +230,22 @@ func live_window() -> void:
 	_refresh_window(false)
 
 
+## Щелчок по золоту: вкладка «Казна» окна «Держава» (повторный — закрыть).
+func _open_treasury() -> void:
+	var pl: Variant = app.game.player if app.game != null else null
+	if pl == null or pl.titles.is_empty():
+		return
+	var open: bool = app.panel_ref != null and app.panel_ref.kind == "tab" and app.panel_ref.id == "realm"
+	if open and app.subtab("realm", "") == "treasury":
+		app.close_panel()
+		return
+	app.subtabs["realm"] = "treasury"
+	if open:
+		app.mark_dirty(true)
+	else:
+		app.open_panel({"kind": "tab", "id": "realm"})
+
+
 ## Подсказка престижа или благочестия: уровень славы (механика renown).
 func _renown_tip(p: Variant, kind: String) -> String:
 	var bb := BB.title(t("ui." + kind))
@@ -245,7 +261,8 @@ func _refresh_resources(p: Variant) -> void:
 		var income := Economy.monthly_income(g, p)
 		items.append(["gold", K.fmt(p.gold), K.signed(income, 1), income >= 0, func():
 			var pl: Variant = app.game.player
-			return BB.title(t("ui.gold")) + ("\n" + BB.breakdown(Economy.income_breakdown(app.game, pl), 1) if pl != null else "")])
+			return BB.title(t("ui.gold")) + ("\n" + BB.breakdown(Economy.income_breakdown(app.game, pl), 1) if pl != null else "") \
+				+ ("\n" + BB.muted(t("ui.treasury_tip")) if pl != null and not pl.titles.is_empty() else ""), _open_treasury])
 		var mp := Economy.monthly_prestige(g, p)
 		items.append(["prestige", K.fmt(p.prestige), K.signed(mp, 1), mp >= 0, func(): return _renown_tip(app.game.player, "prestige")])
 		var pi := Economy.monthly_piety(g, p)
@@ -272,7 +289,10 @@ func _refresh_resources(p: Variant) -> void:
 	_res_sig = sig
 	K.clear(resources)
 	for it in items:
-		resources.add_child(_res(it[0], it[1], it[2], it[3], it[4]))
+		var row := _res(it[0], it[1], it[2], it[3], it[4])
+		if it.size() > 5 and it[5] is Callable:
+			K.on_click(row, it[5])
+		resources.add_child(row)
 
 
 func _res(icon_name: Variant, value: String, delta: String, positive: bool, tip_content: Variant) -> Control:

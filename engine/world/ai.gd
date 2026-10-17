@@ -379,7 +379,8 @@ static func _consider_interactions(game: Game, c: Dictionary) -> void:
 					elif Interactions.hook_available(game, def, c, r) and will >= game.def_num("ai.use_hook_on_player_min_will", 60):
 						args["use_hook"] = true
 					best = {"r": r, "args": args, "score": will}
-		if best != null and game.rng.next() * 100.0 < minf(game.def_num("ai.max_interaction_chance", 90), best.score):
+		if best != null and game.rng.next() * 100.0 < minf(game.def_num("ai.max_interaction_chance", 90), best.score) \
+				and can_spend(game, c, Interactions.cost(game, def, Interactions.context(game, def, c, best.r, best.args)).gold):
 			Interactions.execute(game, def, c, best.r, best.args)
 	_arrange_marriages(game, c)
 
@@ -493,7 +494,7 @@ static func _consider_decisions(game: Game, c: Dictionary) -> void:
 			if w > 0.0:
 				cands.append([def, w])
 		var pick: Variant = game.rng.weighted(cands, func(x): return x[1])
-		if pick != null and game.rng.next() * 100.0 < pick[1]:
+		if pick != null and game.rng.next() * 100.0 < pick[1] and can_spend(game, c, Decisions.cost(game, pick[0], c).gold):
 			Decisions.take(game, pick[0], c)
 	for def in split[0]:
 		var months := Data.num(def.get("ai_check_months"), 6)
@@ -512,7 +513,7 @@ static func _consider_decisions(game: Game, c: Dictionary) -> void:
 		if has_personality:
 			will += Personality.ai_will_shift(game, c, str(def.id))
 		will += trial_shift
-		if game.rng.next() * 100.0 < will:
+		if game.rng.next() * 100.0 < will and can_spend(game, c, Decisions.cost(game, def, c).gold):
 			Decisions.take(game, def, c)
 
 
@@ -536,16 +537,27 @@ static func _consider_titles(game: Game, c: Dictionary) -> void:
 
 static func _consider_building(game: Game, c: Dictionary) -> void:
 	var reserve = game.def_num("ai.gold_reserve", 60)
-	if c.gold < reserve:
+	# копилка: есть цель — копим на неё, а набрав — строим
+	var gl: Variant = goal_of(game, c)
+	if gl != null:
+		var stale: bool = game.date - int(gl.get("since", game.date)) > roundi(game.def_num("ai.goal_months", 48) * 30.4)
+		if stale or not _goal_ok(game, c, gl):
+			c.vars.erase("ai_goal")
+		else:
+			if float(c.gold) >= float(gl.cost) + reserve and _start_goal(game, c, gl):
+				c.vars.erase("ai_goal")
+			return
+	var income := Economy.monthly_income(game, c)
+	if c.gold < reserve and income <= 0.0:
 		return
 	# богатый строит охотнее: золото не должно лежать мёртвым грузом
 	var rich := game.def_num("ai.rich_gold", 400)
 	var chance := game.def_num("ai.build_chance", 0.3) * (1.0 + maxf(0.0, float(c.gold) - rich) / rich)
 	if not game.rng.chance(minf(1.0, chance)):
 		return
-	var opts := Decisions.domain_build_options(game, c).filter(func(o):
-		var cost: Variant = o.def.get("cost")
-		return (Data.num(cost.get("gold")) if cost is Dictionary else 0.0) + reserve <= c.gold)
+	# выбор — из досягаемого: что по карману сейчас или за ai.save_months дохода
+	var reach := float(c.gold) + maxf(0.0, income) * game.def_num("ai.save_months", 24)
+	var opts := Decisions.domain_build_options(game, c, true).filter(func(o): return float(o.cost.gold) + reserve <= reach)
 	# вес постройки — её ai_will_do (root — строитель, scope:province), по умолчанию 10
 	for o in opts:
 		var ai: Variant = o.def.get("ai_will_do")
@@ -555,16 +567,77 @@ static func _consider_building(game: Game, c: Dictionary) -> void:
 			var actx := ScriptContext.make(game, {"type": "character", "id": c.id}, {"province": {"type": "province", "id": o.province}})
 			o["weight"] = Interp.eval_value(actx, actx.root, ai)
 	# районы: заложить новый или поднять тесный (Districts.domain_options)
-	for o in Districts.domain_options(game, c):
-		if float(o.cost.gold) + reserve <= c.gold:
-			opts.append(o)
+	for o in Districts.domain_options(game, c, reach - reserve):
+		opts.append(o)
+	# долгое ожидание немного отбивает охоту: лучше то, что ближе
+	for o in opts:
+		var wait := maxf(0.0, float(o.cost.gold) + reserve - float(c.gold)) / maxf(0.5, income)
+		o.weight = float(o.weight) / (1.0 + wait / 24.0)
 	var pick: Variant = game.rng.weighted(opts, func(o): return o.weight)
 	if pick == null:
 		return
-	if pick.has("level"):
-		Districts.start(game, c, pick.province, pick.def.id)
+	var goal := {"kind": "district" if pick.has("level") else "building", "id": str(pick.def.id), "province": str(pick.province),
+		"level": int(pick.get("level", 0)), "cost": float(pick.cost.gold), "since": game.date}
+	if float(pick.cost.gold) + reserve <= float(c.gold):
+		_start_goal(game, c, goal)
 	else:
-		Decisions.start_building(game, c, pick.province, pick.def.id)
+		c.vars["ai_goal"] = goal
+
+
+# ------------------------------------------------------------ копилка
+# ИИ копит на стройку, которая ему нужна, а не берёт самое дешёвое из того,
+# что по карману. Пока копит, прочие крупные траты (решения, предложения,
+# найм отрядов, заказ вещей) не трогают отложенное — мелочь можно.
+
+## Цель копилки: {kind: building|district, id, province, level, cost, since} или null.
+static func goal_of(_game: Game, c: Dictionary) -> Variant:
+	var gl: Variant = c.vars.get("ai_goal")
+	return gl if gl is Dictionary else null
+
+
+static func goal_name(game: Game, gl: Dictionary) -> String:
+	var what := game.name_of("buildings", str(gl.id)) if gl.kind == "building" \
+		else "%s %s" % [game.name_of("districts", str(gl.id)), Districts.roman(int(gl.level))]
+	return "%s (%s)" % [what, game.name_of("provinces", str(gl.province))]
+
+
+## Может ли ИИ потратить amount, не трогая отложенного на цель. Мелочь — до
+## ai.petty_spend или двух месячных доходов — можно всегда.
+static func can_spend(game: Game, c: Dictionary, amount: float) -> bool:
+	if amount <= 0.0:
+		return true
+	var gl: Variant = goal_of(game, c)
+	if gl == null or float(c.gold) - amount >= float(gl.cost):
+		return true
+	return amount <= maxf(game.def_num("ai.petty_spend", 10), Economy.monthly_income(game, c) * 2.0)
+
+
+## Цель ещё достижима (графство в домене, не захвачено, постройка не стоит,
+## мешает только цена). Пока в графстве идёт другая стройка — ждём.
+static func _goal_ok(game: Game, c: Dictionary, gl: Dictionary) -> bool:
+	var pid := str(gl.province)
+	var p: Variant = game.state.provinces.get(pid)
+	if p == null or p.occupant != null or not Titles.domain_counties(game, c).has(pid):
+		return false
+	if gl.kind == "district":
+		return Districts.on(game) and Districts.level(game, pid, str(gl.id)) == int(gl.level) - 1
+	if p.buildings.has(gl.id):
+		return false
+	if p.construction != null:
+		return true
+	for x in Decisions.building_candidates(game, c, pid):
+		if x.def.id == gl.id:
+			if x.blockers.is_empty() or x.cost_only:
+				gl.cost = float(x.cost.gold)
+				return true
+			return false
+	return false
+
+
+static func _start_goal(game: Game, c: Dictionary, gl: Dictionary) -> bool:
+	if gl.kind == "district":
+		return Districts.start(game, c, str(gl.province), str(gl.id))
+	return Decisions.start_building(game, c, str(gl.province), str(gl.id))
 
 
 ## ИИ игрока-вассала: держит ли он сторону сюзерена (используется модами).

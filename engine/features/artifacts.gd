@@ -544,7 +544,7 @@ static func repair(game: Game, c: Dictionary, it: Dictionary) -> bool:
 	var cost := repair_cost(game, it)
 	if it.get("owner") != c.id or cost <= 0.0 or float(c.gold) < cost:
 		return false
-	c.gold = float(c.gold) - cost
+	Treasury.add(game, c, -cost, "artifacts")
 	it.durability = float(it.max_durability)
 	_history(it, game, "repaired", null, c.id)
 	game.mark_chars_dirty([c.id])
@@ -558,7 +558,7 @@ static func melt_value(game: Game, it: Dictionary) -> float:
 static func melt(game: Game, c: Dictionary, it: Dictionary) -> bool:
 	if it.get("owner") != c.id or is_unique(it):
 		return false
-	c.gold = float(c.gold) + melt_value(game, it)
+	Treasury.add(game, c, melt_value(game, it), "artifacts")
 	destroy(game, it.id, "melted")
 	return true
 
@@ -630,7 +630,7 @@ static func commission(game: Game, c: Dictionary, type: String, tier: String) ->
 	var td: Variant = game.content.get_def("commission_tiers", tier)
 	if td == null or not game.content.has("artifact_types", type) or not commission_blockers(game, c, tier).is_empty():
 		return false
-	c.gold = float(c.gold) - commission_cost(game, c, tier)
+	Treasury.add(game, c, -commission_cost(game, c, tier), "artifacts")
 	var months := Data.num(td.get("months"), 6)
 	c.vars["commission"] = {"type": type, "tier": tier, "start": game.date, "done": game.date + roundi(months * 30.4)}
 	game.mark_chars_dirty([c.id])
@@ -696,7 +696,7 @@ static func _ai_commission(game: Game, c: Dictionary) -> void:
 	for t in tiers:
 		if float(c.gold) >= commission_cost(game, c, str(t.id)) * 2.0 + _n(game, "ai_commission_reserve", 60):
 			best = t
-	if best == null:
+	if best == null or not Ai.can_spend(game, c, commission_cost(game, c, str(best.id))):
 		return
 	# что заказать: в пустой слот, иначе — что угодно
 	var empty := []

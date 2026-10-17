@@ -493,7 +493,7 @@ static func start(game: Game, c: Dictionary, prov_id: String, did: String) -> bo
 			cand = x
 	if cand == null or not cand.blockers.is_empty():
 		return false
-	c.gold -= cand.cost.gold
+	Treasury.add(game, c, -cand.cost.gold, "construction")
 	c.prestige -= cand.cost.prestige
 	game.state.provinces[prov_id].construction = {"district": did, "level": cand.level, "done": game.date + int(cand.days), "days": int(cand.days), "by": c.id}
 	mark(game)
@@ -609,9 +609,10 @@ static func _run_yearly(game: Game, h: Dictionary, prov_id: String, block: Varia
 
 # ------------------------------------------------------------ ИИ
 
-## Варианты стройки районов в домене для ИИ: [{province, def, level, cost, weight}].
+## Варианты стройки районов в домене для ИИ: [{province, def, level, cost, weight}];
+## max_gold — дороже не брать (по умолчанию — сколько есть в казне).
 ## Быстрый путь: без строк причин, только то, что можно начать сейчас.
-static func domain_options(game: Game, c: Dictionary) -> Array:
+static func domain_options(game: Game, c: Dictionary, max_gold := -1.0) -> Array:
 	var out := []
 	if not on(game):
 		return out
@@ -628,7 +629,7 @@ static func domain_options(game: Game, c: Dictionary) -> Array:
 			if target > top or Data.num(p.development) < _arr(d.get("development"), target):
 				continue
 			var gold := roundf(_arr(d.get("cost"), target) * mult)
-			if gold > float(c.gold):
+			if gold > (max_gold if max_gold >= 0.0 else float(c.gold)):
 				continue
 			if cur == 0:
 				if free < 0:
@@ -672,7 +673,7 @@ func install(engine: GameEngine) -> void:
 	# содержание районов — строка в доходах
 	engine.hooks.on("economy.income", func(p):
 		var v := Districts.upkeep(p.game, p.character)
-		return {"label": p.game.loc.t("ui.district_upkeep"), "value": -v} if v > 0.0 else null
+		return {"label": p.game.loc.t("ui.district_upkeep"), "value": -v, "key": "district_upkeep"} if v > 0.0 else null
 	, 0, OWNER)
 	engine.content_validators.register("districts", func(e: GameEngine, v: ScriptValidator) -> void:
 		for d in e.content.all("districts"):

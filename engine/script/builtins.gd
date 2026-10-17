@@ -653,7 +653,10 @@ static func _register_effects(engine: GameEngine) -> void:
 		var field: String = res[1]
 		ce.call(ename, "Изменить " + field, func(g, c, arg, ctx, s):
 			var v := _num(ctx, s, arg)
-			c[field] = float(c[field]) + v
+			if field == "gold":
+				Treasury.add(g, c, v, Treasury.cat_of_src(g, str(ctx.values.get("__src", ""))))
+			else:
+				c[field] = float(c[field]) + v
 			if field == "prestige" and c.dynasty != null and v > 0:
 				Chars.add_dynasty_renown(g, c.dynasty, v * g.def_num(share_key, 0.1))
 		, func(ctx, s, arg): return _t(ctx.game, "fx." + ename, {"value": signed(_num(ctx, s, arg))}))
@@ -952,8 +955,9 @@ static func _register_effects(engine: GameEngine) -> void:
 		var o: Variant = _target_char(ctx, s, arg.get("target"))
 		var v := _num(ctx, s, arg.get("value"))
 		if o != null:
-			c.gold -= v
-			o.gold += v
+			var cat := Treasury.cat_of_src(_g, str(ctx.values.get("__src", "")))
+			Treasury.add(_g, c, -v, cat)
+			Treasury.add(_g, o, v, cat)
 	, func(ctx, s, arg):
 		var o: Variant = _target_char(ctx, s, arg.get("target"))
 		return _t(ctx.game, "fx.pay_gold", {"value": roundi(_num(ctx, s, arg.get("value"))), "to": ctx.game.scope_name({"type": "character", "id": o.id})}) if o != null else null

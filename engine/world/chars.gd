@@ -497,6 +497,7 @@ static func new_character_record() -> Dictionary:
 		"pregnancy": null, "dna": {"skin": 0.5, "hair": 0.5, "eyes": 0.5, "face": 0.5},
 		"succession_law": null, "levy_ratio": 1.0,
 		"lifestyle": null, "council": null, "prison": null, "regiments": null, "secrets": null, "laws": null,
+		"ledger": null,
 	}
 
 

@@ -219,7 +219,7 @@ static func execute(game: Game, def: Dictionary, actor: Dictionary, recipient: D
 	var ctx := context(game, def, actor, recipient, args)
 	ctx.values["__src"] = "interaction:" + str(def.id)
 	var cst := cost(game, def, ctx)
-	actor.gold -= cst.gold
+	Treasury.add(game, actor, -cst.gold, Treasury.cat_of_src(game, "interaction:" + str(def.id)))
 	actor.prestige -= cst.prestige
 	actor.piety -= cst.piety
 	if def.get("cooldown") != null:

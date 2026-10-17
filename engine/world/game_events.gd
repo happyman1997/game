@@ -221,6 +221,7 @@ func run_on_action(id: String, root: Dictionary, scopes: Dictionary) -> void:
 		if c != null and c.death != null:
 			return
 	var ctx := ScriptContext.make(game, root, scopes)
+	ctx.values["__src"] = "on_action:" + id
 	Interp.run_effect(ctx, root, d.get("effect"))
 	for ev in Data.as_array(d.get("events")):
 		fire(str(ev), root, ctx.scopes)

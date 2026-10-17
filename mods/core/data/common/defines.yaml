@@ -60,6 +60,27 @@ defines:
     debt_prestige_divisor: 50
     dynasty_prestige_share: 0.1
 
+  # Казна (engine/world/treasury.gd): книга по статьям за последние месяцы.
+  treasury:
+    history_months: 12
+    # золото из скриптов (add_gold, pay_gold) — в статью по виду источника…
+    source_kinds: { event: events, decision: decisions, interaction: interactions, building: estates, district: estates, on_action: events }
+    # …а точнее — по самому источнику
+    sources:
+      "on_action:on_siege_won": loot
+      "interaction:demand_ransom": ransom
+      "interaction:send_gift": gifts
+      "interaction:bribe": gifts
+      "interaction:fulfill_ambition": gifts
+      "interaction:temple_gift": temple
+      "interaction:synod_sway_for": temple
+      "interaction:synod_sway_against": temple
+      "decision:take_loan": loans
+      "decision:hire_mercenaries": war
+      "decision:give_alms": alms
+      "decision:hold_feast": court
+      "decision:hold_tournament": court
+
   development:
     base_growth: 0.12
     growth_per_stewardship: 0.005   # вторую половину даёт учёность (skills.learning.per_point)
@@ -125,6 +146,12 @@ defines:
     gold_reserve: 60
     build_chance: 0.3
     rich_gold: 400            # богаче — строит и вкладывается охотнее
+    # копилка: ИИ выбирает стройку из того, что накопит за save_months дохода,
+    # и копит на неё (не дольше goal_months); пока копит — тратит лишь мелочь
+    # (до petty_spend или двух месячных доходов)
+    save_months: 24
+    goal_months: 48
+    petty_spend: 10
     use_hook_min_will: 30          # ИИ давит крюком, только если очень хочет
     use_hook_on_player_min_will: 60
 

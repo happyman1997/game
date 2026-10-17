@@ -581,8 +581,8 @@ static func _regency_month(game: Game, c: Dictionary) -> void:
 	# казнокрадство
 	if c.gold > 30.0 and game.rng.chance(_n(game, "regent_embezzle_chance", 0.015) * amb):
 		var take := roundf(minf(c.gold * _n(game, "regent_embezzle_share", 0.15), _n(game, "regent_embezzle_max", 60)))
-		c.gold -= take
-		r.gold += take
+		Treasury.add(game, c, -take, "embezzlement")
+		Treasury.add(game, r, take, "embezzlement")
 		if game.engine.has_feature("secrets") and game.content.has("secret_types", "secret_embezzler"):
 			Secrets.add_secret(game, r, "secret_embezzler", c.id)
 		game.emit("regency.embezzled", {"ruler": c, "regent": r, "gold": take})

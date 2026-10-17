@@ -90,7 +90,7 @@ static func recruit(game: Game, c: Dictionary, type: String, free: bool = false)
 		return null
 	if not free:
 		var cst := cost(game, c, def)
-		c.gold -= cst.gold
+		Treasury.add(game, c, -cst.gold, "regiments")
 		c.prestige -= cst.prestige
 	var r := {"id": game.new_id("reg"), "type": type, "size": int(Data.num(def.get("size"), 100))}
 	if c.get("regiments") == null:
@@ -238,6 +238,9 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 	var gold_cost: float = cost(game, c, pick).gold
 	if c.gold < gold_cost + game.def_num("regiments.ai_gold_reserve", 60):
 		return
+	# копилка ИИ: в мирное время отряды не съедают отложенное на стройку
+	if not Ai.can_spend(game, c, gold_cost) and Wars.wars_of(game, c.id).is_empty():
+		return
 	if Economy.monthly_income(game, c) < Data.num(pick.get("upkeep")) * 1.5:
 		return
 	recruit(game, c, pick.id)
@@ -264,7 +267,7 @@ func install(engine: GameEngine) -> void:
 	# Жалованье — строка в доходах.
 	engine.hooks.on("economy.income", func(p):
 		var v := Regiments.upkeep(p.game, p.character)
-		return {"label": p.game.loc.t("ui.regiment_upkeep"), "value": -v} if v != 0.0 else null
+		return {"label": p.game.loc.t("ui.regiment_upkeep"), "value": -v, "key": "regiment_wages"} if v != 0.0 else null
 	, 0, OWNER)
 	# Поднятая армия забирает отряды.
 	engine.hooks.on("army.raised", func(p):

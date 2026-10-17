@@ -61,7 +61,7 @@ static func take(game: Game, def: Dictionary, c: Dictionary) -> bool:
 	if not game.engine.hooks.veto("decision.before", {"game": game, "decision": def.id, "character": c}):
 		return false
 	var cst := cost(game, def, c)
-	c.gold -= cst.gold
+	Treasury.add(game, c, -cst.gold, Treasury.cat_of_src(game, "decision:" + str(def.id)))
 	c.prestige -= cst.prestige
 	c.piety -= cst.piety
 	if def.get("cooldown") != null:
@@ -134,8 +134,10 @@ static func building_candidates(game: Game, c: Dictionary, prov_id: String) -> A
 				bl.append(game.loc.t("ui.unique_taken_" + str(b.unique), {"place": game.name_of("provinces", where)}))
 		var ctx = ScriptContext.make(game, {"type": "province", "id": prov_id}, {"builder": {"type": "character", "id": c.id}})
 		bl.append_array(Interp.failed_triggers(ctx, ctx.root, b.get("trigger")))
-		bl.append_array(Economy.cost_blockers(game, c, building_cost(game, b, c, prov_id)))
-		out.append({"def": b, "blockers": bl})
+		var cost := building_cost(game, b, c, prov_id)
+		var cb := Economy.cost_blockers(game, c, cost)
+		# cost_only — мешает только нехватка золота (на это ИИ может накопить)
+		out.append({"def": b, "blockers": bl + cb, "cost": cost, "cost_only": bl.is_empty() and not cb.is_empty() and float(c.prestige) >= float(cost.prestige)})
 	return out
 
 
@@ -178,7 +180,7 @@ static func start_building(game: Game, c: Dictionary, prov_id: String, building_
 	if cand == null or not cand.blockers.is_empty():
 		return false
 	var cst = building_cost(game, cand.def, c, prov_id)
-	c.gold -= cst.gold
+	Treasury.add(game, c, -cst.gold, "construction")
 	c.prestige -= cst.prestige
 	# build_time_mult — быстрее строят умелые управители (за очко управления)
 	var days := Data.num(cand.def.get("days"), 365) * maxf(0.3, 1.0 + Stats.stat(game, c, "build_time_mult"))
@@ -216,13 +218,15 @@ static func construction_name(game: Game, cons: Dictionary) -> String:
 
 
 ## [{province, def}] — что ИИ может начать строить сейчас (графства без стройки).
-static func domain_build_options(game: Game, c: Dictionary) -> Array:
+## Что можно построить в домене: [{province, def, cost}]. with_unaffordable —
+## и то, на что пока не хватает золота (для копилки ИИ).
+static func domain_build_options(game: Game, c: Dictionary, with_unaffordable := false) -> Array:
 	var out := []
 	for p in Titles.domain_counties(game, c):
 		var st: Variant = game.state.provinces.get(p)
 		if st == null or st.construction != null or st.occupant != null:
 			continue
 		for x in building_candidates(game, c, p):
-			if x.blockers.is_empty():
-				out.append({"province": p, "def": x.def})
+			if x.blockers.is_empty() or (with_unaffordable and x.cost_only):
+				out.append({"province": p, "def": x.def, "cost": x.cost})
 	return out

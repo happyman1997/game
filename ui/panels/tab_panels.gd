@@ -91,6 +91,7 @@ static func realm(app: App) -> Control:
 	if g.engine.has_feature("council"):
 		tabs.append({"id": "council", "name": app.t("ui.rtab.council"), "icon": "council"})
 	tabs.append({"id": "laws", "name": app.t("ui.rtab.laws"), "icon": "scroll"})
+	tabs.append({"id": "treasury", "name": app.t("ui.treasury"), "icon": "gold"})
 	if g.engine.has_feature("politics") or g.engine.has_feature("factions"):
 		var against := 0
 		if g.engine.has_feature("factions"):
@@ -110,6 +111,8 @@ static func realm(app: App) -> Control:
 				var laws: Variant = FeatureSections.laws(app, p)
 				if laws != null:
 					root.add_child(laws)
+			"treasury":
+				root.add_child(TreasuryPanel.build(app, p))
 			"politics":
 				var politics: Variant = FeatureSections.politics(app, p)
 				if politics != null:

@@ -718,7 +718,7 @@ static func _cleanse(game: Game, prov: String, by: Variant = null) -> void:
 		var d: Variant = game.content.get_def("provinces", prov)
 		if d != null and NORSE.has(str(d.get("culture"))) and st.barrows.has(prov):
 			var gold := game.rng.range_int(60, 160)
-			hero.gold = float(hero.gold) + gold
+			Treasury.add(game, hero, gold, "loot")
 			if game.is_player(hero.id):
 				game.message(t(game, "msg_draugr_gold", {"place": pname(game, prov), "gold": gold}), "good", {"type": "province", "id": prov})
 	p.modifiers = p.modifiers.filter(func(m): return m.id != "restless_dead")
@@ -996,7 +996,7 @@ static func hunt_dragon(game: Game, c: Dictionary) -> void:
 	var scopes := {"place": {"type": "province", "id": lair}}
 	if game.rng.next() * 100.0 < chance:
 		var hoard := roundi(float(d.hoard))
-		c.gold = float(c.gold) + hoard
+		Treasury.add(game, c, hoard, "loot")
 		c.prestige = float(c.prestige) + 500.0
 		Chars.add_trait(game, c, "dragonslayer")
 		add_monster_kill(game, c, 3)

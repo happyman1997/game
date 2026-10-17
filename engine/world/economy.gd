@@ -72,30 +72,30 @@ static func income_breakdown(game: Game, c: Dictionary) -> Array:
 	if c.titles.is_empty():
 		var flat0 := Stats.stat(game, c, "monthly_income")
 		if flat0 != 0.0:
-			parts.append({"label": game.loc.t("ui.other_income"), "value": flat0})
+			parts.append({"label": game.loc.t("ui.other_income"), "value": flat0, "key": "other_income"})
 		return parts
 	var dom := domain_tax(game, c)
-	parts.append({"label": game.loc.t("ui.domain_tax"), "value": dom})
+	parts.append({"label": game.loc.t("ui.domain_tax"), "value": dom, "key": "domain_tax"})
 	var share := vassal_tax_share(game)
 	var from_vassals := 0.0
 	for v in game.vassals_of(c.id):
 		from_vassals += vassal_tax_to(game, c, v)
 	if from_vassals != 0.0:
-		parts.append({"label": game.loc.t("ui.vassal_tax"), "value": from_vassals})
+		parts.append({"label": game.loc.t("ui.vassal_tax"), "value": from_vassals, "key": "vassal_tax"})
 	if c.liege != null:
 		var l: Variant = game.ch(c.liege)
 		var lm = maxf(0.0, 1.0 + Stats.stat(game, l, "vassal_tax_mult")) if l != null else 1.0
-		parts.append({"label": game.loc.t("ui.liege_tax"), "value": -dom * share * lm * maxf(0.0, 1.0 + Stats.stat(game, c, "vassal_contribution_tax"))})
+		parts.append({"label": game.loc.t("ui.liege_tax"), "value": -dom * share * lm * maxf(0.0, 1.0 + Stats.stat(game, c, "vassal_contribution_tax")), "key": "liege_tax"})
 	var flat := Stats.stat(game, c, "monthly_income")
 	if flat != 0.0:
-		parts.append({"label": game.loc.t("ui.other_income"), "value": flat})
+		parts.append({"label": game.loc.t("ui.other_income"), "value": flat, "key": "other_income"})
 	var army := army_maintenance(game, c)
 	if army != 0.0:
-		parts.append({"label": game.loc.t("ui.army_upkeep"), "value": -army})
+		parts.append({"label": game.loc.t("ui.army_upkeep"), "value": -army, "key": "army_upkeep"})
 	# income_per_hook (тайный казначей): должники платят за молчание
 	var per_hook := Stats.stat(game, c, "income_per_hook")
 	if per_hook != 0.0 and not c.hooks.is_empty():
-		parts.append({"label": game.loc.t("ui.hook_income"), "value": per_hook * c.hooks.size()})
+		parts.append({"label": game.loc.t("ui.hook_income"), "value": per_hook * c.hooks.size(), "key": "hook_income"})
 	for extra in game.engine.hooks.collect("economy.income", {"game": game, "character": c}):
 		parts.append(extra)
 	return parts

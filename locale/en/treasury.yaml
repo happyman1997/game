@@ -1,0 +1,63 @@
+# Treasury (engine/world/treasury.gd): ledger entries and the Treasury window.
+ledger:
+  domain_tax: Domain taxes
+  vassal_tax: Vassal taxes
+  liege_tax: Tax to liege
+  other_income: Other income
+  army_upkeep: Army upkeep
+  hook_income: Hush money
+  regiment_wages: Regiment wages
+  district_upkeep: District upkeep
+  construction: Construction
+  decisions: Decisions
+  interactions: Interactions
+  events: Events
+  estates: Building income
+  loot: Loot
+  ransom: Ransoms
+  gifts: Gifts and bribes
+  temple: Temple and Synod
+  loans: Loans
+  alms: Alms
+  court: Feasts and tournaments
+  war: War and mercenaries
+  titles: Titles
+  laws: Laws
+  regiments: Regiment hiring
+  artifacts: Artifacts and repairs
+  inheritance: Inheritance
+  embezzlement: Embezzlement
+  politics: Elections
+  other: Other
+month_short:
+  1: Jan
+  2: Feb
+  3: Mar
+  4: Apr
+  5: May
+  6: Jun
+  7: Jul
+  8: Aug
+  9: Sep
+  10: Oct
+  11: Nov
+  12: Dec
+ui:
+  treasury: Treasury
+  treasury_tip: "Click to open the treasury: income and spending by entry, history and forecast."
+  treasury_now: "In the treasury: {gold}"
+  treasury_monthly: Every month
+  treasury_monthly_net: "Net per month"
+  treasury_oneoff: Last 12 months
+  treasury_oneoff_none: No gold came in or went out this year.
+  treasury_oneoff_avg: "One-off on average: {value} per month"
+  treasury_history: Treasury over the year
+  treasury_history_tip: "Bars show each month's balance (green — profit, red — loss), the line shows the treasury at month's end."
+  treasury_grows: "The treasury grows by {value} a month."
+  treasury_runs_out: "At this rate the treasury runs dry in {n} months."
+  treasury_empty_now: "Spending exceeds income and the treasury is empty."
+  treasury_in_debt: "The treasury is in debt: prestige drains every month until the debt is paid."
+  treasury_income: Income
+  treasury_expense: Spending
+  treasury_year_total: "This year: {income} income, {expense} spending"
+  treasury_goal: "Saving for: {name} — {cost}"

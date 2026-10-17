@@ -300,7 +300,7 @@ static func monthly(game: Game) -> void:
 					continue
 				var will := 0.25 + (0.25 if cand.traits.has("ambitious") else 0.0) - (0.15 if cand.traits.has("content") else 0.0)
 				if game.rng.chance(will):
-					cand.gold -= 40.0
+					Treasury.add(game, cand, -40.0, "politics")
 					cand.vars["campaign"] = Data.num(cand.vars.get("campaign")) + 2.0
 		if yearly and d.get("members") is Dictionary:
 			var m: Dictionary = d.members

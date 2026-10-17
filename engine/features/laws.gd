@@ -91,7 +91,7 @@ static func change(game: Game, c: Dictionary, law_id: String, free: bool = false
 	var gd: Dictionary = game.content.get_def("law_groups", law.group)
 	if not free:
 		var cst := change_cost(game, c, law)
-		c.gold -= cst.gold
+		Treasury.add(game, c, -cst.gold, "laws")
 		c.prestige -= cst.prestige
 		c.piety -= cst.piety
 		c.flags["law_cd:" + str(law.group)] = game.date + roundi(Data.num(gd.get("cooldown_years"), 5) * 365)

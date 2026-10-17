@@ -381,7 +381,7 @@ static func declare_war(game: Game, attacker: Dictionary, t: Dictionary, opts: D
 		return null
 	if not opts.get("free", false):
 		var cost := war_cost(game, attacker, t)
-		attacker.gold -= cost.gold
+		Treasury.add(game, attacker, -cost.gold, "war")
 		attacker.prestige -= cost.prestige
 		attacker.piety -= cost.piety
 	var w := new_war_record()

@@ -172,3 +172,7 @@ ev:
     c: Let them grumble
 karma_deed:
   iron_whisper: The whisper from the iron
+
+# treasury ledger entry
+ledger:
+  grafts: Grafts and surgeons

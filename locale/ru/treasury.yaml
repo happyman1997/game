@@ -1,0 +1,63 @@
+# Казна (engine/world/treasury.gd): статьи книги и окно «Казна».
+ledger:
+  domain_tax: Налоги с домена
+  vassal_tax: Налоги вассалов
+  liege_tax: Налог сюзерену
+  other_income: Прочие доходы
+  army_upkeep: Содержание армий
+  hook_income: Плата за молчание
+  regiment_wages: Жалованье отрядов
+  district_upkeep: Содержание районов
+  construction: Стройка
+  decisions: Решения
+  interactions: Предложения
+  events: События
+  estates: Доход построек
+  loot: Добыча
+  ransom: Выкупы
+  gifts: Дары и подкуп
+  temple: Храму и Собору
+  loans: Займы
+  alms: Милостыня
+  court: Пиры и турниры
+  war: Война и наёмники
+  titles: Титулы
+  laws: Законы
+  regiments: Найм отрядов
+  artifacts: Вещи и починка
+  inheritance: Наследство
+  embezzlement: Казнокрадство
+  politics: Выборы
+  other: Прочее
+month_short:
+  1: янв
+  2: фев
+  3: мар
+  4: апр
+  5: май
+  6: июн
+  7: июл
+  8: авг
+  9: сен
+  10: окт
+  11: ноя
+  12: дек
+ui:
+  treasury: Казна
+  treasury_tip: "Нажмите — окно казны: доходы и траты по статьям, история и прогноз."
+  treasury_now: "В казне: {gold}"
+  treasury_monthly: Каждый месяц
+  treasury_monthly_net: "Итого в месяц"
+  treasury_oneoff: За 12 месяцев
+  treasury_oneoff_none: За год золото не приходило и не уходило.
+  treasury_oneoff_avg: "Разовые в среднем: {value} в месяц"
+  treasury_history: Казна за год
+  treasury_history_tip: "Столбец — сальдо месяца (зелёный — прибыль, красный — убыток), линия — казна в конце месяца."
+  treasury_grows: "Казна растёт: {value} в месяц."
+  treasury_runs_out: "При таком расходе казна опустеет через {n} мес."
+  treasury_empty_now: "Расход больше дохода, а казна пуста."
+  treasury_in_debt: "Казна в долгу: каждый месяц убывает престиж, пока долг не погашен."
+  treasury_income: Доходы
+  treasury_expense: Траты
+  treasury_year_total: "За год: {income} дохода, {expense} трат"
+  treasury_goal: "Копит на: {name} — {cost}"

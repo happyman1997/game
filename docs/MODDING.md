@@ -1439,6 +1439,45 @@ synod_questions:
 `on_synod_result`. В ядре шесть вопросов: анафема культу, примирение с
 ересью, Божий мир, десятина, отлучение тирана и канонизация праведника.
 
+### Казна: книга доходов и трат
+
+Золото персонажа меняется только через `Treasury.add(game, c, сумма, статья)`
+(`engine/world/treasury.gd`): у правителей и игрока ведётся книга — суммы по
+статьям за текущий месяц и за прошлые (`defines.treasury.history_months`),
+запас казны в конце месяца. Из неё — вкладка «Казна» окна «Владения»,
+прогноз (`Treasury.forecast`) и замеры экономики (`Treasury.totals`,
+`Treasury.months`).
+
+```gdscript
+# в скрипте мода: операция у лекаря — своя статья
+Treasury.add(game, c, -50.0, "grafts")   # имя статьи — ключ ledger.grafts
+```
+
+Строки ежемесячного дохода (`Economy.income_breakdown`, хук `economy.income`)
+несут `key` — это статья книги (`domain_tax`, `regiment_wages`,
+`district_upkeep`…); без него — `other_income`. Золото из скриптов (`add_gold`,
+`pay_gold`) попадает в статью по источнику: вид источника — по
+`defines.treasury.source_kinds` (`event` → `events`, `decision` → `decisions`,
+`interaction` → `interactions`, ежегодное постройки или района → `estates`,
+`on_action` → `events`), а точнее — по `defines.treasury.sources`:
+
+```yaml
+defines:
+  treasury:
+    sources:
+      "on_action:on_siege_won": loot
+      "interaction:demand_ransom": ransom
+      "decision:hold_feast": court
+```
+
+**Копилка ИИ.** ИИ выбирает стройку (постройку или район) из того, что
+накопит за `defines.ai.save_months` месяцев дохода, — по весу `ai_will_do`,
+немного предпочитая то, что ближе, — и копит на неё (`vars.ai_goal`, не
+дольше `ai.goal_months`). Пока копит, его решения, предложения, найм отрядов
+в мирное время и заказ вещей не трогают отложенное: можно лишь мелочь — до
+`ai.petty_spend` или двух месячных доходов (`Ai.can_spend`). Свою трату мод
+может проверять так же.
+
 ### Районы: поселение графства и сила построек
 
 Механика `districts` (данные — `core/data/common/districts.yaml`, постройки —
