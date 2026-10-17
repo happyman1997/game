@@ -120,30 +120,33 @@ realm_laws:
     ai_will_do:
       value: 0
       if:
-        - limit: { tax_law_level: 2, num_unhappy_counties: ">= 2" }
-          add: 40
+        - limit: { tax_law_level: 2, num_unhappy_counties: ">= 1" }
+          add: 50
         - limit: { tax_law_level: 0, num_unhappy_counties: 0, gold: "< 100" }
           add: 20
   tax_law_2:
     group: tax_law
     level: 2
     icon: "💰"
-    modifiers: { tax_mult: 0.25, county_opinion: -12, development_growth: -0.03 }
+    modifiers: { tax_mult: 0.25, county_opinion: -10, development_growth: -0.03 }
     change_cost: { prestige: 100 }
     can_change:
       custom_tooltip:
         text: ui.law_needs_calm_counties
         trigger: { num_unhappy_counties: "< 2" }
+    # ИИ берёт тяжкие подати от нужды (долги, пустая казна) или от жадности
     ai_will_do:
-      value: 4
-      add: { value: ai_greed, multiply: 4 }
+      value: 1
+      add: { value: ai_greed, multiply: 2 }
       if:
-        - limit: { gold: "< 30" }
+        - limit: { gold: "< 0" }
           add: 15
+        - limit: { gold: "< 30" }
+          add: 4
         - limit: { has_trait: greedy }
-          add: 8
+          add: 5
         - limit: { num_unhappy_counties: ">= 1" }
-          add: -30
+          add: -50
 
   # ---------------------------------------------------- воинская повинность
   military_service_0:
