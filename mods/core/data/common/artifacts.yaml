@@ -327,17 +327,22 @@ interactions:
       - transfer_artifact: { artifact: scope:target, to: scope:recipient, how: gift }
       - scope:recipient:
           add_opinion: { target: scope:actor, modifier: artifact_gift, value: "scope:target.artifact_gift_opinion" }
-    ai_targets: [liege]
-    ai_frequency_months: 24
+    # ИИ дарит лишнюю вещь сюзерену или супругу, которые к нему прохладны
+    ai_targets: [liege, spouse]
+    ai_frequency_months: 12
     ai_will_do:
       value: 0
       if:
         - limit:
-            num_spare_artifacts: "> 1"
+            num_spare_artifacts: ">= 1"
             scope:target: { artifact_is_equipped: no }
-            scope:recipient: { opinion: { target: scope:actor, value: "< 10" } }
-          add: 25
-      subtract: { value: "scope:target.artifact_value", divide: 20 }
+            scope:recipient: { opinion: { target: scope:actor, value: "< 20" } }
+          add: 30
+        - limit: { has_trait: [generous, gregarious] }
+          add: 10
+        - limit: { has_trait: greedy }
+          add: -20
+      subtract: { value: "scope:target.artifact_value", divide: 25 }
 
   # потребовать назад вещь, на которую есть притязание
   demand_artifact:

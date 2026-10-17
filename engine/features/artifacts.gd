@@ -871,9 +871,12 @@ func install(engine: GameEngine) -> void:
 	var opt := func(game: Game, it: Dictionary) -> Dictionary:
 		return {"id": it.id, "label": "%s (%s)" % [Artifacts.name_of(game, it), game.name_of("artifact_rarities", it.rarity)], "ref": {"type": "artifact", "id": it.id}}
 	engine.interaction_targets.register("own_artifacts", {"options": func(game: Game, actor: Dictionary, _r: Dictionary) -> Array:
-		var items := Artifacts.items_of(game, actor)
+		# сначала лишние (в хранилище), затем надетые; внутри — по ценности
+		var items := Artifacts.storage(game, actor)
 		items.sort_custom(func(a, b): return Artifacts.score(game, a) > Artifacts.score(game, b))
-		return items.map(func(it): return opt.call(game, it))
+		var worn := Artifacts.equipped(game, actor)
+		worn.sort_custom(func(a, b): return Artifacts.score(game, a) > Artifacts.score(game, b))
+		return (items + worn).map(func(it): return opt.call(game, it))
 	}, OWNER)
 	engine.interaction_targets.register("claimed_artifacts", {"options": func(game: Game, actor: Dictionary, recipient: Dictionary) -> Array:
 		return Artifacts.claimed_from(game, actor, recipient).map(func(it): return opt.call(game, it))

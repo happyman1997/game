@@ -201,8 +201,8 @@ interactions:
     ai_will_do:
       value: 0
       if:
-        - limit: { synod_preference: ">= 30", gold: 300 }
-          add: 20
+        - limit: { synod_preference: ">= 15", gold: 150 }
+          add: { value: synod_preference, multiply: 0.5, add: 5, max: 30 }
   synod_sway_against:
     requires_feature: synod
     icon: "⚖"
@@ -227,8 +227,8 @@ interactions:
     ai_will_do:
       value: 0
       if:
-        - limit: { synod_preference: "<= -30", gold: 300 }
-          add: 20
+        - limit: { synod_preference: "<= -15", gold: 150 }
+          add: { value: synod_preference, multiply: -0.5, add: 5, max: 30 }
 
 on_actions:
   # Божий мир: напасть на единоверца (не еретика) — грех перед Храмом

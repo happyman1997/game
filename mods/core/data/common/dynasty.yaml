@@ -132,9 +132,9 @@ interactions:
       value: 0
       if:
         - limit:
-            gold: "< 60"
-            scope:recipient: { gold: 200 }
-          add: { value: ai_greed, multiply: 15, add: 10 }
+            gold: "< 150"
+            scope:recipient: { gold: 120 }
+          add: { value: ai_greed, multiply: 10, add: 15 }
 
   # воздать почести родичу: престиж ему и его благодарность
   honor_kin:
@@ -160,8 +160,8 @@ interactions:
       value: 0
       if:
         - limit:
-            dynasty_renown: 600
-            scope:recipient: { is_ruler: yes, opinion: { target: scope:actor, value: "< 0" } }
+            dynasty_renown: 250
+            scope:recipient: { is_ruler: yes, opinion: { target: scope:actor, value: "< 10" } }
           add: 30
 
 decisions:
