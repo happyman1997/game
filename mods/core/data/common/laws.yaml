@@ -2,12 +2,44 @@
 # менять можно на одну ступень за раз, не чаще cooldown_years.
 # Уровень закона доступен в скриптах как значение <группа>_level
 # (crown_authority_level: 0..3) — им проверяются права правителя.
+# Закон сюзерена может решать судьбу ленов умерших вассалов: escheat
+# (условие в скоупе умершего — лен выморочен) и on_vassal_inherit (эффект в
+# скоупе наследника, scope:liege) — см. engine/features/laws.gd.
 law_groups:
   crown_authority:
     icon: "👑"
     order: 1
     default: crown_authority_1
     cooldown_years: 5
+    is_shown: { tier: ">= duchy" }
+  # Подати с домена: больше золота — злее графства и медленнее развитие
+  tax_law:
+    icon: "🪙"
+    order: 2
+    default: tax_law_1
+    cooldown_years: 3
+    is_shown: { tier: ">= county" }
+  # Воинская повинность: золото вместо войск (щитовые деньги) или всеобщий сбор
+  military_service:
+    icon: "⚔"
+    order: 3
+    default: military_service_1
+    cooldown_years: 4
+    is_shown: { tier: ">= county" }
+  # Храм и корона: вольности Храма (благочестие, милость главы веры) или
+  # королевская десятина (налоги, но Храм недоволен)
+  church_law:
+    icon: "⛪"
+    order: 4
+    default: church_law_1
+    cooldown_years: 5
+    is_shown: { tier: ">= county" }
+  # Наследование ленов: что получает сюзерен, когда умирает вассал
+  fief_law:
+    icon: "📜"
+    order: 5
+    default: fief_law_1
+    cooldown_years: 10
     is_shown: { tier: ">= duchy" }
 
 realm_laws:
@@ -63,3 +95,192 @@ realm_laws:
       if:
         - limit: { has_trait: [ambitious, arbitrary] }
           add: 5
+
+  # ---------------------------------------------------------------- подати
+  tax_law_0:
+    group: tax_law
+    level: 0
+    icon: "🌾"
+    modifiers: { tax_mult: -0.2, county_opinion: 8, development_growth: 0.03 }
+    change_cost: { prestige: 50 }
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { num_unhappy_counties: ">= 2" }
+          add: 30
+        - limit: { has_trait: [generous, compassionate] }
+          add: 8
+        - limit: { has_trait: greedy }
+          add: -20
+  tax_law_1:
+    group: tax_law
+    level: 1
+    icon: "⚖"
+    change_cost: { prestige: 50 }
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { tax_law_level: 2, num_unhappy_counties: ">= 2" }
+          add: 40
+        - limit: { tax_law_level: 0, num_unhappy_counties: 0, gold: "< 100" }
+          add: 20
+  tax_law_2:
+    group: tax_law
+    level: 2
+    icon: "💰"
+    modifiers: { tax_mult: 0.25, county_opinion: -12, development_growth: -0.03 }
+    change_cost: { prestige: 100 }
+    can_change:
+      custom_tooltip:
+        text: ui.law_needs_calm_counties
+        trigger: { num_unhappy_counties: "< 2" }
+    ai_will_do:
+      value: 4
+      add: { value: ai_greed, multiply: 4 }
+      if:
+        - limit: { gold: "< 30" }
+          add: 15
+        - limit: { has_trait: greedy }
+          add: 8
+        - limit: { num_unhappy_counties: ">= 1" }
+          add: -30
+
+  # ---------------------------------------------------- воинская повинность
+  military_service_0:
+    group: military_service
+    level: 0
+    icon: "🛡"
+    modifiers: { levy_mult: -0.25, vassal_levy_mult: -0.4, vassal_tax_mult: 0.3, county_opinion: 4 }
+    change_cost: { prestige: 100 }
+    can_change: { is_at_war: no }
+    ai_will_do:
+      value: 2
+      add: { value: ai_greed, multiply: 3 }
+      if:
+        - limit: { has_trait: [greedy, craven, content] }
+          add: 6
+        - limit: { has_trait: [wrathful, ambitious] }
+          add: -10
+  military_service_1:
+    group: military_service
+    level: 1
+    icon: "⚔"
+    change_cost: { prestige: 50 }
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { military_service_level: 0, is_at_war: yes }
+          add: 40
+        - limit: { military_service_level: 2, is_at_war: no }
+          add: 30
+  military_service_2:
+    group: military_service
+    level: 2
+    icon: "📯"
+    modifiers: { levy_mult: 0.3, vassal_levy_mult: 0.2, county_opinion: -8, vassal_opinion: -5 }
+    change_cost: { prestige: 150 }
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { is_at_war: yes }
+          add: 35
+        - limit: { has_trait: [wrathful, ambitious] }
+          add: 5
+        - limit: { num_unhappy_counties: ">= 2" }
+          add: -30
+
+  # ------------------------------------------------------- Храм и корона
+  church_law_0:
+    group: church_law
+    level: 0
+    icon: "🕯"
+    modifiers: { tax_mult: -0.1, monthly_piety: 1, faith_head_opinion: 15 }
+    change_cost: { prestige: 50 }
+    ai_will_do:
+      value: 2
+      add: { value: ai_zeal, multiply: 5 }
+      if:
+        - limit: { has_trait: zealous }
+          add: 8
+        - limit: { has_trait: [cynical, greedy] }
+          add: -20
+  church_law_1:
+    group: church_law
+    level: 1
+    icon: "⛪"
+    change_cost: { prestige: 50 }
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { church_law_level: 2, has_trait: zealous }
+          add: 30
+        - limit: { church_law_level: 0, gold: "< 30" }
+          add: 20
+  church_law_2:
+    group: church_law
+    level: 2
+    icon: "👑"
+    modifiers: { tax_mult: 0.15, monthly_piety: -1, faith_head_opinion: -25 }
+    change_cost: { prestige: 150, piety: 50 }
+    ai_will_do:
+      value: 2
+      add: { value: ai_greed, multiply: 3 }
+      if:
+        - limit: { has_trait: cynical }
+          add: 10
+        - limit: { has_trait: zealous }
+          add: -50
+
+  # --------------------------------------------------- наследование ленов
+  fief_law_0:
+    group: fief_law
+    level: 0
+    icon: "🕊"
+    modifiers: { vassal_opinion: 8 }
+    change_cost: { prestige: 100 }
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { any_vassal: { count: ">= 3", opinion: { target: root, value: "< -10" } } }
+          add: 20
+  # рельеф: наследник вассала платит сюзерену годовой доход (не больше
+  # половины казны) — статья «Рельеф» (defines.treasury.source_kinds)
+  fief_law_1:
+    group: fief_law
+    level: 1
+    icon: "📜"
+    change_cost: { prestige: 100 }
+    on_vassal_inherit:
+      - if:
+          limit: { gold: "> 10" }
+          pay_gold: { target: scope:liege, value: { value: income, multiply: 12, min: 5, max: { value: gold, multiply: 0.5 } } }
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { fief_law_level: 0, NOT: { any_vassal: { count: ">= 2", opinion: { target: root, value: "< -10" } } } }
+          add: 10
+        - limit: { fief_law_level: 2, any_vassal: { count: ">= 3", opinion: { target: root, value: "< -10" } } }
+          add: 25
+  # выморочное право: лен графа, умершего без детей, возвращается сюзерену
+  fief_law_2:
+    group: fief_law
+    level: 2
+    icon: "🏰"
+    modifiers: { vassal_opinion: -10 }
+    change_cost: { prestige: { value: 300, add: { value: tier, multiply: 100 } } }
+    can_change:
+      crown_authority_level: ">= 2"
+    escheat: { num_children: "< 1", tier: "<= county" }
+    on_vassal_inherit:
+      - if:
+          limit: { gold: "> 10" }
+          pay_gold: { target: scope:liege, value: { value: income, multiply: 12, min: 5, max: { value: gold, multiply: 0.5 } } }
+    ai_will_do:
+      value: 3
+      if:
+        - limit: { has_trait: [ambitious, greedy, arbitrary] }
+          add: 6
+        - limit: { num_counties: "< domain_limit" }
+          add: 4
+        - limit: { any_vassal: { count: ">= 3", opinion: { target: root, value: "< -10" } } }
+          add: -20

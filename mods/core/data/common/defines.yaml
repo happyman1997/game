@@ -64,7 +64,7 @@ defines:
   treasury:
     history_months: 12
     # золото из скриптов (add_gold, pay_gold) — в статью по виду источника…
-    source_kinds: { event: events, decision: decisions, interaction: interactions, building: estates, district: estates, on_action: events }
+    source_kinds: { event: events, decision: decisions, interaction: interactions, building: estates, district: estates, on_action: events, law_inherit: relief }
     # …а точнее — по самому источнику
     sources:
       "on_action:on_siege_won": loot

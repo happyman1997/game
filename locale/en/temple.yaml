@@ -1,5 +1,6 @@
 # Temple feature: engine and UI strings.
 opinion:
+  head_church_rights: The Temple's rights in the realm
   faith_virtue: "Honoured by the cult: {trait}"
   faith_sin: "Condemned by the cult: {trait}"
   head_piety: "Piety in the Temple's eyes: {name}"

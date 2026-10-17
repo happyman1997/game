@@ -11,7 +11,8 @@ extends EngineFeature
 ##     глава веры (Великий Светоч) для всех культов с этим полем; пустой титул —
 ##     престол пуст. Глава веры судит единоверцев по «лицу»: благочестию
 ##     (defines.faith.head_piety_opinion — по уровням), страху
-##     (head_dread_opinion — по ступеням) и ереси (head_heretic_opinion).
+##     (head_dread_opinion — по ступеням), ереси (head_heretic_opinion) и
+##     правам Храма в его державе (модификатор faith_head_opinion — законы).
 ##     Его мнение решает в данных отлучение, коронацию, развод.
 ##   heretic: yes — еретический культ: его последователи — законная цель
 ##     священной войны (Wars.is_heretic).
@@ -139,6 +140,10 @@ func install(engine: GameEngine) -> void:
 				out.append({"label": game.loc.t("opinion.head_dread", {"tier": game.name_of("dread_tiers", t.id) if t != null else ""}), "value": vd})
 		if Wars.is_heretic(game, b):
 			out.append({"label": game.loc.t("opinion.head_heretic"), "value": game.def_num("faith.head_heretic_opinion", -50)})
+		# права Храма в державе (законы «Храм и корона»): faith_head_opinion
+		var vr := Stats.stat(game, b, "faith_head_opinion")
+		if vr != 0.0:
+			out.append({"label": game.loc.t("opinion.head_church_rights"), "value": vr})
 		return out if not out.is_empty() else null
 	}, OWNER)
 

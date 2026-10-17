@@ -1,5 +1,6 @@
 # Механика «Храм»: строки движка и интерфейса.
 opinion:
+  head_church_rights: Права Храма в державе
   faith_virtue: "Чтит культ: {trait}"
   faith_sin: "Осуждает культ: {trait}"
   head_piety: "Благочестие в глазах Храма: {name}"

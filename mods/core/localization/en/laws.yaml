@@ -1,20 +1,54 @@
 law_group:
   crown_authority: Crown Authority
+  tax_law: Taxation
+  military_service: Military Service
+  church_law: Temple and Crown
+  fief_law: Fief Inheritance
 law_group_desc:
   crown_authority: How strong the ruler's power over the vassals is. The higher it is, the more taxes and troops the vassals provide — and the less they like it.
+  tax_law: How much the domain peasants pay. Heavy taxes bring more gold but anger the counties and slow their growth.
+  military_service: "How vassals and peasants serve: with gold instead of soldiers, or with a general levy."
+  church_law: "The Temple's rights in the realm: liberties bring piety and the faith head's favour, the royal tithe brings gold and the Temple's anger."
+  fief_law: "What the liege gets when a vassal dies: nothing, relief from the heir, or the fief itself when there is no heir."
 realm_law:
   crown_authority_0: Autonomous Vassals
   crown_authority_1: Limited Authority
   crown_authority_2: High Authority
   crown_authority_3: Absolute Authority
+  tax_law_0: Light Taxes
+  tax_law_1: Customary Taxes
+  tax_law_2: Heavy Taxes
+  military_service_0: Scutage
+  military_service_1: Forty Days' Service
+  military_service_2: General Levy
+  church_law_0: Clerical Liberties
+  church_law_1: Concord with the Temple
+  church_law_2: Royal Tithe
+  fief_law_0: Free Fiefs
+  fief_law_1: Relief
+  fief_law_2: Escheat
 realm_law_desc:
   crown_authority_0: The vassals are nearly independent. They are content but pay less and send fewer troops.
   crown_authority_1: The usual order. The ruler may revoke titles, but it is considered tyranny.
   crown_authority_2: The vassals pay more and send more troops, though they grumble.
   crown_authority_3: The ruler's word is law. Revoking titles is not considered tyranny.
+  tax_law_0: The counties pay less, but are happier and grow faster.
+  tax_law_1: The usual taxes.
+  tax_law_2: More gold from the domain — and angrier counties. Cannot be enacted with two or more discontented counties.
+  military_service_0: "Vassals buy their way out of service with gold: fewer troops, more vassal taxes. Cannot be enacted during a war."
+  military_service_1: The usual service.
+  military_service_2: "Everyone who can hold a weapon marches: more troops, but the counties and vassals are unhappy."
+  church_law_0: The Temple pays no taxes and judges its own. Lower taxes, more piety, the faith head is pleased.
+  church_law_1: "The usual order: neither crown nor Temple pulls the blanket its way."
+  church_law_2: The crown takes a share of the Temple's tithe. Higher taxes, less piety, the faith head is displeased.
+  fief_law_0: Vassals' heirs take up their fiefs freely. The vassals like it.
+  fief_law_1: A vassal's heir pays the liege relief — a year's income, but no more than half the treasury.
+  fief_law_2: "Relief — and more: the fief of a count who dies childless returns to the liege. The vassals are unhappy. Requires at least High crown authority."
 stat:
   vassal_tax_mult: Vassal taxes
   vassal_levy_mult: Vassal levies
+  faith_head_opinion: Faith head opinion
 ui:
   law_needs_loyal_vassals: Too many discontented vassals
   revoke_needs_authority: Requires at least Limited crown authority or a lawful reason
+  law_needs_calm_counties: Too many discontented counties

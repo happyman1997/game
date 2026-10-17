@@ -355,6 +355,7 @@
 | `blood_potency` | character | Сила крови вампира (растёт с годами и кормлением) | arcana |
 | `blood_thirst` | character | Жажда крови вампира (0–100) | arcana |
 | `calm_months` | character | Сколько месяцев подряд стресс почти нулевой | core/spirit |
+| `church_law_level` | character | Уровень закона группы church_law (−1, если не действует) | core/laws |
 | `commander_advantage` | character | Характеристика: commander_advantage | core |
 | `control` | province | Контроль над графством (0–100) | core/populace |
 | `council_size` | character | Число занятых мест в совете | core/council |
@@ -400,6 +401,7 @@
 | `faction_power` | faction | Сила фракции в % от силы сюзерена | core/factions |
 | `fear_of_liege` | character | Страх перед сюзереном (0 у храбрых и гневливых) | core/politics |
 | `fertility` | character | Плодовитость | core |
+| `fief_law_level` | character | Уровень закона группы fief_law (−1, если не действует) | core/laws |
 | `fort_level` | province | Уровень укреплений | core |
 | `fortitude` | character | Сколько стойкости осталось (вживления её подтачивают) | grafts |
 | `general_opinion` | character | Характеристика: general_opinion | core |
@@ -420,6 +422,7 @@
 | `lifestyle_xp` | character | Опыт текущего образа жизни | core/lifestyles |
 | `loot_mult` | character | Характеристика: loot_mult | core |
 | `martial` | character | Навык: martial | core |
+| `military_service_level` | character | Уровень закона группы military_service (−1, если не действует) | core/laws |
 | `monsters_slain` | character | Сколько чудовищ уничтожил персонаж (слава охотника) | arcana |
 | `monthly_piety` | character | Характеристика: monthly_piety | core |
 | `monthly_prestige` | character | Характеристика: monthly_prestige | core |
@@ -483,6 +486,7 @@
 | `synod_preference` | character | Насколько персонаж за вопрос созванного Собора (больше нуля — за) | core/synod |
 | `synod_vote_weight` | character | Вес голоса на Соборе (0 — нет голоса) | core/synod |
 | `tax` | province | Налог провинции | core |
+| `tax_law_level` | character | Уровень закона группы tax_law (−1, если не действует) | core/laws |
 | `tier` | character | Ранг основного титула (0 — нет земель, 1 — граф ... 4 — император) | core |
 | `title_tier` | title | Ранг титула | core |
 | `turn_plotter_chance` | character | Характеристика: turn_plotter_chance | core |

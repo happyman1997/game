@@ -8,8 +8,17 @@ extends EngineFeature
 ##
 ## Данные:
 ##   law_groups: { icon, default, is_shown, cooldown_years, order }
-##   realm_laws: { group, level, icon, modifiers, can_change, change_cost, on_change, ai_will_do }
+##   realm_laws: { group, level, icon, modifiers, can_change, change_cost, on_change, ai_will_do,
+##                 escheat, on_vassal_inherit }
 ## Состояние: c.laws = { группа: закон }.
+##
+## Права сюзерена при смерти вассала (поля закона сюзерена):
+##   escheat — условие в скоупе умершего вассала (scope:liege — сюзерен):
+##     если верно, лен выморочен и возвращается сюзерену (к игроку не
+##     применяется);
+##   on_vassal_inherit — эффект в скоупе наследника, вступившего в лен того
+##     же сюзерена (scope:liege, scope:predecessor): например, рельеф —
+##     плата за вступление в лен (золото — статья казны «Рельеф»).
 
 const OWNER := "core/laws"
 
@@ -131,8 +140,71 @@ static func yearly_ai(game: Game) -> void:
 				change(game, c, best.id)
 
 
+## Действующие законы правителя во всех видимых ему группах.
+static func laws_of(game: Game, c: Dictionary) -> Array:
+	var out := []
+	if c.titles.is_empty():
+		return out
+	for gd in groups(game):
+		if is_group_shown(game, c, gd):
+			var l: Variant = current(game, c, gd.id)
+			if l != null:
+				out.append(l)
+	return out
+
+
+## Выморочен ли лен умершего вассала по закону его сюзерена.
+static func escheats(game: Game, c: Dictionary, liege: Dictionary) -> bool:
+	if game.is_player(c.id):
+		return false
+	for l in laws_of(game, liege):
+		if l.get("escheat") == null:
+			continue
+		var ctx := ScriptContext.make(game, {"type": "character", "id": c.id}, {"liege": {"type": "character", "id": liege.id}})
+		if Interp.eval_trigger(ctx, ctx.root, l.escheat):
+			return true
+	return false
+
+
+## Наследник вступил в лен того же сюзерена — on_vassal_inherit его законов.
+static func on_vassal_inherit(game: Game, heir: Dictionary, liege: Dictionary, predecessor: Dictionary) -> void:
+	var lg0 := float(liege.gold)
+	for l in laws_of(game, liege):
+		if l.get("on_vassal_inherit") == null:
+			continue
+		var ctx := ScriptContext.make(game, {"type": "character", "id": heir.id}, {"liege": {"type": "character", "id": liege.id}, "predecessor": {"type": "character", "id": predecessor.id}})
+		ctx.values["__src"] = "law_inherit:" + str(l.id)
+		Interp.run_effect(ctx, ctx.root, l.on_vassal_inherit)
+	var got := float(liege.gold) - lg0
+	if got >= 1.0:
+		var args := {"who": game.scope_name({"type": "character", "id": heir.id}), "liege": game.scope_name({"type": "character", "id": liege.id}), "gold": roundi(got)}
+		if game.is_player(liege.id):
+			game.message(game.loc.t("msg.relief_received", args), "good", {"type": "character", "id": heir.id})
+		elif game.is_player(heir.id):
+			game.message(game.loc.t("msg.relief_paid", args), "bad", {"type": "character", "id": liege.id})
+
+
 func install(engine: GameEngine) -> void:
 	engine.systems.register("laws", {"id": "laws", "order": 85, "on_year": Laws.yearly_ai}, OWNER)
+	engine.hooks.on("succession.escheat", func(p):
+		var game: Game = p.game
+		if not Laws.escheats(game, p.character, p.liege):
+			return null
+		if game.is_player(p.liege.id):
+			game.message(game.loc.t("msg.fief_escheated", {"who": game.scope_name({"type": "character", "id": p.character.id})}), "good", {"type": "character", "id": p.character.id})
+		return true
+	, 0, OWNER)
+	engine.hooks.on("succession", func(p):
+		var game: Game = p.game
+		var dead: Dictionary = p.deceased
+		var liege: Variant = game.ch(dead.liege) if dead.liege != null else null
+		if liege == null or not Chars.is_alive(liege):
+			return
+		for hid in p.heirs:
+			var h: Variant = game.ch(hid)
+			if h != null and h.id != liege.id and h.liege == liege.id and not h.titles.is_empty():
+				Laws.on_vassal_inherit(game, h, liege, dead)
+	, 0, OWNER)
 	engine.modifier_providers.register("realm_laws", {"fn": func(game: Game, c: Dictionary) -> Variant:
 		if c.titles.is_empty():
 			return null
@@ -211,4 +283,6 @@ func register_script(engine: GameEngine) -> void:
 			v.ref("law_groups", l.get("group"), "realm_laws/" + l.id)
 			v.trigger(l.get("can_change"), "realm_laws/%s can_change" % l.id)
 			v.effect(l.get("on_change"), "realm_laws/%s on_change" % l.id)
+			v.trigger(l.get("escheat"), "realm_laws/%s escheat" % l.id)
+			v.effect(l.get("on_vassal_inherit"), "realm_laws/%s on_vassal_inherit" % l.id)
 	, OWNER)

@@ -217,6 +217,10 @@ static func inherit(game: Game, c: Dictionary) -> Variant:
 	var heirs: Array = algo.heirs.call(game, c, law) if (law != null and algo != null) else blood_line(game, c, "male_preference")
 	heirs = heirs.filter(func(id): return Succession.can_inherit(game.ch(id)))
 	var old_liege: Variant = game.ch(c.liege)
+	# закон сюзерена (или мод) может объявить лен выморочным: хук succession.escheat
+	if not heirs.is_empty() and old_liege != null and Chars.is_alive(old_liege):
+		if game.engine.hooks.collect("succession.escheat", {"game": game, "character": c, "liege": old_liege}).has(true):
+			heirs = []
 	var vassals = game.vassals_of(c.id)
 	var courtiers = game.courtiers_of(c.id)
 	var titles: Array = c.titles.duplicate()

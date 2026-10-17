@@ -1,5 +1,6 @@
 # Strings for engine features: lifestyles, council, prison, factions, regiments.
 ui:
+  hook_on_cooldown: The hook is on cooldown
   tab:
     lifestyle: Lifestyle
   focus_n: "Focus: {name}"
@@ -102,11 +103,13 @@ ui:
   council_project: "Project: {name}"
   council_project_tip: "Progress {value}% (+{rate} a month, ~{months} more months). Ends with the event \"{name}\" and a choice."
 msg:
+  relief_received: "{who} takes up the fief and pays you relief: {gold} gold"
+  relief_paid: "You take up your fief and pay relief to your liege ({liege}): {gold} gold"
+  fief_escheated: "{who} died childless — the fief escheats back to you"
   law_changed: "{who} enacts the law: {law}"
   secret_learned: "You learned a secret — {secret}: {who}"
   secret_known_by: "{who} has learned your secret: {secret}"
   secret_exposed: "Secret exposed — {secret}: {who} (exposed by {by})"
-  hook_on_cooldown: The hook is on cooldown
   hook_used_on_you: "{who} used a hook on you — you had to agree: {what}"
   faction_created: "{who} founds the {faction} against {liege}"
   faction_demands_accepted: "{liege} yields to the demands of the {faction}"
