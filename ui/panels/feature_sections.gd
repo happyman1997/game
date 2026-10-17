@@ -151,8 +151,47 @@ static func council(app: App, liege: Dictionary) -> Variant:
 				Council.set_task(g, liege, pid2, tid)
 				app.mark_dirty(true), {"icon": t.get("icon", "scroll"), "toggled": active, "disabled": not mine and not active,
 				"tip": func(): return _task_tip(app, liege, pid2, t, holder)}))
-		list.add_child(K.panel(K.vbox([title, row, tasks], 4), "InsetPanel"))
-	return K.section(app.t("ui.council"), [K.para(app.t("ui.council_hint"), "SmallLabel"), list], "council")
+		var box := K.vbox([title, row, tasks], 4)
+		var proj: Variant = _project_bar(app, liege, pos.id, seat)
+		if proj != null:
+			box.add_child(proj)
+		list.add_child(K.panel(box, "InsetPanel"))
+	return K.section(app.t("ui.council"), [K.para(app.t("ui.council_hint"), "SmallLabel"), _pay_row(app, liege, mine), list], "council")
+
+
+## Жалованье совету: три уровня платы, в подсказке — сколько и что даёт.
+static func _pay_row(app: App, liege: Dictionary, mine: bool) -> Control:
+	var g := app.game
+	var row := K.hbox([K.icon("gold", 18), K.label(app.t("ui.council_pay"), "SubheaderLabel")], 6)
+	var cur := Council.pay_level(liege)
+	var n := maxi(1, Council.seated(g, liege).size())
+	for lvl in ["low", "normal", "generous"]:
+		var d := Council.pay_def(g, lvl)
+		var seat := Economy.domain_tax(g, liege) * Data.num(d.get("share"))
+		var level: String = lvl
+		row.add_child(K.button(app.t("ui.council_pay_" + lvl), func():
+			if mine and Council.set_pay(g, liege, level):
+				app.mark_dirty(true), {"toggled": cur == lvl, "disabled": not mine and cur != lvl,
+			"tip": BB.esc(app.t("ui.council_pay_tip", {"seat": K.fmt(seat, 2), "total": K.fmt(seat * n, 1), "opinion": K.signed(Data.num(d.get("opinion"))), "speed": K.fmt(Data.num(d.get("speed"), 1.0), 1)}))}))
+	return row
+
+
+## Полоса дела советника: прогресс к событию по завершении задачи.
+static func _project_bar(app: App, liege: Dictionary, pos_id: String, seat: Variant) -> Variant:
+	var g := app.game
+	if seat == null or seat.get("holder") == null or seat.get("task") == null:
+		return null
+	var t: Variant = g.content.get_def("council_tasks", seat.task)
+	if t == null or t.get("project") == null:
+		return null
+	var ev_name := g.loc.t_or("ev.%s.t" % t.project, str(t.project))
+	var prog := Data.num(seat.get("progress"))
+	var rate := Council.progress_rate(g, liege, pos_id)
+	var bar := K.bar(prog, 100.0, Color("#d8a84a"), 8, "")
+	var lbl := K.label(app.t("ui.council_project", {"name": ev_name}), "SmallLabel")
+	var box := K.vbox([lbl, bar], 2)
+	K.tip(box, BB.esc(app.t("ui.council_project_tip", {"value": roundi(prog), "rate": K.fmt(rate, 1), "months": ceili(maxf(0.0, 100.0 - prog) / maxf(0.1, rate)), "name": ev_name})))
+	return box
 
 
 static func _task_tip(app: App, liege: Dictionary, pos_id: String, t: Dictionary, holder: Variant) -> String:
@@ -166,6 +205,8 @@ static func _task_tip(app: App, liege: Dictionary, pos_id: String, t: Dictionary
 			if seat != null and seat.get("task") == t.id:
 				bb += "\n" + BB.muted(app.t("ui.task_monthly_chance", {"n": snappedf(Council.task_monthly_chance(g, liege, pos_id), 0.1)}))
 			bb += "\n" + BB.desc_lines(Interp.describe_effect(ctx, ctx.root, t.monthly_effect))
+	if t.get("project") != null:
+		bb += "\n" + BB.gold(app.t("ui.council_project", {"name": g.loc.t_or("ev.%s.t" % t.project, str(t.project))}))
 	return bb
 
 

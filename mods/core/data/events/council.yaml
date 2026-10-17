@@ -1,0 +1,207 @@
+# Дела совета (механика council): задача советника копит прогресс по его
+# навыку, а дойдя до 100, завершается одним из этих событий — у сюзерена
+# (root), scope:councillor — советник. Задача указывает своё событие полем
+# project (common/council.yaml).
+
+opinion_modifiers:
+  dispute_ignored: { value: -10, years: 3 }
+  friendly_embassy: { value: 20, years: 10 }
+  # мнение графства
+  harsh_collection: { value: -12, years: 3 }
+  arrears_forgiven: { value: 15, years: 5 }
+  levies_released: { value: 8, years: 3 }
+  sermon_heard: { value: 8, years: 3 }
+  new_roads: { value: 10, years: 5 }
+
+modifiers:
+  drilled_levies: { icon: "📯", modifiers: { levy_mult: 0.15 }, good: true }
+  drilled_knights: { icon: "🎯", modifiers: { knight_effectiveness: 0.15 }, good: true }
+  battle_manual: { icon: "📖", modifiers: { commander_advantage: 2 }, good: true }
+
+events:
+  # Канцлер — дела державы: спор вассалов
+  council.0101:
+    theme: realm
+    icon: "⚖"
+    trigger: { num_vassals: ">= 2" }
+    immediate:
+      - random_vassal: { save_scope_as: vassal_a }
+      - random_vassal:
+          limit: { NOT: { is_same_as: scope:vassal_a } }
+          save_scope_as: vassal_b
+    options:
+      - effect:
+          add_prestige: 10
+          scope:vassal_a: { add_opinion: { target: root, modifier: grateful } }
+          scope:vassal_b: { add_opinion: { target: root, modifier: insulted } }
+        ai_chance: { value: 25, add: { value: ai_vengefulness, multiply: 5 } }
+      - trigger: { gold: 25 }
+        effect:
+          add_gold: -25
+          scope:vassal_a: { add_opinion: { target: root, modifier: grateful } }
+          scope:vassal_b: { add_opinion: { target: root, modifier: grateful } }
+        ai_chance: { value: 35, add: { value: scope:councillor.diplomacy, multiply: 1 } }
+      - effect:
+          scope:vassal_a: { add_opinion: { target: root, modifier: dispute_ignored } }
+          scope:vassal_b: { add_opinion: { target: root, modifier: dispute_ignored } }
+        ai_chance: 15
+
+  # Канцлер — внешние сношения: посольство соседа
+  council.0102:
+    theme: court
+    icon: "🕊"
+    trigger: { any_neighboring_ruler: { is_alive: yes } }
+    immediate:
+      random_neighboring_ruler: { save_scope_as: envoy_lord }
+    options:
+      - effect: { add_gold: { value: scope:envoy_lord.tier, multiply: 15, add: 15 } }
+        ai_chance: { value: 30, add: { value: ai_greed, multiply: 10 } }
+      - effect:
+          scope:envoy_lord: { add_opinion: { target: root, modifier: friendly_embassy } }
+          add_prestige: 10
+        ai_chance: 40
+      - effect:
+          add_prestige: 30
+          scope:envoy_lord: { add_opinion: { target: root, modifier: insulted } }
+        ai_chance: { value: 10, add: { value: ai_cruelty, multiply: 4 } }
+
+  # Казначей — сбор податей: недоимки
+  council.0103:
+    theme: wealth
+    icon: "🪙"
+    trigger: { num_counties: ">= 1" }
+    immediate:
+      random_domain_province: { save_scope_as: province }
+    options:
+      - effect:
+          add_gold: { value: scope:councillor.stewardship, multiply: 3, add: 20 }
+          scope:province: { add_county_opinion: harsh_collection }
+        ai_chance: { value: 35, add: { value: ai_greed, multiply: 10 } }
+      - effect:
+          scope:province: { add_county_opinion: arrears_forgiven }
+        ai_chance: { value: 25, add: { value: ai_compassion, multiply: 5 } }
+      - effect: { add_gold: { value: scope:councillor.stewardship, multiply: 1.5, add: 10 } }
+        ai_chance: 30
+
+  # Казначей — развитие домена: новые дороги
+  council.0104:
+    theme: development
+    icon: "🛤"
+    trigger: { num_counties: ">= 1" }
+    immediate:
+      random_domain_province:
+        weight: { value: 30, subtract: development, min: 1 }
+        save_scope_as: province
+    options:
+      - effect:
+          capital: { add_development: 2 }
+        ai_chance: 30
+      - effect:
+          scope:province:
+            add_development: 3
+            add_county_opinion: new_roads
+        ai_chance: 40
+      - effect: { add_gold: { value: scope:councillor.stewardship, multiply: 2, add: 20 } }
+        ai_chance: { value: 15, add: { value: ai_greed, multiply: 8 } }
+
+  # Маршал — сбор ополчения: смотр
+  council.0105:
+    theme: war
+    icon: "📯"
+    options:
+      - trigger: { gold: 20 }
+        effect:
+          add_gold: -20
+          add_modifier: { id: drilled_levies, years: 3 }
+        ai_chance: { value: 30, if: { limit: { is_at_war: yes }, add: 40 } }
+      - trigger: { gold: 30 }
+        effect:
+          add_gold: -30
+          add_prestige: 40
+        ai_chance: 20
+      - effect:
+          every_domain_province: { add_county_opinion: levies_released }
+        ai_chance: { value: 30, add: { value: ai_compassion, multiply: 5 } }
+
+  # Маршал — обучение полководцев: учения
+  council.0106:
+    theme: war
+    icon: "🎯"
+    options:
+      - effect: { add_modifier: { id: drilled_knights, years: 3 } }
+        ai_chance: 35
+      - effect: { add_modifier: { id: battle_manual, years: 5 } }
+        ai_chance: 35
+      - trigger: { gold: 25 }
+        effect:
+          add_gold: -25
+          scope:councillor: { add_opinion: { target: root, modifier: grateful } }
+        ai_chance: 20
+
+  # Тайный советник — раскрытие заговоров: нити заговора
+  council.0107:
+    theme: intrigue
+    icon: "🕸"
+    trigger:
+      any_courtier: { is_adult: yes, NOT: { is_same_as: scope:councillor } }
+    immediate:
+      random_courtier:
+        limit: { is_adult: yes, NOT: { is_same_as: scope:councillor } }
+        save_scope_as: suspect
+    options:
+      - effect: { imprison: { target: scope:suspect, reason: crime } }
+        ai_chance: { value: 20, add: { value: ai_cruelty, multiply: 6 } }
+      - effect: { add_hook: { target: scope:suspect, years: 10 } }
+        ai_chance: { value: 40, add: { value: scope:councillor.intrigue, multiply: 1 } }
+      - effect:
+          scope:suspect: { add_opinion: { target: root, modifier: grateful } }
+        ai_chance: { value: 20, add: { value: ai_compassion, multiply: 6 } }
+
+  # Тайный советник — поиск претензий: подложная грамота
+  council.0108:
+    theme: intrigue
+    icon: "📜"
+    trigger: { any_neighboring_county: { always: yes } }
+    immediate:
+      random_neighboring_county: { save_scope_as: claim_target }
+    options:
+      - effect: { add_claim: scope:claim_target }
+        ai_chance: { value: 40, add: { value: ai_greed, multiply: 5 } }
+      - effect: { add_gold: 50 }
+        ai_chance: { value: 25, add: { value: ai_greed, multiply: 8 } }
+      - effect: { add_piety: 20 }
+        ai_chance: { value: 10, add: { value: ai_honor, multiply: 8 } }
+
+  # Духовник — наставничество: проповедь
+  council.0109:
+    theme: faith
+    icon: "🙏"
+    options:
+      - effect:
+          every_domain_province: { add_county_opinion: sermon_heard }
+        ai_chance: 35
+      - effect:
+          add_stress: -25
+          add_piety: 20
+        ai_chance: { value: 25, if: { limit: { stress: ">= 40" }, add: 40 } }
+      - effect:
+          add_piety: 45
+          add_prestige: -10
+        ai_chance: { value: 20, add: { value: ai_zeal, multiply: 6 } }
+
+  # Духовник — покровительство наукам: учёный муж
+  council.0110:
+    theme: court
+    icon: "📚"
+    options:
+      - effect:
+          create_character: { age: 45, traits: [scholar], court: root, save_scope_as: scholar }
+        ai_chance: 30
+      - trigger: { primary_heir: { is_child: yes } }
+        effect:
+          primary_heir: { add_education_points: 25 }
+        ai_chance: 45
+      - effect:
+          add_prestige: 20
+          add_lifestyle_xp: 40
+        ai_chance: 25

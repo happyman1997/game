@@ -1,0 +1,74 @@
+# Council projects: events when a task is completed (events/council.yaml).
+opinion_modifier:
+  dispute_ignored: Liege would not judge our dispute
+  friendly_embassy: Friendly embassy
+  harsh_collection: Arrears beaten out of us
+  arrears_forgiven: Our arrears were forgiven
+  levies_released: Levies sent home for the harvest
+  sermon_heard: The chaplain's sermon
+  new_roads: New roads
+modifier:
+  drilled_levies: Drilled levies
+  drilled_knights: Knights at drill
+  battle_manual: Manual of battle
+ev:
+  council.0101:
+    t: Vassals' Dispute
+    desc: "[scope:councillor.first_name], your chancellor, brings a complaint: [scope:vassal_a] and [scope:vassal_b] quarrel over a boundary and threaten each other with steel. Both await your word."
+    a: "[scope:vassal_a] is in the right"
+    b: Reconcile them with gifts (−25 gold)
+    c: Let them settle it themselves
+  council.0102:
+    t: An Embassy
+    desc: "Thanks to [scope:councillor.first_name], envoys of [scope:envoy_lord] have come to court bearing gifts and awaiting an answer."
+    a: Accept the gifts gratefully
+    b: Answer with friendship
+    c: Throw the envoys out
+  council.0103:
+    t: Arrears
+    desc: "Steward [scope:councillor.first_name] found years of arrears in the books of [scope:province]. The peasants swear they have nothing to pay with."
+    a: Collect to the last coin
+    b: Forgive the arrears
+    c: Take half and close the book
+  council.0104:
+    t: New Roads
+    desc: "[scope:councillor.first_name] proposes spending the treasury's savings on roads and bridges. Backward [scope:province] needs it most."
+    a: Pave the roads to the capital
+    b: "Lift up [scope:province]"
+    c: Keep the money in the treasury
+  council.0105:
+    t: Muster of the Levies
+    desc: "Marshal [scope:councillor.first_name] has counted the levies: there are men, but no training. Your orders?"
+    a: Three years of drill (−20 gold)
+    b: A parade in the capital (−30 gold)
+    c: Send the men home for the harvest
+  council.0106:
+    t: Training the Commanders
+    desc: "[scope:councillor.first_name] has finished training your knights and captains. What next?"
+    a: Keep drilling the knights
+    b: Write a manual of battle
+    c: Reward the marshal (−25 gold)
+  council.0107:
+    t: Threads of a Plot
+    desc: "Spymaster [scope:councillor.first_name] has tracked down [scope:suspect], who secretly corresponds with enemies of the court. The proof is thin, but it exists."
+    a: Arrest them
+    b: Keep silent — and keep them on a hook
+    c: Forgive them and bring them close
+  council.0108:
+    t: A Forged Charter
+    desc: "[scope:councillor.first_name] found in foreign archives a charter to [scope:claim_target]. Genuine or not hardly matters if no one can prove otherwise."
+    a: Put it to use
+    b: Sell it to the neighbour (+50 gold)
+    c: Burn it — I'll not take this sin
+  council.0109:
+    t: A Sermon
+    desc: "Chaplain [scope:councillor.first_name] is ready to speak to the people and to you. What shall the sermon be about?"
+    a: Loyalty to the land and its lord
+    b: Penance — for me alone
+    c: The vices of the court
+  council.0110:
+    t: A Learned Man
+    desc: "[scope:councillor.first_name] found a scholar worth bringing close: he knows tongues, numbers and the stars."
+    a: Bring him to court
+    b: Let him teach the heir
+    c: Let him copy books

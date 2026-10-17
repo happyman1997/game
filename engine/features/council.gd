@@ -2,15 +2,23 @@ class_name Council
 extends EngineFeature
 ## Совет правителя: должности (канцлер, казначей, маршал, тайный советник,
 ## духовник), у каждой — набор задач. Задача даёт сюзерену модификаторы,
-## зависящие от навыка советника, и может каждый месяц с некоторым шансом
-## запускать эффект (например, развить провинцию или раскрыть заговор).
+## зависящие от навыка советника, может каждый месяц с некоторым шансом
+## запускать эффект (например, развить провинцию или раскрыть заговор), а
+## главное — ведёт дело: прогресс копится по навыку советника, и, дойдя до
+## 100, дело завершается событием с выбором (project: id события).
+##
+## Совет на жалованье: каждое место стоит сюзерену доли налогов с домена
+## (по уровню платы: скупое, обычное, щедрое — defines.council.pay), плату
+## получает советник. Щедрая плата — советники довольнее и работают быстрее.
 ##
 ## Данные:
 ##   council_positions: { skill, icon, order, is_shown, candidate }
-##   council_tasks:     { position, icon, default, liege_modifiers, monthly_chance, monthly_effect, ai_will_do }
-##   defines.council:   { councillor_opinion, ai_replace_skill_gap, dismiss_opinion_modifier }
-## Скоупы задач: root = scope:councillor, scope:liege.
-## Состояние: liege.council = { должность: {holder, task, since} }.
+##   council_tasks:     { position, icon, default, liege_modifiers, monthly_chance, monthly_effect, project, ai_will_do }
+##   defines.council:   { councillor_opinion, ai_replace_skill_gap, dismiss_opinion_modifier, pay, progress_base, progress_per_skill }
+## Скоупы задач: root = scope:councillor, scope:liege; событие дела — у
+## сюзерена (root), scope:councillor — советник.
+## Состояние: liege.council = { должность: {holder, task, since, progress} },
+## liege.vars.council_pay — уровень платы.
 
 const OWNER := "core/council"
 
@@ -147,6 +155,8 @@ static func set_task(game: Game, liege: Dictionary, pos_id: String, task: String
 		liege["council"] = {}
 	if not liege.council.has(pos_id):
 		liege.council[pos_id] = {"holder": null, "task": null, "since": null}
+	if liege.council[pos_id].task != task:
+		liege.council[pos_id]["progress"] = 0.0
 	liege.council[pos_id].task = task
 	_invalidate(game, liege)
 	return true
@@ -158,6 +168,84 @@ static func _invalidate(game: Game, liege: Dictionary) -> void:
 	for k in game.stat_cache.keys():
 		if k.begins_with("op:"):
 			game.stat_cache.erase(k)
+
+
+# ------------------------------------------------------------ жалованье
+
+## Уровень платы совету: low | normal | generous.
+static func pay_level(liege: Dictionary) -> String:
+	return str(liege.vars.get("council_pay", "normal"))
+
+
+static func pay_def(game: Game, level: String) -> Dictionary:
+	var all: Variant = game.def_val("council.pay", {})
+	var d: Variant = all.get(level) if all is Dictionary else null
+	return d if d is Dictionary else {"share": 0.03, "opinion": 0, "speed": 1.0}
+
+
+static func set_pay(game: Game, liege: Dictionary, level: String) -> bool:
+	var all: Variant = game.def_val("council.pay", {})
+	if not (all is Dictionary) or not all.has(level):
+		return false
+	liege.vars["council_pay"] = level
+	_invalidate(game, liege)
+	return true
+
+
+## Жалованье одного места в месяц: доля налогов с домена сюзерена.
+static func salary(game: Game, liege: Dictionary) -> float:
+	if liege.titles.is_empty():
+		return 0.0
+	return Economy.domain_tax(game, liege) * Data.num(pay_def(game, pay_level(liege)).get("share"), 0.03)
+
+
+## Занятые места (живые советники).
+static func seated(game: Game, liege: Dictionary) -> Array:
+	var out := []
+	if liege.get("council") == null:
+		return out
+	for pos_id in liege.council:
+		var h: Variant = liege.council[pos_id].get("holder")
+		if h != null and game.is_alive(h):
+			out.append(pos_id)
+	return out
+
+
+## Всё жалованье совета в месяц.
+static func wages(game: Game, liege: Dictionary) -> float:
+	var n := seated(game, liege).size()
+	return salary(game, liege) * n if n > 0 else 0.0
+
+
+# ------------------------------------------------------------ дела
+
+## Прогресс дела в месяц: (база + навык × коэф.) × скорость по уровню платы.
+static func progress_rate(game: Game, liege: Dictionary, pos_id: String) -> float:
+	var seat: Variant = seat_of(liege, pos_id)
+	if seat == null or seat.get("holder") == null or seat.get("task") == null:
+		return 0.0
+	var t: Variant = game.content.get_def("council_tasks", seat.task)
+	var pos: Variant = game.content.get_def("council_positions", pos_id)
+	var c: Variant = game.ch(seat.holder)
+	if t == null or t.get("project") == null or pos == null or c == null:
+		return 0.0
+	var sk := Stats.skill(game, c, str(pos.get("skill")))
+	var rate := game.def_num("council.progress_base", 2.0) + sk * game.def_num("council.progress_per_skill", 0.4)
+	return maxf(0.5, rate) * Data.num(pay_def(game, pay_level(liege)).get("speed"), 1.0)
+
+
+static func _advance_project(game: Game, liege: Dictionary, pos_id: String, seat: Dictionary) -> void:
+	var t: Variant = game.content.get_def("council_tasks", seat.task)
+	if t == null or t.get("project") == null:
+		return
+	seat["progress"] = Data.num(seat.get("progress")) + progress_rate(game, liege, pos_id)
+	if float(seat.progress) < 100.0:
+		return
+	var ok := game.events.fire(str(t.project), {"type": "character", "id": liege.id}, {"councillor": {"type": "character", "id": seat.holder}})
+	# не к месту (условия события) — дело подождёт
+	seat.progress = 0.0 if ok else 50.0
+	if ok:
+		game.emit("council.project_done", {"liege": liege, "position": pos_id, "task": t.id, "councillor": seat.holder})
 
 
 static func _seat_context(game: Game, liege: Dictionary, holder: String) -> ScriptContext:
@@ -258,20 +346,28 @@ static func monthly_char(game: Game, liege: Dictionary) -> void:
 		# Пустые места ИИ заполняет раз в квартал (в январе — и заменяет слабых):
 		# подбор кандидатов дорогой, а совет меняется нечасто.
 		fill(game, liege, month == 1)
+		_ai_pay(game, liege)
 		for pos in positions(game):
 			var seat: Variant = seat_of(liege, pos.id)
 			if seat != null and seat.get("holder") != null and game.rng.chance(0.27):
 				var t: Variant = _ai_pick_task(game, liege, pos.id)
 				if t != null and t != seat.get("task"):
 					set_task(game, liege, pos.id, t)
-	# ежемесячные эффекты задач и «пульс» советников для событий
+	# ежемесячные эффекты задач, дела, жалованье безземельным и «пульс» советников
 	if liege.get("council") == null:
 		return
+	var pay := salary(game, liege)
 	for pos_id in liege.council.keys():
 		var seat: Dictionary = liege.council[pos_id]
 		if seat.get("holder") == null:
 			continue
+		var holder: Variant = game.ch(seat.holder)
+		# правители-советники получают жалованье строкой дохода, безземельные — здесь
+		if holder != null and holder.titles.is_empty() and pay > 0.0:
+			Treasury.add(game, holder, pay, "council_salary", true)
 		game.on_action("on_councillor_pulse", {"type": "character", "id": seat.holder}, {"liege": {"type": "character", "id": liege.id}})
+		if seat.get("holder") != null and seat.get("task") != null:
+			_advance_project(game, liege, pos_id, seat)
 		if seat.get("task") == null or seat.get("holder") == null:
 			continue
 		var t: Variant = game.content.get_def("council_tasks", seat.task)
@@ -282,6 +378,18 @@ static func monthly_char(game: Game, liege: Dictionary) -> void:
 		var ctx := _seat_context(game, liege, seat.holder)
 		Interp.run_effect(ctx, ctx.root, t.monthly_effect)
 		game.emit("council.task_fired", {"liege": liege, "position": pos_id, "task": t.id})
+
+
+## ИИ: плата совету по казне и нраву — бедный и жадный платит скупо,
+## богатый и щедрый — щедро.
+static func _ai_pay(game: Game, liege: Dictionary) -> void:
+	var level := "normal"
+	if float(liege.gold) < game.def_num("council.ai_low_pay_below", 40) or Economy.monthly_income(game, liege) < 0.0 or liege.traits.has("greedy"):
+		level = "low"
+	elif float(liege.gold) > game.def_num("ai.rich_gold", 400) or liege.traits.has("generous"):
+		level = "generous"
+	if level != pay_level(liege):
+		set_pay(game, liege, level)
 
 
 static func monthly(game: Game) -> void:
@@ -311,6 +419,30 @@ func install(engine: GameEngine) -> void:
 		if c.get("council") == null:
 			return null
 		return game.cached_monthly("council:" + c.id, func(): return Council.council_modifiers(game, c))
+	}, OWNER)
+	# жалованье совету — строка расходов сюзерена; правитель-советник получает строкой дохода
+	engine.hooks.on("economy.income", func(p):
+		var v := Council.wages(p.game, p.character)
+		return {"label": p.game.loc.t("ui.council_wages"), "value": -v, "key": "council_wages"} if v > 0.0 else null
+	, 0, OWNER)
+	engine.hooks.on("economy.income", func(p):
+		var pos: Variant = Council.position_of(p.game, p.character)
+		if pos == null:
+			return null
+		var v := Council.salary(p.game, pos.liege)
+		return {"label": p.game.loc.t("ui.council_salary"), "value": v, "key": "council_salary"} if v > 0.0 else null
+	, 0, OWNER)
+	# плата совету — в мнении советников
+	engine.opinion_providers.register("council_pay", {"fn": func(game: Game, a: Dictionary, b: Dictionary) -> Variant:
+		if b.get("council") == null:
+			return null
+		var v := Data.num(Council.pay_def(game, Council.pay_level(b)).get("opinion"))
+		if v == 0.0:
+			return null
+		for pos in b.council:
+			if b.council[pos].get("holder") == a.id:
+				return {"label": game.loc.t("opinion.council_pay_" + Council.pay_level(b)), "value": v}
+		return null
 	}, OWNER)
 	engine.opinion_providers.register("council", {"fn": func(game: Game, a: Dictionary, b: Dictionary) -> Variant:
 		if b.get("council") == null:
@@ -412,4 +544,6 @@ func register_script(engine: GameEngine) -> void:
 		for t in e.content.all("council_tasks"):
 			v.ref("council_positions", t.get("position"), "council_tasks/" + t.id)
 			v.effect(t.get("monthly_effect"), "council_tasks/%s monthly_effect" % t.id)
+			if t.get("project") != null:
+				v.ref("events", t.project, "council_tasks/%s project" % t.id)
 	, OWNER)

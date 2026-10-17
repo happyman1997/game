@@ -214,6 +214,15 @@ defines:
     ai_replace_skill_gap: 4         # ИИ меняет советника, если кандидат лучше на столько
     dismiss_opinion_modifier: dismissed_from_council
     ai_task_jitter: 4               # случайная добавка к пользе задачи — ИИ выбирает разнообразнее
+    # дела: прогресс в месяц = (база + навык × коэф.) × скорость платы; 100 — событие
+    progress_base: 2
+    progress_per_skill: 0.4
+    # жалованье: доля налогов с домена за каждое место, мнение советников, скорость дел
+    pay:
+      low: { share: 0.015, opinion: -10, speed: 0.7 }
+      normal: { share: 0.03, opinion: 0, speed: 1.0 }
+      generous: { share: 0.06, opinion: 10, speed: 1.3 }
+    ai_low_pay_below: 40            # ИИ платит скупо, когда казна тоньше
 
   prison:
     escape_chance: 0.004            # в месяц

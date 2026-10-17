@@ -91,7 +91,16 @@ ui:
   knights: Knights
   knights_hint: "Your most valiant courtiers and vassals march with your main army. Right now they are worth {n} levies. Knights get wounded and die in battle."
   no_knights: No suitable knights (prowess 6+ required).
-  council_hint: Councillors strengthen the ruler depending on their skills and the chosen task.
+  council_hint: Councillors strengthen the ruler by their skills, run projects (progress by skill, ending in an event with a choice) and draw a salary from domain taxes.
+  council_wages: Council wages
+  council_salary: Council salary
+  council_pay: "Council pay"
+  council_pay_low: Stingy
+  council_pay_normal: Normal
+  council_pay_generous: Generous
+  council_pay_tip: "Per seat: {seat} a month, the whole council: {total}. Councillors' opinion: {opinion}. Project speed: ×{speed}."
+  council_project: "Project: {name}"
+  council_project_tip: "Progress {value}% (+{rate} a month, ~{months} more months). Ends with the event \"{name}\" and a choice."
 msg:
   law_changed: "{who} enacts the law: {law}"
   secret_learned: "You learned a secret — {secret}: {who}"

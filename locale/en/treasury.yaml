@@ -28,6 +28,8 @@ ledger:
   inheritance: Inheritance
   embezzlement: Embezzlement
   politics: Elections
+  council_wages: Council wages
+  council_salary: Council salary
   other: Other
 month_short:
   1: Jan
@@ -61,3 +63,6 @@ ui:
   treasury_expense: Spending
   treasury_year_total: "This year: {income} income, {expense} spending"
   treasury_goal: "Saving for: {name} — {cost}"
+opinion:
+  council_pay_low: Stingy pay
+  council_pay_generous: Generous pay

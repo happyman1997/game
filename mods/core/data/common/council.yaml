@@ -16,6 +16,7 @@ council_tasks:
   # ---------------------------------------------------------------- канцлер
   domestic_affairs:
     position: chancellor
+    project: council.0101
     icon: "🏛"
     default: yes
     liege_modifiers:
@@ -23,6 +24,7 @@ council_tasks:
     ai_will_do: { value: 10, add: { value: num_vassals, multiply: 2, max: 20 } }
   foreign_affairs:
     position: chancellor
+    project: council.0102
     icon: "🌍"
     liege_modifiers:
       monthly_prestige: { value: diplomacy, multiply: 0.06 }
@@ -31,6 +33,7 @@ council_tasks:
   # ---------------------------------------------------------------- казначей
   collect_taxes:
     position: steward
+    project: council.0103
     icon: "🪙"
     default: yes
     liege_modifiers:
@@ -38,6 +41,7 @@ council_tasks:
     ai_will_do: { value: 10, if: { limit: { gold: "< 50" }, add: 15 } }
   develop_domain:
     position: steward
+    project: council.0104
     icon: "🏗"
     monthly_chance: { value: stewardship, multiply: 0.6 }
     monthly_effect:
@@ -51,6 +55,7 @@ council_tasks:
   # ---------------------------------------------------------------- маршал
   organize_levies:
     position: marshal
+    project: council.0105
     icon: "📯"
     default: yes
     liege_modifiers:
@@ -58,6 +63,7 @@ council_tasks:
     ai_will_do: { value: 10, if: { limit: { is_at_war: yes }, add: 10 } }
   train_commanders:
     position: marshal
+    project: council.0106
     icon: "🎯"
     liege_modifiers:
       commander_advantage: { value: martial, multiply: 0.4 }
@@ -66,6 +72,7 @@ council_tasks:
   # ---------------------------------------------------------------- тайный советник
   disrupt_schemes:
     position: spymaster
+    project: council.0107
     icon: "🛡"
     default: yes
     liege_modifiers:
@@ -76,6 +83,7 @@ council_tasks:
     ai_will_do: { value: 10, if: { limit: { has_trait: paranoid }, add: 20 } }
   fabricate_claims:
     position: spymaster
+    project: council.0108
     icon: "📝"
     monthly_chance: { value: intrigue, multiply: 0.15 }
     monthly_effect:
@@ -99,6 +107,7 @@ council_tasks:
   # ---------------------------------------------------------------- духовник
   spiritual_guidance:
     position: court_chaplain
+    project: council.0109
     icon: "🙏"
     default: yes
     liege_modifiers:
@@ -106,6 +115,7 @@ council_tasks:
     ai_will_do: 10
   promote_learning:
     position: court_chaplain
+    project: council.0110
     icon: "📚"
     liege_modifiers:
       lifestyle_xp_mult: { value: learning, multiply: 0.015 }
