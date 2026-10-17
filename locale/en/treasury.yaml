@@ -28,6 +28,7 @@ ledger:
   inheritance: Inheritance
   embezzlement: Embezzlement
   politics: Elections
+  hooks: Hooks: debts
   council_wages: Council wages
   council_salary: Council salary
   other: Other

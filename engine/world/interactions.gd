@@ -7,6 +7,8 @@ extends RefCounted
 ## Поставщик целей: {label?, options: Callable(game, actor, recipient) -> Array[{id, label, ref?}]}.
 ## Решающий: {decider: Callable(game, recipient, actor) -> Dictionary|null}.
 ## Аргументы (args): {secondary?: id, target?: скоуп, use_hook?: bool}.
+## hook_cost: yes — предложение «по крюку»: доступно, только если у действующего
+## лица есть крюк на получателя; крюк расходуется, а получатель не может отказать.
 
 
 static func context(game: Game, def: Dictionary, actor: Dictionary, recipient: Dictionary, args: Dictionary = {}) -> ScriptContext:
@@ -56,8 +58,14 @@ static func is_shown(game: Game, def: Dictionary, actor: Dictionary, recipient: 
 	var mode: String = str(def.get("prisoner", "never"))
 	if (mode == "never") if recipient.get("prison") != null else (mode == "only"):
 		return false
+	if _hook_cost(def) and Leverage.hook_on(game, actor, recipient.id) == null:
+		return false
 	var ctx := context(game, def, actor, recipient)
 	return Interp.eval_trigger(ctx, ctx.root, def.get("is_shown"))
+
+
+static func _hook_cost(def: Dictionary) -> bool:
+	return ScriptContext.is_yes(def.get("hook_cost", false))
 
 
 ## Часть is_shown только про действующее лицо — блок scope:actor, который не
@@ -159,6 +167,8 @@ static func blockers(game: Game, def: Dictionary, actor: Dictionary, recipient: 
 	var ctx := context(game, def, actor, recipient, args)
 	var out := Interp.failed_triggers(ctx, ctx.root, def.get("is_valid"))
 	out.append_array(Economy.cost_blockers(game, actor, cost(game, def, ctx)))
+	if _hook_cost(def) and not Leverage.can_use_hook(game, actor, recipient.id):
+		out.append(game.loc.t("ui.hook_on_cooldown"))
 	var cd: Variant = actor.flags.get(_cooldown_key(def, recipient))
 	if cd != null and cd > game.date:
 		out.append(game.loc.t("ui.on_cooldown", {"days": int(cd) - game.date}))
@@ -184,7 +194,7 @@ static func hook_available(game: Game, def: Dictionary, actor: Dictionary, recip
 
 
 static func is_auto_accept(game: Game, def: Dictionary, ctx: ScriptContext, actor: Dictionary, recipient: Dictionary, args: Dictionary = {}) -> bool:
-	if def.get("scheme") != null:
+	if def.get("scheme") != null or _hook_cost(def):
 		return true
 	if args.get("use_hook", false) and hook_available(game, def, actor, recipient):
 		return true
@@ -231,7 +241,11 @@ static func execute(game: Game, def: Dictionary, actor: Dictionary, recipient: D
 			Interp.run_effect(ctx, ctx.root, def.get("on_accept"))
 		return "scheme" if s != null else "invalid"
 	if is_auto_accept(game, def, ctx, actor, recipient, args):
-		if args.get("use_hook", false) and hook_available(game, def, actor, recipient):
+		if _hook_cost(def):
+			Leverage.use_hook(game, actor, recipient.id)
+			if game.is_player(recipient.id):
+				game.message(game.loc.t("msg.hook_used_on_you", {"who": game.scope_name({"type": "character", "id": actor.id}), "what": game.name_of("interactions", def.id)}), "bad", {"type": "character", "id": actor.id})
+		elif args.get("use_hook", false) and hook_available(game, def, actor, recipient):
 			var decider := decider_of(game, def, recipient)
 			Leverage.use_hook(game, actor, decider.id)
 			if game.is_player(decider.id):

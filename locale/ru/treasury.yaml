@@ -28,6 +28,7 @@ ledger:
   inheritance: Наследство
   embezzlement: Казнокрадство
   politics: Выборы
+  hooks: Крюки: долги
   council_wages: Жалованье совету
   council_salary: Жалованье в совете
   other: Прочее

@@ -69,6 +69,7 @@ defines:
     sources:
       "on_action:on_siege_won": loot
       "interaction:demand_ransom": ransom
+      "interaction:hook_demand_gold": hooks
       "interaction:send_gift": gifts
       "interaction:bribe": gifts
       "interaction:fulfill_ambition": gifts

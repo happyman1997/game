@@ -106,6 +106,7 @@ msg:
   secret_learned: "Вы узнали секрет «{secret}»: {who}"
   secret_known_by: "{who} узнаёт ваш секрет: {secret}"
   secret_exposed: "Разоблачён секрет «{secret}»: {who} (раскрыл: {by})"
+  hook_on_cooldown: Крюк на перерыве
   hook_used_on_you: "{who} давит на вас крюком — вам пришлось согласиться: {what}"
   faction_created: "{who} основывает «{faction}» против {liege}"
   faction_demands_accepted: "{liege} уступает требованиям: «{faction}»"

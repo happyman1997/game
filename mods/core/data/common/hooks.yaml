@@ -1,0 +1,79 @@
+# Применения крюков: предложения «по крюку» (hook_cost: yes) — доступны, если
+# есть крюк на получателя; крюк расходуется (сильный — уходит на перерыв), а
+# получатель не может отказать. Крюки берутся из тайн, интриги «Добыть
+# компромат», дел тайного советника. Выйти из фракции по крюку — обычное
+# demand_leave_faction (factions.yaml) с отметкой «Использовать крюк».
+
+opinion_modifiers:
+  squeezed_by_hook: { value: -20, years: 5 }
+
+modifiers:
+  levies_lent: { icon: "📯", modifiers: { levy_mult: -0.2 } }
+  levies_borrowed: { icon: "📯", modifiers: { levy_mult: 0.2 }, good: true }
+
+interactions:
+  # Потребовать золото: должник отдаёт треть казны (20–400)
+  hook_demand_gold:
+    icon: "🪙"
+    category: intrigue
+    hook_cost: yes
+    is_shown: { scope:recipient: { is_adult: yes } }
+    is_valid: { scope:recipient: { gold: ">= 30" } }
+    on_accept:
+      - scope:recipient:
+          pay_gold: { target: scope:actor, value: { value: gold, multiply: 0.33, min: 20, max: 400 } }
+          add_opinion: { target: scope:actor, modifier: squeezed_by_hook }
+    ai_targets: [hooked]
+    ai_frequency_months: 6
+    ai_will_do:
+      value: 6
+      add: { value: ai_greed, multiply: 6 }
+      if:
+        - limit: { gold: "< 80" }
+          add: 25
+
+  # Потребовать воинов: должник отдаёт часть ополчения на два года
+  hook_demand_levies:
+    icon: "📯"
+    category: intrigue
+    hook_cost: yes
+    is_shown: { scope:recipient: { is_ruler: yes } }
+    on_accept:
+      - scope:recipient:
+          add_modifier: { id: levies_lent, years: 2 }
+          add_opinion: { target: scope:actor, modifier: squeezed_by_hook }
+      - scope:actor: { add_modifier: { id: levies_borrowed, years: 2 } }
+    ai_targets: [hooked]
+    ai_frequency_months: 3
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { is_at_war: yes }
+          add: 45
+
+  # Голос на Соборе: должник голосует так, как нужно вам
+  hook_synod_vote:
+    requires_feature: synod
+    icon: "⚖"
+    category: intrigue
+    hook_cost: yes
+    is_shown:
+      scope:actor: { synod_active: yes }
+      scope:recipient: { synod_active: yes, is_synod_voter: yes }
+    is_valid:
+      scope:recipient: { synod_swayed: no }
+    on_accept:
+      - if:
+          limit: { scope:actor: { synod_preference: ">= 0" } }
+          scope:recipient: { synod_sway: for }
+        else:
+          scope:recipient: { synod_sway: against }
+      - scope:recipient: { add_opinion: { target: scope:actor, modifier: squeezed_by_hook } }
+    ai_targets: [hooked]
+    ai_frequency_months: 2
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { OR: [ { synod_preference: ">= 30" }, { synod_preference: "<= -30" } ] }
+          add: 40
+

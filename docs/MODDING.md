@@ -889,7 +889,31 @@ regiment_types:
 перерыв (`defines.hooks.strong_hook_cooldown_years`). ИИ тоже давит крюками,
 когда очень хочет получить согласие. Запретить крюк во взаимодействии:
 `hookable: no`. Скрипт: `has_hook_on`, `has_strong_hook_on`, `can_use_hook_on`,
-`num_hooks`, `add_hook`, `remove_hook`.
+`num_hooks`, `add_hook`, `remove_hook`; список `hooked` — те, на кого у
+персонажа есть крюк (удобен в `ai_targets`).
+
+**Предложения «по крюку»** (`hook_cost: yes`) видны, только если у
+действующего лица есть крюк на получателя; отказать нельзя, крюк
+расходуется (сильный — уходит на перерыв, тогда предложение недоступно с
+пометкой «крюк на перерыве»). В ядре (`common/hooks.yaml`): потребовать
+золото — треть казны должника, 20–400 (статья казны «Крюки: долги» через
+`defines.treasury.sources`); потребовать воинов — ополчение должника на два
+года переходит к вам (+20% / −20%); голос на Соборе — должник голосует за
+ваше. Выйти из фракции по крюку — обычное `demand_leave_faction` с отметкой
+крюка.
+
+```yaml
+interactions:
+  hook_demand_gold:
+    category: intrigue
+    hook_cost: yes
+    is_valid: { scope:recipient: { gold: ">= 30" } }
+    on_accept:
+      - scope:recipient:
+          pay_gold: { target: scope:actor, value: { value: gold, multiply: 0.33, min: 20, max: 400 } }
+    ai_targets: [hooked]
+    ai_will_do: { value: 6, add: { value: ai_greed, multiply: 6 } }
+```
 
 **Секреты** (механика `secrets`) — постыдные тайны персонажей:
 

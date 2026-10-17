@@ -106,6 +106,7 @@ msg:
   secret_learned: "You learned a secret — {secret}: {who}"
   secret_known_by: "{who} has learned your secret: {secret}"
   secret_exposed: "Secret exposed — {secret}: {who} (exposed by {by})"
+  hook_on_cooldown: The hook is on cooldown
   hook_used_on_you: "{who} used a hook on you — you had to agree: {what}"
   faction_created: "{who} founds the {faction} against {liege}"
   faction_demands_accepted: "{liege} yields to the demands of the {faction}"

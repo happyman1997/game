@@ -560,6 +560,7 @@
 | `grandchild` | character | Внуки | core |
 | `grantable_title` | character | Титулы, которые персонаж может пожаловать (графства домена кроме столицы, лишние герцогства) | core/ambitions |
 | `held_title` | character | Титулы | core |
+| `hooked` | character | Те, на кого у персонажа есть крюк | core |
 | `independent_ruler` | любой | Независимые правители | core |
 | `knight` | character | Рыцари правителя | core/knights |
 | `known_secret_owner` | character | Персонажи, чьи секреты известны этому персонажу | core/secrets |
@@ -641,7 +642,7 @@
 - **interaction_deciders**: `payer`
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `synod_decrees`, `districts`, `grafts`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`, `districts`
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `faith_morals`, `faith_head`, `arcana_faith`, `grafts`
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council_pay`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `faith_morals`, `faith_head`, `arcana_faith`, `grafts`
 - **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`, `karma`, `synod`, `districts`
 - **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

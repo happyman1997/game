@@ -249,6 +249,15 @@ static func register(engine: GameEngine) -> void:
 		return _chars(Titles.realm_members(ctx.game, c).filter(func(x): return x.id != c.id)) if c != null else []
 	)
 	lst.call("courtier", CHAR, "Придворные", func(ctx, s): return _chars(ctx.game.courtiers_of(s.id)))
+	lst.call("hooked", CHAR, "Те, на кого у персонажа есть крюк", func(ctx, s):
+		var c: Variant = _ch(ctx, s)
+		if c == null:
+			return []
+		var out := []
+		for h in c.hooks:
+			if (h.get("expires") == null or h.expires > ctx.game.date) and ctx.game.is_alive(h.target):
+				out.append({"type": "character", "id": h.target})
+		return out)
 	lst.call("dynasty_member", CHAR, "Живые члены династии (со всеми ветвями)", func(ctx, s):
 		var c: Variant = _ch(ctx, s)
 		if c == null or c.dynasty == null:

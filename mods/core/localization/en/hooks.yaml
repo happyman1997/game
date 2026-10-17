@@ -1,0 +1,14 @@
+# Hook uses (common/hooks.yaml).
+interaction:
+  hook_demand_gold: "Hook: demand gold"
+  hook_demand_levies: "Hook: demand soldiers"
+  hook_synod_vote: "Hook: Synod vote"
+interaction_desc:
+  hook_demand_gold: "Remind them of what you know — and take a third of their treasury (20 to 400 gold). They cannot refuse. The hook is spent (a strong one goes on cooldown)."
+  hook_demand_levies: "For two years they lend you part of their levies: yours grow by 20%, theirs shrink. They cannot refuse."
+  hook_synod_vote: "They will vote at the Synod the way you need. They cannot refuse."
+opinion_modifier:
+  squeezed_by_hook: Pressed me with a hook
+modifier:
+  levies_lent: Levies lent under a hook
+  levies_borrowed: Levies borrowed under a hook
