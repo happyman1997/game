@@ -11,6 +11,18 @@ msg:
   broke_the_peace: "You have broken the Peace of the Sun by attacking a coreligionist. The Temple will not forgive it."
   synod_sway_refused: "The ruler would not change their vote at the Synod."
 ev:
+  synod.0002:
+    t: The Synod Is Called
+    desc: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod at Reims. In a year the rulers of the faith will decide a great question — and until then everyone looks for allies."
+    desc_anathema: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod to ask whether the [scope:synod_faith_ruler.faith_name] shall be anathematised. In a year the rulers of the faith will vote. Your vassals wait to hear what their lord will say."
+    desc_reconcile: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod to ask whether the [scope:synod_faith_ruler.faith_name] shall be received back into the Light. In a year the rulers of the faith will vote. Your vassals wait to hear what their lord will say."
+    desc_peace: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod to proclaim the Peace of the Sun — ten years without war between coreligionists. In a year the rulers of the faith will vote. Your vassals wait to hear what their lord will say."
+    desc_tithe: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod to ask for a tithe — a share of taxes for the Temple for twenty years. In a year the rulers of the faith will vote. Your vassals wait to hear what their lord will say."
+    desc_tyrant: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod to cast [scope:synod_target] out of the Light. In a year the rulers of the faith will vote. Your vassals wait to hear what their lord will say."
+    desc_canonize: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod to proclaim [scope:synod_target.name] a saint. In a year the rulers of the faith will vote. Your vassals wait to hear what their lord will say."
+    a: "Declare: I am “for”"
+    b: "Declare: I am “against”"
+    c: Keep silent until the Synod
   synod.0001:
     t: The Synod at Reims
     desc: "The sun-priests have lit a thousand candles beneath the vaults of the Temple of the Sun. [scope:synod_head] opens the Synod, and the rulers of the faith await your word."

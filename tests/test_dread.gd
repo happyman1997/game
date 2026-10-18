@@ -1,6 +1,7 @@
 extends TestCase
 ## Грозная слава: ступени страха и их правила, кто боится (покорные,
-## сломленные, дерзкие), ходоки из графств, черта «Садист».
+## сломленные, дерзкие), ходоки из графств, черта «Садист», события страха
+## с первой ступени.
 
 
 func _game() -> Game:
@@ -140,3 +141,20 @@ func test_sadist() -> void:
 	check(Personality.stress_for(g, h, "execute_prisoner") < 0.0, "казнь садисту в радость")
 	check(Personality.stress_for(g, h, "release_prisoner") > 0.0, "милость тяготит")
 	check(Personality.stress_for(g, h, "drive_away_petitioners") < 0.0, "прогнать ходоков — по душе")
+
+
+func test_dread_events_from_first_tier() -> void:
+	var g := _game()
+	var h: Dictionary = g.ch("harold")
+	_set_dread(g, h, 25)
+	check_eq(Politics.tier_of(g, h).id, "unease", "25 — опасение")
+	var ctx := ScriptContext.make(g, {"type": "character", "id": h.id})
+	var open := 0
+	for id in ["dread.0001", "dread.0002", "dread.0003"]:
+		var ev: Dictionary = g.content.get_def("events", id)
+		var tr: Dictionary = ev.trigger
+		if Interp.eval_trigger(ctx, ctx.root, {"dread_tier": tr.dread_tier}):
+			open += 1
+	check_eq(open, 3, "на опасении открыты три события страха")
+	var t4: Dictionary = g.content.get_def("events", "dread.0004").trigger
+	check(not Interp.eval_trigger(ctx, ctx.root, {"dread_tier": t4.dread_tier}), "«Ворота открыты» — со страха")

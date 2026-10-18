@@ -6,12 +6,14 @@
 
 defines:
   synod:
-    years_min: 10
-    years_max: 15
-    first_years: [3, 6]            # первый Собор после начала игры
+    years_min: 6
+    years_max: 9
+    first_years: [2, 4]            # первый Собор после начала игры
     after_election_years: 2        # новый Великий Светоч созывает не позже
     notice_days: 365               # от созыва до Собора
+    call_event: synod.0002         # игроку при созыве: объявить позицию
     vote_event: synod.0001
+    liege_stance_weight: 15        # насколько позиция сюзерена тянет вассалов
     vote_event_days: 60
     vote_threshold: 5              # слабее — воздерживается
     head_opinion_weight: 0.3       # верность Храму: мнение о Великом Светоче склоняет к его предложению

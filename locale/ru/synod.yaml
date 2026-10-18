@@ -13,6 +13,8 @@ msg:
   synod_decree_expired: "Указ Собора истёк: «{decree}»."
 alert:
   synod: "Собор через {months} мес.: «{question}». Сейчас за {for}, против {against}."
+  synod_stance_for: "Вы объявили: «за»."
+  synod_stance_against: "Вы объявили: «против»."
 ui:
   synod_decree_mod: "Указ Собора: {decree}"
   synod_called_line: "Созван Собор: «{question}» — через {months} мес."
@@ -26,6 +28,10 @@ tr:
   is_synod_voter.not: Не голосует на Соборе
   has_synod_decree: "Действует указ Собора «{decree}»"
 fx:
+  synod_declare:
+    for: "Объявить: «за» — ваши вассалы склонятся к вашему слову"
+    against: "Объявить: «против» — ваши вассалы склонятся к вашему слову"
+    none: Не объявлять позиции
   synod_vote:
     for: Голосовать «за»
     against: Голосовать «против»

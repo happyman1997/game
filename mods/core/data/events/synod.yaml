@@ -2,7 +2,37 @@
 # Событие приходит за defines.synod.vote_event_days до Собора тому, у кого
 # есть голос; scope:synod_head — Великий Светоч, scope:synod_target — цель
 # вопроса, scope:synod_faith_ruler — правитель культа-цели.
+# synod.0002 — при созыве (defines.synod.call_event): объявить позицию,
+# к которой склонятся вассалы.
 events:
+  synod.0002:
+    requires_feature: synod
+    theme: faith
+    icon: "📜"
+    triggered_only: true
+    desc:
+      - trigger: { synod_question: anathema }
+        desc: ev.synod.0002.desc_anathema
+      - trigger: { synod_question: reconcile }
+        desc: ev.synod.0002.desc_reconcile
+      - trigger: { synod_question: peace_of_the_sun }
+        desc: ev.synod.0002.desc_peace
+      - trigger: { synod_question: tithe }
+        desc: ev.synod.0002.desc_tithe
+      - trigger: { synod_question: excommunicate_tyrant }
+        desc: ev.synod.0002.desc_tyrant
+      - trigger: { synod_question: canonize }
+        desc: ev.synod.0002.desc_canonize
+      - desc: ev.synod.0002.desc
+    options:
+      - trigger: { synod_vassal_voters: ">= 1" }
+        effect: { synod_declare: for }
+        ai_chance: { value: 0, if: { limit: { synod_preference: ">= 10" }, add: 100 } }
+      - trigger: { synod_vassal_voters: ">= 1" }
+        effect: { synod_declare: against }
+        ai_chance: { value: 0, if: { limit: { synod_preference: "<= -10" }, add: 100 } }
+      - effect: { synod_declare: none }
+        ai_chance: 10
   synod.0001:
     requires_feature: synod
     theme: faith

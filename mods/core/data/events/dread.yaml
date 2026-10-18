@@ -6,9 +6,10 @@
 # (самая тяжёлая обида графства). Чем выше ступень страха, тем реже ходоки:
 # опасение — вдвое, страх — вчетверо, ужас и террор — никогда (complaint_mult).
 #
-# События ступеней (любому правителю — и ИИ, из on_monthly_pulse): опасение — «Донос», страх —
-# «Дары без повода» и «Пустое место за столом», ужас — «Ворота открыты» и «Сон
-# о казнённых», террор — «Опустевшие деревни», «Кинжал под подушкой», «Шут».
+# События ступеней (любому правителю — и ИИ, из on_monthly_pulse) начинаются
+# с первой ступени: опасение — «Донос», «Дары без повода» и «Пустое место за
+# столом», страх — «Ворота открыты» и «Сон о казнённых», ужас и выше —
+# «Опустевшие деревни», «Кинжал под подушкой», «Шут».
 # Амнистия — только выбором в событиях («Сон о казнённых», «Шут»).
 
 scripted_effects:
@@ -191,6 +192,7 @@ events:
     requires_feature: politics
     theme: intrigue
     icon: "👁"
+    weight: { value: dread_tier_level, min: 1 }
     trigger:
       dread_tier: ">= unease"
       any_courtier: { is_adult: yes, is_ruler: no }
@@ -225,13 +227,14 @@ events:
           - scope:accused: { add_opinion: { target: root, modifier: fair_judgment } }
         ai_chance: 30
 
-  # ------------------------------------------------------------ страх: дары без повода
+  # ------------------------------------------------------------ опасение: дары без повода
   dread.0002:
     requires_feature: politics
     theme: court
     icon: "🎁"
+    weight: { value: dread_tier_level, min: 1 }
     trigger:
-      dread_tier: ">= fear"
+      dread_tier: ">= unease"
       num_vassals: ">= 2"
     cooldown: { years: 4 }
     options:
@@ -245,13 +248,14 @@ events:
           - every_vassal: { add_opinion: { target: root, modifier: fair_judgment } }
         ai_chance: 30
 
-  # ------------------------------------------------------------ страх: пустое место за столом
+  # ------------------------------------------------------------ опасение: пустое место за столом
   dread.0003:
     requires_feature: politics
     theme: court
     icon: "🍷"
+    weight: { value: dread_tier_level, min: 1 }
     trigger:
-      dread_tier: ">= fear"
+      dread_tier: ">= unease"
       any_courtier: { has_trait: [just, honest, compassionate], is_adult: yes, is_ruler: no, NOT: { is_close_family_of: root } }
       any_neighboring_ruler: { always: yes }
     cooldown: { years: 5 }
@@ -277,13 +281,14 @@ events:
           - add_dread: 5
         ai_chance: { value: 10, add: { value: ai_compassion, multiply: -5 } }
 
-  # ------------------------------------------------------------ ужас: ворота открыты
+  # ------------------------------------------------------------ страх: ворота открыты
   dread.0004:
     requires_feature: politics
     theme: war
     icon: "🏰"
+    weight: { value: dread_tier_level, min: 1 }
     trigger:
-      dread_tier: ">= horror"
+      dread_tier: ">= fear"
       is_at_war: yes
     cooldown: { years: 3 }
     options:
@@ -293,13 +298,14 @@ events:
           - add_modifier: { id: open_gates, years: 1 }
         ai_chance: 100
 
-  # ------------------------------------------------------------ ужас: сон о казнённых
+  # ------------------------------------------------------------ страх: сон о казнённых
   dread.0005:
     requires_feature: politics
     theme: stress
     icon: "🌑"
+    weight: { value: dread_tier_level, min: 1 }
     trigger:
-      dread_tier: ">= horror"
+      dread_tier: ">= fear"
       deeds_executions: ">= 1"
     cooldown: { years: 3 }
     options:
@@ -328,13 +334,14 @@ events:
           - add_prestige: -20
         ai_chance: { value: 5, add: { value: ai_compassion, multiply: 10 } }
 
-  # ------------------------------------------------------------ террор: опустевшие деревни
+  # ------------------------------------------------------------ ужас: опустевшие деревни
   dread.0006:
     requires_feature: politics
     theme: realm
     icon: "🏚"
+    weight: { value: dread_tier_level, min: 1 }
     trigger:
-      dread_tier: terror
+      dread_tier: ">= horror"
       any_domain_province: { development: ">= 4" }
     cooldown: { years: 3 }
     immediate:
@@ -360,13 +367,14 @@ events:
           - scope:province: { add_province_modifier: { id: tax_relief, years: 3 } }
         ai_chance: 30
 
-  # ------------------------------------------------------------ террор: кинжал под подушкой
+  # ------------------------------------------------------------ ужас: кинжал под подушкой
   dread.0007:
     requires_feature: politics
     theme: intrigue
     icon: "🗡"
+    weight: { value: dread_tier_level, min: 1 }
     trigger:
-      dread_tier: terror
+      dread_tier: ">= horror"
     cooldown: { years: 4 }
     options:
       # казнить стражу той ночи
@@ -386,13 +394,14 @@ events:
           add_stress: 25
         ai_chance: 30
 
-  # ------------------------------------------------------------ террор: шут
+  # ------------------------------------------------------------ ужас: шут
   dread.0008:
     requires_feature: politics
     theme: court
     icon: "🃏"
+    weight: { value: dread_tier_level, min: 1 }
     trigger:
-      dread_tier: terror
+      dread_tier: ">= horror"
     cooldown: { years: 5 }
     options:
       # казнить шута
@@ -467,13 +476,14 @@ on_actions:
             else:
               send_message: { text: msg.news_horror, kind: event }
   on_monthly_pulse:
+    # вес растёт со ступенью страха (weight событий — dread_tier_level)
     random_events:
       events:
-        dread.0001: 6
-        dread.0002: 5
-        dread.0003: 5
-        dread.0004: 6
-        dread.0005: 6
-        dread.0006: 5
-        dread.0007: 5
-        dread.0008: 5
+        dread.0001: 12
+        dread.0002: 12
+        dread.0003: 12
+        dread.0004: 12
+        dread.0005: 12
+        dread.0006: 10
+        dread.0007: 10
+        dread.0008: 10

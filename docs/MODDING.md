@@ -1504,9 +1504,17 @@ synod_questions:
 (слабее `vote_threshold` — воздерживается), игрок — в
 событии `vote_event` (эффект `synod_vote: for|against|abstain`). Голоса
 склоняют взаимодействия `synod_sway_for` / `synod_sway_against` (эффект
-`synod_sway`). Скрипт: условия `synod_active`, `synod_question`,
-`is_synod_voter`, `synod_swayed`, `of_synod_target_faith`, `has_synod_decree`,
-`faith_heretic`; значения `synod_vote_weight`, `synod_preference`; эффекты
+`synod_sway`) и крюк `hook_synod_vote`.
+
+**Позиция сюзерена.** При созыве правители с голосующими вассалами объявляют,
+за они или против: ИИ — если его убеждение сильнее удвоенного
+`vote_threshold`, игрок — в событии `call_event` (в ядре `synod.0002`, эффект
+`synod_declare: for|against|none`). Предпочтение вассала сдвигается к позиции
+его сюзерена на `defines.synod.liege_stance_weight` (вдвое слабее, если
+вассал сюзерена не любит). Скрипт: условия `synod_active`, `synod_question`,
+`is_synod_voter`, `synod_swayed`, `synod_declared`, `of_synod_target_faith`,
+`has_synod_decree`, `faith_heretic`; значения `synod_vote_weight`,
+`synod_preference`, `synod_vassal_voters`; эффекты `synod_declare`,
 `call_synod`, `set_faith_heresy` (`faith: synod_target_faith` — культ-цель
 Собора). В текстах — `[scope:synod_head]`, `[scope:synod_target]`,
 `[scope:synod_faith_ruler.faith_name]`. Хуки `synod.called`, `synod.result`,

@@ -58,7 +58,11 @@ static func register_builtin(engine: GameEngine) -> void:
 			return null
 		var pv := Synod.preview(g, head, a)
 		var months := maxi(0, roundi((int(a.convene) - g.date) / 30.0))
-		return {"icon": "piety", "kind": "info", "text": g.loc.t("alert.synod", {"question": Synod.question_name(g, str(a.question), a), "months": months, "for": roundi(pv["for"]), "against": roundi(pv.against)}), "action": {"character": head.id}})
+		var txt := g.loc.t("alert.synod", {"question": Synod.question_name(g, str(a.question), a), "months": months, "for": roundi(pv["for"]), "against": roundi(pv.against)})
+		var st: Variant = a.get("stances", {}).get(p.id)
+		if st != null:
+			txt += " " + g.loc.t("alert.synod_stance_for" if int(st) > 0 else "alert.synod_stance_against")
+		return {"icon": "piety", "kind": "info", "text": txt, "action": {"character": head.id}})
 	reg.call("child_no_guardian", 15, func(g: Game):
 		var p: Dictionary = g.player
 		if not g.engine.has_feature("upbringing"):

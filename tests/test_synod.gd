@@ -1,6 +1,7 @@
 extends TestCase
 ## Собор: созыв, голоса и их вес, голос игрока, склонение голосов, указы
-## (десятина, Божий мир), анафема и примирение, отлучение тирана, канонизация.
+## (десятина, Божий мир), анафема и примирение, отлучение тирана, канонизация;
+## событие созыва и позиция сюзерена, к которой склоняются вассалы.
 
 const HT := "d_sun_throne"
 
@@ -67,7 +68,7 @@ func test_tithe_decree() -> void:
 	g.stat_cache.clear()
 	check(Stats.stat(g, h, "tax_mult") < tax0, "единоверцы отдают долю податей")
 	check(Stats.stat(g, head, "monthly_income") > inc0, "Храм богатеет")
-	check(Synod.state_of(g, HT).active == null and int(Synod.state_of(g, HT).next) > g.date + 3000, "следующий Собор — через годы")
+	check(Synod.state_of(g, HT).active == null and int(Synod.state_of(g, HT).next) > g.date + 2000, "следующий Собор — через годы")
 	# указ истекает
 	g.state.date += 21 * 365
 	Synod.monthly(g)
@@ -181,3 +182,33 @@ func test_sway_interaction() -> void:
 	check(res == "accepted" or res == "pending", "голос склоняют (%s)" % res)
 	if res == "accepted":
 		check_eq(int(a.sway.get(voter.id, 0)), 1, "правитель обещал голосовать «за»")
+
+
+func test_call_event_and_liege_stance() -> void:
+	var g := _game()
+	var h: Dictionary = g.ch("harold")
+	var head: Dictionary = g.ch(g.state.titles[HT].holder)
+	var a := _call(g, "tithe")
+	# игрок узнаёт о созыве сразу и может объявить позицию
+	var pe: Array = g.state.pending_events.filter(func(e): return e.event == "synod.0002")
+	check(not pe.is_empty(), "игроку — событие созыва")
+	var v: Variant = null
+	for x in g.vassals_of(h.id):
+		if Synod.is_voter(g, x, head) and Synod.vote_weight(g, x, head) > 0.0:
+			v = x
+			break
+	check(v != null, "у Гарольда есть голосующий вассал")
+	var p0 := Synod.preference(g, v, head, a)
+	if not pe.is_empty():
+		g.events.choose(pe[-1].uid, 0)
+	check_eq(int(a.stances.get("harold", 0)), 1, "Гарольд объявил: «за»")
+	var p1 := Synod.preference(g, v, head, a)
+	check(p1 - p0 >= 7.0, "вассал склонился к слову сюзерена (%.1f → %.1f)" % [p0, p1])
+	# ИИ-сюзерены с твёрдым убеждением тоже объявляют позицию
+	check(a.stances.keys().any(func(id): return id != "harold"), "ИИ-сюзерены объявили позицию: %d" % a.stances.size())
+
+
+func test_synod_more_often() -> void:
+	var g := _game()
+	check(g.def_num("synod.years_max", 15) <= 9, "Собор — не реже раза в 9 лет")
+	check(Data.num(g.def_val("synod.first_years", [3, 6])[1]) <= 4, "первый — в первые 4 года")

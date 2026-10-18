@@ -157,6 +157,7 @@
 | `same_faith_as` | character | Та же вера | core |
 | `spirit_state` | character | Состояние духа (id из spirit_states, список или yes/no) | core/spirit |
 | `synod_active` | character | Созван Собор веры персонажа: synod_active: yes | core/synod |
+| `synod_declared` | character | Позиция персонажа на созванном Соборе: synod_declared: for \| against \| yes \| no | core/synod |
 | `synod_question` | character | Вопрос созванного Собора: synod_question: anathema | core/synod |
 | `synod_swayed` | character | Голос уже склонён на созванном Соборе | core/synod |
 | `terrain` | province | Местность | core |
@@ -317,6 +318,7 @@
 | `start_disease` | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
 | `start_scheme` | Начать интригу: { type, target } | core |
 | `stress_reaction` | Отклик характера на поступок из события: stress_reaction: <id из defines.personality.event_actions> | core/personality |
+| `synod_declare` | Объявить позицию на созванном Соборе — вассалы склонятся к ней: synod_declare: for \| against \| none | core/synod |
 | `synod_sway` | Склонить голос персонажа на созванном Соборе: synod_sway: for \| against | core/synod |
 | `synod_vote` | Голос игрока на созванном Соборе: synod_vote: for \| against \| abstain | core/synod |
 | `take_faction_counties` | Вожак народной фракции (scope:faction) забирает её графства и правит сам: yes или { create_titles: yes } | core/populace |
@@ -484,6 +486,7 @@
 | `stress_for` | character | Сколько стресса принесёт поступок (по чертам): stress_for(drive_away_petitioners) | core/personality |
 | `stress_level` | character | Уровень стресса (стресс / 100) | core |
 | `synod_preference` | character | Насколько персонаж за вопрос созванного Собора (больше нуля — за) | core/synod |
+| `synod_vassal_voters` | character | Сколько вассалов персонажа голосуют на созванном Соборе | core/synod |
 | `synod_vote_weight` | character | Вес голоса на Соборе (0 — нет голоса) | core/synod |
 | `tax` | province | Налог провинции | core |
 | `tax_law_level` | character | Уровень закона группы tax_law (−1, если не действует) | core/laws |

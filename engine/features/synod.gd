@@ -9,6 +9,11 @@ extends EngineFeature
 ## воздерживается. Игрок голосует в событии vote_event (за vote_event_days до
 ## Собора; эффект synod_vote). Голос можно склонить: эффект synod_sway — тогда
 ## правитель голосует, как обещал. Вопрос принят, если «за» весомее «против».
+## Позиция сюзерена: при созыве правители с вассалами объявляют, за они или
+## против (ИИ — по своему убеждению, если оно сильно; игрок — в событии
+## call_event, эффект synod_declare). Предпочтение вассала сдвигается к
+## позиции его сюзерена на liege_stance_weight (вдвое слабее, если вассал
+## сюзерена не любит).
 ## Принятый вопрос с decree становится указом на decree.years лет (0 —
 ## бессрочно): ruler_modifiers — единоверцам главы, head_modifiers — ему самому;
 ## условие has_synod_decree. Новый глава веры созывает Собор не позже чем
@@ -26,11 +31,13 @@ extends EngineFeature
 ##     | { type: dead, years, trigger } — умерший не раньше years лет назад;
 ##       оба — scope:synod_target.
 ##   defines.synod: { years_min, years_max, first_years: [от, до],
-##     after_election_years, notice_days, vote_event, vote_event_days,
+##     after_election_years, notice_days, call_event, vote_event, vote_event_days,
+##     liege_stance_weight,
 ##     vote_threshold, voter, vote_weight, head_opinion_weight — к предпочтению
 ##     ИИ прибавляется мнение о главе веры с этим множителем }
 ## Состояние: game.state.synod = { <титул главы>: { next, head, last,
-##   active: { question, target, target_faith, convene, sway, votes, asked },
+##   active: { question, target, target_faith, convene, sway, votes, asked,
+##     stances: { правитель: 1 | -1 } },
 ##   decrees: { <вопрос>: { until, target_faith } } } }.
 ## Хуки: synod.called, synod.result — {head_title, question, passed, for,
 ## against, target, target_faith}; on_actions on_synod_called, on_synod_result
@@ -159,7 +166,18 @@ static func preference(game: Game, c: Dictionary, head: Dictionary, active: Dict
 	# верность Храму: кто расположен к главе веры, склоняется к его предложению
 	if c.id != head.id:
 		v += Opinion.opinion(game, c, head) * game.def_num("synod.head_opinion_weight", 0.0)
+	v += liege_pull(game, c, active)
 	return v
+
+
+## Насколько позиция сюзерена тянет вассала (0 — сюзерен молчит).
+static func liege_pull(game: Game, c: Dictionary, active: Dictionary) -> float:
+	var st: Variant = active.get("stances", {}).get(c.liege) if c.liege != null else null
+	if st == null:
+		return 0.0
+	var lg: Variant = game.ch(c.liege)
+	var k := 1.0 if lg != null and Opinion.opinion(game, c, lg) >= 0 else 0.5
+	return float(st) * game.def_num("synod.liege_stance_weight", 15) * k
 
 
 ## Голос правителя: 1 — за, -1 — против, 0 — воздержался.
@@ -271,12 +289,26 @@ static func call_synod(game: Game, ht: String, head: Dictionary, qid: String = "
 		"target": tgt.id if tgt is Dictionary and tgt.get("id") != null else null,
 		"target_faith": tgt.faith_id if tgt is Dictionary and tgt.get("faith_id") != null else "",
 		"convene": game.date + roundi(game.def_num("synod.notice_days", 365)),
-		"sway": {}, "votes": {}, "asked": false,
+		"sway": {}, "votes": {}, "asked": false, "stances": {},
 	}
+	# правители с вассалами объявляют позицию (ИИ — если убеждён твёрдо)
+	var th := game.def_num("synod.vote_threshold", 5) * 2.0
+	for v in voters(game, head):
+		var c: Dictionary = v.c
+		if game.is_player(c.id) or game.vassals_of(c.id).is_empty():
+			continue
+		var pref := preference(game, c, head, s.active)
+		if absf(pref) >= th:
+			s.active.stances[c.id] = 1 if pref > 0.0 else -1
 	var payload := {"head_title": ht, "question": pick.q.id, "target": s.active.target, "target_faith": s.active.target_faith}
 	game.emit("synod.called", payload)
 	game.on_action("on_synod_called", {"type": "character", "id": head.id}, _ctx(game, head, head, s.active).scopes)
 	_news(game, ht, game.loc.t("msg.synod_called", {"head": game.scope_name({"type": "character", "id": head.id}), "question": question_name(game, pick.q.id, s.active)}), "event")
+	# игрок узнаёт о созыве сразу: объявить позицию, пока есть время склонить голоса
+	var p: Variant = game.player
+	var ev := str(game.def_val("synod.call_event", ""))
+	if p != null and ev != "" and Temple.head_title_of(game, p) == ht and is_voter(game, p, head):
+		game.events.trigger(ev, {"type": "character", "id": p.id}, text_scopes(game, head, s.active))
 	return true
 
 
@@ -507,6 +539,41 @@ func register_script(engine: GameEngine) -> void:
 			a.votes[c.id] = {"for": 1, "against": -1}.get(str(arg), 0)
 			a.erase("preview"),
 		"describe": func(ctx, _s, arg): return ctx.game.loc.t("fx.synod_vote." + str(arg)),
+	}, OWNER)
+	r.effects.register("synod_declare", {"scopes": CH, "doc": "Объявить позицию на созванном Соборе — вассалы склонятся к ней: synod_declare: for | against | none", "apply": func(ctx, s, arg):
+		var c: Variant = ch.call(ctx, s)
+		var a: Variant = Synod.active_for(ctx.game, c) if c != null else null
+		if a == null:
+			return
+		if not a.has("stances"):
+			a["stances"] = {}
+		if str(arg) == "for" or str(arg) == "against":
+			a.stances[c.id] = 1 if str(arg) == "for" else -1
+		else:
+			a.stances.erase(c.id)
+		a.erase("preview"),
+		"describe": func(ctx, _s, arg): return ctx.game.loc.t("fx.synod_declare." + str(arg)),
+	}, OWNER)
+	r.triggers.register("synod_declared", {"scopes": CH, "doc": "Позиция персонажа на созванном Соборе: synod_declared: for | against | yes | no", "eval": func(ctx, s, arg):
+		var c: Variant = ch.call(ctx, s)
+		var a: Variant = Synod.active_for(ctx.game, c) if c != null else null
+		var st: Variant = a.get("stances", {}).get(c.id) if a != null else null
+		match str(arg):
+			"for": return st == 1
+			"against": return st == -1
+			"no": return st == null
+		return st != null,
+	}, OWNER)
+	r.values.register("synod_vassal_voters", {"scopes": CH, "doc": "Сколько вассалов персонажа голосуют на созванном Соборе", "get": func(ctx, s, _a):
+		var c: Variant = ch.call(ctx, s)
+		var h: Variant = Temple.head_of(ctx.game, c) if c != null else null
+		if h == null:
+			return 0.0
+		var n := 0
+		for v in ctx.game.vassals_of(c.id):
+			if Synod.is_voter(ctx.game, v, h) and Synod.vote_weight(ctx.game, v, h) > 0.0:
+				n += 1
+		return float(n)
 	}, OWNER)
 	r.effects.register("synod_sway", {"scopes": CH, "doc": "Склонить голос персонажа на созванном Соборе: synod_sway: for | against", "apply": func(ctx, s, arg):
 		var c: Variant = ch.call(ctx, s)

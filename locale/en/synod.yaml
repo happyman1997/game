@@ -13,6 +13,8 @@ msg:
   synod_decree_expired: "A decree of the Synod has expired: “{decree}”."
 alert:
   synod: "Synod in {months} months: “{question}”. For {for}, against {against} so far."
+  synod_stance_for: "You declared “for”."
+  synod_stance_against: "You declared “against”."
 ui:
   synod_decree_mod: "Decree of the Synod: {decree}"
   synod_called_line: "A Synod is called: “{question}” — in {months} months."
@@ -26,6 +28,10 @@ tr:
   is_synod_voter.not: Does not vote at the Synod
   has_synod_decree: "The Synod's decree “{decree}” is in force"
 fx:
+  synod_declare:
+    for: "Declare “for” — your vassals will lean to your word"
+    against: "Declare “against” — your vassals will lean to your word"
+    none: Declare no position
   synod_vote:
     for: Vote “for”
     against: Vote “against”
