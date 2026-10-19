@@ -26,6 +26,7 @@ factions:
         - { desc: ai.content, limit: { has_trait: content }, value: -20 }
         - { desc: ai.family, limit: { is_close_family_of: scope:liege }, value: -30 }
         - { desc: ai.rank, value: { value: tier, multiply: 6 } }
+        - { desc: ai.wants_independence, limit: { has_ambition: independence }, value: 25 }
         - { desc: ai.councillor, limit: { is_councillor: yes }, value: -15 }
         # политика двора (условия службы уже сказались на мнении): страх, вражда с лидером
         - { desc: ai.dread, value: { value: fear_of_liege, multiply: -0.6 } }

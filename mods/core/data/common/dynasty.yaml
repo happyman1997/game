@@ -181,10 +181,17 @@ decisions:
       - found_cadet_house: yes
       - add_prestige: 50
     ai_check_months: 24
+    # своя ветвь — у дальней родни главы дома, у королей и у тех, кто прославился
     ai_will_do:
       value: 0
       if:
-        - limit: { prestige: 600, is_independent: yes }
-          add: 20
+        - limit: { prestige: 400 }
+          add: 8
+        - limit: { prestige: 400, NOT: { is_close_family_of: house_head } }
+          add: 15
+        - limit: { prestige: 400, is_independent: yes }
+          add: 12
         - limit: { prestige: 900 }
           add: 10
+        - limit: { has_trait: [ambitious, arrogant] }
+          add: 5

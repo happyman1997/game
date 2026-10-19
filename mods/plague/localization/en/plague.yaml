@@ -12,10 +12,11 @@ decision_desc:
   close_city_gates: Pestilence in the capital! Close the gates to slow the spread of the disease.
 ev:
   plague.0001:
-    t: Pestilence in the Capital!
-    desc: "More and more dead are found in the streets of the capital. Physicians are helpless and sun-priests cannot keep up with the funerals."
+    t: Pestilence!
+    desc: "Black news comes from [scope:province]: more and more dead are found in the streets. The physicians are helpless, the sun-priests cannot keep up with the funerals."
     a: Declare a quarantine (−40 gold)
-    b: Trust in the Sun
+    b: Pray together with the people
+    c: Let the physicians do their work
 plague:
   copinion_plague: Plague in the county
   copinion_aftermath: The plague is not forgotten

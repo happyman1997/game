@@ -19,6 +19,7 @@ ev:
     a: Yield to their demands
     b: No concessions to rebels!
 ai:
+  wants_independence: Dreams of independence
   content: Content with life
   family: Family of the liege
   councillor: Seat on the council

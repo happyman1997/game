@@ -166,3 +166,29 @@ func test_ai_takes_up_ambitions() -> void:
 			check(Ambitions.def_of(g, Ambitions.current(c).id) != null, "известное желание")
 	check(started[0] > 10, "ИИ заводит желания (%d)" % started[0])
 	check(with_amb > 5, "у многих есть желания (%d)" % with_amb)
+
+
+## Мечта о независимости: и у графа, и тем сильнее, чем чужее он сюзерену;
+## с ней вассал охотнее идёт во фракцию за независимость.
+func test_independence_ambition() -> void:
+	var g := _game()
+	var h: Dictionary = g.ch("harold")
+	var v: Variant = null
+	for x in g.vassals_of(h.id):
+		if Chars.is_adult(g, x) and x.get("prison") == null and not x.traits.has("content"):
+			v = x
+			break
+	Opinion.add_opinion(g, v, h, "generic", -200)
+	var opt: Array = Ambitions.options(g, v).filter(func(o): return o.id == "independence")
+	check(not opt.is_empty(), "недовольный вассал может мечтать о независимости")
+	var w0: float = opt[0].weight if not opt.is_empty() else 0.0
+	for f in g.content.all("faiths"):
+		if str(f.id) != str(h.faith):
+			v.faith = f.id
+			break
+	var opt2: Array = Ambitions.options(g, v).filter(func(o): return o.id == "independence")
+	check(not opt2.is_empty() and float(opt2[0].weight) > w0, "иноверец мечтает сильнее (%.1f → %.1f)" % [w0, opt2[0].weight if not opt2.is_empty() else 0.0])
+	var def: Dictionary = g.content.get_def("factions", "independence_faction")
+	var s0 := Factions.ai_join_score(g, v, def, h)
+	check(Ambitions.start(g, v, "independence"), "желание начато")
+	check(Factions.ai_join_score(g, v, def, h) > s0, "с мечтой — охотнее во фракцию")

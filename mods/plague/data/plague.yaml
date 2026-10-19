@@ -4,15 +4,15 @@ diseases:
   bubonic_plague:
     color: "#7a1f1f"
     icon: "☠"
-    outbreak_chance: 0.0025    # шанс новой вспышки в месяц
-    spread_chance: 0.05        # шанс перекинуться на соседнюю провинцию в месяц
+    outbreak_chance: 0.004     # шанс новой вспышки в месяц
+    spread_chance: 0.035       # шанс перекинуться на соседнюю провинцию в месяц
     monthly_death_chance: 0.01 # для персонажей в заражённой столице
     duration_months: 8
     development_loss: 2
   camp_fever:
     color: "#7a6a1f"
     icon: "🤢"
-    outbreak_chance: 0.006
+    outbreak_chance: 0.01
     spread_chance: 0.025
     monthly_death_chance: 0.004
     duration_months: 6
@@ -46,6 +46,7 @@ decisions:
     ai_check_months: 3
 
 events:
+  # мор в графстве домена игрока (scope:province)
   plague.0001:
     theme: death
     icon: "☠"
@@ -53,11 +54,15 @@ events:
     options:
       - trigger: { gold: 40 }
         effect:
-          capital: { add_province_modifier: { id: quarantine, months: 12 } }
+          scope:province: { add_province_modifier: { id: quarantine, months: 12 } }
           add_gold: -40
+      # молебны с народом: графство благодарно, а Солнце — может быть, милостиво
       - effect:
           add_piety: 30
-          add_stress: 20
+          add_stress: 15
+          scope:province: { add_county_opinion: { modifier: prayed_together, value: 10 } }
+      - effect:
+          add_stress: 5
 
 # Вставляем своё событие в чужой on_action, не трогая файлы основного мода.
 on_actions:

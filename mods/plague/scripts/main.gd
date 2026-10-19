@@ -25,9 +25,16 @@ static func is_quarantined(game: Game, prov: String) -> bool:
 	return p != null and p.modifiers.any(func(m): return m.id == "quarantine")
 
 
+## Переболевшее графство (последствия мора) не заражается снова, пока
+## последствия не прошли, — так волна выгорает, а не обходит мир по кругу.
+static func is_immune(game: Game, prov: String) -> bool:
+	var p: Variant = game.state.provinces.get(prov)
+	return p != null and p.modifiers.any(func(m): return m.id == "plague_aftermath" and (m.get("expires") == null or int(m.expires) > game.date))
+
+
 static func infect(game: Game, prov: String, disease: String) -> void:
 	var st := state_of(game)
-	if st.infected.has(prov) or not game.state.provinces.has(prov):
+	if st.infected.has(prov) or not game.state.provinces.has(prov) or is_immune(game, prov):
 		return
 	st.infected[prov] = {"disease": disease, "months": 0}
 	st.outbreaks = int(st.outbreaks) + 1
@@ -36,8 +43,8 @@ static func infect(game: Game, prov: String, disease: String) -> void:
 	var player: Variant = game.player
 	if holder != null and player != null and (holder.id == player.id or holder.liege == player.id):
 		game.message(game.loc.t("plague.msg_outbreak", {"place": game.name_of("provinces", prov), "disease": game.name_of("diseases", disease)}), "bad", {"type": "province", "id": prov})
-		if holder.id == player.id and player.capital == prov:
-			game.events.trigger("plague.0001", {"type": "character", "id": player.id}, {})
+		if holder.id == player.id:
+			game.events.trigger("plague.0001", {"type": "character", "id": player.id}, {"province": {"type": "province", "id": prov}})
 	game.emit("plague.outbreak", {"province": prov, "disease": disease})
 
 

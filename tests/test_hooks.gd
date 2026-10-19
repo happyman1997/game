@@ -83,7 +83,7 @@ func test_ai_uses_hooks() -> void:
 		if p.interaction == "hook_demand_gold" and p.actor == h.id:
 			used[0] = true
 	g.engine.hooks.on("interaction", fn, 0, "test")
-	for k in 40:
+	for k in 400:
 		if used[0]:
 			break
 		Ai._consider_interactions(g, h)

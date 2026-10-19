@@ -236,16 +236,23 @@ ambitions:
     order: 9
     is_valid:
       is_vassal: yes
-      tier: ">= duchy"
+      tier: ">= county"
       opinion: { target: liege, value: "< 10" }
+    # сильнее всего — у чужих сюзерену по крови и вере и у тех, кто его не терпит
     weight:
-      value: 1
+      value: 2
       add: { value: ai_energy, multiply: 1 }
       if:
         - limit: { has_trait: ambitious }
           add: 6
         - limit: { has_trait: arrogant }
           add: 4
+        - limit: { opinion: { target: liege, value: "< -25" } }
+          add: 6
+        - limit: { NOT: { same_culture_as: liege } }
+          add: 4
+        - limit: { NOT: { same_faith_as: liege } }
+          add: 6
         - limit: { has_trait: content }
           multiply: 0
     fulfilled: { is_independent: yes }
