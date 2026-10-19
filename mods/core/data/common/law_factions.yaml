@@ -1,0 +1,240 @@
+# Фракции за закон: вассалы требуют отменить закон, который бьёт по ним
+# (выморочное право, всеобщий сбор, королевская десятина), а мятеж за него
+# ведут под своим поводом. И события заговора: сюзерену — когда против него
+# собралась фракция (on_faction_formed), вассалу-игроку — приглашение
+# вступить (on_faction_invite). Скоупы — как в factions.yaml.
+
+opinion_modifiers:
+  refused_conspiracy: { value: -10, years: 3 }
+  betrayed_conspiracy: { value: -40, years: 10 }
+  reported_conspiracy: { value: 25, years: 10 }
+
+factions:
+  # Наследные права: против выморочного права — бездетные боятся первыми
+  fief_rights_faction:
+    requires_feature: laws
+    icon: "📜"
+    cb: fief_rights_revolt
+    can_join:
+      scope:liege: { fief_law_level: ">= 2" }
+      is_vassal: yes
+      is_imprisoned: no
+      NOR:
+        - scope:liege: { has_strong_hook_on: root }
+        - fear_stance: broken
+    can_create: { felt_dread_tier: "< unease" }
+    ai_join:
+      value: -10
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:liege)", multiply: -0.6 } }
+        - { desc: ai.childless_vassal, limit: { num_children: "< 1" }, value: 35 }
+        - { desc: ai.rank, value: { value: tier, multiply: 5 } }
+        - { desc: ai.content, limit: { has_trait: content }, value: -15 }
+        - { desc: ai.councillor, limit: { is_councillor: yes }, value: -15 }
+        - { desc: ai.dread, value: { value: fear_of_liege, multiply: -0.6 } }
+        - { desc: ai.rival_leader, limit: { exists: scope:faction_leader, has_opinion_modifier: { target: scope:faction_leader, modifier: rival } }, value: -60 }
+    ai_accept_demands:
+      value: -30
+      add: { value: scope:faction.faction_power, multiply: 0.4 }
+    on_demands_accepted:
+      - scope:liege:
+          shift_realm_law: { group: fief_law, by: -1 }
+          add_prestige: -50
+      - scope:faction:
+          every_faction_member: { add_prestige: 20 }
+
+  # Против всеобщего сбора — особенно когда войны нет
+  levy_relief_faction:
+    requires_feature: laws
+    icon: "⚔"
+    cb: levy_relief_revolt
+    can_join:
+      scope:liege: { military_service_level: ">= 2" }
+      is_vassal: yes
+      is_imprisoned: no
+      NOR:
+        - scope:liege: { has_strong_hook_on: root }
+        - fear_stance: broken
+    can_create: { felt_dread_tier: "< unease" }
+    ai_join:
+      value: -15
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:liege)", multiply: -0.6 } }
+        - { desc: ai.levy_in_peace, limit: { scope:liege: { is_at_war: no } }, value: 30 }
+        - { desc: ai.peaceful_nature, limit: { has_trait: [craven, content] }, value: 10 }
+        - { desc: ai.councillor, limit: { is_councillor: yes }, value: -15 }
+        - { desc: ai.dread, value: { value: fear_of_liege, multiply: -0.6 } }
+        - { desc: ai.rival_leader, limit: { exists: scope:faction_leader, has_opinion_modifier: { target: scope:faction_leader, modifier: rival } }, value: -60 }
+    ai_accept_demands:
+      value: -20
+      add: { value: scope:faction.faction_power, multiply: 0.4 }
+    on_demands_accepted:
+      - scope:liege:
+          shift_realm_law: { group: military_service, by: -1 }
+          add_prestige: -40
+      - scope:faction:
+          every_faction_member: { add_prestige: 15 }
+
+  # Ревнители Храма: против королевской десятины — единоверцы, у кого вера горячей
+  zealot_faction:
+    requires_feature: laws
+    icon: "⛪"
+    cb: zealot_revolt
+    can_join:
+      scope:liege: { church_law_level: ">= 2" }
+      same_faith_as: scope:liege
+      is_vassal: yes
+      is_imprisoned: no
+      NOR:
+        - scope:liege: { has_strong_hook_on: root }
+        - fear_stance: broken
+    can_create: { felt_dread_tier: "< unease" }
+    ai_join:
+      value: -25
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:liege)", multiply: -0.5 } }
+        - { desc: ai.faith_zeal, value: { value: ai_zeal, multiply: 10 } }
+        - { desc: ai.zealot, limit: { has_trait: zealous }, value: 25 }
+        - { desc: ai.faith_cynic, limit: { has_trait: cynical }, value: -30 }
+        - { desc: ai.councillor, limit: { is_councillor: yes }, value: -15 }
+        - { desc: ai.dread, value: { value: fear_of_liege, multiply: -0.6 } }
+        - { desc: ai.rival_leader, limit: { exists: scope:faction_leader, has_opinion_modifier: { target: scope:faction_leader, modifier: rival } }, value: -60 }
+    ai_accept_demands:
+      value: -30
+      add: { value: scope:faction.faction_power, multiply: 0.4 }
+    on_demands_accepted:
+      - scope:liege:
+          shift_realm_law: { group: church_law, by: -1 }
+          add_piety: 50
+      - scope:faction:
+          every_faction_member: { add_piety: 30 }
+
+casus_belli:
+  fief_rights_revolt:
+    requires_feature: laws
+    icon: "📜"
+    targets: faction
+    manual: yes
+    on_victory:
+      - scope:defender:
+          set_realm_law: fief_law_0
+          add_prestige: -150
+      - scope:war:
+          every_war_attacker: { add_prestige: 80 }
+    on_defeat:
+      - scope:war:
+          every_war_attacker:
+            add_prestige: -100
+            scope:defender: { add_opinion: { target: prev, modifier: rebel } }
+      - scope:defender:
+          add_prestige: 120
+          add_dread: 10
+          imprison: { target: scope:attacker, reason: rebellion }
+    truce_years: 5
+    war_name: cb.fief_rights_revolt.war_name
+
+  levy_relief_revolt:
+    requires_feature: laws
+    icon: "⚔"
+    targets: faction
+    manual: yes
+    on_victory:
+      - scope:defender:
+          set_realm_law: military_service_0
+          add_prestige: -120
+      - scope:war:
+          every_war_attacker: { add_prestige: 60 }
+    on_defeat:
+      - scope:war:
+          every_war_attacker:
+            add_prestige: -100
+            scope:defender: { add_opinion: { target: prev, modifier: rebel } }
+      - scope:defender:
+          add_prestige: 120
+          add_dread: 10
+          imprison: { target: scope:attacker, reason: rebellion }
+    truce_years: 5
+    war_name: cb.levy_relief_revolt.war_name
+
+  zealot_revolt:
+    requires_feature: laws
+    icon: "⛪"
+    targets: faction
+    manual: yes
+    on_victory:
+      - scope:defender:
+          set_realm_law: church_law_0
+          add_piety: -100
+          add_prestige: -100
+      - scope:war:
+          every_war_attacker: { add_piety: 100 }
+    on_defeat:
+      - scope:war:
+          every_war_attacker:
+            add_prestige: -100
+            scope:defender: { add_opinion: { target: prev, modifier: rebel } }
+      - scope:defender:
+          add_prestige: 100
+          add_dread: 10
+          imprison: { target: scope:attacker, reason: rebellion }
+    truce_years: 5
+    war_name: cb.zealot_revolt.war_name
+
+on_actions:
+  on_faction_formed:
+    events: [faction.0002]
+  on_faction_invite:
+    events: [faction.0003]
+
+events:
+  # Сюзерену: против него собралась фракция
+  faction.0002:
+    requires_feature: factions
+    theme: intrigue
+    icon: "🕯"
+    triggered_only: true
+    options:
+      # выслушать вожака: дипломат может уговорить его выйти из фракции
+      - skill: { skill: diplomacy, check: 14 }
+        success:
+          scope:faction_leader:
+            leave_faction: yes
+            add_opinion: { target: root, modifier: heard_grievances }
+        failure:
+          add_prestige: -20
+        ai_chance: { value: 10, add: { value: diplomacy, multiply: 2 } }
+      # законный повод — вожака в темницу
+      - trigger: { has_imprisonment_reason: scope:faction_leader }
+        effect:
+          - imprison: { target: scope:faction_leader }
+          - add_dread: 5
+        ai_chance: { value: 30, add: { value: ai_vengefulness, multiply: 10 } }
+      # соглядатаи: выведать тайну вожака
+      - trigger: { gold: 25 }
+        effect:
+          - add_gold: -25
+          - learn_secret: { owner: scope:faction_leader }
+        ai_chance: { value: 10, add: { value: intrigue, multiply: 1.5 } }
+      # пусть шепчутся
+      - effect: { add_prestige: 5 }
+        ai_chance: 20
+
+  # Вассалу-игроку: приглашение во фракцию против сюзерена
+  faction.0003:
+    requires_feature: factions
+    theme: intrigue
+    icon: "✉"
+    triggered_only: true
+    options:
+      - effect: { join_faction: scope:faction }
+        ai_chance: { value: 10, add: { value: "opinion(scope:liege)", multiply: -0.5 } }
+      - effect:
+          scope:faction_leader: { add_opinion: { target: root, modifier: refused_conspiracy } }
+        ai_chance: 30
+      # донести сюзерену: он благодарен, у него повод к темнице
+      - effect:
+          - scope:liege: { add_opinion: { target: root, modifier: reported_conspiracy } }
+          - scope:faction_leader:
+              add_opinion: { target: root, modifier: betrayed_conspiracy }
+              mark_criminal: { target: scope:liege, years: 5 }
+        ai_chance: { value: 10, add: { value: "opinion(scope:liege)", multiply: 0.3 } }

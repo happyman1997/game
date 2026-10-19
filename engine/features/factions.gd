@@ -21,6 +21,9 @@ extends EngineFeature
 ## Скоупы: root — вассал (для can_join/ai_join) или лидер фракции (для
 ## on_demands_accepted), scope:liege, scope:faction, scope:faction_leader,
 ## scope:claimant.
+## on_actions: on_faction_formed (root — сюзерен, против кого собралась
+## фракция) и on_faction_invite (root — вассал-игрок того же сюзерена, который
+## может вступить); скоупы scope:faction, scope:faction_leader, scope:liege.
 
 const OWNER := "core/factions"
 
@@ -148,6 +151,14 @@ static func create(game: Game, type: String, founder: Dictionary, claimant: Vari
 	game.emit("faction.created", {"faction": f})
 	game.message(game.loc.t("msg.faction_created", {"faction": game.name_of("factions", type), "who": game.scope_name({"type": "character", "id": founder.id}), "liege": game.scope_name({"type": "character", "id": liege.id})}),
 		"bad", {"type": "character", "id": founder.id}, [liege.id, founder.id])
+	var scopes := {"liege": {"type": "character", "id": liege.id}}
+	_faction_scopes(scopes, f)
+	game.on_action("on_faction_formed", {"type": "character", "id": liege.id}, scopes)
+	# вассал-игрок того же сюзерена получает приглашение
+	var p: Variant = game.player
+	if p != null and p.liege == liege.id and p.id != founder.id and not p.titles.is_empty() and faction_of(game, p) == null \
+			and can_join(game, p, def, liege, claimant):
+		game.on_action("on_faction_invite", {"type": "character", "id": p.id}, scopes)
 	return f
 
 
@@ -571,10 +582,15 @@ func register_script(engine: GameEngine) -> void:
 			var f: Variant = fac.call(ctx, s)
 			return ctx.game.loc.t("fx.faction_start_war", {"faction": ctx.game.name_of("factions", f.type)}) if f != null else null,
 	}, OWNER)
-	r.effects.register("join_faction", {"scopes": CH, "doc": "Вступить во фракцию против сюзерена (или создать): join_faction: <тип>",
+	r.effects.register("join_faction", {"scopes": CH, "doc": "Вступить во фракцию против сюзерена (или создать): join_faction: <тип> или scope:faction",
 		"apply": func(ctx, s, arg):
 			var c: Variant = ch.call(ctx, s)
 			if c == null or c.liege == null:
+				return
+			if str(arg).begins_with("scope:"):
+				var fr: Variant = fac.call(ctx, Interp.resolve_scope(ctx, s, arg))
+				if fr != null:
+					Factions.join(ctx.game, c, fr)
 				return
 			for f in Factions.against(ctx.game, c.liege):
 				if f.type == arg:

@@ -1,0 +1,45 @@
+# Фракции за закон и события заговора (common/law_factions.yaml).
+faction:
+  fief_rights_faction: Фракция наследных прав
+  levy_relief_faction: Фракция против всеобщего сбора
+  zealot_faction: Ревнители Храма
+faction_desc:
+  fief_rights_faction: "Вассалы требуют отменить выморочное право: лен должен переходить к родне, а не к сюзерену. Примете требования — закон о ленах смягчится на ступень."
+  levy_relief_faction: "Вассалы требуют отменить всеобщий сбор — не дело гнать в поле каждого пахаря. Примете требования — повинность смягчится на ступень."
+  zealot_faction: "Ревнители веры требуют отменить королевскую десятину: добро Храма — не добро короны. Примете требования — закон о Храме смягчится на ступень."
+casus_belli:
+  fief_rights_revolt: Мятеж за наследные права
+  levy_relief_revolt: Мятеж против всеобщего сбора
+  zealot_revolt: Мятеж ревнителей
+cb:
+  fief_rights_revolt:
+    war_name: "Мятеж [scope:attacker] за наследные права"
+  levy_relief_revolt:
+    war_name: "Мятеж [scope:attacker] против всеобщего сбора"
+  zealot_revolt:
+    war_name: "Мятеж ревнителей [scope:attacker] против [scope:defender]"
+opinion_modifier:
+  refused_conspiracy: Отказался от заговора
+  betrayed_conspiracy: Выдал заговор
+  reported_conspiracy: Донёс о заговоре
+ai:
+  childless_vassal: Нет детей — лен уйдёт сюзерену
+  levy_in_peace: Сбор в мирное время
+  peaceful_nature: Не любит войну
+  faith_zeal: Рвение в вере
+  zealot: Ревностный
+  faith_cynic: Циник
+ev:
+  faction.0002:
+    t: Заговор зреет
+    desc: "Ваш соглядатай говорит тихо: [scope:faction_leader] собирает недовольных, и под их письмами уже стоит имя фракции — «[scope:faction]». Пока это только шёпот за закрытыми дверями."
+    a: Позвать [scope:faction_leader] и выслушать
+    b: В темницу вожака — повод есть
+    c: Подослать соглядатаев (25 золотых)
+    d: Пусть шепчутся
+  faction.0003:
+    t: Приглашение
+    desc: "Слуга [scope:faction_leader] передаёт письмо без подписи: недовольные [scope:liege] собираются во фракцию «[scope:faction]» и ждут вас. Сожгите письмо — или поставьте свою печать."
+    a: Поставить печать
+    b: Сжечь письмо
+    c: Отнести письмо [scope:liege]

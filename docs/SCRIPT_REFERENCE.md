@@ -260,7 +260,7 @@
 | `imprison` | Заключить персонажа в свою темницу: imprison: scope:x или { target, reason } | core/prison |
 | `inherit_dread` | Наследник держит страх предшественника в узде (ступенью ниже), сломленные остаются сломленными: inherit_dread: scope:predecessor | core/politics |
 | `install_graft` | Вживить бесплатно: install_graft: glass_eye | grafts |
-| `join_faction` | Вступить во фракцию против сюзерена (или создать): join_faction: <тип> | core/factions |
+| `join_faction` | Вступить во фракцию против сюзерена (или создать): join_faction: <тип> или scope:faction | core/factions |
 | `learn_secret` | Узнать тайну персонажа (тип — необязателен): learn_secret: { owner: scope:x, type: secret_embezzler } | core/secrets |
 | `leave_faction` | Выйти из фракции | core/factions |
 | `lose_all_titles` | Потерять все титулы | core |

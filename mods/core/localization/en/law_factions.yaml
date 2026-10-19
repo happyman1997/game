@@ -1,0 +1,45 @@
+# Law factions and conspiracy events (common/law_factions.yaml).
+faction:
+  fief_rights_faction: Hereditary Rights Faction
+  levy_relief_faction: Faction against the General Levy
+  zealot_faction: Zealots of the Temple
+faction_desc:
+  fief_rights_faction: "The vassals demand an end to escheat: a fief must pass to kin, not to the liege. Accept the demands and the fief law eases by one step."
+  levy_relief_faction: "The vassals demand an end to the general levy — it is no way to drive every ploughman into the field. Accept the demands and military service eases by one step."
+  zealot_faction: "Zealots of the faith demand an end to the royal tithe: the Temple's goods are not the crown's. Accept the demands and the Temple law eases by one step."
+casus_belli:
+  fief_rights_revolt: Revolt for Hereditary Rights
+  levy_relief_revolt: Revolt against the General Levy
+  zealot_revolt: Zealot Revolt
+cb:
+  fief_rights_revolt:
+    war_name: "[scope:attacker]'s Revolt for Hereditary Rights"
+  levy_relief_revolt:
+    war_name: "[scope:attacker]'s Revolt against the General Levy"
+  zealot_revolt:
+    war_name: "Zealot Revolt of [scope:attacker] against [scope:defender]"
+opinion_modifier:
+  refused_conspiracy: Refused the conspiracy
+  betrayed_conspiracy: Betrayed the conspiracy
+  reported_conspiracy: Reported the conspiracy
+ai:
+  childless_vassal: Childless — the fief would go to the liege
+  levy_in_peace: Levy in time of peace
+  peaceful_nature: Dislikes war
+  faith_zeal: Zeal of faith
+  zealot: Zealous
+  faith_cynic: Cynic
+ev:
+  faction.0002:
+    t: A Conspiracy Ripens
+    desc: "Your informant speaks quietly: [scope:faction_leader] is gathering the discontented, and their letters already bear the name of a faction — “[scope:faction]”. For now it is only whispering behind closed doors."
+    a: Summon [scope:faction_leader] and hear them out
+    b: The ringleader to the dungeon — there is cause
+    c: Send informers (25 gold)
+    d: Let them whisper
+  faction.0003:
+    t: An Invitation
+    desc: "A servant of [scope:faction_leader] hands you an unsigned letter: those discontented with [scope:liege] are gathering into the faction “[scope:faction]” and await you. Burn the letter — or set your seal to it."
+    a: Set your seal
+    b: Burn the letter
+    c: Take the letter to [scope:liege]
