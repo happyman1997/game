@@ -21,8 +21,9 @@ extends EngineFeature
 ##
 ##   synod_questions: { <id>: { icon, weight, is_valid (root — глава), target,
 ##     ai_vote (root — голосующий), on_pass, on_fail (root — глава),
-##     decree: { years, ruler_modifiers, head_modifiers, ai_war_mult } } }
-##   (ai_war_mult — ИИ реже начинает войну с единоверцем-не-еретиком: хук ai.war_will)
+##     decree: { years, ruler_modifiers, head_modifiers, ai_war_mult, ai_holy_war_mult } } }
+##   (ai_war_mult — желание ИИ воевать с единоверцем-не-еретиком, ai_holy_war_mult —
+##   с еретиком, а при цели-культе — только с ним: хук ai.war_will)
 ##   target: { type: faith, heretic: yes|no, prefer: small|large } — культ той же религии, что у
 ##       главы, с правителями (кроме его собственного), еретический или нет;
 ##       в данных — synod_target_faith, условие of_synod_target_faith,
@@ -471,13 +472,26 @@ static func _ai_war_will(p: Dictionary) -> Variant:
 	var att: Dictionary = p.attacker
 	var dfn: Dictionary = p.defender
 	var s: Variant = Synod.state_for(game, att)
-	if s == null or s.decrees.is_empty() or Wars.is_heretic(game, dfn) or Temple.head_title_of(game, dfn) != Temple.head_title_of(game, att):
+	if s == null or s.decrees.is_empty() or Wars.is_heretic(game, att):
+		return null
+	# на еретика — ai_holy_war_mult (если указ о культе — только на этот культ),
+	# на единоверца-не-еретика — ai_war_mult
+	var key := ""
+	if Wars.is_heretic(game, dfn):
+		key = "ai_holy_war_mult"
+	elif Temple.head_title_of(game, dfn) == Temple.head_title_of(game, att):
+		key = "ai_war_mult"
+	else:
 		return null
 	var m := 1.0
 	for qid in s.decrees:
 		var q: Variant = game.content.get_def("synod_questions", qid)
-		if q != null and q.get("decree") is Dictionary and q.decree.get("ai_war_mult") != null:
-			m *= Data.num(q.decree.ai_war_mult, 1.0)
+		if q == null or not (q.get("decree") is Dictionary) or q.decree.get(key) == null:
+			continue
+		var tf := str(s.decrees[qid].get("target_faith", ""))
+		if key == "ai_holy_war_mult" and tf != "" and tf != str(dfn.faith):
+			continue
+		m *= Data.num(q.decree.get(key), 1.0)
 	return m if m != 1.0 else null
 
 

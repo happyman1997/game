@@ -139,6 +139,9 @@ interactions:
         - { desc: ai.craven, limit: { has_trait: craven }, value: -40 }
         - { desc: ai.wounded, limit: { has_trait: wounded }, value: -40 }
     on_accept:
+      - if:
+          limit: { has_synod_decree: ban_duels }
+          add_piety: -60
       - duel: scope:recipient
     on_decline:
       - add_prestige: 15
@@ -162,5 +165,8 @@ interactions:
           add: 25
         - limit: { has_trait: [wrathful, arrogant, brave] }
           add: 8
+        # указ Собора: поединки — грех
+        - limit: { has_synod_decree: ban_duels }
+          multiply: 0.3
       # только когда уверен в победе
       multiply: { value: "duel_odds(scope:recipient)", subtract: 45, multiply: 0.05, min: 0, max: 1 }

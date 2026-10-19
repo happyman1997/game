@@ -23,6 +23,14 @@ events:
         desc: ev.synod.0002.desc_tyrant
       - trigger: { synod_question: canonize }
         desc: ev.synod.0002.desc_canonize
+      - trigger: { synod_question: crusade }
+        desc: ev.synod.0002.desc_crusade
+      - trigger: { synod_question: condemn_royal_tithe }
+        desc: ev.synod.0002.desc_tithe_condemn
+      - trigger: { synod_question: blessing_of_fields }
+        desc: ev.synod.0002.desc_fields
+      - trigger: { synod_question: ban_duels }
+        desc: ev.synod.0002.desc_duels
       - desc: ev.synod.0002.desc
     options:
       - trigger: { synod_vassal_voters: ">= 1" }
@@ -51,6 +59,14 @@ events:
         desc: ev.synod.0001.desc_tyrant
       - trigger: { synod_question: canonize }
         desc: ev.synod.0001.desc_canonize
+      - trigger: { synod_question: crusade }
+        desc: ev.synod.0001.desc_crusade
+      - trigger: { synod_question: condemn_royal_tithe }
+        desc: ev.synod.0001.desc_tithe_condemn
+      - trigger: { synod_question: blessing_of_fields }
+        desc: ev.synod.0001.desc_fields
+      - trigger: { synod_question: ban_duels }
+        desc: ev.synod.0001.desc_duels
       - desc: ev.synod.0001.desc
     # ai_chance — за игрока на автопилоте: голос по убеждению, как у всех
     options:

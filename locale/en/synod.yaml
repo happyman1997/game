@@ -6,6 +6,10 @@ synod_question:
   tithe: The Temple Tithe
   excommunicate_tyrant: "Excommunicate {target}"
   canonize: "Canonise {target}"
+  crusade: "Holy Campaign: {faith}"
+  condemn_royal_tithe: "Condemn the Tithe of {target}"
+  blessing_of_fields: Blessing of the Fields
+  ban_duels: Ban on Duels
 msg:
   synod_called: "{head} calls a Synod at Reims. The question: “{question}”. The Synod will meet in a year."
   synod_passed: "The Synod has passed: “{question}” (for {for}, against {against})."

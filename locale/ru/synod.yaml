@@ -6,6 +6,10 @@ synod_question:
   tithe: Десятина Храму
   excommunicate_tyrant: "Отлучить {target}"
   canonize: "Канонизировать {target}"
+  crusade: "Священный поход: {faith}"
+  condemn_royal_tithe: "Осудить десятину {target}"
+  blessing_of_fields: Освящение нив
+  ban_duels: Запрет поединков
 msg:
   synod_called: "{head} созывает Собор в Реймсе. Вопрос: «{question}». Собор соберётся через год."
   synod_passed: "Собор принял: «{question}» (за {for}, против {against})."

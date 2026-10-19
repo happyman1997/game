@@ -174,6 +174,107 @@ synod_questions:
           add_dynasty_prestige: 300
       - create_relics: { of: scope:synod_target, rarity: illustrious }
 
+  # Священный поход: десять лет ИИ-единоверцы охотнее идут священной войной
+  # на этот еретический культ, а благочестие всех верных растёт.
+  crusade:
+    icon: "⚔"
+    target: { type: faith, heretic: yes, prefer: large }
+    weight: 1
+    ai_vote:
+      value: 0
+      add:
+        - { value: ai_zeal, multiply: 8 }
+        - { value: ai_aggression, multiply: 4 }
+      if:
+        - limit: { of_synod_target_faith: yes }
+          add: -200
+        - limit: { has_trait: [zealous, wrathful] }
+          add: 15
+        - limit: { any_neighboring_ruler: { of_synod_target_faith: yes } }
+          add: 10
+        - limit: { has_trait: [compassionate, content, craven] }
+          add: -15
+        - limit: { any_spouse: { of_synod_target_faith: yes } }
+          add: -40
+    decree:
+      years: 10
+      ai_holy_war_mult: 2.5
+      ruler_modifiers: { monthly_piety: 0.3 }
+
+  # Осудить королевскую десятину: Собор велит правителю, что забирает
+  # десятину Храма, вернуть её — закон о Храме смягчается, благочестие падает.
+  # Свои же «десятинники» голосуют против.
+  condemn_royal_tithe:
+    requires_feature: laws
+    icon: "⚖"
+    weight: 2
+    target:
+      type: character
+      trigger:
+        is_heretic: no
+        faith_head: { is_same_as: scope:synod_head }
+        church_law_level: ">= 2"
+      order: { value: tier }
+    ai_vote:
+      value: 10
+      add: { value: ai_zeal, multiply: 6 }
+      if:
+        - limit: { is_same_as: scope:synod_target }
+          add: -300
+        - limit: { church_law_level: ">= 2" }
+          add: -60
+        - limit: { is_close_family_of: scope:synod_target }
+          add: -40
+        - limit: { is_vassal_of: scope:synod_target }
+          add: -25
+        - limit: { has_trait: [greedy, cynical] }
+          add: -15
+    on_pass:
+      - scope:synod_target:
+          shift_realm_law: { group: church_law, by: -1 }
+          add_piety: -150
+
+  # Освящение нив: десять лет земли верных растут быстрее, Храм благочестив.
+  blessing_of_fields:
+    icon: "🌾"
+    weight: 1
+    ai_vote:
+      value: 8
+      add:
+        - { value: ai_compassion, multiply: 4 }
+        - { value: ai_zeal, multiply: 3 }
+      if:
+        - limit: { has_trait: cynical }
+          add: -20
+        - limit: { has_trait: [diligent, generous] }
+          add: 8
+    decree:
+      years: 10
+      ruler_modifiers: { development_growth: 0.02 }
+      head_modifiers: { monthly_piety: 2 }
+
+  # Запрет поединков: «Божий суд» — грех; слава за победу вдвое меньше,
+  # а вызвавший на поединок теряет благочестие.
+  ban_duels:
+    requires_feature: duels
+    icon: "🤺"
+    weight: 1
+    ai_vote:
+      value: 0
+      add:
+        - { value: ai_boldness, multiply: -6 }
+        - { value: ai_compassion, multiply: 4 }
+      if:
+        - limit: { has_trait: [brave, wrathful, arrogant] }
+          add: -15
+        - limit: { has_trait: [craven, compassionate, content] }
+          add: 15
+        - limit: { prowess: ">= 14" }
+          add: -10
+    decree:
+      years: 15
+      ruler_modifiers: { duel_prestige_mult: -0.5 }
+
 opinion_modifiers:
   broke_the_peace: { value: -30, years: 10 }
 

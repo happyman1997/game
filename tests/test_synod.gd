@@ -212,3 +212,60 @@ func test_synod_more_often() -> void:
 	var g := _game()
 	check(g.def_num("synod.years_max", 15) <= 9, "Собор — не реже раза в 9 лет")
 	check(Data.num(g.def_val("synod.first_years", [3, 6])[1]) <= 4, "первый — в первые 4 года")
+
+
+func test_condemn_royal_tithe() -> void:
+	var g := _game()
+	var h: Dictionary = g.ch("harold")
+	Laws.change(g, h, "church_law_2", true)
+	var a := _call(g, "condemn_royal_tithe")
+	check_eq(str(a.get("target")), "harold", "Собор судит того, кто забрал десятину")
+	var p0 := float(h.piety)
+	_sway_all(g, a, 1)
+	var r := _convene(g)
+	check(r.passed, "осуждение принято")
+	check_eq(Laws.current(g, h, "church_law").id, "church_law_1", "десятина возвращена Храму")
+	check(float(h.piety) < p0, "и грех замаливать")
+
+
+func test_crusade_decree() -> void:
+	var g := _game()
+	var head: Dictionary = g.ch(g.state.titles[HT].holder)
+	var a: Variant = null
+	if Synod.call_synod(g, HT, head, "crusade"):
+		a = Synod.state_of(g, HT).active
+	if a == null:
+		check(true, "еретического культа с правителями нет — пропуск")
+		return
+	_sway_all(g, a, 1)
+	_convene(g)
+	var tf := str(Synod.state_of(g, HT).decrees.crusade.target_faith)
+	var heretic: Variant = null
+	var other: Variant = null
+	for c in g.rulers():
+		if str(c.faith) == tf and heretic == null:
+			heretic = c
+	var att: Variant = null
+	for c in g.rulers():
+		if Temple.head_of(g, c) != null and not Wars.is_heretic(g, c) and c.id != head.id:
+			att = c
+			break
+	check(heretic != null and att != null, "есть кому идти в поход и на кого")
+	var m: Variant = Synod._ai_war_will({"game": g, "attacker": att, "defender": heretic})
+	check(m is float and float(m) > 1.0, "ИИ охотнее идёт на еретика (%s)" % [m])
+
+
+func test_ban_duels_and_blessing() -> void:
+	var g := _game()
+	var h: Dictionary = g.ch("harold")
+	var a := _call(g, "ban_duels")
+	_sway_all(g, a, 1)
+	_convene(g)
+	g.stat_cache.clear()
+	check(Stats.stat(g, h, "duel_prestige_mult") <= -0.5, "за поединок — вдвое меньше славы")
+	var dg0 := Stats.stat(g, h, "development_growth")
+	a = _call(g, "blessing_of_fields")
+	_sway_all(g, a, 1)
+	_convene(g)
+	g.stat_cache.clear()
+	check(Stats.stat(g, h, "development_growth") > dg0, "освящённые нивы растут быстрее")

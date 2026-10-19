@@ -20,6 +20,10 @@ ev:
     desc_tithe: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod to ask for a tithe — a share of taxes for the Temple for twenty years. In a year the rulers of the faith will vote. Your vassals wait to hear what their lord will say."
     desc_tyrant: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod to cast [scope:synod_target] out of the Light. In a year the rulers of the faith will vote. Your vassals wait to hear what their lord will say."
     desc_canonize: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod to proclaim [scope:synod_target.name] a saint. In a year the rulers of the faith will vote. Your vassals wait to hear what their lord will say."
+    desc_crusade: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod to summon the faithful to a holy campaign against the [scope:synod_faith_ruler.faith_name]. In a year the rulers of the faith will vote. Your vassals wait to hear what their lord will say."
+    desc_tithe_condemn: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod to condemn [scope:synod_target] for the royal tithe. In a year the rulers of the faith will vote. Your vassals wait to hear what their lord will say."
+    desc_fields: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod to bless the fields of the faithful. In a year the rulers of the faith will vote. Your vassals wait to hear what their lord will say."
+    desc_duels: "Heralds of the Temple of the Sun carry the news: [scope:synod_head] calls a Synod to ban duels. In a year the rulers of the faith will vote. Your vassals wait to hear what their lord will say."
     a: "Declare: I am “for”"
     b: "Declare: I am “against”"
     c: Keep silent until the Synod
@@ -32,6 +36,10 @@ ev:
     desc_tithe: "Beneath the vaults of the Temple of the Sun, [scope:synod_head] asks for a tithe: for twenty years the faithful will give the Temple a share of their taxes, and the Temple will pray for them. The treasury grows lighter; piety grows."
     desc_tyrant: "Beneath the vaults of the Temple of the Sun, [scope:synod_head] denounces [scope:synod_target]: blood, lies and fear are their rule. Shall the whole Synod cast them out of the Light?"
     desc_canonize: "Beneath the vaults of the Temple of the Sun, [scope:synod_head] recalls the righteous life of [scope:synod_target.name]. Shall the righteous one be proclaimed a saint? Glory to their house, and a place in the Temple for their relics."
+    desc_crusade: "Beneath the vaults of the Temple of the Sun, [scope:synod_head] calls the faithful to a holy campaign against the [scope:synod_faith_ruler.faith_name]. If the Synod agrees, for ten years the rulers of the faith will more readily raise swords against the heretics, and the piety of the faithful will grow."
+    desc_tithe_condemn: "Beneath the vaults of the Temple of the Sun, [scope:synod_head] denounces [scope:synod_target]: the crown takes the Temple's tithe. If the Synod agrees, [scope:synod_target] will have to restore the Temple's rights — and atone for the sin."
+    desc_fields: "Beneath the vaults of the Temple of the Sun, [scope:synod_head] proposes to bless the fields: for ten years the priests will bless the lands of the faithful, and they will prosper faster."
+    desc_duels: "Beneath the vaults of the Temple of the Sun, [scope:synod_head] proposes to ban duels: “God's judgement” is pride, not faith. If the Synod agrees, for fifteen years a duel won will bring half the glory, and the challenger will sin."
     a: Vote “for”
     b: Vote “against”
     c: Abstain
