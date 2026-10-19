@@ -233,7 +233,7 @@
 | `create_relics` | Мощи праведника — реликварий с его именем: create_relics: { of: scope:predecessor, rarity: famed } (получает текущий персонаж) | core/karma |
 | `cure_ailments` | Снять болезни, раны и порчу | arcana |
 | `death` | Смерть: yes, причина или { reason, killer } | core |
-| `delay_construction` | Отложить стройку в графстве на столько дней: delay_construction: 180 | core |
+| `delay_construction` | Отложить стройку в графстве на столько дней: delay_construction: 180 (меньше нуля — ускорить) | core |
 | `destroy_artifact` | Уничтожить вещь (уникальная — теряется): destroy_artifact: yes | core/artifacts |
 | `discover_scheme_against` | Раскрыть случайную враждебную интригу против персонажа или его семьи | core/council |
 | `discover_secret` | Узнать случайный секрет кого-то из своей державы | core/secrets |

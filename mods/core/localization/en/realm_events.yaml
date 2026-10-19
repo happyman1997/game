@@ -1,0 +1,70 @@
+# Life of the realm (events/realm.yaml).
+opinion_modifier:
+  widows_cared: Cared for the widows
+  widows_forgotten: Forgot the widows of the fallen
+  harsh_collectors: Ruthless tax collectors
+  fair_market: A fair without tolls
+  merciful_release: Released me from the dungeon
+  legate_appeased: Honoured the legate
+  legate_insulted: Threw out the legate
+  welcomed_kin: Welcomed me to court
+  turned_away_kin: Turned me away
+  hook_redeemed: Let me buy back my secret
+  redemption_refused: Refused to let me buy back my secret
+ev:
+  realm.0001:
+    t: Merchants Ask for a Loan
+    desc: "The merchants' guild is fitting out a caravan overseas and asks the treasury for a hundred gold. They swear to repay with interest — if the sea is kind."
+    a: Lend a hundred gold
+    b: The treasury is no money-changer's stall
+  realm.0002:
+    t: The Caravan Returns
+    desc: "The merchants have returned with profit and, as promised, bring the debt to the treasury — and more besides."
+    a: A good bargain
+  realm.0003:
+    t: The Caravan Is Lost
+    desc: "Storm or brigands — who knows. The guild is ruined and can return only a small part of the debt."
+    a: Well, that is the sea
+  realm.0004:
+    t: Ruthless Collectors
+    desc: "Complaints come from [scope:province]: your collectors take the last crumb, and those who cannot pay are beaten. The heavy taxes are enforced too eagerly."
+    a: Punish the collectors and return part of the take
+    b: Taxes are taxes
+    c: Restore customary taxes across the domain
+  realm.0005:
+    t: Widows of the Fallen
+    desc: "After the lost battle, widows come to your castle: their husbands did not return from the field, and there is nothing to feed the children."
+    a: Grant the widows a pension
+    b: War is war
+  realm.0006:
+    t: A Prisoner Begs for Mercy
+    desc: "[scope:captive] asks for an audience and, near tears, swears: release me and you will not regret it — the debt will be remembered for life."
+    a: Release them under oath
+    b: Let them rot
+  realm.0007:
+    t: Buying Back a Secret
+    desc: "[scope:debtor] comes with a purse: what you know must never come out. How much does it cost to forget?"
+    a: Sell your silence
+    b: The secret is worth more than gold
+  realm.0008:
+    t: The Fair
+    desc: "A fair opens in [scope:province]: merchants have come from neighbouring lands, and the tolls promise good takings."
+    a: Collect the tolls
+    b: A fair without tolls — let them remember
+  realm.0009:
+    t: The Temple's Legate
+    desc: "A legate of the Great Light arrives with a letter: the royal tithe is robbery of the Temple, and the Light expects you to come to your senses."
+    a: Gift the legate (60 gold)
+    b: Show the legate the gate
+    c: Return the tithe to the Temple
+  realm.0010:
+    t: A Kinsman Asks for a Place
+    desc: "[scope:kin] of your house has been left without roof or bread and asks for a place at your court."
+    a: Welcome them to court
+    b: Give them money for the road
+    c: Refuse
+  realm.0011:
+    t: The Masons Want More Pay
+    desc: "The master mason in the capital asks for more pay: the work is hard, and they pay more beyond the next wall. Refuse — and the crew leaves for a month."
+    a: Raise the pay (construction speeds up)
+    b: Refuse

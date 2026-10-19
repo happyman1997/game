@@ -1,0 +1,271 @@
+# Жизнь державы: события, которые вырастают из механик — казны, податей,
+# войны, темницы, крюков, районов, Храма, рода и стройки. Приходят из
+# ежемесячного пульса (on_monthly_pulse) тем, к кому подходят по условиям,
+# и ИИ тоже (он выбирает по ai_chance). Вдовы павших — после проигранной битвы.
+
+opinion_modifiers:
+  # мнение графств (add_county_opinion)
+  widows_cared: { value: 12, years: 3 }
+  widows_forgotten: { value: -8, years: 3 }
+  harsh_collectors: { value: -12, years: 3 }
+  fair_market: { value: 12, years: 2 }
+  # мнение персонажей
+  merciful_release: { value: 30, years: 10 }
+  legate_appeased: { value: 15, years: 5 }
+  legate_insulted: { value: -25, years: 10 }
+  welcomed_kin: { value: 20, years: 10 }
+  turned_away_kin: { value: -15, years: 5 }
+  hook_redeemed: { value: 20, years: 10 }
+  redemption_refused: { value: -10, years: 3 }
+
+on_actions:
+  on_monthly_pulse:
+    random_events:
+      events:
+        realm.0001: 8
+        realm.0004: 10
+        realm.0006: 8
+        realm.0007: 8
+        realm.0008: 8
+        realm.0009: 8
+        realm.0010: 6
+        realm.0011: 8
+  on_battle_lost:
+    random_events:
+      chance: 35
+      events:
+        realm.0005: 10
+
+events:
+  # ------------------------------------------------------------ казна: купцы просят ссуду
+  realm.0001:
+    theme: realm
+    icon: "🪙"
+    trigger:
+      is_ruler: yes
+      gold: ">= 150"
+    cooldown: { years: 6 }
+    options:
+      # ссудить — через год купцы вернут с лихвой (или разорятся)
+      - effect:
+          - add_gold: -100
+          - random_list:
+              - weight: { value: 70, add: { value: stewardship, multiply: 1 } }
+                trigger_event: { id: realm.0002, days: 365 }
+              - weight: 30
+                trigger_event: { id: realm.0003, days: 365 }
+        ai_chance: { value: 20, add: { value: ai_greed, multiply: 5 } }
+      - effect: { add_prestige: 5 }
+        ai_chance: 30
+
+  realm.0002:
+    theme: realm
+    icon: "🪙"
+    triggered_only: true
+    options:
+      - effect: { add_gold: 140 }
+
+  realm.0003:
+    theme: realm
+    icon: "🪙"
+    triggered_only: true
+    options:
+      - effect: { add_gold: 20, add_stress: 5 }
+
+  # ------------------------------------------------------------ подати: сборщики лютуют
+  realm.0004:
+    requires_feature: populace
+    theme: realm
+    icon: "💰"
+    trigger:
+      tax_law_level: ">= 2"
+      num_counties: ">= 1"
+    cooldown: { years: 4 }
+    immediate:
+      random_domain_province: { save_scope_as: province }
+    options:
+      # наказать сборщиков: графство слышит, казна недосчитается
+      - effect:
+          - add_gold: -20
+          - scope:province: { add_county_opinion: heard_out_people }
+        ai_chance: { value: 15, add: { value: ai_compassion, multiply: 5 } }
+      # подати есть подати
+      - effect:
+          - scope:province: { add_county_opinion: harsh_collectors }
+          - add_dread: 3
+        ai_chance: { value: 25, add: { value: ai_greed, multiply: 5 } }
+      # вернуть обычные подати
+      - effect:
+          - shift_realm_law: { group: tax_law, by: -1 }
+          - every_domain_province: { add_county_opinion: heard_out_people }
+        ai_chance: 10
+
+  # ------------------------------------------------------------ война: вдовы павших
+  realm.0005:
+    theme: war
+    icon: "🕯"
+    trigger: { num_counties: ">= 1" }
+    cooldown: { years: 2 }
+    options:
+      - trigger: { gold: 20 }
+        effect:
+          - add_gold: { value: -15, add: { value: tier, multiply: -10 } }
+          - ordered_domain_province: { order_by: development, max: 3, add_county_opinion: widows_cared }
+          - add_karma: { value: 3, deed: charity }
+        ai_chance: { value: 20, add: { value: ai_compassion, multiply: 8 } }
+      - effect:
+          - capital: { add_county_opinion: widows_forgotten }
+          - if:
+              limit: { has_trait: compassionate }
+              add_stress: 15
+        ai_chance: 30
+
+  # ------------------------------------------------------------ темница: пленник просит милости
+  realm.0006:
+    requires_feature: prison
+    theme: intrigue
+    icon: "⛓"
+    trigger: { num_prisoners: ">= 1" }
+    cooldown: { years: 3 }
+    immediate:
+      random_prisoner: { save_scope_as: captive }
+    options:
+      # отпустить под клятву: благодарность и крюк
+      - effect:
+          - scope:captive:
+              release_from_prison: released
+              add_opinion: { target: root, modifier: merciful_release }
+          - add_hook: { target: scope:captive, years: 15 }
+          - add_karma: { value: 3, deed: mercy }
+        ai_chance: { value: 15, add: { value: ai_compassion, multiply: 8 } }
+      # пусть сидит
+      - effect: { add_dread: 2 }
+        ai_chance: { value: 20, add: { value: ai_vengefulness, multiply: 5 } }
+
+  # ------------------------------------------------------------ крюки: должник ищет примирения
+  realm.0007:
+    requires_feature: secrets
+    theme: intrigue
+    icon: "🤝"
+    trigger:
+      any_hooked: { gold: ">= 40", is_imprisoned: no }
+    cooldown: { years: 4 }
+    immediate:
+      random_hooked:
+        limit: { gold: ">= 40", is_imprisoned: no }
+        save_scope_as: debtor
+    options:
+      # продать крюк: должник выкупает свою тайну
+      - effect:
+          - scope:debtor:
+              pay_gold: { target: root, value: { value: gold, multiply: 0.25, min: 20, max: 250 } }
+              add_opinion: { target: root, modifier: hook_redeemed }
+          - remove_hook: scope:debtor
+        ai_chance: { value: 20, add: { value: ai_greed, multiply: 6 } }
+      # крюк дороже золота
+      - effect:
+          - scope:debtor: { add_opinion: { target: root, modifier: redemption_refused } }
+        ai_chance: 30
+
+  # ------------------------------------------------------------ районы: ярмарка
+  realm.0008:
+    requires_feature: districts
+    theme: realm
+    icon: "🎪"
+    trigger:
+      any_domain_province: { has_district: { district: market, level: 2 } }
+    cooldown: { years: 3 }
+    immediate:
+      random_domain_province:
+        limit: { has_district: { district: market, level: 2 } }
+        save_scope_as: province
+    options:
+      - effect: { add_gold: { value: 30, add: { value: stewardship, multiply: 2 } } }
+        ai_chance: { value: 30, add: { value: ai_greed, multiply: 5 } }
+      # отменить пошлину на ярмарку: люди помнят щедрость
+      - effect:
+          - scope:province: { add_county_opinion: fair_market }
+          - add_prestige: 15
+        ai_chance: 20
+
+  # ------------------------------------------------------------ Храм: легат требует десятину
+  realm.0009:
+    requires_feature: laws
+    theme: faith
+    icon: "📜"
+    trigger:
+      church_law_level: ">= 2"
+      exists: faith_head
+      NOT: { is_faith_head: yes }
+    cooldown: { years: 5 }
+    options:
+      # откупиться
+      - trigger: { gold: 60 }
+        effect:
+          - add_gold: -60
+          - faith_head: { add_opinion: { target: root, modifier: legate_appeased } }
+        ai_chance: { value: 20, add: { value: ai_zeal, multiply: 5 } }
+      # выгнать легата
+      - effect:
+          - add_prestige: 15
+          - faith_head: { add_opinion: { target: root, modifier: legate_insulted } }
+        ai_chance: { value: 20, add: { value: ai_zeal, multiply: -5 } }
+      # вернуть десятину Храму
+      - effect:
+          - shift_realm_law: { group: church_law, by: -1 }
+          - add_piety: 40
+        ai_chance: { value: 5, add: { value: ai_zeal, multiply: 5 } }
+
+  # ------------------------------------------------------------ род: родич просит места
+  realm.0010:
+    theme: family
+    icon: "🏠"
+    trigger:
+      is_ruler: yes
+      any_dynasty_member:
+        is_adult: yes
+        is_ruler: no
+        is_imprisoned: no
+        NOT: { is_courtier_of: root }
+    cooldown: { years: 5 }
+    immediate:
+      random_dynasty_member:
+        limit:
+          is_adult: yes
+          is_ruler: no
+          is_imprisoned: no
+          NOT: { is_courtier_of: root }
+        save_scope_as: kin
+    options:
+      - effect:
+          - scope:kin:
+              move_to_court: root
+              add_opinion: { target: root, modifier: welcomed_kin }
+        ai_chance: 30
+      - trigger: { gold: 25 }
+        effect:
+          - add_gold: -25
+          - scope:kin: { add_opinion: { target: root, modifier: grateful } }
+        ai_chance: 20
+      - effect:
+          - scope:kin: { add_opinion: { target: root, modifier: turned_away_kin } }
+        ai_chance: { value: 10, add: { value: ai_greed, multiply: 5 } }
+
+  # ------------------------------------------------------------ стройка: каменщики просят надбавки
+  realm.0011:
+    theme: realm
+    icon: "🏗"
+    trigger:
+      capital: { has_construction: yes }
+    cooldown: { years: 3 }
+    options:
+      # надбавка — и стройка пойдёт быстрее
+      - trigger: { gold: 40 }
+        effect:
+          - add_gold: -40
+          - capital: { delay_construction: -90 }
+        ai_chance: { value: 20, add: { value: ai_greed, multiply: -5 } }
+      # отказать — артель уходит на месяц
+      - effect:
+          - capital: { delay_construction: 30 }
+        ai_chance: 25

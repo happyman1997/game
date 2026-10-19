@@ -77,6 +77,9 @@ defines:
       "interaction:synod_sway_for": temple
       "interaction:synod_sway_against": temple
       "decision:take_loan": loans
+      "event:realm.0001": loans
+      "event:realm.0002": loans
+      "event:realm.0003": loans
       "decision:hire_mercenaries": war
       "decision:give_alms": alms
       "decision:hold_feast": court
@@ -216,8 +219,9 @@ defines:
     dismiss_opinion_modifier: dismissed_from_council
     ai_task_jitter: 4               # случайная добавка к пользе задачи — ИИ выбирает разнообразнее
     # дела: прогресс в месяц = (база + навык × коэф.) × скорость платы; 100 — событие
-    progress_base: 2
-    progress_per_skill: 0.4
+    # (навык 10 — дело за ~4,5 года, навык 20 — за ~3 года)
+    progress_base: 0.6
+    progress_per_skill: 0.12
     # жалованье: доля налогов с домена за каждое место, мнение советников, скорость дел
     pay:
       low: { share: 0.015, opinion: -10, speed: 0.7 }

@@ -1070,12 +1070,12 @@ static func _register_effects(engine: GameEngine) -> void:
 			ctx.game.state["build_ver"] = int(ctx.game.state.get("build_ver", 0)) + 1
 			ctx.game.stat_cache.clear()
 	, func(ctx, s, arg): return _t(ctx.game, "fx.add_building", {"place": ctx.game.scope_name(s), "value": ctx.game.name_of("buildings", arg)}))
-	eff.call("delay_construction", PROV, "Отложить стройку в графстве на столько дней: delay_construction: 180", func(ctx, s, arg):
+	eff.call("delay_construction", PROV, "Отложить стройку в графстве на столько дней: delay_construction: 180 (меньше нуля — ускорить)", func(ctx, s, arg):
 		var p: Variant = ctx.game.state.provinces.get(s.id)
 		if p != null and p.get("construction") != null:
-			# не дальше начала: сделанное можно потерять, но не больше
+			# не дальше начала: сделанное можно потерять, но не больше; ускорить — не раньше завтра
 			var cons: Dictionary = p.construction
-			cons.done = mini(int(cons.done) + roundi(_num(ctx, s, arg)), ctx.game.date + int(cons.get("days", 0)))
+			cons.done = clampi(int(cons.done) + roundi(_num(ctx, s, arg)), ctx.game.date + 1, ctx.game.date + int(cons.get("days", 0)))
 	, func(ctx, s, arg): return _t(ctx.game, "fx.delay_construction", {"place": ctx.game.scope_name(s), "value": roundi(_num(ctx, s, arg))}))
 	eff.call("remove_building", PROV, "Убрать постройку", func(ctx, s, arg):
 		var p: Variant = ctx.game.state.provinces.get(s.id)
