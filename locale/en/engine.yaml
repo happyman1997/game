@@ -18,6 +18,7 @@ rank:
     county: { m: Jarl, f: Jarl }
 
 fx:
+  delay_construction: "{place}: construction set back by {value} days"
   add_gold: "{value} 💰"
   add_prestige: "{value} prestige"
   add_piety: "{value} piety"
@@ -58,6 +59,9 @@ fx:
     ordered: "The best ({list}):"
 
 tr:
+  artifact_claimed_by: "Claimed by {who}"
+  has_construction: Construction under way
+  has_construction.not: No construction
   is_alive: Must be alive
   is_adult: Must be an adult
   is_adult.not: Must be a child

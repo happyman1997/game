@@ -1,0 +1,33 @@
+# Schemes against others' goods and kin (common/intrigues.yaml).
+scheme:
+  abduct: Abduction
+  steal_artifact: Theft of a Relic
+  incite_unrest: Stirring Unrest
+  sabotage: Arson
+interaction:
+  abduct: Abduct
+  steal_artifact: Steal a Relic
+  incite_unrest: Stir Unrest in the Counties
+  sabotage: Commit Arson
+interaction_desc:
+  abduct: "Scheme: bribed men will seize this person and bring them to your dungeon. The prisoner can be ransomed, traded — or kept as leverage. Their kin and liege will not forgive it."
+  steal_artifact: "Scheme: a thief will carry off the most valuable item in their treasury — or, if one of them is yours that was lost, that one. The former owner keeps a claim."
+  incite_unrest: "Scheme: agitators will spread through this ruler's three richest counties. For three years the counties will resent their lord — who pays taxes when there is talk of revolt?"
+  sabotage: "Scheme: the storehouses of this ruler's capital will burn — taxes there fall for two years, and any construction is set back half a year."
+opinion_modifier:
+  abducted_kin: Abducted my kin
+  caught_scheming: Caught scheming against me
+  incited_unrest: Agitators
+modifier:
+  burned_stores: Burned Storehouses
+msg:
+  abduct_success: "The abduction succeeded: [scope:target] is in your dungeon."
+  abduct_failed: "The abduction failed: [scope:target] slipped away."
+  steal_success: "The thief has returned with loot from the treasury of [scope:target]."
+  steal_failed: "The thief was nearly caught — the treasury of [scope:target] is untouched."
+  unrest_success: "The agitators are at work: the counties of [scope:target] grumble."
+  unrest_failed: "No one listened to the agitators in the lands of [scope:target]."
+  unrest_incited_you: "Someone is stirring up your counties: agitators walk the villages."
+  sabotage_success: "The storehouses of [scope:target]'s capital are burning."
+  sabotage_failed: "The arsonists were seen before the fire caught."
+  sabotage_you: "At night the storehouses of your capital caught fire. It was put out, but the stores and the construction are lost."

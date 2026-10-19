@@ -19,6 +19,7 @@ rank:
     county: { m: Ярл, f: Ярл }
 
 fx:
+  delay_construction: "{place}: стройка отложена на {value} дн."
   add_gold: "{value} 💰"
   add_prestige: "{value} престижа"
   add_piety: "{value} благочестия"
@@ -59,6 +60,9 @@ fx:
     ordered: "Лучший ({list}):"
 
 tr:
+  artifact_claimed_by: "На вещь притязает {who}"
+  has_construction: Идёт стройка
+  has_construction.not: Стройки нет
   is_alive: Должен быть жив
   is_adult: Должен быть совершеннолетним
   is_adult.not: Должен быть ребёнком

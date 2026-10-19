@@ -1,0 +1,271 @@
+# Интриги против чужого добра и чужой родни (к убийству, соблазнению и
+# компромату из schemes.yaml и secrets.yaml): похищение — пленник в вашей
+# темнице (выкуп, обмен, крюк); кража реликвии — вещь у вас, у прежнего
+# владельца — притязание; смута — графства врага злятся на него; поджог —
+# стройка в столице врага отложена, подати падают. Раскрытая интрига — законный
+# повод к темнице (opinion caught_scheming в defines.prison.crime_opinion_modifiers).
+# Скоупы интриг: root = scope:owner, scope:target, scope:scheme.
+
+opinion_modifiers:
+  abducted_kin: { value: -45, years: 15 }
+  caught_scheming: { value: -30, years: 10 }
+  # мнение графств (add_county_opinion)
+  incited_unrest: { value: -18, years: 3 }
+
+modifiers:
+  burned_stores: { icon: "🔥", modifiers: { tax_mult: -0.3, development_growth: -0.05 } }
+
+schemes:
+  # Похищение: не правитель (дети, супруги, придворные) — в вашу темницу
+  abduct:
+    category: hostile
+    icon: "⛓"
+    skill: intrigue
+    is_valid:
+      scope:target: { is_alive: yes, is_ruler: no, is_imprisoned: no }
+    progress:
+      value: 4
+      add: { value: "scope:owner.intrigue", multiply: 0.5 }
+    success_chance:
+      value: 15
+      add:
+        - { desc: ai.your_intrigue, value: { value: "scope:owner.intrigue", multiply: 2.5 } }
+        - { desc: ai.target_prowess, limit: { scope:target: { is_adult: yes } }, value: { value: "scope:target.prowess", multiply: -1 } }
+        - { desc: ai.scheme_power, value: "scope:owner.scheme_power" }
+        - { desc: ai.target_scheme_defense, value: { value: "scope:target.scheme_defense", multiply: -1 } }
+      min: 3
+      max: 85
+    discovery_chance:
+      value: 5
+      add: { value: "scope:target.scheme_defense", multiply: 0.2 }
+      min: 1
+    on_success:
+      - scope:owner: { imprison: { target: scope:target } }
+      - scope:target:
+          every_close_family:
+            limit: { is_adult: yes }
+            add_opinion: { target: scope:owner, modifier: abducted_kin }
+      - if:
+          limit: { exists: scope:target.liege }
+          scope:target.liege: { add_opinion: { target: scope:owner, modifier: abducted_kin } }
+      - scope:owner:
+          send_message: { text: msg.abduct_success, kind: good }
+          add_karma: { value: -8, deed: unjust_imprisonment }
+          if:
+            limit: { has_trait: compassionate }
+            add_stress: 25
+    on_failure:
+      - scope:owner: { send_message: { text: msg.abduct_failed, kind: bad }, add_stress: 5 }
+    on_discovered:
+      - scope:target: { add_opinion: { target: scope:owner, modifier: caught_scheming } }
+      - if:
+          limit: { exists: scope:target.liege }
+          scope:target.liege: { add_opinion: { target: scope:owner, modifier: caught_scheming } }
+      - scope:owner: { send_message: { text: msg.scheme_discovered, kind: bad } }
+
+  # Кража реликвии: самая ценная вещь цели — ваша, у цели остаётся притязание
+  steal_artifact:
+    requires_feature: artifacts
+    category: hostile
+    icon: "🗝"
+    skill: intrigue
+    is_valid:
+      scope:target: { is_alive: yes, num_artifacts: "> 0" }
+    progress:
+      value: 5
+      add: { value: "scope:owner.intrigue", multiply: 0.5 }
+    success_chance:
+      value: 25
+      add:
+        - { desc: ai.your_intrigue, value: { value: "scope:owner.intrigue", multiply: 2 } }
+        - { desc: ai.target_intrigue, value: { value: "scope:target.intrigue", multiply: -1 } }
+        - { desc: ai.scheme_power, value: "scope:owner.scheme_power" }
+        - { desc: ai.target_scheme_defense, value: { value: "scope:target.scheme_defense", multiply: -0.5 } }
+      min: 5
+      max: 90
+    discovery_chance:
+      value: 4
+      add: { value: "scope:target.intrigue", multiply: 0.3 }
+      min: 1
+    on_success:
+      # сначала — то, на что вы притязаете, затем — самое ценное
+      - scope:target:
+          ordered_artifact:
+            order_by:
+              value: artifact_value
+              if:
+                - limit: { artifact_claimed_by: scope:owner }
+                  add: 1000
+            save_scope_as: loot
+      - if:
+          limit: { exists: scope:loot }
+          scope:owner:
+            transfer_artifact: { artifact: scope:loot, how: stolen }
+            send_message: { text: msg.steal_success, kind: good }
+    on_failure:
+      - scope:owner: { send_message: { text: msg.steal_failed, kind: bad } }
+    on_discovered:
+      - scope:target: { add_opinion: { target: scope:owner, modifier: caught_scheming } }
+      - scope:owner: { send_message: { text: msg.scheme_discovered, kind: bad } }
+
+  # Смута: подстрекатели в трёх богатейших графствах домена цели
+  incite_unrest:
+    requires_feature: populace
+    category: political
+    icon: "🔥"
+    skill: intrigue
+    is_valid:
+      scope:target: { is_alive: yes, is_ruler: yes }
+    progress:
+      value: 6
+      add: { value: "scope:owner.intrigue", multiply: 0.5 }
+    success_chance:
+      value: 35
+      add:
+        - { desc: ai.your_intrigue, value: { value: "scope:owner.intrigue", multiply: 2 } }
+        - { desc: ai.target_intrigue, value: { value: "scope:target.intrigue", multiply: -1.5 } }
+        - { desc: ai.scheme_power, value: "scope:owner.scheme_power" }
+      min: 5
+      max: 90
+    discovery_chance:
+      value: 4
+      add: { value: "scope:target.intrigue", multiply: 0.3 }
+      min: 1
+    on_success:
+      - scope:target:
+          ordered_domain_province:
+            order_by: development
+            max: 3
+            add_county_opinion: incited_unrest
+          send_message: { text: msg.unrest_incited_you, kind: bad }
+      - scope:owner: { send_message: { text: msg.unrest_success, kind: good } }
+    on_failure:
+      - scope:owner: { send_message: { text: msg.unrest_failed, kind: bad } }
+    on_discovered:
+      - scope:target: { add_opinion: { target: scope:owner, modifier: caught_scheming } }
+      - scope:owner: { send_message: { text: msg.scheme_discovered, kind: bad } }
+
+  # Поджог: в столице цели горят склады, а стройка откатывается на полгода
+  sabotage:
+    category: political
+    icon: "🔥"
+    skill: intrigue
+    is_valid:
+      scope:target: { is_alive: yes, is_ruler: yes }
+    progress:
+      value: 6
+      add: { value: "scope:owner.intrigue", multiply: 0.5 }
+    success_chance:
+      value: 30
+      add:
+        - { desc: ai.your_intrigue, value: { value: "scope:owner.intrigue", multiply: 2 } }
+        - { desc: ai.target_intrigue, value: { value: "scope:target.intrigue", multiply: -1.5 } }
+        - { desc: ai.scheme_power, value: "scope:owner.scheme_power" }
+        - { desc: ai.target_scheme_defense, value: { value: "scope:target.scheme_defense", multiply: -0.5 } }
+      min: 5
+      max: 90
+    discovery_chance:
+      value: 5
+      add: { value: "scope:target.intrigue", multiply: 0.3 }
+      min: 1
+    on_success:
+      - scope:target:
+          capital:
+            add_province_modifier: { id: burned_stores, years: 2 }
+            delay_construction: 180
+          send_message: { text: msg.sabotage_you, kind: bad }
+      - scope:owner: { send_message: { text: msg.sabotage_success, kind: good } }
+    on_failure:
+      - scope:owner: { send_message: { text: msg.sabotage_failed, kind: bad } }
+    on_discovered:
+      - scope:target: { add_opinion: { target: scope:owner, modifier: caught_scheming } }
+      - scope:owner: { send_message: { text: msg.scheme_discovered, kind: bad } }
+
+interactions:
+  abduct:
+    requires_feature: prison
+    icon: "⛓"
+    category: hostile
+    scheme: abduct
+    is_shown:
+      scope:actor: { is_ruler: yes }
+      scope:recipient: { is_ruler: no, is_imprisoned: no }
+      NOR:
+        - scope:recipient: { is_courtier_of: scope:actor }
+        - scope:actor: { is_close_family_of: scope:recipient }
+    # ИИ похищает родню врагов и соперников — ради выкупа и рычага
+    ai_targets: [enemy_kin]
+    ai_frequency_months: 24
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { scope:recipient: { any_liege: { is_at_war_with: scope:actor } } }
+          add: 15
+        - limit: { has_trait: [callous, deceitful, ambitious, vengeful] }
+          add: 10
+        - limit: { has_trait: [compassionate, honest, just] }
+          multiply: 0
+
+  steal_artifact:
+    requires_feature: artifacts
+    icon: "🗝"
+    category: hostile
+    scheme: steal_artifact
+    is_shown:
+      scope:recipient: { num_artifacts: "> 0" }
+      NOT: { scope:actor: { is_close_family_of: scope:recipient } }
+    # ИИ крадёт прежде всего свои же утраченные вещи (притязания)
+    ai_targets: [artifact_claim_holders, rival]
+    ai_frequency_months: 24
+    ai_will_do:
+      value: 0
+      add: { value: ai_greed, multiply: 4 }
+      if:
+        - limit: { has_artifact_claim: scope:recipient }
+          add: 30
+        - limit: { has_trait: [greedy, deceitful] }
+          add: 10
+        - limit: { has_trait: [honest, just] }
+          multiply: 0
+
+  incite_unrest:
+    requires_feature: populace
+    icon: "🔥"
+    category: hostile
+    scheme: incite_unrest
+    is_shown:
+      scope:actor: { is_ruler: yes }
+      scope:recipient: { is_ruler: yes }
+      NOT: { scope:recipient: { is_liege_of: scope:actor } }
+    ai_targets: [war_enemy, rival]
+    ai_frequency_months: 24
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { is_at_war_with: scope:recipient }
+          add: 25
+        - limit: { has_trait: [deceitful, vengeful, arbitrary] }
+          add: 8
+        - limit: { has_trait: [honest, just] }
+          multiply: 0
+
+  sabotage:
+    icon: "🔥"
+    category: hostile
+    scheme: sabotage
+    is_shown:
+      scope:actor: { is_ruler: yes }
+      scope:recipient: { is_ruler: yes }
+    ai_targets: [war_enemy, rival, neighboring_ruler]
+    ai_frequency_months: 24
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { is_at_war_with: scope:recipient }
+          add: 20
+        - limit: { scope:recipient: { capital: { has_construction: yes } } }
+          add: 10
+        - limit: { opinion: { target: scope:recipient, value: "< -40" } }
+          add: 10
+        - limit: { has_trait: [honest, just, compassionate] }
+          multiply: 0

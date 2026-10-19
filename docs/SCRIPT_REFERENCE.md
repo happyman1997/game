@@ -10,6 +10,7 @@
 | `ambition_frustrated` | character | Желание давно не исполняется — копится обида | core/ambitions |
 | `ambition_grantable_by` | character | Сюзерен может исполнить желание сам: ambition_grantable_by: scope:actor | core/ambitions |
 | `ambition_target_is` | character | Цель желания — этот скоуп: ambition_target_is: scope:target | core/ambitions |
+| `artifact_claimed_by` | artifact | На вещь притязает персонаж: artifact_claimed_by: scope:owner | core/artifacts |
 | `artifact_is_equipped` | artifact | Вещь надета или стоит при дворе | core/artifacts |
 | `artifact_is_held` | любой | Реликвия у кого-то есть (не утеряна): artifact_is_held: <id> | core/artifacts |
 | `artifact_rarity` | artifact | Редкость вещи не ниже: artifact_rarity: masterwork | core/artifacts |
@@ -46,6 +47,7 @@
 | `has_building` | province | Есть постройка | core |
 | `has_champion` | character | За персонажа в поединке бьётся поборник | core/duels |
 | `has_claim_on` | character | Есть претензия на титул | core |
+| `has_construction` | province | В графстве идёт стройка (постройка или район): has_construction: yes | core |
 | `has_council_task` | character | Сюзерен: на какой-то должности выбрана задача (или одна из списка) | core/council |
 | `has_district` | province | В графстве есть район (не ниже уровня): has_district: market или { district: market, level: 2 } | core/districts |
 | `has_dynasty_legacy` | character | Род персонажа открыл наследие: has_dynasty_legacy: <id> | core/dynasties |
@@ -231,6 +233,7 @@
 | `create_relics` | Мощи праведника — реликварий с его именем: create_relics: { of: scope:predecessor, rarity: famed } (получает текущий персонаж) | core/karma |
 | `cure_ailments` | Снять болезни, раны и порчу | arcana |
 | `death` | Смерть: yes, причина или { reason, killer } | core |
+| `delay_construction` | Отложить стройку в графстве на столько дней: delay_construction: 180 | core |
 | `destroy_artifact` | Уничтожить вещь (уникальная — теряется): destroy_artifact: yes | core/artifacts |
 | `discover_scheme_against` | Раскрыть случайную враждебную интригу против персонажа или его семьи | core/council |
 | `discover_secret` | Узнать случайный секрет кого-то из своей державы | core/secrets |
@@ -560,6 +563,7 @@
 | `de_jure_vassal_title` | title | Де-юре вассальные титулы | core |
 | `domain_province` | character | Провинции домена | core |
 | `dynasty_member` | character | Живые члены династии (со всеми ветвями) | core |
+| `enemy_kin` | character | Близкая семья врагов по войнам и соперников (не правители) | core |
 | `faction_against` | character | Фракции против персонажа | core/factions |
 | `faction_county` | faction | Графства народной фракции | core/populace |
 | `faction_member` | faction | Члены фракции | core/factions |

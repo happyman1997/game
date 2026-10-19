@@ -249,6 +249,27 @@ static func register(engine: GameEngine) -> void:
 		return _chars(Titles.realm_members(ctx.game, c).filter(func(x): return x.id != c.id)) if c != null else []
 	)
 	lst.call("courtier", CHAR, "Придворные", func(ctx, s): return _chars(ctx.game.courtiers_of(s.id)))
+	# родня врагов (по войнам и кровной вражде) — цели похищения
+	lst.call("enemy_kin", CHAR, "Близкая семья врагов по войнам и соперников (не правители)", func(ctx, s):
+		var c: Variant = _ch(ctx, s)
+		if c == null:
+			return []
+		var foes: Array = Wars.enemies_of(ctx.game, c.id).duplicate()
+		var rv: Variant = ctx.game.engine.scripting.lists.get_item("rival")
+		if rv != null:
+			for r in rv.list.call(ctx, s):
+				foes.append(r.id)
+		var ids := []
+		for fid in Data.uniq(foes):
+			var f: Variant = ctx.game.ch(fid)
+			if f == null:
+				continue
+			for k in f.children + f.spouses:
+				var x: Variant = ctx.game.ch(k)
+				if x != null and Chars.is_alive(x) and x.titles.is_empty() and x.get("prison") == null:
+					ids.append(k)
+		return _ids_to_chars(ctx.game, Data.uniq(ids))
+	)
 	lst.call("hooked", CHAR, "Те, на кого у персонажа есть крюк", func(ctx, s):
 		var c: Variant = _ch(ctx, s)
 		if c == null:
@@ -599,6 +620,10 @@ static func register(engine: GameEngine) -> void:
 		var p: Variant = ctx.game.state.provinces.get(s.id)
 		return p != null and p.buildings.has(arg)
 	)
+	trig.call("has_construction", PROV, "В графстве идёт стройка (постройка или район): has_construction: yes", func(ctx, s, arg):
+		var p: Variant = ctx.game.state.provinces.get(s.id)
+		return (p != null and p.get("construction") != null) == ScriptContext.is_yes(arg)
+	, func(ctx, _s, arg): return _t(ctx.game, "tr.has_construction" if ScriptContext.is_yes(arg) else "tr.has_construction.not", {}))
 	trig.call("has_holding", PROV, "Есть владение типа", func(ctx, s, arg):
 		var d: Variant = ctx.game.content.get_def("provinces", s.id)
 		return d != null and Data.as_array(d.get("holdings")).has(arg)
@@ -1045,6 +1070,13 @@ static func _register_effects(engine: GameEngine) -> void:
 			ctx.game.state["build_ver"] = int(ctx.game.state.get("build_ver", 0)) + 1
 			ctx.game.stat_cache.clear()
 	, func(ctx, s, arg): return _t(ctx.game, "fx.add_building", {"place": ctx.game.scope_name(s), "value": ctx.game.name_of("buildings", arg)}))
+	eff.call("delay_construction", PROV, "Отложить стройку в графстве на столько дней: delay_construction: 180", func(ctx, s, arg):
+		var p: Variant = ctx.game.state.provinces.get(s.id)
+		if p != null and p.get("construction") != null:
+			# не дальше начала: сделанное можно потерять, но не больше
+			var cons: Dictionary = p.construction
+			cons.done = mini(int(cons.done) + roundi(_num(ctx, s, arg)), ctx.game.date + int(cons.get("days", 0)))
+	, func(ctx, s, arg): return _t(ctx.game, "fx.delay_construction", {"place": ctx.game.scope_name(s), "value": roundi(_num(ctx, s, arg))}))
 	eff.call("remove_building", PROV, "Убрать постройку", func(ctx, s, arg):
 		var p: Variant = ctx.game.state.provinces.get(s.id)
 		if p != null:

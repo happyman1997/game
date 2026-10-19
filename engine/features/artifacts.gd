@@ -1059,6 +1059,12 @@ func register_script(engine: GameEngine) -> void:
 		return (it != null and it.get("slot") != null) == (arg == null or ScriptContext.is_yes(arg)),
 		"describe": func(ctx, _s, arg): return ctx.game.loc.t("tr.artifact_is_equipped" + ("" if arg == null or ScriptContext.is_yes(arg) else ".not")),
 	}, OWNER)
+	r.triggers.register("artifact_claimed_by", {"scopes": AR, "doc": "На вещь притязает персонаж: artifact_claimed_by: scope:owner", "eval": func(ctx, s, arg):
+		var it: Variant = art.call(ctx, s)
+		var who: Variant = Interp.resolve_scope(ctx, s, arg)
+		return it != null and who is Dictionary and Data.as_array(it.get("claims")).has(who.get("id")),
+		"describe": func(ctx, s, arg): return ctx.game.loc.t("tr.artifact_claimed_by", {"who": ctx.game.scope_name(Interp.resolve_scope(ctx, s, arg))}),
+	}, OWNER)
 	r.values.register("artifact_value", {"scopes": AR, "doc": "Ценность вещи (по редкости)", "get": func(ctx, s, _a):
 		var it: Variant = art.call(ctx, s)
 		return Artifacts.value_of(ctx.game, it) if it != null else 0.0

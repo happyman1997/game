@@ -237,7 +237,7 @@ defines:
     ransom_income_months: 6
     monthly_stress: 2
     dungeon_health: -1
-    crime_opinion_modifiers: [attempted_murder, murdered_relative, rebel]
+    crime_opinion_modifiers: [attempted_murder, murdered_relative, rebel, abducted_kin, caught_scheming]
 
   factions:
     power_threshold: 80             # % силы сюзерена, при котором растёт недовольство
