@@ -99,14 +99,14 @@ events:
     trigger:
       is_ruler: yes
       any_artifact: { artifact_rarity: famed }
-      any_neighboring_ruler: { is_ai: yes, gold: 300 }
+      any_neighboring_ruler: { is_ai: yes, gold: 250 }
     cooldown: { years: 8 }
     immediate:
       random_artifact:
         limit: { artifact_rarity: famed }
         save_scope_as: artifact
       random_neighboring_ruler:
-        limit: { is_ai: yes, gold: 300 }
+        limit: { is_ai: yes, gold: 250 }
         save_scope_as: buyer
     options:
       # продать за 250 золотых

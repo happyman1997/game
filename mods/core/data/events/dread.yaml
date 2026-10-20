@@ -196,11 +196,11 @@ events:
     trigger:
       dread_tier: ">= unease"
       any_courtier: { is_adult: yes, is_ruler: no }
-      any_vassal: { fear_stance: obedient, opinion: { target: root, value: "< 10" } }
+      any_vassal: { fear_stance: obedient, opinion: { target: root, value: "< 25" } }
     cooldown: { years: 4 }
     immediate:
       - random_vassal:
-          limit: { fear_stance: obedient, opinion: { target: root, value: "< 10" } }
+          limit: { fear_stance: obedient, opinion: { target: root, value: "< 25" } }
           weight: { value: 1, if: { limit: { is_in_faction: yes }, add: 5 } }
           save_scope_as: accused
       - random_courtier:

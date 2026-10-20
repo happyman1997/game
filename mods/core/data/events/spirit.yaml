@@ -173,7 +173,7 @@ events:
     theme: stress
     icon: "✉"
     triggered_only: true
-    trigger: { stress: ">= 50" }
+    trigger: { stress: ">= 40" }
     cooldown: { years: 5 }
     options:
       - effect:
@@ -231,7 +231,7 @@ events:
     icon: "👁"
     triggered_only: true
     trigger:
-      stress: ">= 50"
+      stress: ">= 40"
       OR:
         - has_trait: zealous
         - learning: ">= 14"
@@ -276,7 +276,7 @@ events:
     theme: stress
     icon: "🕳"
     triggered_only: true
-    trigger: { stress: ">= 80" }
+    trigger: { stress: ">= 60" }
     cooldown: { years: 2 }
     options:
       - effect: { add_piety: -20, add_stress: -30 }
