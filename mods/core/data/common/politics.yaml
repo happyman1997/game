@@ -180,8 +180,9 @@ interactions:
           if:
             limit: { vassal_obligation: privileged }
             add_opinion: { target: scope:actor, modifier: privileges_revoked }
-            else:
-              add_opinion: { target: scope:actor, modifier: duties_lightened }
+          else_if:
+            limit: { vassal_obligation: heavy }
+            add_opinion: { target: scope:actor, modifier: duties_lightened }
           set_vassal_obligation: standard
 
   # ---------------------------------------------------------- разделяй и властвуй

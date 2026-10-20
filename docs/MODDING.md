@@ -1044,13 +1044,19 @@ vassal_obligations:                 # условия службы, ровно о
   privileged: { level: -1, tax: -0.5, levy: -0.5, opinion: 20 }
   standard: { level: 0, default: yes }
   heavy: { level: 1, tax: 0.5, levy: 0.4, opinion: -25 }
+  # формы службы того же уровня (common/obligations.yaml): не легче, а иначе
+  sword_service: { level: 0, tax: -0.4, levy: 0.6 }   # ратная
+  coin_service: { level: 0, tax: 0.5, levy: -0.5, opinion: 5 }   # денежная
 ```
 
 - **Условия службы** — свои у каждого вассала: `tax`/`levy` меняют его взнос
   сюзерену (характеристики вассала `vassal_contribution_tax` и
   `vassal_contribution_levy` — их можно давать и чертами, и модификаторами),
   `opinion` — его мнение. Скрипт: `vassal_obligation: heavy`,
-  `set_vassal_obligation: privileged`.
+  `set_vassal_obligation: privileged`. О ратной и денежной службе
+  договариваются (`ask_sword_service`, `ask_coin_service`): на меч охотнее
+  соглашаются храбрые и сильные в войне, на кошель — мирные и хозяйственные;
+  ИИ просит воинов на войне и золота в мирной нужде.
 - **Влиятельные вассалы** — у кого больше всего графств, их число —
   `defines.politics.powerful_vassals_by_tier`. В совете они довольны, вне его —
   обижены. ИИ ценит их при выборе советников (хук `council.candidate_score`:

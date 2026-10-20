@@ -256,16 +256,17 @@ interactions:
     is_shown:
       scope:actor: { is_ruler: yes }
       scope:recipient: { is_ruler: yes }
-    ai_targets: [war_enemy, rival, neighboring_ruler]
-    ai_frequency_months: 24
+    # поджигают врагов по войне и соперников — не всякого соседа
+    ai_targets: [war_enemy, rival]
+    ai_frequency_months: 36
     ai_will_do:
       value: 0
       if:
         - limit: { is_at_war_with: scope:recipient }
-          add: 20
-        - limit: { scope:recipient: { capital: { has_construction: yes } } }
-          add: 10
+          add: 15
         - limit: { opinion: { target: scope:recipient, value: "< -40" } }
-          add: 10
+          add: 8
+        - limit: { scope:recipient: { capital: { has_construction: yes } } }
+          multiply: 1.5
         - limit: { has_trait: [honest, just, compassionate] }
           multiply: 0

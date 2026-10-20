@@ -1,8 +1,12 @@
 vassal_obligation:
+  sword_service: Service of the Sword
+  coin_service: Service in Coin
   privileged: Privileges
   standard: Standard Obligations
   heavy: Heavy Duties
 vassal_obligation_desc:
+  sword_service: The vassal sends more soldiers (+60%) but pays less in taxes (−40%).
+  coin_service: The vassal buys their way out of campaigns — pays more (+50%) and sends half the soldiers. They prefer it so.
   privileged: The vassal pays half the taxes and sends half the troops — and is grateful for it.
   standard: The usual terms of service.
   heavy: The vassal pays half as much again and sends more troops. They will not forget it.

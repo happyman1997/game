@@ -1,0 +1,87 @@
+# Формы службы вассала того же уровня, что и обычная (level 0): не легче и не
+# тяжелее, а иначе. Ратная служба — больше войск, меньше податей; денежная —
+# наоборот. О них договариваются: вассал соглашается, если это ему по нраву
+# (храбрым — меч, мирным и богатым — кошель), сюзерен — по нужде (война или
+# пустая казна). Вернуть обычный порядок — restore_obligations (politics.yaml).
+
+vassal_obligations:
+  sword_service: { level: 0, icon: "⚔", tax: -0.4, levy: 0.6, opinion: 0 }
+  coin_service: { level: 0, icon: "🪙", tax: 0.5, levy: -0.5, opinion: 5 }
+
+opinion_modifiers:
+  service_terms_agreed: { value: 10, years: 5 }
+
+interactions:
+  # Ратная служба: вассал шлёт больше воинов, но платит меньше
+  ask_sword_service:
+    requires_feature: politics
+    icon: "⚔"
+    category: realm
+    is_shown:
+      scope:recipient:
+        is_vassal_of: scope:actor
+        NOR:
+          - vassal_obligation: sword_service
+          - vassal_obligation: heavy
+    cooldown: { years: 3 }
+    ai_accept:
+      value: -10
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.4 } }
+        - { desc: ai.boldness, value: { value: ai_boldness, multiply: 8 } }
+        - { desc: ai.martial_vassal, value: { value: martial, subtract: 8, multiply: 2 } }
+        - { desc: ai.greedy_keeps_coin, limit: { has_trait: greedy }, value: 15 }
+        - { desc: ai.craven, limit: { has_trait: craven }, value: -30 }
+        - { desc: ai.privileges, limit: { vassal_obligation: privileged }, value: -20 }
+    on_accept:
+      - scope:recipient:
+          set_vassal_obligation: sword_service
+          add_opinion: { target: scope:actor, modifier: service_terms_agreed }
+    ai_targets: [vassal]
+    ai_frequency_months: 12
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { is_at_war: yes }
+          add: 20
+        - limit: { has_trait: [wrathful, ambitious, brave] }
+          add: 5
+        - limit: { scope:recipient: { is_powerful_vassal: yes } }
+          add: 5
+
+  # Денежная служба: вассал откупается от похода — платит больше, воинов шлёт меньше
+  ask_coin_service:
+    requires_feature: politics
+    icon: "🪙"
+    category: realm
+    is_shown:
+      scope:recipient:
+        is_vassal_of: scope:actor
+        NOR:
+          - vassal_obligation: coin_service
+          - vassal_obligation: heavy
+    cooldown: { years: 3 }
+    ai_accept:
+      value: -10
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.4 } }
+        - { desc: ai.boldness, value: { value: ai_boldness, multiply: -6 } }
+        - { desc: ai.rich_vassal, value: { value: stewardship, subtract: 8, multiply: 2 } }
+        - { desc: ai.peaceful_nature, limit: { has_trait: [craven, content] }, value: 15 }
+        - { desc: ai.greedy, limit: { has_trait: greedy }, value: -25 }
+        - { desc: ai.privileges, limit: { vassal_obligation: privileged }, value: -20 }
+    on_accept:
+      - scope:recipient:
+          set_vassal_obligation: coin_service
+          add_opinion: { target: scope:actor, modifier: service_terms_agreed }
+    ai_targets: [vassal]
+    ai_frequency_months: 12
+    ai_will_do:
+      value: 0
+      if:
+        - limit: { is_at_war: no, gold: "< 100" }
+          add: 15
+        - limit: { has_trait: greedy }
+          add: 5
+        - limit: { is_at_war: yes }
+          multiply: 0

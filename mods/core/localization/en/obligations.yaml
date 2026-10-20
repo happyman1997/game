@@ -1,0 +1,13 @@
+# Forms of service (common/obligations.yaml).
+interaction:
+  ask_sword_service: Propose Service of the Sword
+  ask_coin_service: Propose Service in Coin
+interaction_desc:
+  ask_sword_service: "Come to terms with the vassal: more soldiers on campaign, less in taxes. The brave and the war-wise agree more readily."
+  ask_coin_service: "Come to terms with the vassal: they buy their way out of campaigns with gold — more taxes, fewer soldiers. The peaceful and the wealthy agree more readily."
+opinion_modifier:
+  service_terms_agreed: Agreed on terms of service
+ai:
+  martial_vassal: Martial skill
+  rich_vassal: Stewardship
+  greedy_keeps_coin: Greedy — would rather pay in blood than in gold
