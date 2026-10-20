@@ -1,0 +1,19 @@
+# Дань (common/tribute.yaml, механика tribute).
+casus_belli:
+  demand_tribute: Война за дань
+cb:
+  demand_tribute:
+    war_name: "Война [scope:attacker] за дань с [scope:defender]"
+decision:
+  refuse_tribute: Отказаться платить дань
+decision_desc:
+  refuse_tribute: "Хватит платить чужому государю. Господин этого не простит — и может снова пойти войной."
+interaction:
+  offer_tribute: Откупиться данью
+interaction_desc:
+  offer_tribute: "Мир сейчас — в обмен на дань: восемь лет вы будете платить врагу долю своих податей."
+opinion_modifier:
+  refused_tribute: Отказался платить дань
+  accepted_tribute: Принял дань
+ai:
+  stronger_enemy: Враг слабее — зачем ему мир?

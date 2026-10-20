@@ -96,6 +96,7 @@ fx:
   begin_trial: "Trial of the calling «{name}», {years} years. Goals:"
   trial_fail: "Fail — stress +{stress} and {years} years before you may try this calling again"
   grant_archetype: "The calling «{name}» is yours"
+  make_peace_with: "{who} makes peace with {enemy}"
   make_white_peace: "{who} makes white peace in all of their wars"
   duel: "Duel: {a} vs {b}, {chance}% to win"
   faction_negotiate: "The {faction} disbands without concessions"

@@ -140,6 +140,8 @@
 | `is_sibling_of` | character | Брат/сестра персонажа | core |
 | `is_spouse_of` | character | Супруг(а) персонажа | core |
 | `is_synod_voter` | character | Голосует на Соборе своей веры (defines.synod.voter, вес больше нуля) | core/synod |
+| `is_tributary` | character | Платит кому-то дань: is_tributary: yes | core/tribute |
+| `is_tributary_of` | character | Платит дань этому персонажу: is_tributary_of: scope:x | core/tribute |
 | `is_vassal` | character | Вассал | core |
 | `is_vassal_of` | character | Прямой вассал персонажа | core |
 | `karma_tier` | character | Ступень кармы: karma_tier: ashen или karma_tier: ">= bright" | core/karma |
@@ -240,6 +242,7 @@
 | `disinherit` | Лишить наследства (yes) или восстановить в правах (no) | core/dynasties |
 | `divorce` | Развод | core |
 | `duel` | Поединок с персонажем: duel: scope:x (за правителей могут биться поборники) | core/duels |
+| `end_tribute` | Перестать платить дань: end_tribute: yes | core/tribute |
 | `end_war` | Завершить войну: victory/white_peace/defeat | core |
 | `expose_secret` | Разоблачить самый тяжёлый известный секрет персонажа | core/secrets |
 | `faction_enforce_demands` | Сюзерен выполняет требования фракции | core/factions |
@@ -266,7 +269,9 @@
 | `lose_all_titles` | Потерять все титулы | core |
 | `lose_artifact` | Утратить реликвию — она пропадает, и её можно найти снова: lose_artifact: <id> | core/artifacts |
 | `lose_title` | Потерять титул (переходит к сюзерену) | core |
+| `make_peace_with` | Белый мир в войнах, где персонаж и этот враг — вожди сторон: make_peace_with: scope:x | core |
 | `make_pregnant` | Беременность: { father } | core |
+| `make_tributary` | Сделать персонажа данником: make_tributary: { to: scope:attacker, years: 10, share: 0.2 } (или make_tributary: scope:x) | core/tribute |
 | `make_white_peace` | Белый мир во всех войнах, где персонаж — вождь стороны | core |
 | `mark_criminal` | Даёт target законный повод заключить этого персонажа: { target, years } | core/prison |
 | `marry` | Заключить брак | core |
@@ -460,6 +465,7 @@
 | `num_spare_artifacts` | character | Число вещей в хранилище (не надетых) | core/artifacts |
 | `num_spouses` | character | Число супругов | core |
 | `num_traits` | character | Число черт | core |
+| `num_tributaries` | character | Число данников | core/tribute |
 | `num_unhappy_counties` | character | Графств домена, недовольных владельцем (мнение не выше defines.populace.unhappy_opinion) | core/populace |
 | `num_vassals` | character | Число прямых вассалов | core |
 | `num_wars` | character | Число войн | core |
@@ -495,6 +501,7 @@
 | `tax_law_level` | character | Уровень закона группы tax_law (−1, если не действует) | core/laws |
 | `tier` | character | Ранг основного титула (0 — нет земель, 1 — граф ... 4 — император) | core |
 | `title_tier` | title | Ранг титула | core |
+| `tribute_amount` | character | Сколько данник платит в месяц | core/tribute |
 | `turn_plotter_chance` | character | Характеристика: turn_plotter_chance | core |
 | `vampire_tier` | character | Уровень вампира: 1 птенец, 2 вампир, 3 старейшина, 4 древний (0 — не вампир) | arcana |
 | `vassal_opinion` | character | Характеристика: vassal_opinion | core |
@@ -545,6 +552,7 @@
 | `steward` | character | Советник на должности steward | core/council |
 | `target` | scheme | Цель интриги | core |
 | `top_liege` | character | Верховный сюзерен | core |
+| `tribute_suzerain` | character | Кому персонаж платит дань | core/tribute |
 
 ## Списки (any_ / every_ / random_ / ordered_)
 
@@ -593,6 +601,7 @@
 | `snubbed_powerful_vassal` | character | Влиятельные вассалы без места в совете | core/politics |
 | `son` | character | Сыновья | core |
 | `spouse` | character | Супруги | core |
+| `tributary` | character | Данники персонажа | core/tribute |
 | `vassal` | character | Прямые вассалы | core |
 | `war` | любой | Все войны | core |
 | `war_attacker` | war | Участники войны на стороне нападения | core/factions |
@@ -642,18 +651,19 @@
 | `temple` | Вера: добродетели и грехи культов, глава веры | да |
 | `synod` | Собор: голосование единоверцев по вопросам веры, указы | да |
 | `districts` | Районы графства: кварталы с уровнями, сила района масштабирует постройки | да |
+| `tribute` | Дань: доля податей данника — победителю войны за дань | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
 ## Реестры движка
 
 - **succession_algorithms**: `primogeniture`, `partition`, `seniority`, `elected_member`, `best_master`, `republic_election`, `elective`
-- **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `heretic_realm`, `faction`, `artifact_holder`, `monster_hunt`
+- **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `heretic_realm`, `faction`, `artifact_holder`, `tribute`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`, `own_artifacts`, `claimed_artifacts`
 - **interaction_deciders**: `payer`
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `synod_decrees`, `districts`, `grafts`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`, `districts`
-- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council_pay`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `faith_morals`, `faith_head`, `arcana_faith`, `grafts`
+- **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council_pay`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `faith_morals`, `faith_head`, `tribute`, `arcana_faith`, `grafts`
 - **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`, `karma`, `synod`, `districts`
-- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
+- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `tribute` (56), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

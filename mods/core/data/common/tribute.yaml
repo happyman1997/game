@@ -1,0 +1,105 @@
+# Дань (механика tribute): война за дань — побеждённый сосед платит долю
+# податей; слабый может сам откупиться данью от войны; данник может отказаться
+# платить — господин этого не простит.
+
+defines:
+  tribute:
+    share: 0.2          # доля податей (с домена и вассалов)
+    years: 10           # срок дани по умолчанию
+    opinion: -15        # мнение данника о господине
+
+opinion_modifiers:
+  refused_tribute: { value: -40, years: 10 }
+  accepted_tribute: { value: 10, years: 5 }
+
+casus_belli:
+  demand_tribute:
+    requires_feature: tribute
+    category: conquest
+    icon: "🪙"
+    targets: tribute
+    is_valid:
+      scope:attacker: { is_independent: yes, tier: ">= duchy" }
+    cost:
+      prestige: 60
+    on_victory:
+      - scope:defender:
+          make_tributary: { to: scope:attacker, years: 10 }
+          add_prestige: -80
+      - scope:attacker: { add_prestige: 100 }
+    on_white_peace:
+      - scope:attacker: { add_prestige: -30 }
+    on_defeat:
+      - scope:attacker:
+          add_prestige: -80
+          pay_gold: { target: scope:defender, value: { value: "scope:attacker.gold", multiply: 0.25, min: 0 } }
+    # ИИ требует дань с соседей, когда жаден или воинствен (реже, чем
+    # завоёвывает: целей у этого повода много — всё царство соседа); кому
+    # уже платят двое, третьего ищет неохотно
+    ai_will_do:
+      value: 4
+      add:
+        - { value: ai_greed, multiply: 3 }
+        - { value: ai_aggression, multiply: 2 }
+      if:
+        - limit: { gold: "< 100" }
+          add: 4
+        - limit: { num_tributaries: ">= 2" }
+          multiply: 0.3
+    truce_years: 5
+    war_name: cb.demand_tribute.war_name
+
+decisions:
+  # отказаться платить дань — господин получает повод к войне и запомнит
+  refuse_tribute:
+    requires_feature: tribute
+    category: realm
+    icon: "✋"
+    is_shown: { is_tributary: yes }
+    effect:
+      - tribute_suzerain: { add_opinion: { target: root, modifier: refused_tribute } }
+      - end_tribute: yes
+      - add_prestige: 50
+    ai_check_months: 12
+    ai_will_do:
+      value: 0
+      if:
+        # сильнее господина — пора сбросить ярмо
+        - limit: { levies: "> tribute_suzerain.levies" }
+          add: 40
+        - limit: { has_trait: [ambitious, arrogant, brave] }
+          add: 10
+        - limit: { has_trait: [craven, content] }
+          multiply: 0.3
+
+interactions:
+  # откупиться данью от войны: мир сейчас, дань — восемь лет
+  offer_tribute:
+    requires_feature: tribute
+    icon: "🪙"
+    category: diplomacy
+    is_shown:
+      scope:actor: { is_independent: yes, is_tributary: no, is_at_war_with: scope:recipient }
+      scope:recipient: { is_ruler: yes }
+    ai_accept:
+      value: 5
+      add:
+        - { desc: ai.greedy, value: { value: ai_greed, multiply: 8 } }
+        - { desc: ai.war_weary, value: 10 }
+        - { desc: ai.stronger_enemy, limit: { levies: "< scope:actor.levies" }, value: -30 }
+    on_accept:
+      - make_tributary: { to: scope:recipient, years: 8 }
+      - make_peace_with: scope:recipient
+      - scope:recipient: { add_opinion: { target: scope:actor, modifier: accepted_tribute } }
+    ai_targets: [war_enemy]
+    ai_frequency_months: 6
+    ai_will_do:
+      value: 0
+      if:
+        # враг сильнее — лучше платить, чем потерять всё
+        - limit: { levies: "< scope:recipient.levies" }
+          add: 25
+        - limit: { gold: "< 50" }
+          add: 5
+        - limit: { has_trait: [arrogant, brave] }
+          multiply: 0.3

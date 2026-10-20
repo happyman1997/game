@@ -1,0 +1,19 @@
+# Tribute (common/tribute.yaml, the tribute mechanic).
+casus_belli:
+  demand_tribute: War for Tribute
+cb:
+  demand_tribute:
+    war_name: "[scope:attacker]'s War for Tribute from [scope:defender]"
+decision:
+  refuse_tribute: Refuse to Pay Tribute
+decision_desc:
+  refuse_tribute: "Enough paying a foreign lord. The suzerain will not forgive it — and may march again."
+interaction:
+  offer_tribute: Buy Peace with Tribute
+interaction_desc:
+  offer_tribute: "Peace now — in exchange for tribute: for eight years you will pay the enemy a share of your taxes."
+opinion_modifier:
+  refused_tribute: Refused to pay tribute
+  accepted_tribute: Accepted tribute
+ai:
+  stronger_enemy: The enemy is weaker — why would they want peace?

@@ -1045,6 +1045,16 @@ static func _register_effects(engine: GameEngine) -> void:
 			if g.state.wars.has(w.id) and (w.attacker == c.id or w.defender == c.id):
 				Wars.end_war(g, w, "white_peace"),
 		func(ctx, s, _arg): return _t(ctx.game, "fx.make_white_peace", {"who": ctx.game.scope_name(s)}))
+	ce.call("make_peace_with", "Белый мир в войнах, где персонаж и этот враг — вожди сторон: make_peace_with: scope:x", func(g, c, arg, ctx, s):
+		var o: Variant = _target_char(ctx, s, arg)
+		if o == null:
+			return
+		for w in Wars.wars_of(g, c.id).duplicate():
+			if g.state.wars.has(w.id) and ((w.attacker == c.id and w.defender == o.id) or (w.attacker == o.id and w.defender == c.id)):
+				Wars.end_war(g, w, "white_peace"),
+		func(ctx, s, arg):
+			var o: Variant = _target_char(ctx, s, arg)
+			return _t(ctx.game, "fx.make_peace_with", {"who": ctx.game.scope_name(s), "enemy": ctx.game.scope_name({"type": "character", "id": o.id}) if o != null else "?"}))
 	eff.call("change_culture", ["character", "province"], "Сменить культуру", func(ctx, s, arg):
 		var src: Variant = ctx.game.ch(s.id) if s.type == "character" else ctx.game.state.provinces.get(s.id)
 		if src != null:

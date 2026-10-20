@@ -1543,6 +1543,32 @@ synod_questions:
 `church_law_level >= 2` смягчает закон), освящение нив (`development_growth`)
 и запрет поединков (`duel_prestige_mult`, вызов — грех).
 
+### Дань
+
+Механика `tribute` (`engine/features/tribute.gd`, данные —
+`core/data/common/tribute.yaml`): данник платит господину долю податей с
+домена и вассалов (`defines.tribute.share`) столько-то лет
+(`defines.tribute.years`); у обоих — строка казны (`tribute_paid`,
+`tribute_received`), данник не любит господина (`defines.tribute.opinion`).
+Дань переходит к наследнику данника и наследнику господина; данник, ставший
+чьим-то вассалом, платить перестаёт.
+
+```yaml
+casus_belli:
+  demand_tribute:
+    targets: tribute                 # независимые соседи, ещё не данники
+    on_victory:
+      - scope:defender: { make_tributary: { to: scope:attacker, years: 10 } }
+```
+
+Скрипт: условия `is_tributary`, `is_tributary_of`; значения
+`num_tributaries`, `tribute_amount`; ссылка `tribute_suzerain`; список
+`tributary`; эффекты `make_tributary: { to, years, share }`, `end_tribute`.
+В ядре: повод «Война за дань», предложение «Откупиться данью» (мир сейчас —
+дань восемь лет, `make_peace_with`) и решение «Отказаться платить дань».
+Хуки `tribute.started`, `tribute.ended` (`reason`: expired, vassalized,
+refused, ended).
+
 ### Казна: книга доходов и трат
 
 Золото персонажа меняется только через `Treasury.add(game, c, сумма, статья)`

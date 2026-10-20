@@ -96,6 +96,7 @@ fx:
   begin_trial: "Испытание призвания «{name}» на {years} лет. Цели:"
   trial_fail: "Не успеете — стресс +{stress} и {years} лет перерыва на это призвание"
   grant_archetype: "Призвание «{name}» обретено"
+  make_peace_with: "{who} заключает мир с {enemy}"
   make_white_peace: "{who} заключает белый мир во всех своих войнах"
   duel: "Поединок: {a} — {b}, шанс победы {chance}%"
   faction_negotiate: "Фракция «{faction}» расходится без уступок"

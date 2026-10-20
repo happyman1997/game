@@ -1,0 +1,22 @@
+# Tribute: engine strings (engine/features/tribute.gd).
+ui:
+  tribute_paid: Tribute paid
+  tribute_received: Tribute received
+ledger:
+  tribute_paid: Tribute paid
+  tribute_received: Tribute received
+msg:
+  tribute_started: "{payer} pays tribute to {to}"
+  tribute_expired: "{payer} no longer pays tribute to {to}: the term is over"
+  tribute_vassalized: "{payer} became a vassal and no longer pays tribute to {to}"
+  tribute_refused: "{payer} refuses to pay tribute to {to}"
+  tribute_ended: "{payer} no longer pays tribute to {to}"
+opinion:
+  pays_tribute: Pays them tribute
+tr:
+  is_tributary: Pays tribute
+  is_tributary.not: Pays no tribute
+  is_tributary_of: "Pays tribute to {who}"
+fx:
+  make_tributary: "{who} pays tribute to {to}"
+  end_tribute: "{who} stops paying tribute"

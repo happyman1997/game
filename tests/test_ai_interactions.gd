@@ -55,10 +55,14 @@ func test_dynasty_head_tribute_and_honor() -> void:
 			kin = x
 			break
 	check(kin != null, "у главы рода есть родич-правитель")
+	# богат только этот родич — цель одна; шанс на раздумье мал, раздумий много
+	for x in g.living():
+		if x.id != head.id and Chars.same_dynasty(g, x, head):
+			x.gold = 0.0
 	head.gold = 80.0
 	kin.gold = 400.0
 	Chars.add_dynasty_renown(g, head.dynasty, 400)
-	check(_does(g, head, "demand_family_tribute", kin.id, 120), "глава рода берёт дань с богатого родича")
+	check(_does(g, head, "demand_family_tribute", kin.id, 500), "глава рода берёт дань с богатого родича")
 	Opinion.add_opinion(g, kin, head, "generic", -60)
 	Chars.add_dynasty_renown(g, head.dynasty, 400)
 	check(_does(g, head, "honor_kin", kin.id, 120), "и чтит недовольного родича")

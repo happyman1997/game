@@ -1,0 +1,22 @@
+# Дань: строки движка (engine/features/tribute.gd).
+ui:
+  tribute_paid: Дань уплачена
+  tribute_received: Дань получена
+ledger:
+  tribute_paid: Дань уплачена
+  tribute_received: Дань получена
+msg:
+  tribute_started: "{payer} платит дань {to}"
+  tribute_expired: "{payer} больше не платит дань {to}: срок вышел"
+  tribute_vassalized: "{payer} стал вассалом и больше не платит дань {to}"
+  tribute_refused: "{payer} отказывается платить дань {to}"
+  tribute_ended: "{payer} больше не платит дань {to}"
+opinion:
+  pays_tribute: Платит ему дань
+tr:
+  is_tributary: Платит дань
+  is_tributary.not: Не платит дань
+  is_tributary_of: "Платит дань {who}"
+fx:
+  make_tributary: "{who} платит дань {to}"
+  end_tribute: "{who} перестаёт платить дань"
