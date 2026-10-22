@@ -61,7 +61,7 @@
 | `has_known_trait` | character | Есть черта, известная всем (не скрытая или разоблачённая) | core |
 | `has_lifestyle` | character | Текущий фокус принадлежит образу жизни | core/lifestyles |
 | `has_mastery` | character | Легла тень мастерства навыка: has_mastery: intrigue | core |
-| `has_modifier` | character | Есть модификатор | core |
+| `has_modifier` | character | Есть модификатор (или любой из списка) | core |
 | `has_nickname` | character | Есть прозвище (yes/no или id прозвища из nicknames) | core/deeds |
 | `has_opinion_modifier` | character | Есть модификатор мнения: { target, modifier } | core |
 | `has_perk` | character | Открыт перк | core/lifestyles |

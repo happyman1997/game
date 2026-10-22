@@ -17,6 +17,7 @@ decision_desc:
 msg:
   archives_claim: "В архивах нашлась грамота: у вас претензия на [scope:claim_target]!"
 ai:
+  actor_prestige: Слава посредника
   war_weary: Устал от войны
   actor_stewardship: Управление предлагающего
   actor_diplomacy: Красноречие посредника

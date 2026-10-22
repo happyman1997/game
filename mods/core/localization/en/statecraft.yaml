@@ -17,6 +17,7 @@ decision_desc:
 msg:
   archives_claim: "An old charter turned up in the archives: you now have a claim on [scope:claim_target]!"
 ai:
+  actor_prestige: Mediator's renown
   war_weary: Tired of war
   actor_stewardship: Proposer's stewardship
   actor_diplomacy: Mediator's eloquence

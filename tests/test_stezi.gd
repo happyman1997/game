@@ -25,10 +25,13 @@ func test_every_tree_is_a_path() -> void:
 	check_eq(trees.size(), 11, "одиннадцать стезей")
 	for t in trees:
 		check(g.loc.raw("perk_tree_desc." + t) != null, "описание стези %s" % t)
-	# у каждой вершины — черта и своё действие
+	# вершина даёт черту; перк-ключ значится в ключах своего действия
 	for p in g.content.all("perks"):
-		if p.get("trait") != null and str(p.get("lifestyle")) != "sorcery_lifestyle":
-			check(not Data.as_array(p.get("unlocks")).is_empty(), "вершина %s открывает действие" % p.id)
+		if p.get("requires_any") != null:
+			check(p.get("trait") != null, "вершина %s даёт черту" % p.id)
+		for u in Data.as_array(p.get("unlocks")):
+			var d: Variant = g.content.get_def("decisions", u) if g.content.has("decisions", u) else g.content.get_def("interactions", u)
+			check(d != null and Data.as_array(d.get("keys")).any(func(k): return k is Dictionary and k.get("perk") == p.id), "%s — ключ к «%s»" % [p.id, u])
 		check(g.loc.raw("perk_desc." + str(p.id)) != null or str(p.get("lifestyle")) == "sorcery_lifestyle", "описание перка %s" % p.id)
 
 
@@ -137,6 +140,10 @@ func test_treasurer_loan_and_bribe() -> void:
 	check_eq(float(h.gold), gold0 + 300.0, "золото сразу")
 	check(not Decisions.can_take(g, loan, h), "второй заём — после первого")
 	var v: Dictionary = g.vassals_of("harold").filter(func(x): return not x.traits.has("honest") and not x.traits.has("just"))[0]
+	# жадного ловкий казначей подкупит наверняка (удача или «взял, но не ушёл»)
+	v.traits.append("greedy")
+	h.skills["intrigue"] = 20
+	g.stat_cache.clear()
 	h.gold = 500.0
 	var bribe: Dictionary = g.content.get_def("interactions", "bribe")
 	var op0 := Opinion.opinion(g, v, h)

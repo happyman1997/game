@@ -5,8 +5,10 @@
 # связывает механики (казни и страх, поединки и вещи, крюки и казна, мощи и
 # душа, стройки и род…): правила-характеристики в modifiers (их читает
 # движок), stress_reactions — что теперь персонажу по душе (как у черт; ИИ
-# поступает по ним), а правила в данных — в stezi.yaml (has_perk). Вершина
-# стези даёт черту и открывает действия (unlocks — для подсказки).
+# поступает по ним), а правила в данных — в stezi.yaml (has_perk). Стезя
+# ветвится: корень, две ветки (branch) и вершина (requires_any). Перки в
+# начале веток — ключи к вершинным действиям стези (unlocks — для подсказки),
+# вершина даёт черту и делает эти действия мастерскими.
 lifestyles:
   diplomacy_lifestyle: { skill: diplomacy, icon: "🕊", color: "#6b8fb3", order: 1 }
   martial_lifestyle: { skill: martial, icon: "⚔", color: "#b35a4a", order: 2 }
@@ -139,8 +141,8 @@ perks:
     tree: august
     requires_any: [statesman, unifier]
     icon: "👑"
+    unlocks: [golden_age]
     trait: diplomat
-    unlocks: [royal_progress]
     ai_will_do: 40
 
   # ================================================ дипломатия: Династ — род как опора
@@ -157,6 +159,7 @@ perks:
     requires: fecund_line
     branch: a
     icon: "🩸"
+    unlocks: [gather_kin]
     modifiers: { legacy_cost_mult: -0.25, family_opinion: 10 }
     ai_will_do: 40
   # родичи-правители охотнее заключают союзы и браки с главой рода
@@ -175,6 +178,7 @@ perks:
     requires: fecund_line
     branch: b
     icon: "🧓"
+    unlocks: [gather_kin]
     modifiers: { ward_education_mult: 0.5, learning: 1 }
     stress_reactions: { choose_guardian: -5 }
     ai_will_do: 40
@@ -195,7 +199,6 @@ perks:
     icon: "🏰"
     trait: family_patriarch
     effect: { add_dynasty_prestige: 100 }
-    unlocks: [gather_kin]
     ai_will_do: 40
 
   # ================================================ воинское дело: Полководец — манёвр и пленные
@@ -212,6 +215,7 @@ perks:
     requires: logistics
     branch: a
     icon: "⛓"
+    unlocks: [grand_muster]
     modifiers: { commander_advantage: 2 }
     ai_will_do: 40
   # на своей земле войско сильнее, разбитый враг теряет больше
@@ -230,6 +234,7 @@ perks:
     requires: logistics
     branch: b
     icon: "🥁"
+    unlocks: [grand_muster]
     modifiers: { regiment_power: 0.15, army_upkeep_mult: -0.15 }
     ai_will_do: 40
   # добыча вдвое больше, наёмники вдвое дешевле
@@ -248,7 +253,6 @@ perks:
     requires_any: [ambush, quartermaster]
     icon: "♞"
     trait: strategist
-    unlocks: [grand_muster]
     ai_will_do: 40
 
   # ================================================ воинское дело: Тиран — правит страхом
@@ -273,6 +277,7 @@ perks:
     requires: stern_gaze
     branch: a
     icon: "🪓"
+    unlocks: [public_execution]
     stress_reactions: { execute_prisoner: -15, imprison: -5 }
     ai_will_do: 40
   # каждая победа внушает ужас, враг сдаётся раньше
@@ -310,7 +315,6 @@ perks:
     requires_any: [scourge, menace]
     icon: "⛓"
     trait: tyrant
-    unlocks: [intimidate, public_execution]
     ai_will_do: 40
 
   # ================================================ воинское дело: Рыцарь — поединки и трофеи
@@ -328,6 +332,7 @@ perks:
     requires: knightly_vow
     branch: a
     icon: "⚔"
+    unlocks: [glory_quest]
     modifiers: { attraction_opinion: 5 }
     ai_will_do: 40
   # победы в поединках вдвое славнее
@@ -346,6 +351,7 @@ perks:
     requires: knightly_vow
     branch: b
     icon: "🤝"
+    unlocks: [glory_quest]
     modifiers: { knight_cap: 2, knight_effectiveness: 0.15 }
     ai_will_do: 40
   # сам бьётся в рядах своих рыцарей — и рискует, как они
@@ -364,7 +370,6 @@ perks:
     requires_any: [champion, warrior_king]
     icon: "🏇"
     trait: paragon
-    unlocks: [glory_quest]
     ai_will_do: 40
 
   # ================================================ управление: Зодчий — стройки и великолепие
@@ -381,6 +386,7 @@ perks:
     requires: master_builder
     branch: a
     icon: "🌾"
+    unlocks: [great_work]
     modifiers: { development_growth: 0.1, control_gain: 0.5 }
     ai_will_do: 40
   court_splendor:
@@ -399,6 +405,7 @@ perks:
     requires: master_builder
     branch: b
     icon: "🧱"
+    unlocks: [great_work]
     modifiers: { domain_fort: 1 }
     ai_will_do: 40
   # столица держит осаду вдвое дольше
@@ -417,7 +424,6 @@ perks:
     requires_any: [court_splendor, castellan]
     icon: "🏗"
     trait: architect
-    unlocks: [great_work]
     ai_will_do: 40
 
   # ================================================ управление: Казначей — золото как оружие
@@ -453,7 +459,6 @@ perks:
     branch: b
     icon: "🏦"
     modifiers: { monthly_income: 0.3 }
-    unlocks: [take_loan]
     ai_will_do: 40
   # подарки вдвое действеннее, торговые договоры охотнее
   golden_hand:
@@ -471,7 +476,6 @@ perks:
     requires_any: [reformer, golden_hand]
     icon: "⚖"
     trait: administrator
-    unlocks: [bribe]
     ai_will_do: 40
 
   # ================================================ интриги: Паук — тайны и крюки
@@ -488,6 +492,7 @@ perks:
     requires: subtle_hand
     branch: a
     icon: "🪙"
+    unlocks: [compel_service]
     modifiers: { income_per_hook: 0.5 }
     stress_reactions: { blackmail: -10 }
     ai_will_do: 40
@@ -498,7 +503,6 @@ perks:
     branch: a
     icon: "📜"
     modifiers: { intrigue: 1 }
-    unlocks: [sell_secret]
     ai_will_do: 40
   # ветка «Чужие руки»
   # раскрытую интригу валят на придворного; раздор сеется удачнее
@@ -508,6 +512,7 @@ perks:
     requires: subtle_hand
     branch: b
     icon: "🎭"
+    unlocks: [compel_service]
     modifiers: { scapegoat: 1, discord_chance: 20 }
     ai_will_do: 40
   # его убийцы вдвое быстрее, а против него самого убийцам вдвое труднее
@@ -526,7 +531,6 @@ perks:
     requires_any: [secret_trade, night_blade]
     icon: "🕷"
     trait: schemer
-    unlocks: [compel_service]
     ai_will_do: 40
 
   # ================================================ интриги: Соблазнитель — любовь как оружие
@@ -543,6 +547,7 @@ perks:
     requires: alluring
     branch: a
     icon: "💔"
+    unlocks: [heart_pact]
     modifiers: { diplomacy: 1 }
     stress_reactions: { seduce: -10 }
     ai_will_do: 40
@@ -562,6 +567,7 @@ perks:
     requires: alluring
     branch: b
     icon: "🕯"
+    unlocks: [heart_pact]
     modifiers: { intrigue: 1 }
     ai_will_do: 40
   # интриги через постель вернее
@@ -580,7 +586,6 @@ perks:
     requires_any: [courtly_love, honey_trap]
     icon: "🌹"
     trait: seducer
-    unlocks: [heart_pact]
     ai_will_do: 40
 
   # ================================================ учёность: Учёный — знание ускоряет всё
@@ -597,6 +602,7 @@ perks:
     requires: avid_reader
     branch: a
     icon: "🔭"
+    unlocks: [magnum_opus]
     modifiers: { development_growth: 0.05, lifestyle_xp_mult: 0.1 }
     ai_will_do: 40
   polymath:
@@ -615,6 +621,7 @@ perks:
     requires: avid_reader
     branch: b
     icon: "📚"
+    unlocks: [magnum_opus]
     modifiers: { scheme_power: 5 }
     ai_will_do: 40
   # осадные машины и расчёт: чужие стены падают быстрее, свои строятся дешевле
@@ -633,7 +640,6 @@ perks:
     requires_any: [polymath, engineer]
     icon: "🎓"
     trait: scholar
-    unlocks: [magnum_opus]
     ai_will_do: 40
 
   # ================================================ учёность: Светоч — благочестие, мощи, чудеса
@@ -657,6 +663,7 @@ perks:
     requires: devout_prayer
     branch: a
     icon: "🕯"
+    unlocks: [miracle]
     modifiers: { stress_gain_mult: -0.15, piety_opinion_mult: 0.5 }
     ai_will_do: 40
   relic_keeper:
@@ -676,6 +683,7 @@ perks:
     requires: devout_prayer
     branch: b
     icon: "✝"
+    unlocks: [holy_call]
     modifiers: { battle_survival: 0.15 }
     ai_will_do: 40
   # священная война вдвое дешевле
@@ -694,7 +702,6 @@ perks:
     requires_any: [relic_keeper, sun_sword]
     icon: "✝"
     trait: theologian
-    unlocks: [miracle, holy_call]
     ai_will_do: 40
 
 # Черты за пройденную стезю.

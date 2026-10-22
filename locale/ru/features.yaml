@@ -1,5 +1,8 @@
 # Строки механик движка: образ жизни, совет, темница, фракции, отряды.
 ui:
+  keys_needed: "Нужен один из ключей: {list}"
+  keys_or: " или "
+  keys_title: "Ключи (хватит одного):"
   hook_on_cooldown: Крюк на перерыве
   tab:
     lifestyle: Образ жизни
@@ -19,7 +22,7 @@ ui:
   perk_need_xp: "Нужно опыта: {cost} (есть {xp})"
   perk_unlock: Открыть перк
   perk_grants_trait: "Даёт черту «{trait}»"
-  perk_unlocks: "Открывает: {list}"
+  perk_unlocks: "Ключ к: {list}"
   lifestyle_skill: "Навык: {skill}"
   lifestyle_all_done: Все перки этого образа жизни открыты
   council: Совет
@@ -174,3 +177,8 @@ alert:
   prisoners: "В вашей темнице пленников: {n}"
   imprisoned: "Вы в темнице у {jailer}"
   can_recruit: Можно нанять профессиональный отряд
+key:
+  perk: "перк «{name}»"
+  trait: "черта «{name}»"
+  deed: "{goal}: {n}"
+  artifact: "вещь: {name}"

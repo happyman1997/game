@@ -495,8 +495,10 @@ static func register(engine: GameEngine) -> void:
 			var d: Variant = g.content.get_def("traits", x)
 			return d != null and d.get("category") == arg)
 	)
-	ct.call("has_modifier", "Есть модификатор", func(_g, c, arg, _ctx, _s): return c.modifiers.any(func(m): return m.id == arg),
-		func(ctx, _s, arg): return _t(ctx.game, "tr.has_modifier", {"value": ctx.game.name_of("modifiers", arg)}))
+	ct.call("has_modifier", "Есть модификатор (или любой из списка)", func(_g, c, arg, _ctx, _s):
+		var ids := Data.as_array(arg)
+		return c.modifiers.any(func(m): return ids.has(m.id)),
+		func(ctx, _s, arg): return _t(ctx.game, "tr.has_modifier", {"value": " / ".join(Data.as_array(arg).map(func(x): return ctx.game.name_of("modifiers", x)))}))
 	ct.call("has_flag", "Есть флаг", func(g, c, arg, _ctx, _s):
 		var v: Variant = c.flags.get(str(arg))
 		return v != null and (v == 0 or v > g.date)

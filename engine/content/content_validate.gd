@@ -71,11 +71,13 @@ static func validate(engine: GameEngine) -> Array:
 	for ck in c.all("checks"):
 		v.check(ck, "checks/" + str(ck.id))
 	for d in c.all("decisions"):
+		Keys.validate(v, d, "decisions/" + str(d.id))
 		v.trigger(d.get("is_shown"), "decisions/%s is_shown" % d.id)
 		v.trigger(d.get("ai_potential"), "decisions/%s ai_potential" % d.id)
 		v.trigger(d.get("is_valid"), "decisions/%s is_valid" % d.id)
 		v.effect(d.get("effect"), "decisions/%s effect" % d.id)
 	for d in c.all("interactions"):
+		Keys.validate(v, d, "interactions/" + str(d.id))
 		var w = "interactions/" + d.id
 		v.trigger(d.get("is_shown"), w + " is_shown")
 		v.trigger(d.get("is_valid"), w + " is_valid")

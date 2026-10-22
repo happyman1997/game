@@ -1,5 +1,8 @@
 # Стези (деревья перков, lifestyles.yaml): правила, которые живут в данных,
-# и действия, которые открывает вершина стези. Файл грузится после
+# и действия стезей. Базовые (объезд, заём, подкуп, запугивание, продажа
+# тайны) открыты всем — перки делают их лучше. Вершинные (смотр, казнь, чудо…)
+# заперты ключами (keys): перк в начале ветки стези или иная дорога — вещь,
+# деяния, положение, слава или страх; вершина стези делает их мастерскими. Файл грузится после
 # decisions/interactions/prison/schemes/statecraft и дописывает к их
 # записям ($append), остальное — свои записи. Правила-характеристики
 # (страх от пленников, цена наследий, обозы…) читает движок — они в
@@ -12,6 +15,8 @@ ui_categories:
 modifiers:
   grand_muster: { icon: "🥁", good: true, modifiers: { levy_mult: 0.25, commander_advantage: 5, regiment_power: 0.1 } }
   lombard_debt: { icon: "🏦", modifiers: { monthly_income: -2.5 } }
+  loan_debt_harsh: { icon: "🏦", modifiers: { monthly_income: -3.5 } }
+  loan_debt_fair: { icon: "🏦", modifiers: { monthly_income: -1.8 } }
   holy_call: { icon: "✝", good: true, modifiers: { levy_mult: 0.25, monthly_piety: 0.5, knight_effectiveness: 0.1 } }
   # «Великая стройка» в столице — навсегда
   great_cathedral: { icon: "⛪", good: true, modifiers: { development_growth: 0.1, county_opinion: 15 } }
@@ -80,34 +85,58 @@ decisions:
               create_artifact: { type: reliquary, rarity: [masterwork, famed], how: found }
               send_message: { text: msg.pilgrim_relic, kind: good }
 
-  # ---------------------------------------------------------------- вершины стезей
+  # ---------------------------------------------------------------- действия стезей
 
-  # Государь: объехать свои земли — графства и вассалы помнят визит
+  # Объехать свои земли (открыто всем): удастся ли — от дипломатии и славы;
+  # Государь объезжает мастерски и вдвое дешевле
   royal_progress:
-    category: stezi
+    category: realm
     icon: "👑"
-    is_shown: { is_ruler: yes, has_perk: august_majesty }
+    is_shown: { is_ruler: yes }
     is_valid:
       is_adult: yes
       is_at_war: no
       is_imprisoned: no
-    cost: { gold: { value: 50, add: { value: tier, multiply: 25 } } }
+    cost: { gold: { value: 50, add: { value: tier, multiply: 25 }, if: { limit: { has_perk: august_majesty }, multiply: 0.5 } } }
     cooldown: { years: 5 }
     effect:
-      - every_domain_province:
-          add_county_opinion: royal_visit
-      - every_vassal:
-          add_opinion: { target: root, modifier: royal_progress_host }
-      - add_prestige: 100
-      - add_stress: -10
+      check:
+        name: decision.royal_progress
+        skill: diplomacy
+        base: 15
+        add:
+          - { desc: skill.diplomacy, value: { value: diplomacy, multiply: 3 } }
+          - { desc: check.prestige_level, value: { value: prestige_level, multiply: 5 } }
+          - { desc: perk.august_majesty, limit: { has_perk: august_majesty }, value: 30 }
+        success:
+          - every_domain_province:
+              add_county_opinion: royal_visit
+          - every_vassal:
+              add_opinion: { target: root, modifier: royal_progress_host }
+          - add_prestige: 100
+          - add_stress: -10
+        # графства рады, а вассалы скучали
+        partial:
+          - every_domain_province:
+              add_county_opinion: royal_visit
+          - add_prestige: 30
+        # объезд не задался: пиры скудны, речи неловки
+        failure:
+          - add_prestige: -30
+          - add_stress: 10
     ai_check_months: 12
-    ai_will_do: { value: 30, add: { value: ai_sociability, multiply: 5 } }
+    ai_will_do: { value: 5, add: [ { value: ai_sociability, multiply: 5 }, { value: diplomacy } ] }
 
-  # Династ: созвать родню — правители рода несут дары, род гремит
+  # Созвать родню — правители рода несут дары, род гремит. Ключи: «Кровь» или
+  # «Наставник» Династа — или быть главой рода; «Глава дома» — вдвое громче
   gather_kin:
     category: stezi
     icon: "🏰"
-    is_shown: { is_adult: yes, has_perk: head_of_house }
+    is_shown: { is_adult: yes }
+    keys:
+      - { perk: blood_ties }
+      - { perk: wise_mentor }
+      - { trigger: { is_dynasty_head: yes }, desc: key.dynasty_head }
     is_valid:
       is_at_war: no
       is_imprisoned: no
@@ -122,31 +151,50 @@ decisions:
           pay_gold: { target: root, value: { value: gold, multiply: 0.15, min: 0, max: 60 } }
           add_opinion: { target: root, modifier: kin_gathering }
       - add_dynasty_prestige: 100
+      - if:
+          limit: { has_perk: head_of_house }
+          add_dynasty_prestige: 100
     ai_check_months: 12
     ai_will_do: 30
 
-  # Полководец: военный смотр — ополчение, отряды и рыцари на подъёме
+  # Военный смотр — ополчение, отряды и рыцари на подъёме. Ключи: перк
+  # Полководца, боевое знамя или королевский титул при большой славе;
+  # «Великий полководец» держит смотр три года
   grand_muster:
     category: stezi
     icon: "🥁"
-    is_shown: { is_ruler: yes, has_perk: master_strategist }
+    is_shown: { is_ruler: yes }
+    keys:
+      - { perk: take_alive }
+      - { perk: military_drills }
+      - { artifact: banner }
+      - { trigger: { tier: ">= kingdom", prestige_level: ">= 3" }, desc: key.great_king }
     is_valid:
       is_adult: yes
       is_imprisoned: no
     cost: { prestige: 150, gold: 50 }
     cooldown: { years: 5 }
     effect:
-      - add_modifier: { id: grand_muster, years: 2 }
+      - if:
+          limit: { has_perk: master_strategist }
+          add_modifier: { id: grand_muster, years: 3 }
+          else:
+            add_modifier: { id: grand_muster, years: 2 }
       - every_knight:
           add_opinion: { target: root, modifier: mustered }
     ai_check_months: 6
     ai_will_do: { value: 0, if: { limit: { is_at_war: yes }, add: 60 } }
 
-  # Тиран: показательная казнь — страх на всю державу
+  # Показательная казнь — страх на всю державу. Ключи: «Кровавый суд», страх
+  # не ниже ужаса или три казни за жизнь; «Железная рука» — ещё страшнее
   public_execution:
     category: stezi
     icon: "🪓"
-    is_shown: { is_ruler: yes, has_perk: iron_fist }
+    is_shown: { is_ruler: yes }
+    keys:
+      - { perk: bloody_justice }
+      - { trigger: { dread_tier: ">= horror" }, desc: key.dread_horror }
+      - { deed: executions, count: 3 }
     is_valid:
       is_imprisoned: no
       custom_tooltip:
@@ -164,6 +212,9 @@ decisions:
             add_opinion: { target: root, modifier: executed_relative }
       # казнь на площади поднимает страх на ступень, а столица её не забудет
       - raise_dread_tier: 1
+      - if:
+          limit: { has_perk: iron_fist }
+          add_dread: 15
       - capital: { add_county_opinion: executions_witnessed }
       - add_karma: { value: -10, deed: public_execution }
       - if:
@@ -184,70 +235,92 @@ decisions:
         - limit: { has_trait: [compassionate, forgiving] }
           multiply: 0
 
-  # Рыцарь: поход за славой — сам на ристалище или лучший из рыцарей
+  # Поход за славой — сам на ристалище или лучший из рыцарей. Ключи: перк
+  # Рыцаря, две победы в поединках или великая доблесть; «Образец
+  # рыцарства» ходит за славой даром
   glory_quest:
     category: stezi
     icon: "🏇"
-    is_shown: { is_adult: yes, has_perk: paragon_of_chivalry }
+    is_shown: { is_adult: yes }
+    keys:
+      - { perk: trophy_taker }
+      - { perk: sword_brotherhood }
+      - { deed: duels_won, count: 2 }
+      - { trigger: { prowess: ">= 18" }, desc: key.great_warrior }
     is_valid:
       is_at_war: no
       is_imprisoned: no
       NOT: { has_trait: wounded }
-    cost: { gold: 50 }
+    cost: { gold: { value: 50, if: { limit: { has_perk: paragon_of_chivalry }, multiply: 0 } } }
     cooldown: { years: 4 }
     effect:
       - trigger_event: stezi.0001
     ai_check_months: 12
     ai_will_do: { value: 20, if: { limit: { has_trait: [brave, arrogant] }, add: 20 } }
 
-  # Зодчий: великая стройка в столице — раз в жизни
+  # Великая стройка в столице — раз в жизни. Ключи: перк Зодчего, мастер-цверг
+  # при дворе или великий управитель; «Королевский зодчий» строит дешевле
   great_work:
     category: stezi
     icon: "🏗"
-    is_shown: { is_ruler: yes, has_perk: royal_architect }
+    is_shown: { is_ruler: yes }
+    keys:
+      - { perk: thriving_lands }
+      - { perk: fortifier }
+      - { trigger: { any_courtier: { culture: zwerg } }, desc: key.zwerg_master }
+      - { trigger: { stewardship: ">= 20" }, desc: key.great_steward }
     is_valid:
       is_at_war: no
       custom_tooltip:
         text: ui.great_work_once
         trigger: { NOT: { has_flag: great_work_done } }
-    cost: { gold: 400 }
+    cost: { gold: { value: 400, if: { limit: { has_perk: royal_architect }, multiply: 0.6 } } }
     effect:
       - set_flag: great_work_done
       - trigger_event: stezi.0002
     ai_check_months: 12
     ai_will_do: { value: 0, if: { limit: { gold: ">= 650" }, add: 40 } }
 
-  # Казначей: ломбардский заём — золото сейчас, проценты потом. Тот же заём
-  # открывает Меняльный двор в домене (районы, common/economy.yaml).
+  # Заём у менял (открыт всем): золото сейчас, проценты потом. Условия — от
+  # того, кто берёт: без связей — кабала; с Меняльным двором в домене или
+  # «Заимодавцем» — обычные; «Великий казначей» и «Щедрая рука» — льготные.
   take_loan:
-    category: stezi
+    category: realm
     icon: "🏦"
-    is_shown:
-      is_ruler: yes
-      OR:
-        - has_perk: lombard_loan
-        - any_domain_province: { has_building: money_changer }
+    is_shown: { is_ruler: yes }
     is_valid:
       custom_tooltip:
         text: ui.loan_unpaid
-        trigger: { NOT: { has_modifier: lombard_debt } }
+        trigger: { NOT: { has_modifier: [lombard_debt, loan_debt_harsh, loan_debt_fair] } }
     effect:
       - add_gold: 300
-      - add_modifier: { id: lombard_debt, years: 12 }
+      - if:
+          limit: { OR: [ { has_perk: great_administrator }, { has_perk: golden_hand } ] }
+          add_modifier: { id: loan_debt_fair, years: 12 }
+          else_if:
+            - limit: { OR: [ { has_perk: lombard_loan }, { any_domain_province: { has_building: money_changer } } ] }
+              add_modifier: { id: lombard_debt, years: 12 }
+          else:
+            add_modifier: { id: loan_debt_harsh, years: 12 }
     ai_check_months: 6
     ai_will_do: { value: 0, if: { limit: { is_at_war: yes, gold: "< 60" }, add: 50 } }
 
-  # Учёный: великий труд — книга, которую будут переписывать веками
+  # Великий труд — книга, которую будут переписывать веками. Ключи: перк
+  # Учёного или великая учёность; «Прославленный учёный» пишет блистательно
   magnum_opus:
     category: stezi
     icon: "📜"
-    is_shown: { is_adult: yes, has_perk: renowned_scholar }
+    is_shown: { is_adult: yes }
+    keys:
+      - { perk: natural_philosophy }
+      - { perk: archivist }
+      - { trigger: { learning: ">= 20" }, desc: key.great_scholar }
     is_valid: { is_imprisoned: no }
     cost: { gold: 100 }
     cooldown: { years: 10 }
     effect:
       - if:
-          limit: { learning: ">= 20" }
+          limit: { OR: [ { learning: ">= 20" }, { has_perk: renowned_scholar } ] }
           create_artifact: { type: [codex, book], rarity: illustrious, how: commissioned }
           else:
             create_artifact: { type: [codex, book], rarity: famed, how: commissioned }
@@ -257,13 +330,18 @@ decisions:
     ai_check_months: 12
     ai_will_do: 30
 
-  # Святой: чудо — исцеление, ликование графств
+  # Чудо — исцеление, ликование графств. Ключи: «Внутренний покой», солнечная
+  # душа или реликварий; «Доктор богословия» творит чудо дешевле
   miracle:
     category: stezi
     icon: "✨"
-    is_shown: { is_adult: yes, has_perk: doctor_of_theology }
+    is_shown: { is_adult: yes }
+    keys:
+      - { perk: inner_peace }
+      - { trigger: { karma_tier: solar }, desc: key.solar_soul }
+      - { artifact: reliquary }
     is_valid: { is_imprisoned: no }
-    cost: { piety: 300 }
+    cost: { piety: { value: 300, if: { limit: { has_perk: doctor_of_theology }, multiply: 0.6 } } }
     cooldown: { years: 5 }
     effect:
       - remove_trait: wounded
@@ -294,11 +372,16 @@ decisions:
         - limit: { has_trait: [wounded, ill, pneumonic] }
           add: 60
 
-  # Святой: воззвание к священной войне
+  # Воззвание к священной войне. Ключи: «Воин веры», глава веры или великое
+  # благочестие; «Доктор богословия» — воззвание держится четыре года
   holy_call:
     category: stezi
     icon: "✝"
-    is_shown: { is_ruler: yes, has_perk: doctor_of_theology }
+    is_shown: { is_ruler: yes }
+    keys:
+      - { perk: holy_warrior }
+      - { trigger: { is_faith_head: yes }, desc: key.faith_head }
+      - { trigger: { piety_level: ">= 4" }, desc: key.great_piety }
     is_valid:
       custom_tooltip:
         text: ui.need_war_vs_infidel
@@ -306,18 +389,26 @@ decisions:
     cost: { piety: 200 }
     cooldown: { years: 5 }
     effect:
-      - add_modifier: { id: holy_call, years: 3 }
+      - if:
+          limit: { has_perk: doctor_of_theology }
+          add_modifier: { id: holy_call, years: 4 }
+          else:
+            add_modifier: { id: holy_call, years: 3 }
       - every_vassal:
           limit: { same_faith_as: root }
           add_opinion: { target: root, modifier: answered_holy_call }
     ai_check_months: 6
     ai_will_do: 50
 
-  # Государь: раз в жизни — «Золотой век»
+  # Раз в жизни — «Золотой век». Ключи: «Августейшее величие» или великая
+  # слава в мирное время
   golden_age:
     category: realm
     icon: "☀"
-    is_shown: { is_ruler: yes, has_perk: august_majesty }
+    is_shown: { is_ruler: yes }
+    keys:
+      - { perk: august_majesty }
+      - { trigger: { prestige_level: ">= 4", is_at_war: no }, desc: key.golden_glory }
     is_valid:
       NOT: { has_flag: golden_age_done }
     cost: { gold: 200, prestige: 500 }
@@ -386,14 +477,15 @@ interactions:
             limit: { has_perk: knightly_vow }
             scope:recipient: { add_prestige: -40 }
 
-  # ---------------------------------------------------------------- вершины стезей
+  # ---------------------------------------------------------------- действия стезей
 
-  # Тиран: запугать вассала — дань страхом, отказ — законный повод к темнице
+  # Запугать вассала (открыто всем): дань страхом — если боятся; отказ —
+  # законный повод к темнице, но слабого, чьей угрозе не верят, высмеют
   intimidate:
     icon: "⛓"
     category: hostile
     is_shown:
-      scope:actor: { has_perk: iron_fist }
+      scope:actor: { is_ruler: yes }
       scope:recipient: { is_vassal_of: scope:actor }
     is_valid:
       scope:recipient: { gold: 20, is_imprisoned: no }
@@ -410,6 +502,7 @@ interactions:
         - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.2 } }
         - { desc: ai.boldness, value: { value: ai_boldness, multiply: -10 } }
         - { desc: ai.menace, limit: { scope:actor: { has_perk: menace } }, value: 20 }
+        - { desc: ai.iron_fist, limit: { scope:actor: { has_perk: iron_fist } }, value: 10 }
     on_accept:
       - scope:recipient:
           pay_gold: { target: scope:actor, value: { value: gold, multiply: 0.3, min: 0, max: 150 } }
@@ -419,6 +512,9 @@ interactions:
     on_decline:
       - scope:recipient:
           mark_criminal: { target: scope:actor, years: 5 }
+      - if:
+          limit: { NOT: { has_perk: [menace, iron_fist] }, dread_tier: "< fear" }
+          add_prestige: -25
     decline_text: msg.intimidate_refused
     ai_targets: [vassal]
     ai_frequency_months: 12
@@ -430,28 +526,41 @@ interactions:
         - limit: { gold: "< 100" }
           add: 10
 
-  # Казначей: подкуп — верность за золото (честные оскорбятся)
+  # Подкуп (открыт всем) — верность за золото: удастся ли, решают жадность
+  # того, кого подкупают, и ловкость дающего; честные оскорбятся
   bribe:
     icon: "💰"
     category: intrigue
     is_shown:
-      scope:actor: { has_perk: great_administrator }
+      scope:actor: { is_adult: yes }
       scope:recipient: { is_adult: yes }
     cost: { gold: { value: 40, add: { value: "scope:recipient.tier", multiply: 30 } } }
     auto_accept: yes
     hookable: no
     cooldown: { years: 5 }
     on_accept:
-      - scope:recipient:
-          if:
-            limit: { has_trait: [honest, just] }
-            add_opinion: { target: scope:actor, modifier: bribe_insult }
-            else:
+      - check:
+          name: interaction.bribe
+          skill: intrigue
+          base: 35
+          add:
+            - { desc: check.target_greed, value: { value: "scope:recipient.ai_greed", multiply: 10 } }
+            - { desc: skill.intrigue, value: { value: intrigue, subtract: 8, multiply: 2 } }
+            - { desc: check.target_honest, limit: { scope:recipient: { has_trait: [honest, just] } }, value: -60 }
+            - { desc: perk.great_administrator, limit: { has_perk: great_administrator }, value: 25 }
+            - { desc: perk.golden_hand, limit: { has_perk: golden_hand }, value: 10 }
+          success:
+            scope:recipient:
               add_opinion: { target: scope:actor, modifier: bribed }
               if:
                 limit: { is_vassal_of: scope:actor, is_in_faction: yes }
                 leave_faction: yes
                 set_flag: { name: faction_cooldown, years: 3 }
+          # золото взял, а от своих не отступился
+          partial:
+            scope:recipient: { add_opinion: { target: scope:actor, modifier: bribed } }
+          failure:
+            scope:recipient: { add_opinion: { target: scope:actor, modifier: bribe_insult } }
     ai_targets: [vassal]
     ai_frequency_months: 12
     ai_will_do:
@@ -466,12 +575,13 @@ interactions:
             scope:recipient: { is_powerful_vassal: yes, NOT: { has_trait: [honest, just] }, opinion: { target: scope:actor, value: "< 0" } }
           add: 20
 
-  # Паук: продать тайну — сосед узнаёт чужой секрет, вам — серебро
+  # Продать тайну (открыто всем, кто знает чужие тайны): сосед узнаёт чужой
+  # секрет, вам — серебро; «Торговля тайнами» — дороже
   sell_secret:
     icon: "📜"
     category: intrigue
     is_shown:
-      scope:actor: { has_perk: secret_trade }
+      scope:actor: { is_adult: yes }
       scope:recipient: { is_ruler: yes }
     is_valid:
       custom_tooltip:
@@ -501,19 +611,24 @@ interactions:
             save_scope_as: sold_secret_owner
       - scope:recipient:
           learn_secret: { owner: scope:sold_secret_owner }
-          pay_gold: { target: scope:actor, value: { value: gold, multiply: 0.15, min: 0, max: 100 } }
+          pay_gold: { target: scope:actor, value: { value: gold, multiply: 0.15, if: { limit: { scope:actor: { has_perk: secret_trade } }, multiply: 1.7 }, min: 0, max: 150 } }
           add_opinion: { target: scope:actor, modifier: bought_secret }
     ai_targets: [neighboring_ruler]
     ai_frequency_months: 24
     ai_will_do: { value: 0, if: { limit: { num_known_secrets: ">= 2" }, add: 20 } }
 
-  # Паук: заставить служить — крюк в обмен на службу (золото, союз или совет)
+  # Заставить служить — крюк в обмен на службу (золото, союз или совет).
+  # Ключи: перк Паука или великая ловкость в интригах
   compel_service:
     icon: "🕸"
     category: intrigue
     is_shown:
-      scope:actor: { has_perk: master_schemer }
+      scope:actor: { is_adult: yes }
       scope:recipient: { is_adult: yes }
+    keys:
+      - { perk: prying_eyes }
+      - { perk: gray_eminence }
+      - { trigger: { intrigue: ">= 18" }, desc: key.master_intriguer }
     is_valid:
       scope:actor: { has_hook_on: scope:recipient }
     auto_accept: yes
@@ -525,13 +640,18 @@ interactions:
     ai_frequency_months: 12
     ai_will_do: { value: 0, if: { limit: { has_hook_on: scope:recipient }, add: 25 } }
 
-  # Соблазнитель: сердечный союз — любовник-правитель вступает в союз или мирится
+  # Сердечный союз — любовник-правитель вступает в союз или мирится. Ключи:
+  # перк Соблазнителя или сладкие речи великого дипломата
   heart_pact:
     icon: "💞"
     category: diplomacy
     is_shown:
-      scope:actor: { has_perk: irresistible, is_ruler: yes }
+      scope:actor: { is_ruler: yes }
       scope:recipient: { is_ruler: yes }
+    keys:
+      - { perk: heartbreaker }
+      - { perk: pillow_talk }
+      - { trigger: { diplomacy: ">= 18" }, desc: key.silver_tongue }
     is_valid:
       custom_tooltip:
         text: ui.need_lover

@@ -424,6 +424,7 @@ static func _interaction_button(app: App, def: Dictionary, actor_id: String, rec
 			var desc := g.desc_of("interactions", def.id)
 			if desc != "":
 				bb += "\n" + BB.i(desc)
+			bb += W.keys_tip(app, def, actor)
 			if not blockers.is_empty():
 				bb += "\n" + BB.reasons(blockers)
 			elif not needs_choice:

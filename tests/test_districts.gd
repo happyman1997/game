@@ -95,13 +95,18 @@ func test_yearly_buildings() -> void:
 		check(Karma.value(h) > k0, "странноприимный дом — Свет на душу")
 
 
-func test_money_changer_unlocks_loan() -> void:
+func test_money_changer_eases_loan() -> void:
 	var g := _game()
 	var h: Dictionary = g.ch("harold")
+	var w: Dictionary = g.ch("william")
 	var loan: Dictionary = g.content.get_def("decisions", "take_loan")
-	check(not Decisions.is_shown(g, loan, h), "без менял и стези заёма нет")
+	for c in [h, w]:
+		for cid in Titles.domain_counties(g, c):
+			g.state.provinces[cid].buildings.erase("money_changer")
 	g.state.provinces["c_winchester"].buildings.append("money_changer")
-	check(Decisions.is_shown(g, loan, h), "меняльный двор открывает ссуду")
+	check(Decisions.take(g, loan, h) and Decisions.take(g, loan, w), "заём открыт всем")
+	check(h.modifiers.any(func(m): return m.id == "lombard_debt"), "с меняльным двором — обычные условия")
+	check(w.modifiers.any(func(m): return m.id == "loan_debt_harsh"), "без связей — кабала")
 
 
 func test_ai_builds_districts() -> void:

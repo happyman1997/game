@@ -53,7 +53,9 @@ static func decisions(app: App) -> Control:
 	var p: Dictionary = g.player
 	var root := K.vbox([], 8)
 	var defs: Array = g.content.all("decisions").filter(func(d): return Decisions.is_shown(g, d, p))
-	Data.sort_by(defs, func(d): return 0 if d.get("major", false) else 1)
+	# запертые ключами — в конец: видно, к чему стремиться
+	var kctx := Decisions.context(g, p)
+	Data.sort_by(defs, func(d): return (0 if d.get("major", false) else 1) + (0 if Keys.opened(kctx, kctx.root, d) else 2))
 	var items := []
 	for d in defs:
 		var blockers := Decisions.blockers(g, d, p)
@@ -66,7 +68,7 @@ static func decisions(app: App) -> Control:
 				if Decisions.take(g, d, p):
 					app.toast(g.name_of("decisions", did), "good")
 				app.mark_dirty(true), {"variation": "GoldButton", "disabled": not blockers.is_empty(),
-				"tip": func(): return BB.effect(g, d.get("effect"), {"type": "character", "id": p.id}, {"actor": {"type": "character", "id": p.id}}, app.t("ui.effects")) + ("\n" + BB.reasons(blockers) if not blockers.is_empty() else "")})], 6),
+				"tip": func(): return BB.effect(g, d.get("effect"), {"type": "character", "id": p.id}, {"actor": {"type": "character", "id": p.id}}, app.t("ui.effects")) + W.keys_tip(app, d, p) + ("\n" + BB.reasons(blockers) if not blockers.is_empty() else "")})], 6),
 		], 3)
 		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var card := K.panel(K.hbox([K.icon(d.get("icon", "scroll"), 34), info], 10), "InsetPanel")

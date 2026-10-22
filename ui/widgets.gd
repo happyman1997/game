@@ -205,6 +205,18 @@ static func stress_source(g: Game, src: String) -> String:
 	return g.loc.t_or("stress_src." + kind, g.loc.t("stress_src.other"))
 
 
+## Ключи запертого действия для подсказки: «Ключи (хватит одного)» и
+## каждый — с отметкой, есть ли он (пусто, если ключей нет).
+static func keys_tip(app: App, def: Dictionary, c: Dictionary) -> String:
+	if not Keys.has_keys(def):
+		return ""
+	var ctx := ScriptContext.make(app.game, {"type": "character", "id": c.id}, {"actor": {"type": "character", "id": c.id}})
+	var bb := "\n" + BB.gold(app.t("ui.keys_title"))
+	for k in Keys.status(ctx, ctx.root, def):
+		bb += "\n" + (BB.good("✓ " + k.name) if k.ok else BB.muted("• " + k.name))
+	return bb
+
+
 ## Летопись деяний: значки со счётчиками и ближайшие прозвища (null — пусто).
 static func deeds(app: App, c: Dictionary) -> Variant:
 	var g := app.game

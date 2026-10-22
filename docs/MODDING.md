@@ -171,7 +171,7 @@ defines:
 | `casus_belli` | `core/data/common/war.yaml` | Поводы к войне: `targets` (поставщик целей: `claim`, `de_jure`, `independence`, `adjacent_county`, `holy_war` — против чужой веры, `independent_ruler` — любой независимый правитель, сужайте условием `is_valid`, `artifact_holder` — держава со спорной реликвией), `is_shown` (условие на самого нападающего — проверяется до поиска целей, дёшево), `is_valid`, `cost`, `on_victory`, `on_white_peace`, `on_defeat`, `ai_will_do`, `truce_years`, `war_name`, `manual` (не предлагать игроку и ИИ — только для скриптов, например мятежей). |
 | `interactions` | `core/data/common/interactions.yaml` | Взаимодействия персонажей (см. раздел 6). |
 | `schemes` | `core/data/common/schemes.yaml`, `intrigues.yaml` | Интриги: `progress`, `success_chance`, `discovery_chance`, `on_success`, `on_failure`, `on_discovered`. В ядре: убийство, дружба, расположение, соблазнение, фабрикация претензии, компромат, похищение (`imprison` в темницу владельца интриги; цели ИИ — список `enemy_kin`), кража реликвии (`ordered_artifact` по `artifact_value` и `artifact_claimed_by`), смута (`add_county_opinion` трём богатейшим графствам), поджог (`add_province_modifier` и `delay_construction` в столице). |
-| `decisions` | `core/data/common/decisions.yaml` | `is_shown`, `is_valid`, `cost`, `effect`, `cooldown`, `major`, `ai_will_do`, `ai_check_months`, `ai_potential` (условие для ИИ до всех проверок; у группы — первого решения), `ai_group` (решения одной группы ИИ обдумывает вместе — одна проверка, выбор по весу). |
+| `decisions` | `core/data/common/decisions.yaml` | `is_shown`, `keys` (ключи — см. «Ключи к запертым действиям»), `is_valid`, `cost`, `effect`, `cooldown`, `major`, `ai_will_do`, `ai_check_months`, `ai_potential` (условие для ИИ до всех проверок; у группы — первого решения), `ai_group` (решения одной группы ИИ обдумывает вместе — одна проверка, выбор по весу). |
 | `events`, `on_actions` | `core/data/events/`, `core/data/common/on_actions.yaml` | События и точки их вызова — раздел 5. |
 | `script_values`, `scripted_triggers`, `scripted_effects` | `core/data/common/decisions.yaml` | Именованные формулы и блоки скрипта для повторного использования. |
 | `event_themes`, `map_modes` | `core/data/common/ui.yaml` | Оформление событий; режимы карты без кода (значение + градиент). |
@@ -423,6 +423,29 @@ ev:
 Свойства: `name`, `first_name`, `full_name`, `title_name`, `rank`,
 `culture_name`, `faith_name`, `dynasty_name`, `age`. `|g:муж/жен` выбирает
 вариант по полу. `{name}` в фигурных скобках — параметры, которые передаёт код.
+
+### Ключи к запертым действиям
+
+Базовые действия открыты всем, а вершинные заперты: их нужно заслужить, и к
+каждому ведёт несколько дорог. Поле `keys` у решения или взаимодействия —
+список ключей, хватает любого. Без ключа действие видно (запертые — в конце
+списка решений), но не берётся: «Нужен один из ключей: …», а подсказка
+показывает все ключи с отметкой, какие уже есть. ИИ проверяет ключи сам.
+
+```yaml
+public_execution:
+  is_shown: { is_ruler: yes }
+  keys:
+    - { perk: bloody_justice }                       # перк стези
+    - { trigger: { dread_tier: ">= horror" }, desc: key.dread_horror }   # любое условие (desc — название)
+    - { deed: executions, count: 3 }                 # деяния за жизнь (текст — deed_goal.<деяние>)
+    # ещё: { trait: <черта> }, { artifact: <тип вещи> }
+```
+
+Ключи — про того, кто действует (root), а не про того, к кому обращаются.
+В ядре ключом к вершинному действию стези служит перк в начале её ветки
+(поле `unlocks` перка — для подсказки), а вершина стези делает действие
+мастерским (дешевле, сильнее, дольше).
 
 ### Взаимодействия
 
@@ -780,7 +803,8 @@ perks:
 которую читает движок, либо проверка `has_perk` в данных: в
 `data/common/stezi.yaml` основной мод дописывает правила к чужим записям
 (`$append` к `on_accept` казни, к `on_success` соблазнения, к `on_battle_won`…)
-и добавляет действия вершин (`is_shown: { has_perk: ... }`). Подпись стези под
+и добавляет действия стезей: базовые открыты всем (перки их улучшают),
+вершинные заперты ключами (`keys`, см. «Ключи к запертым действиям»). Подпись стези под
 её названием — ключ `perk_tree_desc.<дерево>`. Характеристики-правила,
 которые понимает движок:
 

@@ -1,5 +1,8 @@
 # Strings for engine features: lifestyles, council, prison, factions, regiments.
 ui:
+  keys_needed: "Needs one of the keys: {list}"
+  keys_or: " or "
+  keys_title: "Keys (any one will do):"
   hook_on_cooldown: The hook is on cooldown
   tab:
     lifestyle: Lifestyle
@@ -19,7 +22,7 @@ ui:
   perk_need_xp: "Requires experience: {cost} (you have {xp})"
   perk_unlock: Unlock perk
   perk_grants_trait: "Grants the trait “{trait}”"
-  perk_unlocks: "Unlocks: {list}"
+  perk_unlocks: "A key to: {list}"
   lifestyle_skill: "Skill: {skill}"
   lifestyle_all_done: All perks of this lifestyle are unlocked
   council: Council
@@ -174,3 +177,8 @@ alert:
   prisoners: "Prisoners in your dungeon: {n}"
   imprisoned: "You are imprisoned by {jailer}"
   can_recruit: You can recruit a men-at-arms regiment
+key:
+  perk: "the «{name}» perk"
+  trait: "the «{name}» trait"
+  deed: "{goal}: {n}"
+  artifact: "an item: {name}"

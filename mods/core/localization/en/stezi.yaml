@@ -17,13 +17,13 @@ decision:
   holy_call: Call to Holy War
 decision_desc:
   golden_age: "Once in a lifetime a sovereign may proclaim a Golden Age: for ten years the land develops faster, the court is calm, the vassals content."
-  royal_progress: "You ride through your lands with your court and banners. Your domain counties and vassals will long remember the visit, and word of your majesty travels far."
+  royal_progress: "You tour your lands with your court and banners. Whether it goes well depends on your diplomacy and renown: then counties and vassals long remember the visit and word spreads far; a clumsy progress is laughed at."
   gather_kin: "The rulers of your house gather for a family council and bring gifts — a share of their treasuries. The house's fame grows and kin warm to their head."
   grand_muster: "A muster of the host: for two years levies gather more readily, regiments are drilled, the commander is confident and knights are flattered."
   public_execution: "The noblest of your prisoners is executed in the square before the people. Your dread rises by a tier, the capital long remembers the execution, the defiant will hate the tyrant and the kin of the executed become blood enemies."
   glory_quest: "You set out where swords ring: to the lists of a foreign court or to a border where glory is sought. Fight yourself or send your best knight."
-  great_work: "Once in a lifetime the Architect may raise in the capital something that outlives him: a cathedral, a keep or a market."
-  take_loan: "Money changers give 300 gold at once. Repayment: 2.5 gold a month for twelve years. A new loan only after the old one."
+  great_work: "Once in a lifetime a ruler may raise in the capital something that outlives them for centuries: a cathedral, a keep or a market."
+  take_loan: "Money changers give 300 gold at once, to be repaid over twelve years. The terms depend on you: without connections — ruinous (3.5 gold a month); with a Money Changers' Court in your domain or the Moneylender perk — ordinary (2.5); for a Great Treasurer or an open hand — easy (1.8). A new loan only after the old one."
   magnum_opus: "You sit down to a work that will be copied for centuries. The book becomes a famed relic of your court (illustrious at learning 20)."
   miracle: "A prayer after which the bedridden rise. Heals your wounds and illnesses and those of your family; your domain counties speak of the miracle."
   holy_call: "At war with another cult or a heretic you call your coreligionists to arms: for three years levies are larger, knights fiercer, and coreligionist vassals grateful."
@@ -35,13 +35,15 @@ interaction:
   compel_service: Compel Service
   heart_pact: Pact of Hearts
 interaction_desc:
-  intimidate: "Demand a third of a vassal's treasury. Only the obedient or the broken can be intimidated: those who fear you comply, and a refusal gives you a lawful reason to imprison them."
-  bribe: "Gold instead of feasts: a vassal or courtier warms to you for years and leaves their faction. The honest and the just are offended."
+  intimidate: "Demand a third of a vassal's treasury. Only the submissive or the broken can be intimidated: those who fear you agree. A refusal gives you a lawful reason to imprison them — but if you are not feared, your threat is laughed at."
+  bribe: "Gold instead of feasts. Whether it works depends on the greed of the one you bribe and your own cunning: then they long favour you and leave their faction. The honest and the just are offended."
   sell_secret: "Sell a neighbouring ruler a secret you know — best of all about their vassal or enemy. They pay in silver and are grateful."
   compel_service: "Spend a hook: the one on your hook pays in gold, enters an alliance, or takes a seat on your council and forgets factions."
   heart_pact: "A ruling lover will not refuse: they ally with you, or lay down arms if you are at war."
 
 modifier:
+  loan_debt_fair: Easy Debt to the Changers
+  loan_debt_harsh: Ruinous Debt to the Changers
   golden_age: Golden Age
   hero_legacy: Ancestor's Legacy
   grand_muster: Grand Muster
@@ -81,6 +83,7 @@ ui:
   need_lover: The ruler must be your lover
 
 ai:
+  iron_fist: Iron Fist
   respects_unifier: Respects the victor
   kin_council: Council of kin
   golden_hand: Open hand
@@ -115,3 +118,21 @@ ev:
     a: Let them pay in gold
     b: Let them become an ally
     c: Let them serve on my council
+key:
+  dynasty_head: "head of the house"
+  great_king: "a king of great renown"
+  dread_horror: "dread of horror or more"
+  great_warrior: "prowess 18+"
+  zwerg_master: "a zwerg master at court"
+  great_steward: "stewardship 20+"
+  great_scholar: "learning 20+"
+  solar_soul: "a solar soul"
+  faith_head: "head of the faith"
+  great_piety: "great piety"
+  golden_glory: "great renown in peacetime"
+  master_intriguer: "intrigue 18+"
+  silver_tongue: "diplomacy 18+"
+check:
+  prestige_level: "Prestige level"
+  target_greed: "Greed"
+  target_honest: "Honest — not for sale"

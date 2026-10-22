@@ -30,7 +30,11 @@ static func is_shown(game: Game, def: Dictionary, c: Dictionary, ctx: ScriptCont
 
 static func blockers(game: Game, def: Dictionary, c: Dictionary) -> Array:
 	var ctx := context(game, c)
-	var out := Interp.failed_triggers(ctx, ctx.root, def.get("is_valid"))
+	var out := []
+	var kb := Keys.blocker(ctx, ctx.root, def)
+	if kb != "":
+		out.append(kb)
+	out.append_array(Interp.failed_triggers(ctx, ctx.root, def.get("is_valid")))
 	out.append_array(Economy.cost_blockers(game, c, cost(game, def, c)))
 	var cd: Variant = c.flags.get("dec:" + str(def.id))
 	if cd != null and (cd == 0 or cd > game.date):
@@ -46,7 +50,7 @@ static func can_take(game: Game, def: Dictionary, c: Dictionary, ctx: ScriptCont
 		return false
 	if ctx == null:
 		ctx = context(game, c)
-	if not Interp.eval_trigger(ctx, ctx.root, def.get("is_valid")):
+	if not Keys.opened(ctx, ctx.root, def) or not Interp.eval_trigger(ctx, ctx.root, def.get("is_valid")):
 		return false
 	if def.get("cost") == null:
 		return true

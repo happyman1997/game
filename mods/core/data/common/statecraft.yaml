@@ -40,7 +40,7 @@ interactions:
       add: { value: stewardship, max: 20 }
 
   # посредничество: правитель мирит чужую войну — обоим сторонам мир, ему —
-  # слава; слушают того, кого уважают и кто умеет говорить
+  # слава; слушают того, кого уважают, кто славен и умеет говорить
   mediate_peace:
     icon: "🕊"
     category: diplomacy
@@ -50,10 +50,11 @@ interactions:
     is_valid:
       scope:actor: { NOT: { is_at_war_with: scope:recipient } }
     ai_accept:
-      value: -10
+      value: -25
       add:
         - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.6 } }
         - { desc: ai.actor_diplomacy, value: { value: "scope:actor.diplomacy", subtract: 8, multiply: 2 } }
+        - { desc: ai.actor_prestige, value: { value: "scope:actor.prestige_level", multiply: 5 } }
         - { desc: ai.war_weary, value: 15 }
         - { desc: ai.ambitious, limit: { has_trait: [ambitious, wrathful] }, value: -20 }
     on_accept:
@@ -66,7 +67,7 @@ interactions:
     ai_frequency_months: 12
     ai_will_do:
       value: 0
-      add: { value: diplomacy, subtract: 6, max: 20 }
+      add: { value: diplomacy, subtract: 10, max: 15 }
 
 decisions:
   # в старых грамотах может найтись право на соседнюю землю — найдёт

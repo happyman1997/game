@@ -95,10 +95,10 @@ static func actor_gate(game: Game, def: Dictionary) -> Variant:
 ## Проходит ли действующее лицо свою часть is_shown (true, если её нет).
 static func actor_passes(game: Game, def: Dictionary, actor: Dictionary) -> bool:
 	var gate: Variant = actor_gate(game, def)
-	if gate == null:
+	if gate == null and not Keys.has_keys(def):
 		return true
 	var ctx := context(game, def, actor, actor)
-	return Interp.eval_trigger(ctx, ctx.root, gate)
+	return Keys.opened(ctx, ctx.root, def) and Interp.eval_trigger(ctx, ctx.root, gate)
 
 
 static func _cooldown_key(def: Dictionary, recipient: Dictionary) -> String:
@@ -165,7 +165,11 @@ static func target_options(game: Game, def: Dictionary, actor: Dictionary, recip
 ## Причины, по которым взаимодействие сейчас недоступно (пусто — доступно).
 static func blockers(game: Game, def: Dictionary, actor: Dictionary, recipient: Dictionary, args: Dictionary = {}) -> Array:
 	var ctx := context(game, def, actor, recipient, args)
-	var out := Interp.failed_triggers(ctx, ctx.root, def.get("is_valid"))
+	var out := []
+	var kb := Keys.blocker(ctx, ctx.root, def)
+	if kb != "":
+		out.append(kb)
+	out.append_array(Interp.failed_triggers(ctx, ctx.root, def.get("is_valid")))
 	out.append_array(Economy.cost_blockers(game, actor, cost(game, def, ctx)))
 	if _hook_cost(def) and not Leverage.can_use_hook(game, actor, recipient.id):
 		out.append(game.loc.t("ui.hook_on_cooldown"))
