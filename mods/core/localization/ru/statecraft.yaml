@@ -20,3 +20,5 @@ ai:
   war_weary: Устал от войны
   actor_stewardship: Управление предлагающего
   actor_diplomacy: Красноречие посредника
+fx:
+  archives_claim: "Право на одно из соседних графств"

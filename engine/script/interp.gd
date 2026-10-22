@@ -687,6 +687,9 @@ static func run_effect_key(ctx: ScriptContext, scope: Variant, key: String, arg:
 			if pick != null:
 				run_effect(ctx, scope, pick.effect)
 			return
+		"check":
+			Checks.run(ctx, scope, arg)
+			return
 		"save_scope_as":
 			ctx.scopes[str(arg)] = scope
 			return
@@ -811,6 +814,9 @@ static func describe_effect(ctx: ScriptContext, scope: Variant, block: Variant, 
 				var rest := _without(a, ["chance"])
 				out.append({"text": game.loc.t("fx.random", {"chance": roundi(eval_value(ctx, scope, a.get("chance")))}), "depth": depth})
 				describe_effect(ctx, scope, rest.get("effect", rest), depth + 1, out)
+				continue
+			"check":
+				Checks.describe(ctx, scope, arg, depth, out)
 				continue
 			"random_list":
 				var opts := random_list_options(ctx, scope, arg)

@@ -20,3 +20,5 @@ ai:
   war_weary: Tired of war
   actor_stewardship: Proposer's stewardship
   actor_diplomacy: Mediator's eloquence
+fx:
+  archives_claim: "A claim on one of the neighbouring counties"

@@ -1,5 +1,8 @@
 # Механики «Характер», «Слава и благочестие», «Вера и культура земель».
 msg:
+  roll_success: "{what}: удача (шанс был {chance}%)."
+  roll_partial: "{what}: удалось лишь отчасти (шанс удачи был {chance}%)."
+  roll_failure: "{what}: провал (шанс удачи был {chance}%)."
   scapegoat: "Интрига раскрыта, но подозрение пало на {who}."
   wounded_in_front: "{who} вёл войско в первых рядах — и получил рану."
   escaped_by_passage: "Столица {place} пала, но вы ушли тайным ходом и не попали в плен."
@@ -77,6 +80,11 @@ tr:
   has_holder_culture: Графство одной культуры с владельцем
   not_holder_culture: Графство чужой культуры
 fx:
+  check_odds: "Проверка: удача — {chance}%"
+  check_odds_partial: "Проверка: удача — {chance}%, отчасти — {partial}%"
+  check_success: "При удаче:"
+  check_partial: "Если удастся отчасти:"
+  check_failure: "При провале:"
   stress_reaction: "Отклик характера: {value} стресса"
   give_nickname: "Прозвище: {nick}"
   make_peace_with: "{who} заключает мир с {enemy}"
@@ -150,3 +158,7 @@ stress_src:
   prison: Темница
   dread_tier: Бессонница грозного правителя
   dragon: Схватка с драконом
+check:
+  base: Основа
+  stress: Стресс
+  generic: Проверка

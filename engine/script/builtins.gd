@@ -353,6 +353,9 @@ static func register(engine: GameEngine) -> void:
 		}, O)
 
 	cv.call("age", "Возраст", func(g, c, _a): return Chars.age_of(g, c))
+	reg.values.register("check_chance", {"scopes": CHAR, "doc": "Шанс удачи по проверке checks.<id>, %: check_chance(<id>)", "get": func(ctx, s, arg):
+		return Checks.odds(ctx, s, Checks.spec(ctx.game, str(arg))).success
+	}, O)
 	cv.call("gold", "Золото", func(_g, c, _a): return c.gold)
 	cv.call("prestige", "Престиж", func(_g, c, _a): return c.prestige)
 	cv.call("piety", "Благочестие", func(_g, c, _a): return c.piety)

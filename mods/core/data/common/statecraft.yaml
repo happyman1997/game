@@ -70,23 +70,38 @@ interactions:
 
 decisions:
   # в старых грамотах может найтись право на соседнюю землю — найдёт
-  # учёный (Архивариус — почти наверняка)
+  # учёный (Архивариус — почти наверняка); проверка учёности
   search_archives:
     category: personal
     icon: "📜"
     is_shown: { is_ruler: yes }
+    is_valid:
+      any_neighboring_county: { NOT: { scope:actor: { has_claim_on: prev } } }
     cost: { gold: 50 }
     cooldown: { years: 4 }
     effect:
-      - random_neighboring_county:
-          limit: { NOT: { scope:actor: { has_claim_on: prev } } }
-          save_scope_as: claim_target
-      - if:
-          limit: { exists: scope:claim_target }
-          random:
-            chance: { value: learning, multiply: 4, add: 10, if: { limit: { has_perk: archivist }, add: 40 }, max: 95 }
-            add_claim: scope:claim_target
-            send_message: { text: msg.archives_claim, kind: good }
+      check:
+        name: decision.search_archives
+        skill: learning
+        base: 10
+        add:
+          - { desc: skill.learning, value: { value: learning, multiply: 4 } }
+          - { desc: perk.archivist, limit: { has_perk: archivist }, value: 40 }
+        success:
+          custom_tooltip: fx.archives_claim
+          hidden_effect:
+            random_neighboring_county:
+              limit: { NOT: { scope:actor: { has_claim_on: prev } } }
+              save_scope_as: claim_target
+            if:
+              limit: { exists: scope:claim_target }
+              add_claim: scope:claim_target
+              send_message: { text: msg.archives_claim, kind: good }
+        # грамоты нет, но в старых письмах — чужая тайна
+        partial:
+          discover_secret: yes
+        failure:
+          add_stress: 5
     ai_check_months: 24
     ai_will_do:
       value: 0

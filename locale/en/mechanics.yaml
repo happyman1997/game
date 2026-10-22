@@ -1,5 +1,8 @@
 # Personality, Renown and Faith & Culture of the Land mechanics.
 msg:
+  roll_success: "{what}: success (the chance was {chance}%)."
+  roll_partial: "{what}: only a partial success (the chance of success was {chance}%)."
+  roll_failure: "{what}: failure (the chance of success was {chance}%)."
   scapegoat: "The scheme was discovered, but suspicion fell on {who}."
   wounded_in_front: "{who} led from the front — and took a wound."
   escaped_by_passage: "{place} has fallen, but you slipped out through a secret passage and avoided capture."
@@ -77,6 +80,11 @@ tr:
   has_holder_culture: County shares its holder's culture
   not_holder_culture: County of a foreign culture
 fx:
+  check_odds: "Check: success — {chance}%"
+  check_odds_partial: "Check: success — {chance}%, partial — {partial}%"
+  check_success: "On success:"
+  check_partial: "On partial success:"
+  check_failure: "On failure:"
   stress_reaction: "Character reacts: {value} stress"
   give_nickname: "Nickname: {nick}"
   make_peace_with: "{who} makes peace with {enemy}"
@@ -150,3 +158,7 @@ stress_src:
   prison: Prison
   dread_tier: Sleepless nights of a dread ruler
   dragon: Fight with a dragon
+check:
+  base: Base
+  stress: Stress
+  generic: A check

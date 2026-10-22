@@ -1,7 +1,8 @@
 class_name Momentum
 extends EngineFeature
 ## Удачи и неудачи: успех в своём деле снимает стресс, провал — добавляет.
-## Успехи и провалы: проверки навыков в событиях, интриги (по навыку
+## Успехи и провалы: проверки навыков в событиях и общие проверки (эффект
+## check с полем skill), интриги (по навыку
 ## интриги), битвы, поединки, дипломатические и интриганские
 ## взаимодействия игрока, которые решает другая сторона.
 ##   defines.momentum: { success_stress, failure_stress }
@@ -29,6 +30,11 @@ static func record(game: Game, c: Variant, skill: String, success: bool) -> void
 func install(engine: GameEngine) -> void:
 	engine.hooks.on("event.check", func(p):
 		Momentum.record(p.game, p.game.ch(p.character), str(p.skill), p.success)
+	, 0, OWNER)
+	# общая проверка: удача и провал (частичный успех — ни то ни другое)
+	engine.hooks.on("check", func(p):
+		if p.result != "partial" and p.character != null:
+			Momentum.record(p.game, p.game.ch(str(p.character)), str(p.skill), p.result == "success")
 	, 0, OWNER)
 	engine.hooks.on("scheme.ended", func(p):
 		var g: Game = p.game

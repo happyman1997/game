@@ -5,7 +5,7 @@ extends RefCounted
 ## проверки через engine.content_validators: Callable(engine, validator).
 
 const TRIGGER_CONTROL := ["AND", "and", "OR", "or", "NOT", "not", "NOR", "nor", "NAND", "always", "exists", "is", "this", "custom_tooltip", "custom_description", "desc", "text"]
-const EFFECT_CONTROL := ["if", "else_if", "else", "effect", "hidden_effect", "then", "custom_tooltip", "limit", "random", "random_list", "save_scope_as", "save_scope_value_as", "trigger_event"]
+const EFFECT_CONTROL := ["if", "else_if", "else", "effect", "hidden_effect", "then", "custom_tooltip", "limit", "random", "random_list", "check", "save_scope_as", "save_scope_value_as", "trigger_event"]
 const LOGIC := ["AND", "and", "OR", "or", "NOT", "not", "NOR", "nor", "NAND"]
 
 ## Аргументы-ссылки на контент: has_trait: brave → traits/brave должна существовать.
@@ -140,6 +140,18 @@ func trigger(block: Variant, where: String) -> void:
 		_warn(where, "неизвестный триггер \"%s\"" % k)
 
 
+## Проверка (эффект check или запись checks): факторы, исходы, ссылка на checks.<id>.
+func check(v: Variant, where: String) -> void:
+	if not (v is Dictionary):
+		ref("checks", v, where + " check")
+		return
+	if v.get("id") != null:
+		ref("checks", v.id, where + " check")
+	value({"value": v.get("base", 0), "add": v.get("add", [])}, where + " check")
+	for k in ["success", "partial", "failure"]:
+		effect(v.get(k), "%s check %s" % [where, k])
+
+
 func effect(block: Variant, where: String) -> void:
 	if block == null:
 		return
@@ -196,6 +208,9 @@ func effect(block: Variant, where: String) -> void:
 		if k == "custom_tooltip":
 			if v is Dictionary:
 				effect(v.get("effect"), where)
+			continue
+		if k == "check":
+			check(v, where)
 			continue
 		if k == "trigger_event":
 			var id: Variant = v if v is String else (v.get("id") if v is Dictionary else null)

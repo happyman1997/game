@@ -68,6 +68,8 @@ static func validate(engine: GameEngine) -> Array:
 						v.effect(opts[i].get("failure"), "%s option %d failure" % [w, i + 1])
 				elif sp != null:
 					v.issue("%s option %d: skill — словарь { skill, min | check } или { perk }" % [w, i + 1])
+	for ck in c.all("checks"):
+		v.check(ck, "checks/" + str(ck.id))
 	for d in c.all("decisions"):
 		v.trigger(d.get("is_shown"), "decisions/%s is_shown" % d.id)
 		v.trigger(d.get("ai_potential"), "decisions/%s ai_potential" % d.id)

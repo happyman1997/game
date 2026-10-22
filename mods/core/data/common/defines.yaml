@@ -202,6 +202,13 @@ defines:
     second_branch_mult: 2     # перк второй ветки стези вдвое дороже
     focus_change_cooldown_months: 12
 
+  # общая проверка (эффект check): удача, частичный успех, провал
+  checks:
+    partial_band: 15          # ширина полосы частичного успеха, %
+    min: 5                    # шанс удачи не ниже
+    max: 95                   # и не выше
+    stress_penalty: 10        # минус к шансу за каждую сотню стресса
+
   momentum:
     success_stress: -5        # успех в своём деле снимает стресс
     failure_stress: 5         # провал добавляет

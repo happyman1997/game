@@ -360,6 +360,7 @@
 | `blood_potency` | character | Сила крови вампира (растёт с годами и кормлением) | arcana |
 | `blood_thirst` | character | Жажда крови вампира (0–100) | arcana |
 | `calm_months` | character | Сколько месяцев подряд стресс почти нулевой | core/spirit |
+| `check_chance` | character | Шанс удачи по проверке checks.<id>, %: check_chance(<id>) | core |
 | `church_law_level` | character | Уровень закона группы church_law (−1, если не действует) | core/laws |
 | `commander_advantage` | character | Характеристика: commander_advantage | core |
 | `control` | province | Контроль над графством (0–100) | core/populace |

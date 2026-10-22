@@ -157,6 +157,7 @@ defines:
 | Тип | Где пример | Кратко |
 |---|---|---|
 | `defines` | `core/data/common/defines.yaml` | Числовые константы экономики, армии, демографии, ИИ. |
+| `checks` | любой файл | Именованные проверки для эффекта `check`: `{ base, add, skill, partial_band, min, max }` (см. «Проверка»). |
 | `skills` | `core/data/common/skills.yaml` | Навыки. Новый навык автоматически становится значением в скриптах. `mean`/`spread` — среднее и разброс при рождении (по умолчанию 6 и 5; историческим персонажам без указанного навыка — на 1 выше), `inherit_spread` — разброс вокруг среднего родителей, `hide_if_zero` — не показывать нулевой навык (редкий дар вроде чародейства). `per_point` / `ruler_per_point` — что даёт каждое очко (всем / только правителям), `mastery` — тень мастерства (см. «Навыки: очки, тени и связки»). |
 | `traits` | `core/data/common/traits.yaml` | Черты: `category`, `icon`, `modifiers`, `opposites`, `compatibility`, `genetic`/`birth_chance`/`inherit_chance`, `education`, `ai`, `monthly_death_chance`, `monthly_cure_chance`, `duration_days`, `group`, `color` (цвет плашки), `concealed` (скрытая черта — см. «Крюки и секреты»), `portrait` (как черта меняет портрет — см. ниже). |
 | `cultures` | `core/data/common/cultures.yaml` | `color`, `male_names`, `female_names`, `dynasty_pattern` (`name`/`place`), `succession_law`, `skin`/`hair`, `modifiers`, `traits` (врождённые черты всех людей этой культуры — например, раса `dwarf`), `government` (правление по умолчанию). |
@@ -352,6 +353,36 @@ effect:
 
 Порядок эффектов сохраняется. Если в одном объекте нужно повторить ключ —
 используйте список (как выше), в YAML ключи объекта уникальны.
+
+### Проверка (эффект `check`)
+
+Действие открыто всем, а исход зависит от того, кто берётся: шанс удачи
+складывается из основы и факторов, исход — удача, частичный успех или
+провал. Подсказка до решения показывает шанс, разбор и каждый исход; игрок
+получает сообщение об исходе.
+
+```yaml
+effect:
+  check:
+    name: decision.search_archives   # как назвать проверку в сообщении
+    skill: learning                  # главный навык (удачи и неудачи — механика momentum)
+    base: 10                         # основа, %
+    add:                             # факторы — как в ai_accept: { desc, limit, value }
+      - { desc: skill.learning, value: { value: learning, multiply: 4 } }
+      - { desc: perk.archivist, limit: { has_perk: archivist }, value: 40 }
+    partial_band: 15                 # полоса частичного успеха, % (по умолчанию defines.checks.partial_band)
+    success: { add_claim: scope:claim_target }
+    partial: { discover_secret: yes }   # без блока partial полосы нет — только удача и провал
+    failure: { add_stress: 5 }
+```
+
+Шанс удачи — в пределах `defines.checks.min…max`; каждая полная сотня
+стресса отнимает `defines.checks.stress_penalty`. Одну и ту же проверку можно
+описать один раз в `checks.<id>` (поля `base`, `add`, `skill`, `partial_band`)
+и звать её `check: { id: <id>, success: … }`; значение `check_chance(<id>)` —
+шанс удачи (например, чтобы ИИ реже брался за безнадёжное). Хук `check` —
+`{character, id, skill, chance, result}`. Голоса навыков в событиях
+(`skill: { skill, check }`) остаются простой проверкой одного навыка.
 
 ### Значения (формулы)
 
