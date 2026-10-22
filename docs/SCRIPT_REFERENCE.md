@@ -18,6 +18,7 @@
 | `assembly_supports_war` | character | Сход одобряет наступательную войну (или правление его не требует) | core/governments |
 | `can_be_guardian_of` | character | Может стать опекуном ребёнка: can_be_guardian_of: scope:recipient | core/upbringing |
 | `can_be_regent_of` | character | Может стать регентом: can_be_regent_of: scope:actor | core/upbringing |
+| `can_go_on_mission` | character | Может уйти с поручением от scope:actor (или scope:patron): can_go_on_mission: <поручение> | core/missions |
 | `can_manage_upbringing` | character | Распоряжается воспитанием ребёнка: can_manage_upbringing: scope:recipient | core/upbringing |
 | `can_marry` | character | Может вступить в брак с персонажем | core |
 | `can_use_hook_on` | character | Крюк на персонажа можно использовать сейчас | core |
@@ -125,6 +126,7 @@
 | `is_male` | character | Мужчина | core |
 | `is_married` | character | В браке | core |
 | `is_occupied` | province | Оккупирована | core |
+| `is_on_mission_of` | character | В отъезде с поручением этого покровителя: is_on_mission_of: scope:actor | core/missions |
 | `is_parent_of` | character | Родитель персонажа | core |
 | `is_player` | character | Персонаж игрока | core |
 | `is_powerful_vassal` | character | Один из влиятельных вассалов своего сюзерена | core/politics |
@@ -145,6 +147,7 @@
 | `knows_secret_of` | character | Знает какой-то секрет персонажа | core/secrets |
 | `near_dragon_lair` | character | Логово дракона в державе персонажа или по соседству | arcana |
 | `of_synod_target_faith` | character | Персонаж исповедует культ — цель вопроса Собора (анафема, примирение) | core/synod |
+| `on_mission` | character | В отъезде с поручением: on_mission: yes \| <поручение> \| [список] | core/missions |
 | `province_has_disease` | province | В провинции эпидемия. Аргумент: yes или id болезни. | plague |
 | `province_restless` | province | В провинции бродят мертвецы | arcana |
 | `random_chance` | любой | Случайный шанс в процентах (используйте осторожно в триггерах) | core |
@@ -238,6 +241,7 @@
 | `disinherit` | Лишить наследства (yes) или восстановить в правах (no) | core/dynasties |
 | `divorce` | Развод | core |
 | `duel` | Поединок с персонажем: duel: scope:x (за правителей могут биться поборники) | core/duels |
+| `end_mission` | Прервать поручение (агент возвращается без исхода): end_mission: recalled | core/missions |
 | `end_tribute` | Перестать платить дань: end_tribute: yes | core/tribute |
 | `end_war` | Завершить войну: victory/white_peace/defeat | core |
 | `expose_secret` | Разоблачить самый тяжёлый известный секрет персонажа | core/secrets |
@@ -319,6 +323,7 @@
 | `spend_dynasty_renown` | Потратить известность рода: spend_dynasty_renown: 100 | core/dynasties |
 | `start_ambition` | Завести желание: start_ambition: land (цель — случайная подходящая) | core/ambitions |
 | `start_disease` | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
+| `start_mission` | Отправить с поручением (в скоупе покровителя): start_mission: <поручение> (агент — scope:recipient, цель — scope:target) или { id, agent, target } | core/missions |
 | `start_scheme` | Начать интригу: { type, target } | core |
 | `stress_reaction` | Отклик характера на поступок из события: stress_reaction: <id из defines.personality.event_actions> | core/personality |
 | `synod_declare` | Объявить позицию на созванном Соборе — вассалы склонятся к ней: synod_declare: for \| against \| none | core/synod |
@@ -429,6 +434,7 @@
 | `loot_mult` | character | Характеристика: loot_mult | core |
 | `martial` | character | Навык: martial | core |
 | `military_service_level` | character | Уровень закона группы military_service (−1, если не действует) | core/laws |
+| `mission_months_left` | character | Сколько месяцев до возвращения | core/missions |
 | `monsters_slain` | character | Сколько чудовищ уничтожил персонаж (слава охотника) | arcana |
 | `monthly_piety` | character | Характеристика: monthly_piety | core |
 | `monthly_prestige` | character | Характеристика: monthly_prestige | core |
@@ -580,6 +586,7 @@
 | `known_secret_owner` | character | Персонажи, чьи секреты известны этому персонажу | core/secrets |
 | `liege` | character | Сюзерен (список из одного персонажа) | core |
 | `living_character` | любой | Все живые персонажи | core |
+| `mission_agent` | character | Люди персонажа, ушедшие с его поручениями | core/missions |
 | `neighbor` | province | Соседние провинции | core |
 | `neighboring_county` | character | Чужие графства, граничащие с державой | core/council |
 | `neighboring_ruler` | character | Независимые правители по соседству | core |
@@ -646,6 +653,7 @@
 | `synod` | Собор: голосование единоверцев по вопросам веры, указы | да |
 | `districts` | Районы графства: кварталы с уровнями, сила района масштабирует постройки | да |
 | `tribute` | Дань: доля податей данника — победителю войны за дань | да |
+| `missions` | Поручения: люди правителя уходят в мир с делом | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -653,11 +661,11 @@
 
 - **succession_algorithms**: `primogeniture`, `partition`, `seniority`, `elected_member`, `best_master`, `republic_election`, `elective`
 - **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `heretic_realm`, `faction`, `artifact_holder`, `tribute`, `monster_hunt`
-- **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`, `own_artifacts`, `claimed_artifacts`
+- **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`, `own_artifacts`, `claimed_artifacts`, `mission:embassy`, `mission:foreign_service`, `mission:glory_wandering`, `mission:pilgrimage`, `mission:preaching`
 - **interaction_deciders**: `payer`
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `synod_decrees`, `districts`, `grafts`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`, `districts`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council_pay`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `faith_morals`, `faith_head`, `tribute`, `arcana_faith`, `grafts`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `spirit`, `karma`, `synod`, `districts`
-- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `tribute` (56), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `spirit`, `karma`, `synod`, `districts`, `missions`
+- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `council` (15), `ambitions` (16), `missions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `tribute` (56), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

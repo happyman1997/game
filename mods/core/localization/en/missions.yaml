@@ -1,0 +1,98 @@
+# Missions (missions.yaml) and journey events (events/missions.yaml)
+mission:
+  embassy: Embassy
+  foreign_service: Service at a Foreign Court
+  glory_wandering: Wandering for Glory
+  pilgrimage: Pilgrimage
+  preaching: Preaching
+  recall: Recall from the Mission
+mission_desc:
+  embassy: "Send an envoy to a ruler's court. An eloquent envoy of a renowned lord wins goodwill; a clumsy one gives offence. At a foreign court the envoy may be offered gold for your secrets — or learn someone else's."
+  foreign_service: "Two years of service at a renowned ruler's court: the young one learns what the host excels at and returns a friend of a foreign house. They may fall in love there — or into a quarrel."
+  glory_wandering: "A year and a half on the roads: duels at foreign lists, bandits, beasts in the woods. The brave return with a name and a good blade — or wounded, or not at all."
+  pilgrimage: "Pray at the shrines for you and your house: piety for you and the pilgrim, perhaps relics for the court. The road is long — one may fall ill."
+  preaching: "A learned coreligionist goes to preach in a county of another faith. Success — the county converts; failure — the preacher is driven out, or killed."
+  recall: "Bring the person home now: the mission ends without an outcome."
+check:
+  patron_prestige: Patron's renown
+  host_opinion: Host's opinion of the patron
+  other_faith: Different faith
+  patron_piety: Patron's piety
+  won_dispute: Won the dispute
+  lost_dispute: Lost the dispute
+ai:
+  adventurous: Longs to see the world
+  homebody: Homebody
+opinion_modifier:
+  embassy_goodwill: Goodwill of an embassy
+  embassy_courtesy: Courteous embassy
+  embassy_insult: Failed embassy
+  served_at_court: Served at my court
+  served_poorly: Served poorly
+  let_go_wandering: Let me seek glory
+  forbade_wandering: Kept me at home
+  preached_to: Heard the preacher
+msg:
+  ran_off_wandering: "[scope:agent.name] disobeyed and left to seek glory without your blessing."
+ev:
+  mission.0001:
+    t: Gold of a Foreign Court
+    desc: "Your envoy [scope:agent.name] writes: at the court of [scope:target.name] he was secretly offered a purse of gold — for your secrets."
+    a: Let him take the gold and feed them lies
+    b: Let him refuse — honour is worth more than silver
+    c: Recall the envoy before it is too late
+  mission.0002:
+    t: A Secret of a Foreign Court
+    desc: "[scope:agent.name] overheard at the court of [scope:target.name] what is spoken there only in whispers."
+    a: Write it down and bring it home
+    b: Do not stain the embassy with others' secrets
+  mission.0003:
+    t: A Quarrel at a Foreign Court
+    desc: "[scope:agent.name] quarrelled at the court of [scope:target.name] with [scope:rival.name], who threw down the gauntlet."
+    a: Let him answer with a duel
+    b: Let him endure it — service comes first
+  mission.0004:
+    t: Love Abroad
+    desc: "[scope:agent.name] writes that their heart belongs to [scope:beloved.name] at the court of [scope:target.name], and asks your blessing."
+    a: Bless the marriage
+    b: Forbid it — that is not why they were sent
+  mission.0005:
+    t: A Teacher at a Foreign Court
+    desc: "A learned man at the foreign court is ready to teach [scope:agent.name] — for fifty gold."
+    a: Pay for the learning
+    b: Not worth it
+  mission.0006:
+    t: A Knight at the Bridge
+    desc: "A strange knight stands on the bridge and will not let [scope:agent.name] pass without a duel."
+    a: Accept the challenge
+    b: Pay the toll
+  mission.0007:
+    t: Bandits on the Road
+    desc: "On a forest road [scope:agent.name] and the companions were set upon by bandits."
+    a: Fight
+    b: Flee — no shame, just sense
+  mission.0008:
+    t: A Beast in the Woods
+    desc: "Peasants beg [scope:agent.name] to rid them of a beast that kills their cattle and their people."
+    a: Track the beast
+    b: Pass by
+  mission.0009:
+    t: A Holy Hermit
+    desc: "On the road [scope:agent.name] met a hermit whose holiness is spoken of across the land. The old man blessed the pilgrim — and you from afar."
+    a: So be it
+  mission.0010:
+    t: Relics for Sale
+    desc: "At the holy gates [scope:agent.name] is offered relics — for a hundred gold. Shrine or fake — their learning will tell."
+    a: Buy
+    b: Refuse
+  mission.0011:
+    t: A Dispute with the Local Priest
+    desc: "The local priest has challenged [scope:agent.name] to a dispute before the whole county."
+    a: Accept the dispute
+    b: Avoid it — the preaching will go more quietly
+  mission.0020:
+    t: A Son Asks to See the World
+    desc: "[scope:agent.name] asks you to let him go: the court is cramped, and glory lies beyond the river."
+    a: Go and seek glory
+    b: Serve first at the court of [scope:court.name]
+    c: Your place is here

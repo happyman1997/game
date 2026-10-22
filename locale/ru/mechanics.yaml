@@ -1,5 +1,12 @@
 # Механики «Характер», «Слава и благочестие», «Вера и культура земель».
 msg:
+  mission_started: "{agent} отправляется: {mission}{target}. Вернётся месяцев через {months}."
+  mission_success: "{agent} вернулся(лась): {mission} — удача!"
+  mission_partial: "{agent} вернулся(лась): {mission} — удалось лишь отчасти."
+  mission_failure: "{agent} вернулся(лась): {mission} — неудача."
+  mission_dead: "{agent} погиб(ла) в пути: {mission}."
+  mission_recalled: "{agent} отозван(а) с поручения: {mission}."
+  mission_captured: "{agent} схвачен(а), поручение сорвано: {mission}."
   roll_success: "{what}: удача (шанс был {chance}%)."
   roll_partial: "{what}: удалось лишь отчасти (шанс удачи был {chance}%)."
   roll_failure: "{what}: провал (шанс удачи был {chance}%)."
@@ -16,6 +23,10 @@ msg:
   converted_faith: "{place} принимает веру: {value}."
   converted_culture: "{place} перенимает культуру: {value}."
 ui:
+  mission_chip: "В отъезде: {mission}"
+  mission_where: "Куда: {target}"
+  mission_left: "Вернётся через {months} мес."
+  missions_section: Поручения
   hook_income: Плата за молчание (крюки)
   spouse_must_like: Супруг должен относиться к вам хотя бы ровно
   stress_recent: "Недавно:"
@@ -74,12 +85,18 @@ ai:
   wounded: Ранен
   faction_leader: Глава фракции
 tr:
+  can_go_on_mission: "Может отправиться: {name}"
+  on_mission: "В отъезде с поручением"
+  on_mission.not: "Не в отъезде"
+  is_on_mission_of: "В отъезде с поручением {who}"
   has_mastery: "Тень мастерства: {value}"
   has_holder_faith: Графство одной веры с владельцем
   not_holder_faith: Графство чужой веры
   has_holder_culture: Графство одной культуры с владельцем
   not_holder_culture: Графство чужой культуры
 fx:
+  start_mission: "Отправится: {name}"
+  end_mission: "{who} возвращается, не закончив поручения"
   check_odds: "Проверка: удача — {chance}%"
   check_odds_partial: "Проверка: удача — {chance}%, отчасти — {partial}%"
   check_success: "При удаче:"

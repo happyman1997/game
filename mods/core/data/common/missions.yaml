@@ -1,0 +1,236 @@
+# Поручения (механика missions, engine/features/missions.gd): человек из
+# круга правителя — сын, дочь, придворный — уходит в мир с делом. Пока он в
+# пути, с ним случается всякое (события приходят покровителю), а по
+# возвращении исход решает проверка его навыков: удача, «отчасти» или
+# провал. Взаимодействие «Отправить…» (mission_<id>) движок создаёт сам — оно
+# в окне того, кого отправляют, в разделе «Поручения».
+# Скоупы: agent — root агента, scope:patron; target_trigger — root цели;
+# events — root покровителя, scope:agent, scope:target; check и исходы —
+# root агента; ai_will_do — root покровителя, scope:recipient — агент.
+
+defines:
+  missions:
+    min_age: 15               # с какого возраста можно отправить
+    event_chance: 12          # шанс события в пути в месяц, %
+    ai_frequency_months: 12   # как часто ИИ думает о каждом поручении
+    max_targets: 12           # сколько целей предлагать (самые крупные и славные)
+
+ui_categories:
+  interactions:
+    missions: { order: 4.5, icon: map }
+
+opinion_modifiers:
+  embassy_goodwill: { value: 25, years: 10 }
+  embassy_courtesy: { value: 10, years: 5 }
+  embassy_insult: { value: -15, years: 5 }
+  served_at_court: { value: 25, years: 20 }
+  served_poorly: { value: -10, years: 5 }
+  let_go_wandering: { value: 15, years: 5 }
+  forbade_wandering: { value: -20, years: 5 }
+  # мнение графств (add_county_opinion)
+  preached_to: { value: 8, years: 5 }
+
+missions:
+  # Посольство ко двору правителя: добрая воля — если посол речист, а
+  # покровитель славен; при дворе посла могут подкупить или открыть ему тайну
+  embassy:
+    icon: "📜"
+    agent: { is_adult: yes }
+    target: ruler
+    target_trigger:
+      is_independent: yes
+      NOT: { is_at_war_with: scope:patron }
+    months: 8
+    cost: { gold: 25 }
+    events: { mission.0001: 10, mission.0002: 10 }
+    check:
+      skill: diplomacy
+      base: 15
+      add:
+        - { desc: skill.diplomacy, value: { value: diplomacy, multiply: 3 } }
+        - { desc: check.patron_prestige, value: { value: "scope:patron.prestige_level", multiply: 5 } }
+        - { desc: check.host_opinion, value: { value: "scope:target.opinion(scope:patron)", multiply: 0.4 } }
+        - { desc: check.other_faith, limit: { NOT: { scope:target: { same_faith_as: scope:patron } } }, value: -15 }
+    success:
+      - scope:target: { add_opinion: { target: scope:patron, modifier: embassy_goodwill } }
+      - scope:patron: { add_prestige: 30 }
+      - add_prestige: 20
+    partial:
+      - scope:target: { add_opinion: { target: scope:patron, modifier: embassy_courtesy } }
+    failure:
+      - scope:target: { add_opinion: { target: scope:patron, modifier: embassy_insult } }
+      - add_stress: 10
+    ai_will_do:
+      value: 8
+      if:
+        - limit: { gold: ">= 100" }
+          add: 8
+        - limit: { scope:recipient: { diplomacy: ">= 10" } }
+          add: 8
+
+  # Служба при чужом дворе: молодой человек два года служит славному
+  # правителю и учится у него тому, в чём тот силён; возвращается другом
+  # чужого дома — или с позором
+  foreign_service:
+    icon: "🏰"
+    agent: { age: "<= 30" }
+    target: ruler
+    target_trigger:
+      tier: ">= duchy"
+      same_faith_as: scope:patron
+      NOT: { is_at_war_with: scope:patron }
+    months: 24
+    event_chance: 8
+    accept:
+      value: 15
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.3 } }
+        - { desc: ai.adventurous, limit: { has_trait: [brave, ambitious, gregarious] }, value: 15 }
+        - { desc: ai.homebody, limit: { has_trait: [shy, content, craven] }, value: -25 }
+    events: { mission.0003: 10, mission.0004: 8, mission.0005: 8 }
+    check:
+      skill: diplomacy
+      base: 40
+      add:
+        - { desc: skill.diplomacy, value: { value: diplomacy, multiply: 2 } }
+        - { desc: skill.learning, value: { value: learning } }
+        - { desc: check.host_opinion, value: { value: "scope:target.opinion(scope:patron)", multiply: 0.3 } }
+    success:
+      # учится тому, в чём силён хозяин
+      - random_list:
+          - { weight: { value: "scope:target.diplomacy", min: 1 }, add_skill: { skill: diplomacy, value: 2 } }
+          - { weight: { value: "scope:target.martial", min: 1 }, add_skill: { skill: martial, value: 2 } }
+          - { weight: { value: "scope:target.stewardship", min: 1 }, add_skill: { skill: stewardship, value: 2 } }
+          - { weight: { value: "scope:target.intrigue", min: 1 }, add_skill: { skill: intrigue, value: 2 } }
+          - { weight: { value: "scope:target.learning", min: 1 }, add_skill: { skill: learning, value: 2 } }
+      - scope:target: { add_opinion: { target: root, modifier: served_at_court } }
+      - add_prestige: 25
+    partial:
+      - random_list:
+          - { weight: { value: "scope:target.diplomacy", min: 1 }, add_skill: { skill: diplomacy, value: 1 } }
+          - { weight: { value: "scope:target.martial", min: 1 }, add_skill: { skill: martial, value: 1 } }
+          - { weight: { value: "scope:target.stewardship", min: 1 }, add_skill: { skill: stewardship, value: 1 } }
+          - { weight: { value: "scope:target.intrigue", min: 1 }, add_skill: { skill: intrigue, value: 1 } }
+          - { weight: { value: "scope:target.learning", min: 1 }, add_skill: { skill: learning, value: 1 } }
+    failure:
+      - scope:target: { add_opinion: { target: root, modifier: served_poorly } }
+      - add_stress: 15
+    ai_will_do:
+      value: 6
+      if:
+        - limit: { scope:recipient: { age: "<= 22", is_child_of: root } }
+          add: 20
+
+  # Странствие за славой: поединки на чужих ристалищах, разбойники на
+  # дорогах, звери в чащах; храбрый вернётся с именем и добрым клинком — или
+  # не вернётся
+  glory_wandering:
+    icon: "🗡"
+    agent: { is_adult: yes, prowess: ">= 8" }
+    months: 18
+    event_chance: 25
+    accept:
+      value: 0
+      add:
+        - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.2 } }
+        - { desc: ai.brave, limit: { has_trait: brave }, value: 30 }
+        - { desc: ai.ambitious, limit: { has_trait: [ambitious, arrogant] }, value: 20 }
+        - { desc: ai.craven, limit: { has_trait: craven }, value: -50 }
+    events: { mission.0006: 10, mission.0007: 10, mission.0008: 6 }
+    check:
+      skill: prowess
+      base: 10
+      add:
+        - { desc: skill.prowess, value: { value: prowess, multiply: 3 } }
+        - { desc: skill.martial, value: { value: martial } }
+        - { desc: trait.brave, limit: { has_trait: brave }, value: 10 }
+        - { desc: trait.craven, limit: { has_trait: craven }, value: -20 }
+    success:
+      - add_prestige: 150
+      - create_artifact: { type: [sword, axe, spear, mace], rarity: [masterwork, masterwork, famed], how: found }
+      - scope:patron: { add_prestige: 50, add_dynasty_prestige: 25 }
+    partial:
+      - add_prestige: 50
+      - add_trait: wounded
+    failure:
+      - random_list:
+          - { weight: 70, add_trait: wounded, add_prestige: -20 }
+          - { weight: 30, death: { reason: journey } }
+    ai_will_do:
+      value: 3
+      if:
+        - limit: { scope:recipient: { has_trait: [brave, ambitious], prowess: ">= 12" } }
+          add: 15
+
+  # Паломничество за покровителя: молиться у святынь за его душу и дом; может
+  # вернуться с мощами
+  pilgrimage:
+    icon: "⛪"
+    agent: { is_adult: yes, same_faith_as: scope:patron }
+    months: 10
+    events: { mission.0009: 10, mission.0010: 8 }
+    check:
+      skill: learning
+      base: 35
+      add:
+        - { desc: skill.learning, value: { value: learning, multiply: 2 } }
+        - { desc: trait.zealous, limit: { has_trait: zealous }, value: 15 }
+        - { desc: trait.cynical, limit: { has_trait: cynical }, value: -15 }
+    success:
+      - scope:patron: { add_piety: 120 }
+      - add_piety: 60
+      - add_stress: -30
+      - random:
+          chance: 30
+          scope:patron: { create_artifact: { type: reliquary, rarity: [masterwork, famed], how: found } }
+    partial:
+      - scope:patron: { add_piety: 50 }
+      - add_piety: 30
+    # дорога долгая: можно и заболеть
+    failure:
+      random_list:
+        - { weight: 40, add_trait: ill }
+        - { weight: 60, add_stress: 15 }
+    ai_will_do:
+      value: 4
+      if:
+        - limit: { has_trait: [zealous, humble] }
+          add: 8
+        - limit: { scope:recipient: { has_trait: zealous } }
+          add: 6
+
+  # Проповедь в графстве чужой веры своей державы: учёный проповедник
+  # обращает народ — или гибнет мучеником
+  preaching:
+    icon: "✝"
+    agent: { is_adult: yes, same_faith_as: scope:patron, learning: ">= 8" }
+    target: county
+    target_trigger: { has_holder_faith: no }
+    months: 12
+    events: { mission.0011: 10 }
+    check:
+      skill: learning
+      base: 10
+      add:
+        - { desc: skill.learning, value: { value: learning, multiply: 4 } }
+        - { desc: check.patron_piety, value: { value: "scope:patron.piety_level", multiply: 5 } }
+        - { desc: trait.zealous, limit: { has_trait: zealous }, value: 15 }
+        - { desc: check.won_dispute, limit: { has_flag: preach_bonus }, value: 15 }
+        - { desc: check.lost_dispute, limit: { has_flag: preach_setback }, value: -15 }
+    success:
+      - scope:target: { convert_to_holder_faith: yes }
+      - add_piety: 50
+      - scope:patron: { add_piety: 50 }
+    partial:
+      - scope:target: { add_county_opinion: preached_to }
+    failure:
+      - random_list:
+          - { weight: 75, add_stress: 15 }
+          - { weight: 25, death: { reason: martyrdom } }
+    ai_will_do:
+      value: 6
+      if:
+        - limit: { has_trait: zealous }
+          add: 10
+        - limit: { scope:recipient: { learning: ">= 12" } }
+          add: 8

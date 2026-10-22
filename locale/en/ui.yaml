@@ -139,6 +139,8 @@ ui:
     execution: executed
     ash_spawn: became a spawn of ash
     burned: burned at the stake of the Light
+    journey: on the road, on a mission
+    martyrdom: as a martyr
     duel: in a duel
   courtier_of: "Courtier of {who}"
   wanderer: Wanderer

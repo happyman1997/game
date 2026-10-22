@@ -24,7 +24,8 @@ static func cap(game: Game, c: Dictionary) -> int:
 
 
 static func is_candidate(game: Game, liege: Dictionary, c: Dictionary) -> bool:
-	if not Chars.is_alive(c) or c.get("prison") != null or c.id == liege.id:
+	# в отъезде с поручением — не в строю
+	if not Chars.is_alive(c) or c.get("prison") != null or c.id == liege.id or c.vars.has("mission"):
 		return false
 	if game.content.has("scripted_triggers", "knight_candidate"):
 		var ctx := ScriptContext.make(game, {"type": "character", "id": c.id}, {"liege": {"type": "character", "id": liege.id}})

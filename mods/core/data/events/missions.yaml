@@ -1,0 +1,329 @@
+# События поручений (missions.yaml). События в пути приходят покровителю:
+# root — он, scope:agent — его человек, scope:target — куда отправлен.
+# Исход вариантов, где решает умение агента, — проверка (эффект check в его
+# скоупе). Сын, который просится в мир, — из ежемесячного пульса.
+
+on_actions:
+  on_monthly_pulse:
+    random_events:
+      events:
+        mission.0020: 5
+
+events:
+  # ------------------------------------------------------------ посольство
+  # Чужой двор предлагает послу золото за ваши тайны
+  mission.0001:
+    theme: diplomacy
+    icon: "🪙"
+    cooldown: { years: 2 }
+    trigger: { exists: scope:agent }
+    options:
+      # пусть возьмёт золото и кормит их ложью
+      - effect:
+          scope:agent:
+            check:
+              skill: intrigue
+              base: 25
+              add:
+                - { desc: skill.intrigue, value: { value: intrigue, multiply: 4 } }
+                - { desc: trait.deceitful, limit: { has_trait: deceitful }, value: 15 }
+                - { desc: trait.honest, limit: { has_trait: honest }, value: -25 }
+              success:
+                scope:patron: { add_gold: 60 }
+              failure:
+                - scope:target: { add_opinion: { target: scope:patron, modifier: embassy_insult } }
+                - end_mission: captured
+        ai_chance: { value: 10, add: { value: ai_greed, multiply: 5 } }
+      # отказать — честь посла дороже серебра
+      - effect:
+          - add_prestige: 10
+          - scope:agent: { add_prestige: 10 }
+        ai_chance: 30
+      # отозвать посла, пока не поздно
+      - effect:
+          scope:agent: { end_mission: recalled }
+        ai_chance: 5
+
+  # Посол прослышал о тайне чужого двора
+  mission.0002:
+    theme: intrigue
+    icon: "🗝"
+    cooldown: { years: 2 }
+    trigger:
+      exists: scope:target
+      scope:target: { num_secrets: ">= 1" }
+    options:
+      # записать и привезти домой
+      - effect:
+          - learn_secret: { owner: scope:target }
+          - add_karma: { value: -2, deed: blackmail }
+        ai_chance: { value: 20, add: { value: ai_honor, multiply: -5 } }
+      # не марать посольство чужими тайнами
+      - effect: { add_karma: 2 }
+        ai_chance: 15
+
+  # ------------------------------------------------------------ служба при чужом дворе
+  # Ссора с придворным хозяина
+  mission.0003:
+    theme: court
+    icon: "⚔"
+    cooldown: { years: 2 }
+    trigger:
+      exists: scope:target
+      scope:target: { any_courtier: { is_adult: yes, is_male: yes, NOT: { is_same_as: scope:agent } } }
+    immediate:
+      scope:target:
+        random_courtier:
+          limit: { is_adult: yes, is_male: yes, NOT: { is_same_as: scope:agent } }
+          save_scope_as: rival
+    options:
+      # пусть ответит поединком
+      - effect:
+          scope:agent: { duel: scope:rival }
+        ai_chance: { value: 10, add: { value: ai_boldness, multiply: 8 } }
+      # пусть стерпит — служба важнее
+      - effect:
+          scope:agent:
+            add_stress: 10
+            add_prestige: -10
+        ai_chance: 20
+
+  # Любовь на чужбине
+  mission.0004:
+    theme: family
+    icon: "💞"
+    cooldown: { years: 3 }
+    trigger:
+      exists: scope:target
+      scope:agent: { is_married: no }
+      scope:target:
+        any_courtier: { is_adult: yes, is_married: no, can_marry: scope:agent }
+    immediate:
+      scope:target:
+        random_courtier:
+          limit: { is_adult: yes, is_married: no, can_marry: scope:agent }
+          save_scope_as: beloved
+    options:
+      # благословить брак — чужой дом станет роднёй
+      - effect:
+          - scope:agent: { marry: scope:beloved }
+          - scope:target: { add_opinion: { target: root, modifier: served_at_court } }
+        ai_chance: 30
+      # запретить — не для того отправляли
+      - effect:
+          scope:agent:
+            add_opinion: { target: root, modifier: forbade_wandering }
+            add_stress: 15
+        ai_chance: 20
+
+  # Учитель при чужом дворе просит платы за науку
+  mission.0005:
+    theme: learning
+    icon: "📚"
+    cooldown: { years: 2 }
+    trigger: { gold: ">= 50" }
+    options:
+      - effect:
+          - add_gold: -50
+          - scope:agent:
+              random_list:
+                - { weight: 1, add_skill: { skill: learning, value: 1 } }
+                - { weight: 1, add_skill: { skill: diplomacy, value: 1 } }
+                - { weight: 1, add_skill: { skill: stewardship, value: 1 } }
+        ai_chance: { value: 20, add: { value: ai_greed, multiply: -5 } }
+      - effect: { add_prestige: -5 }
+        ai_chance: 20
+
+  # ------------------------------------------------------------ странствие за славой
+  # Чужой рыцарь не пускает через мост без поединка
+  mission.0006:
+    theme: war
+    icon: "🌉"
+    cooldown: { years: 1 }
+    trigger: { exists: scope:agent }
+    options:
+      - effect:
+          scope:agent:
+            check:
+              skill: prowess
+              base: 20
+              add:
+                - { desc: skill.prowess, value: { value: prowess, multiply: 3 } }
+                - { desc: trait.brave, limit: { has_trait: brave }, value: 10 }
+              success: { add_prestige: 40 }
+              failure:
+                random_list:
+                  - { weight: 85, add_trait: wounded }
+                  - { weight: 15, death: { reason: duel } }
+        ai_chance: { value: 20, add: { value: ai_boldness, multiply: 5 } }
+      # заплатить за проезд
+      - effect:
+          - add_gold: -20
+          - scope:agent: { add_prestige: -15 }
+        ai_chance: 15
+
+  # Разбойники на дороге
+  mission.0007:
+    theme: war
+    icon: "🗡"
+    cooldown: { years: 1 }
+    trigger: { exists: scope:agent }
+    options:
+      - effect:
+          scope:agent:
+            check:
+              skill: prowess
+              base: 25
+              add:
+                - { desc: skill.prowess, value: { value: prowess, multiply: 2 } }
+                - { desc: skill.martial, value: { value: martial, multiply: 2 } }
+              success:
+                - add_prestige: 30
+                - scope:patron: { add_gold: 40 }
+              failure: { add_trait: wounded }
+        ai_chance: 25
+      # бежать — не позор, а здравый смысл
+      - effect:
+          scope:agent: { add_prestige: -10 }
+        ai_chance: { value: 10, add: { value: ai_boldness, multiply: -5 } }
+
+  # Зверь в чаще разоряет деревню
+  mission.0008:
+    theme: war
+    icon: "🐺"
+    cooldown: { years: 1 }
+    trigger: { exists: scope:agent }
+    options:
+      - effect:
+          scope:agent:
+            check:
+              skill: prowess
+              base: 15
+              add:
+                - { desc: skill.prowess, value: { value: prowess, multiply: 3 } }
+              success:
+                - add_prestige: 60
+                - create_artifact: { type: trophy_shield, rarity: [common, masterwork], how: trophy }
+              failure:
+                random_list:
+                  - { weight: 80, add_trait: wounded }
+                  - { weight: 20, death: { reason: hunting } }
+        ai_chance: { value: 15, add: { value: ai_boldness, multiply: 5 } }
+      - effect:
+          scope:agent: { add_stress: 5 }
+        ai_chance: 15
+
+  # ------------------------------------------------------------ паломничество
+  # Святой отшельник благословляет паломника
+  mission.0009:
+    theme: faith
+    icon: "🕯"
+    cooldown: { years: 2 }
+    trigger: { exists: scope:agent }
+    options:
+      - effect:
+          - scope:agent:
+              add_piety: 30
+              add_stress: -20
+          - add_piety: 20
+        ai_chance: 1
+
+  # Мощи на продажу — святыня или подделка?
+  mission.0010:
+    theme: faith
+    icon: "⛪"
+    cooldown: { years: 2 }
+    trigger: { gold: ">= 100" }
+    options:
+      - effect:
+          - add_gold: -100
+          - scope:agent:
+              check:
+                skill: learning
+                base: 20
+                add:
+                  - { desc: skill.learning, value: { value: learning, multiply: 4 } }
+                success:
+                  scope:patron: { create_artifact: { type: reliquary, rarity: [masterwork, famed], how: bought } }
+                failure: { add_stress: 10 }
+        ai_chance: { value: 10, add: { value: ai_righteousness, multiply: 5 } }
+      - effect: { add_prestige: -5 }
+        ai_chance: 20
+
+  # ------------------------------------------------------------ проповедь
+  # Местный жрец вызывает проповедника на спор
+  mission.0011:
+    theme: faith
+    icon: "📖"
+    cooldown: { years: 1 }
+    trigger: { exists: scope:agent }
+    options:
+      - effect:
+          scope:agent:
+            check:
+              skill: learning
+              base: 20
+              add:
+                - { desc: skill.learning, value: { value: learning, multiply: 3 } }
+              success:
+                - add_piety: 20
+                - set_flag: { name: preach_bonus, years: 2 }
+              failure:
+                - add_stress: 10
+                - set_flag: { name: preach_setback, years: 2 }
+        ai_chance: 25
+      # уклониться от спора — проповедь пойдёт тише
+      - effect:
+          scope:agent: { add_prestige: -10 }
+        ai_chance: 10
+
+  # ------------------------------------------------------------ сын просится в мир
+  mission.0020:
+    theme: family
+    icon: "🗡"
+    trigger:
+      is_ruler: yes
+      any_child:
+        age: "<= 25"
+        is_adult: yes
+        is_ruler: no
+        is_courtier_of: root
+        on_mission: no
+        is_imprisoned: no
+        prowess: ">= 8"
+        has_trait: [brave, ambitious, arrogant, wrathful]
+    cooldown: { years: 4 }
+    immediate:
+      - random_child:
+          limit:
+            age: "<= 25"
+            is_adult: yes
+            is_ruler: no
+            is_courtier_of: root
+            on_mission: no
+            is_imprisoned: no
+            prowess: ">= 8"
+            has_trait: [brave, ambitious, arrogant, wrathful]
+          save_scope_as: agent
+      - random_neighboring_ruler:
+          limit: { tier: ">= duchy", same_faith_as: root, NOT: { is_at_war_with: root } }
+          save_scope_as: court
+    options:
+      # отпустить за славой
+      - effect:
+          - start_mission: { id: glory_wandering, agent: scope:agent }
+          - scope:agent: { add_opinion: { target: root, modifier: let_go_wandering } }
+        ai_chance: 40
+      # пусть послужит при дворе соседа — и славы, и науки
+      - trigger: { exists: scope:court }
+        effect:
+          - start_mission: { id: foreign_service, agent: scope:agent, target: scope:court }
+        ai_chance: 30
+      # твоё место здесь
+      - effect:
+          - scope:agent: { add_opinion: { target: root, modifier: forbade_wandering } }
+          - random:
+              chance: 25
+              start_mission: { id: glory_wandering, agent: scope:agent }
+              send_message: { text: msg.ran_off_wandering, kind: bad }
+        ai_chance: 30

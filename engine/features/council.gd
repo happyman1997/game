@@ -75,7 +75,7 @@ static func position_of(game: Game, c: Dictionary) -> Variant:
 ## Может ли персонаж занять должность в совете сюзерена.
 static func can_hold_seat(game: Game, liege: Dictionary, cand: Dictionary, pos_id: String) -> bool:
 	var pos: Variant = game.content.get_def("council_positions", pos_id)
-	if pos == null or not Chars.is_alive(cand) or cand.id == liege.id or cand.get("prison") != null or not Chars.is_adult(game, cand):
+	if pos == null or not Chars.is_alive(cand) or cand.id == liege.id or cand.get("prison") != null or not Chars.is_adult(game, cand) or cand.vars.has("mission"):
 		return false
 	if not (cand.liege == liege.id or liege.spouses.has(cand.id)):
 		return false

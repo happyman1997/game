@@ -74,7 +74,9 @@ static func run(ctx: ScriptContext, scope: Variant, arg: Variant) -> String:
 	Interp.run_effect(ctx, scope, sp.get(result))
 	var cid: Variant = scope.get("id") if scope is Dictionary else null
 	game.emit("check", {"character": cid, "id": str(sp.get("id", "")), "skill": str(sp.get("skill", "")), "chance": o.success, "result": result})
-	if cid != null and game.is_player(str(cid)):
+	# весть — тому, кто проверялся, или игроку, по чьей воле (событие о его человеке)
+	var rid: Variant = ctx.root.get("id") if ctx.root is Dictionary and ctx.root.get("type") == "character" else null
+	if (cid != null and game.is_player(str(cid))) or (rid != null and game.is_player(str(rid))):
 		var what := game.text(sp.get("name"), ctx) if sp.get("name") != null else game.loc.t("check.generic")
 		game.message(game.loc.t("msg.roll_" + result, {"what": what, "chance": roundi(o.success)}),
 			{"success": "good", "partial": "info", "failure": "bad"}[result], scope)

@@ -1,6 +1,7 @@
 # Names of list categories (ui_categories).
 ui_category:
   interactions:
+    missions: Missions
     diplomacy: Diplomacy
     family: Family & Marriage
     realm: Vassals & Realm

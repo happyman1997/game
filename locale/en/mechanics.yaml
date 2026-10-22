@@ -1,5 +1,12 @@
 # Personality, Renown and Faith & Culture of the Land mechanics.
 msg:
+  mission_started: "{agent} sets out: {mission}{target}. Back in about {months} months."
+  mission_success: "{agent} has returned: {mission} — a success!"
+  mission_partial: "{agent} has returned: {mission} — only a partial success."
+  mission_failure: "{agent} has returned: {mission} — a failure."
+  mission_dead: "{agent} died on the road: {mission}."
+  mission_recalled: "{agent} has been recalled: {mission}."
+  mission_captured: "{agent} was seized, the mission has failed: {mission}."
   roll_success: "{what}: success (the chance was {chance}%)."
   roll_partial: "{what}: only a partial success (the chance of success was {chance}%)."
   roll_failure: "{what}: failure (the chance of success was {chance}%)."
@@ -16,6 +23,10 @@ msg:
   converted_faith: "{place} adopts a new faith: {value}."
   converted_culture: "{place} adopts a new culture: {value}."
 ui:
+  mission_chip: "Away: {mission}"
+  mission_where: "Where: {target}"
+  mission_left: "Back in {months} months"
+  missions_section: Missions
   hook_income: Hush money (hooks)
   spouse_must_like: Your spouse must not dislike you
   stress_recent: "Recently:"
@@ -74,12 +85,18 @@ ai:
   wounded: Wounded
   faction_leader: Faction leader
 tr:
+  can_go_on_mission: "Can set out: {name}"
+  on_mission: "Away on a mission"
+  on_mission.not: "Not away"
+  is_on_mission_of: "Away on a mission for {who}"
   has_mastery: "Shadow of mastery: {value}"
   has_holder_faith: County shares its holder's faith
   not_holder_faith: County of a foreign faith
   has_holder_culture: County shares its holder's culture
   not_holder_culture: County of a foreign culture
 fx:
+  start_mission: "Sets out: {name}"
+  end_mission: "{who} returns without finishing the mission"
   check_odds: "Check: success — {chance}%"
   check_odds_partial: "Check: success — {chance}%, partial — {partial}%"
   check_success: "On success:"

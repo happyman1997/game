@@ -558,6 +558,21 @@ func _outliner_sections(p: Dictionary) -> Array:
 				def.get("icon", "dagger") if def != null else "dagger", func(): app.open_tab("intrigue")))
 			sig += "%s:%d," % [s.id, int(s.progress)]
 		out.append({"id": "schemes", "name": t("ui.tab.intrigue"), "icon": "dagger", "rows": rows, "sig": sig})
+	# поручения: кто из ваших людей в отъезде и когда вернётся
+	if g.engine.has_feature("missions"):
+		var agents: Array = g.living().filter(func(x): return Missions.of(x) != null and str(Missions.of(x).get("patron")) == p.id)
+		if not agents.is_empty():
+			var rows := []
+			var sig := ""
+			for x in agents:
+				var m: Dictionary = Missions.of(x)
+				var xid: String = x.id
+				var left := maxi(0, ceili((float(m.until) - g.date) / 30.4))
+				var md: Variant = g.content.get_def("missions", str(m.id))
+				rows.append(row.call("%s: %s" % [Chars.char_name(g, x), app.t("ui.months_short", {"n": left})],
+					md.get("icon", "map") if md != null else "map", func(): app.open_character(xid), {"tip": func(): return BB.title(g.name_of("missions", str(Missions.of(g.ch(xid)).id) if Missions.of(g.ch(xid)) != null else "")) + "\n" + app.character_tooltip(xid)}))
+				sig += "%s:%s:%d," % [x.id, m.id, left]
+			out.append({"id": "missions", "name": t("ui.missions_section"), "icon": "map", "rows": rows, "sig": sig})
 	# фракции против вас
 	if g.engine.has_feature("factions"):
 		var facs: Array = g.state.factions.values().filter(func(f): return f.get("target") == p.id)

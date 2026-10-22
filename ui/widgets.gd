@@ -293,6 +293,22 @@ static func traits(app: App, c: Dictionary) -> Control:
 			chip.modulate = Color(1, 1, 1, 0.8)
 		K.tip(chip, tipbb)
 		f.add_child(chip)
+	# в отъезде с поручением: куда и когда вернётся
+	var mis: Variant = Missions.of(c) if g.engine.has_feature("missions") else null
+	if mis != null:
+		var md: Variant = g.content.get_def("missions", str(mis.id))
+		var mname := g.name_of("missions", str(mis.id))
+		var chip := K.panel(K.hbox([K.icon(md.get("icon", "map") if md != null else "map", 16), K.label(app.t("ui.mission_chip", {"mission": mname}), "SmallLabel")], 3))
+		chip.add_theme_stylebox_override("panel", UiArt.flat(Color("#2a3346"), Color(UiArt.GOLD, 0.6), 1, 3, 3))
+		var tb := BB.title(mname)
+		if mis.get("target") is Dictionary:
+			tb += "\n" + BB.esc(app.t("ui.mission_where", {"target": g.scope_name(mis.target)}))
+		tb += "\n" + BB.muted(app.t("ui.mission_left", {"months": maxi(0, ceili((float(mis.until) - g.date) / 30.4))}))
+		var mdesc := g.desc_of("missions", str(mis.id))
+		if mdesc != "":
+			tb += "\n" + BB.i(mdesc)
+		K.tip(chip, tb)
+		f.add_child(chip)
 	# состояние духа: безмятежность, порыв, надлом
 	var sp: Variant = Spirit.state_of(c) if g.engine.has_feature("spirit") else null
 	var spd: Variant = g.content.get_def("spirit_states", sp) if sp != null else null

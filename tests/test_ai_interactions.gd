@@ -41,7 +41,7 @@ func test_gift_artifact_to_cold_liege() -> void:
 		Artifacts.create(g, "ring", "common", v)
 	check(not Artifacts.storage(g, v).is_empty(), "у вассала есть лишняя вещь")
 	Opinion.add_opinion(g, h, v, "generic", -60)
-	check(_does(g, v, "gift_artifact", h.id), "вассал дарит вещь прохладному сюзерену")
+	check(_does(g, v, "gift_artifact", h.id, 400), "вассал дарит вещь прохладному сюзерену")
 
 
 func test_dynasty_head_tribute_and_honor() -> void:

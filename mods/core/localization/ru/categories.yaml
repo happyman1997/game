@@ -1,6 +1,7 @@
 # Названия категорий в списках (ui_categories).
 ui_category:
   interactions:
+    missions: Поручения
     diplomacy: Дипломатия
     family: Семья и брак
     realm: Вассалы и держава

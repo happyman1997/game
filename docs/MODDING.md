@@ -1579,6 +1579,44 @@ synod_questions:
 `church_law_level >= 2` смягчает закон), освящение нив (`development_growth`)
 и запрет поединков (`duel_prestige_mult`, вызов — грех).
 
+### Поручения
+
+Механика `missions`: человек из круга правителя (придворный или ребёнок без
+земли, не моложе `defines.missions.min_age`, не в совете и не в темнице)
+уходит в мир с делом. Пока он в пути, с ним случается всякое — события
+приходят покровителю; по возвращении исход решает проверка его навыков
+(эффект `check`): удача, «отчасти» или провал. В отъезде он не служит рыцарем
+и не садится в совет; погиб в пути — весть покровителю; умер покровитель —
+служит его наследнику.
+
+```yaml
+missions:
+  embassy:
+    icon: "📜"
+    agent: { is_adult: yes }                # кто может идти (root — агент, scope:patron)
+    target: ruler                           # ruler | county | без поля — без цели
+    target_trigger: { is_independent: yes } # какие цели годятся (root — цель)
+    months: 8                               # срок (значение)
+    cost: { gold: 25 }
+    accept: { value: 10, add: [...] }       # согласится ли агент (как ai_accept); нет поля — идёт без спроса
+    events: { mission.0001: 10 }            # события в пути (root — покровитель, scope:agent, scope:target)
+    event_chance: 20                        # % в месяц (defines.missions.event_chance)
+    check: { skill: diplomacy, base: 15, add: [...] }   # по возвращении (root — агент)
+    success: { ... }
+    partial: { ... }
+    failure: { ... }
+    ai_will_do: { ... }                     # ИИ-покровитель (scope:recipient — агент, scope:target)
+```
+
+Для каждого поручения движок сам создаёт взаимодействие `mission_<id>`
+(раздел «Поручения» в окне того, кого отправляют; своё с тем же id в данных
+его заменяет) и отзыв `mission_recall`. Скрипт: условия `can_go_on_mission:
+<id>`, `on_mission: yes | <id>`, `is_on_mission_of: scope:x`; значение
+`mission_months_left`; список `mission_agent`; эффекты `start_mission: <id>`
+(или `{ id, agent, target }` — в скоупе покровителя) и `end_mission`. Хуки
+`mission.started`, `mission.ended` (`result`: success, partial, failure,
+dead, recalled, captured).
+
 ### Дань
 
 Механика `tribute` (`engine/features/tribute.gd`, данные —
