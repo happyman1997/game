@@ -61,11 +61,11 @@ events:
             - weight: { value: 30, add: { value: prowess, multiply: 3 } }
               add_trait: tourney_champion
               add_prestige: 100
-              # куртуазный рыцарь (связка ядра): слава турнира — вдвое
-              if: { limit: { has_archetype: courtly_knight }, add_prestige: 100 }
+              # «Поборник» (стезя Рыцаря ядра): слава турнира — вдвое
+              if: { limit: { has_perk: champion }, add_prestige: 100 }
             - weight: 40
               add_prestige: 30
-              if: { limit: { has_archetype: courtly_knight }, add_prestige: 30 }
+              if: { limit: { has_perk: champion }, add_prestige: 30 }
             - weight: 20
               add_trait: wounded
             - weight: 3
@@ -73,7 +73,7 @@ events:
         ai_chance: { value: 20, add: { value: ai_boldness, multiply: 10 } }
       - effect:
           add_prestige: 50
-          if: { limit: { has_archetype: courtly_knight }, add_prestige: 50 }
+          if: { limit: { has_perk: champion }, add_prestige: 50 }
           every_vassal: { add_opinion: { target: root, modifier: feast_guest } }
           random_courtier:
             limit: { is_adult: yes, is_male: yes }

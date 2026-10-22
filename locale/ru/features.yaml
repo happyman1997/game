@@ -14,6 +14,7 @@ ui:
   lifestyle_xp_month: "+{n} опыта в месяц"
   perks_n: "Перков: {n}"
   perk_owned: Открыт
+  perk_second_branch: "Вторая ветка стези: на {pct}% дороже"
   perk_locked: Сначала откройте предыдущий перк
   perk_need_xp: "Нужно опыта: {cost} (есть {xp})"
   perk_unlock: Открыть перк

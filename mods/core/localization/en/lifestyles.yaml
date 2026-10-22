@@ -51,17 +51,40 @@ perk_tree:
   scholarship: Way of the Scholar
   theology: Way of the Lightbearer
 perk_tree_desc:
-  august: "Rules by glory: feasts, royal progresses, neighbours who ask to kneel."
-  family_first: "The house is the pillar: children add renown, legacies cost less, kin bring gifts."
-  strategist: "War of manoeuvre: no losses to attrition, captured knights for ransom, a grand muster."
-  tyranny: "Rules by fear: executions and the dungeon terrify, vassals can be intimidated and fleeced."
-  chivalry: "Personal valour: duels, trophies, a brotherhood of knights and a quest for glory."
-  architect: "Building and splendour: counties cheer new walls, craftsmen seek your commissions."
-  administrator: "Gold as a weapon: taxes, a Lombard loan and bribery."
-  schemer: "Secrets and hooks: ears everywhere, silver for silence, secrets for sale."
+  august: "Rules by glory: feasts and progresses — or the peace he brings, and the defeated who come to kneel."
+  family_first: "The house is the pillar: children add renown, legacies cost less, kin become allies; a mentor raises a worthy heir."
+  strategist: "War of manoeuvre: baggage trains, captured knights, ambushes — or veterans, loot and mercenaries."
+  tyranny: "Rules by fear: executions and victories that make enemies yield — or the dungeon and menace."
+  chivalry: "Personal valour: duels and trophies — or a brotherhood of knights where the king fights in the line."
+  architect: "Building and splendour — or strongholds that break sieges."
+  administrator: "Gold as a weapon: taxes and reform — or loans, generous gifts and bribery."
+  schemer: "Secrets and hooks — or other hands: a courtier to blame and a blade in the night."
   seducer: "Love as a weapon: pillow talk, lovers on a hook, a pact of hearts."
-  scholarship: "Knowledge speeds everything: experience for every deed, callings open earlier."
-  theology: "Piety and relics: pilgrimages, veneration of relics, miracles and holy war."
+  scholarship: "Knowledge speeds everything: experience for every deed, secrets from the archives, siege engines."
+  theology: "Piety and relics — or the sword of faith: victories over infidels and cheap holy war."
+perk_branch:
+  august_a: The Court
+  august_b: The Peacemaker
+  family_first_a: Blood
+  family_first_b: The Mentor
+  strategist_a: Manoeuvre
+  strategist_b: Master of the Host
+  tyranny_a: Blood
+  tyranny_b: The Dungeon
+  chivalry_a: The Duellist
+  chivalry_b: The Brotherhood
+  architect_a: The Lands
+  architect_b: Strongholds
+  administrator_a: Taxes
+  administrator_b: Gold
+  schemer_a: Secrets
+  schemer_b: Other Hands
+  seducer_a: Hearts
+  seducer_b: Alcove Secrets
+  scholarship_a: Nature
+  scholarship_b: The Archives
+  theology_a: Stillness
+  theology_b: The Warrior of Faith
 
 perk:
   regal_bearing: Regal Bearing
@@ -90,7 +113,7 @@ perk:
   royal_architect: Royal Architect
   efficient_rule: Efficient Rule
   tax_collectors: Tax Farmers
-  lombard_loan: Lombard Loan
+  lombard_loan: Moneylender
   great_administrator: Great Treasurer
   subtle_hand: Ears Everywhere
   prying_eyes: Silver for Silence
@@ -108,6 +131,28 @@ perk:
   inner_peace: Inner Peace
   relic_keeper: Keeper of Relics
   doctor_of_theology: Doctor of Theology
+  peacemaker: Peacemaker
+  unifier: Unifier
+  kin_council: Council of Kin
+  worthy_heir: Worthy Heir
+  ambush: Ambushes
+  quartermaster: Master of the Train
+  scourge: Scourge
+  menace: Menace
+  champion: Champion
+  warrior_king: Warrior King
+  fortifier: Builder of Strongholds
+  castellan: Castellan
+  reformer: Reformer
+  golden_hand: Open Hand
+  gray_eminence: Grey Eminence
+  night_blade: Night Blade
+  courtly_love: Courtly Love
+  honey_trap: Honey Trap
+  archivist: Archivist
+  engineer: Engineer
+  holy_warrior: Warrior of the Faith
+  sun_sword: Sword of the Sun
 perk_desc:
   regal_bearing: "Your glory weighs more: prestige levels raise your subjects' opinion half again as much. The sovereign listens to the people: petitioners and petitions are not cowed even under Unease, and hearing petitioners brings prestige."
   court_etiquette: "Feasts cost half as much and add 50 prestige. You enjoy feasts — they relieve stress."
@@ -135,7 +180,7 @@ perk_desc:
   royal_architect: "Unlocks the Great Work: once in a lifetime — a cathedral, a keep or a market in the capital, forever."
   efficient_rule: "You can hold one more county in your domain."
   tax_collectors: "Taxes are higher, and embezzlers on your council are caught more often."
-  lombard_loan: "Unlocks the Lombard Loan: 300 gold at once, repaid at 2.5 a month for twelve years."
+  lombard_loan: "Unlocks the Changers' Loan: 300 gold at once, repaid at 2.5 a month for twelve years."
   great_administrator: "Unlocks Bribe: gold buys favour and pulls a vassal out of a faction. The honest and the just are offended."
   subtle_hand: "Every year you learn someone's secret in your realm."
   prying_eyes: "Every hook brings 0.5 gold a month. You enjoy blackmail."
@@ -147,12 +192,34 @@ perk_desc:
   irresistible: "Unlocks the Pact of Hearts: a ruling lover allies with you, or makes peace if you are at war."
   avid_reader: "Every deed (a victory, a building, a duel…) brings 25 experience in your current lifestyle."
   natural_philosophy: "Development grows faster and lifestyle experience accrues sooner."
-  polymath: "+1 to all skills, and callings open 2 skill points earlier."
+  polymath: "+1 to diplomacy, martial, stewardship and intrigue."
   renowned_scholar: "Unlocks the Magnum Opus: a book of famed rarity (illustrious at learning 20), renown for your house."
   devout_prayer: "Pilgrimage washes away all stress and has a 35% chance to bring a reliquary. You enjoy pilgrimages and almsgiving."
   inner_peace: "Stress grows slower, and piety levels raise coreligionists' opinion half again as much."
   relic_keeper: "A reliquary at court yields 60 piety a year and the veneration of coreligionist vassals. You hate executions."
   doctor_of_theology: "Unlocks the Miracle (healing yourself and your family, rejoicing counties) and the Call to Holy War."
+  peacemaker: "Feuds between your vassals fade faster, and your mediation in other rulers' wars is accepted more readily (+25)."
+  unifier: "Those you defeat bear no grudge (+25 opinion for 10 years) and are readier to become your vassals. Vassals send more troops."
+  kin_council: "Kin are readier to ally with you (+25) and to marry into your line (+20). Your kin think more warmly of you."
+  worthy_heir: "Your heir receives the Ancestor's Legacy: twenty years of prestige, vassals' respect and braver knights."
+  ambush: "Your army is stronger on your own land, and a beaten enemy loses more in the rout."
+  quartermaster: "Twice the loot, mercenaries at half price, and the army is cheaper to maintain."
+  scourge: "Every battle won inspires dread (+3), and enemies surrender sooner. People hate you."
+  menace: "Intimidation works better (+20 acceptance), and dread grows faster."
+  champion: "Victories in duels bring twice the glory."
+  warrior_king: "You fight in the ranks of your knights yourself — and share their risk. Your knights fight better."
+  fortifier: "The fortresses of your domain are one level stronger."
+  castellan: "Your capital holds out against sieges twice as long, and building is cheaper."
+  reformer: "Realm laws cost half as much to change, do not offend vassals, and their discontent does not stand in the way of reform."
+  golden_hand: "Your gifts are twice as effective, and rulers are readier to sign a trade pact with you (+20). Vassals pay a little more."
+  gray_eminence: "An exposed scheme is blamed on one of your courtiers. Discord is sown more successfully — even without a spymaster."
+  night_blade: "Your assassins work twice as fast, and assassins sent against you succeed half as often."
+  courtly_love: "The court is charmed: they sing of your loves rather than whisper."
+  honey_trap: "Schemes succeed more often: the road to secrets runs through the bedchamber."
+  archivist: "Every year the archives give up a neighbour's secret, and claims in old charters are found almost certainly."
+  engineer: "Siege engines and reckoning: enemy walls fall faster, your own building is cheaper."
+  holy_warrior: "A battle won against an infidel or heretic pleases the Sun (+30 piety). You survive battles more often."
+  sun_sword: "Holy war costs half as much, and your knights fight better."
 
 trait:
   diplomat: Diplomat

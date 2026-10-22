@@ -138,7 +138,7 @@ static func stat_value(k: String, v: float) -> String:
 ## Характеристики, у которых меньше — лучше (цены, сроки, потери, рост стресса).
 const LOWER_BETTER := ["stress_gain_mult", "build_time_mult", "faction_discontent_mult", "build_cost_mult",
 	"army_upkeep_mult", "law_cost_mult", "legacy_cost_mult", "attrition_mult", "commission_cost_mult",
-	"dread_decay_mult", "archetype_skill_min"]
+	"dread_decay_mult"]
 
 
 ## Хуже ли персонажу от такого значения характеристики.

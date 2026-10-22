@@ -1,6 +1,6 @@
 # Стези (деревья перков, lifestyles.yaml): правила, которые живут в данных,
 # и действия, которые открывает вершина стези. Файл грузится после
-# decisions/interactions/prison/schemes/skill_paths и дописывает к их
+# decisions/interactions/prison/schemes/statecraft и дописывает к их
 # записям ($append), остальное — свои записи. Правила-характеристики
 # (страх от пленников, цена наследий, обозы…) читает движок — они в
 # modifiers перков.
@@ -17,6 +17,9 @@ modifiers:
   great_cathedral: { icon: "⛪", good: true, modifiers: { development_growth: 0.1, county_opinion: 15 } }
   great_keep: { icon: "🏯", good: true, modifiers: { levy_mult: 0.5, county_opinion: 5 } }
   great_market: { icon: "⚖", good: true, modifiers: { tax_mult: 0.3, development_growth: 0.1 } }
+  golden_age: { icon: "☀", good: true, modifiers: { development_growth: 0.3, stress_gain_mult: -0.3, vassal_opinion: 10, monthly_prestige: 1 } }
+  # Династ «Достойный наследник»: слава предка переходит к наследнику
+  hero_legacy: { icon: "🗝", good: true, modifiers: { monthly_prestige: 1.5, vassal_opinion: 10, knight_effectiveness: 0.1 } }
 
 opinion_modifiers:
   # мнение графств (add_county_opinion)
@@ -37,10 +40,24 @@ opinion_modifiers:
   heart_pact: { value: 20, years: 10 }
   relic_veneration: { value: 5, years: 2 }
   answered_holy_call: { value: 15, years: 5 }
+  respects_unifier: { value: 25, years: 10 }
+  merchant_gift: { value: 20, decay: 1 }
+  # ссоры (feud): у вассалов Миротворца тают быстрее (feud_decay)
+  rival: { feud: yes }
+  insulted: { feud: yes }
+  humiliated: { feud: yes }
+  caught_sowing_discord: { feud: yes }
+  slandered_me: { feud: yes }
+  bested_in_duel: { feud: yes }
 
 # ---------------------------------------------------------------- правила стезей в чужих записях
 
 decisions:
+  # Полководец «Хозяин обоза»: наёмники вдвое дешевле
+  hire_mercenaries:
+    cost:
+      gold: { value: 80, add: { value: tier, multiply: 30 }, if: { limit: { has_perk: quartermaster }, multiply: 0.5 } }
+
   # Государь «Придворный церемониал»: пир вдвое дешевле и прибавляет славы
   hold_feast:
     cost:
@@ -296,6 +313,21 @@ decisions:
     ai_check_months: 6
     ai_will_do: 50
 
+  # Государь: раз в жизни — «Золотой век»
+  golden_age:
+    category: realm
+    icon: "☀"
+    is_shown: { is_ruler: yes, has_perk: august_majesty }
+    is_valid:
+      NOT: { has_flag: golden_age_done }
+    cost: { gold: 200, prestige: 500 }
+    effect:
+      - set_flag: golden_age_done
+      - add_modifier: { id: golden_age, years: 10 }
+      - every_vassal: { add_opinion: { target: root, modifier: grateful } }
+    ai_check_months: 12
+    ai_will_do: 60
+
 interactions:
   # Государь «Государственный муж»: соседи склоняются перед славой
   offer_vassalization:
@@ -303,6 +335,40 @@ interactions:
       add:
         $append:
           - { desc: ai.statesman, limit: { scope:actor: { has_perk: statesman } }, value: { value: "scope:actor.prestige_level", multiply: 10 } }
+          # Государь «Объединитель»: побеждённый им охотнее склоняется
+          - { desc: ai.respects_unifier, limit: { has_opinion_modifier: { target: scope:actor, modifier: respects_unifier } }, value: 30 }
+
+  # Династ «Совет родни»: родичи охотнее заключают союзы и браки
+  propose_alliance:
+    ai_accept:
+      add:
+        $append:
+          - { desc: ai.kin_council, limit: { same_dynasty_as: scope:actor, scope:actor: { has_perk: kin_council } }, value: 25 }
+  arrange_marriage:
+    ai_accept:
+      add:
+        $append:
+          - { desc: ai.kin_council, limit: { same_dynasty_as: scope:actor, scope:actor: { has_perk: kin_council } }, value: 20 }
+
+  # Казначей «Щедрая рука»: подарки вдвое действеннее, торговый договор охотнее
+  send_gift:
+    on_accept:
+      $append:
+        - if:
+            limit: { scope:actor: { has_perk: golden_hand } }
+            scope:recipient: { add_opinion: { target: scope:actor, modifier: merchant_gift } }
+  trade_pact:
+    ai_accept:
+      add:
+        $append:
+          - { desc: ai.golden_hand, limit: { scope:actor: { has_perk: golden_hand } }, value: 20 }
+
+  # Государь «Миротворец»: его посредничество принимают охотнее
+  mediate_peace:
+    ai_accept:
+      add:
+        $append:
+          - { desc: ai.peacemaker, limit: { scope:actor: { has_perk: peacemaker } }, value: 25 }
 
   # Тиран «Кровавый суд»: казнь внушает вдвое больше страха
   execute_prisoner:
@@ -343,6 +409,7 @@ interactions:
         - { desc: ai.dread, value: { value: fear_of_liege, multiply: 1.0 } }
         - { desc: ai.opinion, value: { value: "opinion(scope:actor)", multiply: 0.2 } }
         - { desc: ai.boldness, value: { value: ai_boldness, multiply: -10 } }
+        - { desc: ai.menace, limit: { scope:actor: { has_perk: menace } }, value: 20 }
     on_accept:
       - scope:recipient:
           pay_gold: { target: scope:actor, value: { value: gold, multiply: 0.3, min: 0, max: 150 } }
@@ -484,6 +551,14 @@ interactions:
     ai_will_do: 30
 
 schemes:
+  # Паук «Клинок в ночи»: его убийцы вдвое быстрее, а против него — вдвое труднее
+  murder:
+    progress:
+      multiply: { value: 1, if: { limit: { scope:owner: { has_perk: night_blade } }, add: 1 } }
+    success_chance:
+      # после min/max: против клинка в ночи — вдвое меньше
+      multiply: { value: 1, if: { limit: { scope:target: { has_perk: night_blade } }, multiply: 0.5 } }
+
   # Соблазнитель «Обаяние»: соблазнять легче и быстрее; «Постельные тайны» —
   # секреты любовника и его сюзерена; «Сердцеед» — любовник на крючке
   seduce:
@@ -507,7 +582,49 @@ schemes:
               limit: { has_perk: heartbreaker }
               add_hook: { target: scope:target }
 
+casus_belli:
+  # Светоч «Меч Солнца»: священная война вдвое дешевле
+  holy_war:
+    cost:
+      piety: { value: 150, if: { limit: { has_perk: sun_sword }, multiply: 0.5 } }
+
+realm_laws:
+  # Казначей «Реформатор»: вассалы не мешают реформам
+  crown_authority_2:
+    can_change:
+      custom_tooltip:
+        trigger:
+          $replace: true
+          OR:
+            - has_perk: reformer
+            - NOT: { any_vassal: { count: ">= 2", opinion: { target: root, value: "< -20" } } }
+  crown_authority_3:
+    can_change:
+      custom_tooltip:
+        trigger:
+          $replace: true
+          OR:
+            - has_perk: reformer
+            - NOT: { any_vassal: { count: ">= 2", opinion: { target: root, value: "< 0" } } }
+
 on_actions:
+  # Победитель войны (root) и побеждённый (scope:enemy).
+  # Государь «Объединитель»: побеждённые не держат зла — и охотнее идут к нему в вассалы.
+  on_war_won:
+    effect:
+      - if:
+          limit: { has_perk: unifier }
+          scope:enemy: { add_opinion: { target: root, modifier: respects_unifier } }
+
+  # Наследник (root) предшественника (scope:predecessor) с «Достойным наследником».
+  on_inheritance:
+    effect:
+      $append:
+        - if:
+            limit: { scope:predecessor: { has_perk: worthy_heir } }
+            add_modifier: { id: hero_legacy, years: 20 }
+            send_message: { text: msg.hero_legacy, kind: good }
+
   # Династ «Плодовитый род»: каждый ребёнок — слава роду (root — новорождённый)
   on_birth:
     effect:
@@ -543,6 +660,16 @@ on_actions:
             random:
               chance: 20
               create_artifact: { type: trophy_shield, rarity: [common, masterwork], how: trophy }
+        # Тиран «Бич»: каждая победа внушает ужас
+        - if:
+            limit: { has_perk: scourge }
+            add_dread: 3
+        # Светоч «Воин веры»: победа над чужим культом или еретиком угодна Солнцу
+        - if:
+            limit:
+              has_perk: holy_warrior
+              scope:enemy: { OR: { NOT: { same_faith_as: root }, is_heretic: yes } }
+            add_piety: 30
 
   # Рыцарь «Трофеи»: победив в поединке, забрать оружие побеждённого
   # (root — победившая сторона, scope:loser)
@@ -573,6 +700,15 @@ on_actions:
         - if:
             limit: { has_perk: subtle_hand }
             discover_secret: yes
+        # Учёный «Архивариус»: каждый год в архивах всплывает чужая тайна
+        - if:
+            limit: { has_perk: archivist }
+            random_neighboring_ruler:
+              limit: { num_secrets: ">= 1" }
+              save_scope_as: archive_target
+            if:
+              limit: { exists: scope:archive_target }
+              learn_secret: { owner: scope:archive_target }
         # Святой «Хранитель мощей»: мощи при дворе — благочестие и почитание
         - if:
             limit:

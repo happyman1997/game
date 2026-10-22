@@ -91,7 +91,7 @@ func visible_options(d: Dictionary, ctx: ScriptContext, target: Dictionary, with
 # ------------------------------------------------------------ голоса навыков
 # Вариант события может говорить голосом навыка:
 #   skill: { skill: learning, min: 14 }       — доступен при навыке не ниже min;
-#   skill: { archetype: arbiter }             — доступен архетипу (связке навыков);
+#   skill: { perk: peacemaker }               — доступен тому, кто взял перк стези;
 #   skill: { skill: intrigue, check: 12 }     — проверка: шанс виден заранее,
 #       после effect выполняется success или failure.
 # Шанс проверки: events.check_base + (навык − сложность) × events.check_per_point,
@@ -109,7 +109,7 @@ func skill_gate_ok(opt: Dictionary, target: Dictionary) -> bool:
 	var c: Variant = game.ch(target.id)
 	if c == null:
 		return false
-	if sp.get("archetype") != null and Stats.stat(game, c, "archetype:" + str(sp.archetype)) <= 0.0:
+	if sp.get("perk") != null and not Lifestyles.has_perk(c, str(sp.perk)):
 		return false
 	if sp.get("min") != null and Stats.skill(game, c, str(sp.get("skill"))) < int(Data.num(sp.min)):
 		return false

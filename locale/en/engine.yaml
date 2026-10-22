@@ -178,7 +178,6 @@ modsrc:
   skill: "Skill «{name}»"
   spouse: "Spouse: {name}"
   mastery: "Shadow of mastery: {name}"
-  archetype: "Calling: {name}"
 
 list:
   vassal: vassals

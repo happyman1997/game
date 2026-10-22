@@ -104,10 +104,10 @@ static func _age_adjust(game: Game, c: Dictionary, totals: Dictionary) -> Dictio
 
 
 ## Производные от навыков: доля навыков супруга (defines.character.spouse_skill_share),
-## «за каждое очко» (skills.<id>.per_point), тень мастерства (skills.<id>.mastery)
-## и связки навыков (skill_archetypes). Считаются после навыков и обратно на их
-## пороги не влияют. labels = true — разбивка [{label, mods}] для подсказок;
-## иначе (горячий путь) всё складывается прямо в into.
+## «за каждое очко» (skills.<id>.per_point) и тень мастерства (skills.<id>.mastery).
+## Считаются после навыков и обратно на их пороги не влияют. labels = true —
+## разбивка [{label, mods}] для подсказок; иначе (горячий путь) всё складывается
+## прямо в into.
 static func _derived(game: Game, c: Dictionary, totals: Dictionary, labels: bool, into: Dictionary = {}) -> Array:
 	var out := []
 	if not Chars.is_adult(game, c):
@@ -133,12 +133,9 @@ static func _derived(game: Game, c: Dictionary, totals: Dictionary, labels: bool
 					out.append({"label": game.loc.t("modsrc.spouse", {"name": game.scope_name({"type": "character", "id": sp.id})}), "mods": m})
 				else:
 					add_into(into, m)
-	var high := 0
 	for item in plan.per_skill:
 		var s: String = item[0]
 		var v: float = sk[s]
-		if v >= plan.archetype_min:
-			high += 1
 		if v <= 0.0:
 			continue
 		var pp: Dictionary = item[1].duplicate()
@@ -164,46 +161,6 @@ static func _derived(game: Game, c: Dictionary, totals: Dictionary, labels: bool
 				out.append({"label": game.loc.t("modsrc.mastery", {"name": game.loc.t("mastery." + s)}), "mods": m})
 			else:
 				add_into(into, m)
-	# Связки навыков. С механикой trials — только заслуженные испытанием
-	# (c.vars.archetypes, навсегда); без неё — два-три высоких навыка, не больше
-	# defines.character.max_archetypes (тройки, затем пары с навыками повыше).
-	if plan.earned:
-		for aid in Data.as_array(c.vars.get("archetypes")):
-			var a: Variant = plan.arch_by_id.get(aid)
-			if a == null:
-				continue
-			var m := {a[5]: 1.0}
-			add_into(m, a[3])
-			if labels:
-				out.append({"label": game.loc.t("modsrc.archetype", {"name": game.name_of("skill_archetypes", a[0])}), "mods": m})
-			else:
-				add_into(into, m)
-	elif high >= 2:
-		var fit := []
-		for a in plan.archetypes:
-			var total := 0.0
-			var okk := true
-			for s in a[1]:
-				var v := float(sk.get(s, 0.0))
-				if v < a[2]:
-					okk = false
-					break
-				total += v
-			if okk:
-				fit.append([a, total])
-		if not fit.is_empty():
-			fit.sort_custom(func(x, y):
-				if x[0][1].size() != y[0][1].size():
-					return x[0][1].size() > y[0][1].size()
-				return x[1] > y[1])
-			for n in mini(fit.size(), plan.max_archetypes):
-				var a: Array = fit[n][0]
-				var m := {"archetype:" + str(a[0]): 1.0}
-				add_into(m, a[3])
-				if labels:
-					out.append({"label": game.loc.t("modsrc.archetype", {"name": game.name_of("skill_archetypes", a[0])}), "mods": m})
-				else:
-					add_into(into, m)
 	return out
 
 
@@ -223,14 +180,9 @@ static func _derived_fast(game: Game, c: Dictionary, out: Dictionary) -> void:
 				if v > 0.0:
 					out[s] = float(out.get(s, 0.0)) + v
 	var sk: Array = []
-	var high := 0
-	var amin: float = plan.archetype_min
 	for item in plan.per_skill:
-		var v := maxf(0.0, float(out.get(item[0], 0.0)))
-		sk.append(v)
-		if v >= amin:
-			high += 1
-	# мастерство и связки читают навыки до добавок (sk), поэтому порядок не важен
+		sk.append(maxf(0.0, float(out.get(item[0], 0.0))))
+	# мастерство читает навыки до добавок (sk), поэтому порядок не важен
 	var i := 0
 	for item in plan.per_skill:
 		var v: float = sk[i]
@@ -253,43 +205,6 @@ static func _derived_fast(game: Game, c: Dictionary, out: Dictionary) -> void:
 		if ms != null and v >= float(ms[0]):
 			out["mastery:" + item[0]] = 1.0
 			add_into(out, ms[1])
-	if plan.earned:
-		var have: Variant = c.vars.get("archetypes")
-		if have is Array:
-			for aid in have:
-				var a: Variant = plan.arch_by_id.get(aid)
-				if a != null:
-					out[a[5]] = 1.0
-					add_into(out, a[3])
-		return
-	if high < 2:
-		return
-	# связки: индексы навыков заранее посчитаны в плане
-	var fit := []
-	for a in plan.archetypes:
-		var idx: PackedInt32Array = a[4]
-		var mn: float = a[2]
-		var total := 0.0
-		var okk := true
-		for ix in idx:
-			var v: float = sk[ix]
-			if v < mn:
-				okk = false
-				break
-			total += v
-		if okk:
-			fit.append([a, total])
-	if fit.is_empty():
-		return
-	if fit.size() > plan.max_archetypes:
-		fit.sort_custom(func(x, y):
-			if x[0][4].size() != y[0][4].size():
-				return x[0][4].size() > y[0][4].size()
-			return x[1] > y[1])
-	for n in mini(fit.size(), plan.max_archetypes):
-		var a: Array = fit[n][0]
-		out[a[5]] = 1.0
-		add_into(out, a[3])
 
 
 ## Заранее разобранные данные для _derived (на движок).
@@ -316,42 +231,12 @@ static func _derived_plan(game: Game) -> Dictionary:
 				rkeys.append(str(k))
 				rcoefs.append(Data.num(rp[k]))
 		per_skill.append([s, pp if pp is Dictionary else {}, [Data.num(ms.get("at"), 18), ms.get("modifiers")] if ms is Dictionary else null, keys, coefs, rkeys, rcoefs, rp if rp is Dictionary else {}])
-	var archetypes := []
-	var amin := INF
-	var ids: Array = Chars.skill_ids(game)
-	for a in _archetype_defs(game):
-		var mn := Data.num(a.get("min"), 12)
-		var idx := PackedInt32Array()
-		for sname in a.skills:
-			idx.append(ids.find(str(sname)))
-		if idx.has(-1):
-			continue
-		amin = minf(amin, mn)
-		archetypes.append([str(a.id), a.skills, mn, a.get("modifiers"), idx, "archetype:" + str(a.id)])
 	var share: Variant = game.def_val("character.spouse_skill_share", null)
-	var by_id := {}
-	for a in archetypes:
-		by_id[a[0]] = a
-	hit = {"skills": Chars.skill_ids(game), "per_skill": per_skill, "archetypes": archetypes, "archetype_min": amin,
-		"earned": game.engine.has_feature("trials"), "arch_by_id": by_id,
+	hit = {"skills": Chars.skill_ids(game), "per_skill": per_skill,
 		"adult_days": int(game.def_num("character.adult_age", 16) * GameDate.DAYS_PER_YEAR),
-		"max_archetypes": int(game.def_num("character.max_archetypes", 2)), "share": share if share is Dictionary else {}}
+		"share": share if share is Dictionary else {}}
 	game.engine.cache["stats:derived"] = hit
 	return hit
-
-
-static func _archetype_defs(game: Game) -> Array:
-	var hit: Variant = game.engine.cache.get("stats:archetypes")
-	if hit == null:
-		hit = game.content.all("skill_archetypes").filter(func(a): return a.get("skills") is Array)
-		game.engine.cache["stats:archetypes"] = hit
-	return hit
-
-
-## Архетипы (связки навыков) персонажа: [id].
-static func archetypes(game: Game, c: Dictionary) -> Array:
-	var st := char_stats(game, c)
-	return _archetype_defs(game).filter(func(a): return Data.num(st.get("archetype:" + str(a.id))) > 0.0).map(func(a): return str(a.id))
 
 
 ## Тени мастерства, которые легли на персонажа: [id навыка].
@@ -393,7 +278,7 @@ static func _add_flat(out: Dictionary, pair: Variant) -> void:
 
 
 ## Характеристика только из «простых» источников — черт, модификаторов и
-## заслуженных архетипов — без полного расчёта. Для поставщиков модификаторов,
+## перков стезей — без полного расчёта. Для поставщиков модификаторов,
 ## которые сами входят в расчёт и не могут звать Stats.stat (законы).
 static func raw_stat(game: Game, c: Dictionary, key: String) -> float:
 	var v := 0.0
@@ -404,11 +289,11 @@ static func raw_stat(game: Game, c: Dictionary, key: String) -> float:
 		var fm := _flat_of(game, "modifiers")
 		for md in c.modifiers:
 			v += _flat_get(fm.get(md.id), key)
-	var have: Variant = c.vars.get("archetypes")
-	if have is Array and not have.is_empty():
-		var fa := _flat_of(game, "skill_archetypes")
-		for aid in have:
-			v += _flat_get(fa.get(aid), key)
+	var ls: Variant = c.get("lifestyle")
+	if ls != null and not ls.perks.is_empty():
+		var fp := _flat_of(game, "perks")
+		for pid in ls.perks:
+			v += _flat_get(fp.get(pid), key)
 	return v
 
 

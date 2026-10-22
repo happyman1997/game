@@ -4,12 +4,19 @@ extends EngineFeature
 ## образов жизни, каждый месяц копит опыт этого образа жизни и тратит его на
 ## перки — узлы деревьев. Последний перк дерева обычно даёт черту.
 ##
+## Дерево с развилкой: корень, две ветки (branch: a | b) и вершина, которой
+## достаточно одной из веток (requires_any). Перк второй ветки дороже в
+## defines.lifestyle.second_branch_mult раз — сначала выбирают путь, но взять
+## и другой можно.
+##
 ## Данные:
 ##   lifestyles:   { skill, secondary_skill, secondary_share, xp_mult, icon, color, order, is_shown }
 ##   focuses:      { lifestyle, icon, modifiers, is_shown, ai_will_do }
-##   perks:        { lifestyle, tree, requires, icon, modifiers, trait, effect, ai_will_do,
-##                   stress_reactions (отклик характера, как у черт), unlocks (действия — для подсказки) }
-##   defines.lifestyle: { base_xp, xp_per_skill, perk_cost, perk_cost_growth, focus_change_cooldown_months }
+##   perks:        { lifestyle, tree, requires, requires_any, branch, icon, modifiers, trait, effect,
+##                   ai_will_do, stress_reactions (отклик характера, как у черт),
+##                   unlocks (действия — для подсказки) }
+##   defines.lifestyle: { base_xp, xp_per_skill, perk_cost, perk_cost_growth, second_branch_mult,
+##                        focus_change_cooldown_months }
 
 const OWNER := "core/lifestyles"
 
@@ -59,14 +66,16 @@ static func _depth(game: Game, p: Dictionary, seen: Dictionary) -> int:
 		return 0
 	seen[p.id] = true
 	var best := -1
-	for r in Data.as_array(p.get("requires")):
+	for r in Data.as_array(p.get("requires")) + Data.as_array(p.get("requires_any")):
 		var rd: Variant = game.content.get_def("perks", r)
 		if rd != null:
 			best = maxi(best, _depth(game, rd, seen))
 	return 0 if best < 0 else best + 1
 
 
-## Деревья образа жизни: [{tree, perks}] — перки в порядке глубины (корни первыми).
+## Деревья образа жизни: [{tree, perks, root, branches, apex}] — perks в порядке
+## глубины (корни первыми); у дерева с развилкой root — перки до неё, branches —
+## {a: [...], b: [...]}, apex — после неё (у прямого дерева branches пуст).
 static func trees_of(game: Game, lifestyle: String) -> Array:
 	var by_tree := {}
 	for p in perks_of(game, lifestyle):
@@ -78,7 +87,20 @@ static func trees_of(game: Game, lifestyle: String) -> Array:
 	for t in by_tree:
 		var perks: Array = by_tree[t].duplicate()
 		Data.sort_by(perks, func(p): return _depth(game, p, {}))
-		out.append({"tree": t, "perks": perks})
+		var root := []
+		var branches := {}
+		var apex := []
+		for p in perks:
+			if p.get("branch") != null:
+				var b := str(p.branch)
+				if not branches.has(b):
+					branches[b] = []
+				branches[b].append(p)
+			elif branches.is_empty():
+				root.append(p)
+			else:
+				apex.append(p)
+		out.append({"tree": t, "perks": perks, "root": root, "branches": branches, "apex": apex})
 	return out
 
 
@@ -94,21 +116,38 @@ static func has_perk(c: Dictionary, perk: String) -> bool:
 	return c.get("lifestyle") != null and c.lifestyle.perks.has(perk)
 
 
-static func perk_cost(game: Game, c: Dictionary, lifestyle: String) -> int:
+## Цена следующего перка образа жизни (растёт с каждым взятым); perk — цена
+## именно этого перка: вторая ветка стези дороже.
+static func perk_cost(game: Game, c: Dictionary, lifestyle: String, perk: Variant = null) -> int:
 	var owned := 0
 	if c.get("lifestyle") != null:
 		for p in c.lifestyle.perks:
 			var pd: Variant = game.content.get_def("perks", p)
 			if pd != null and pd.get("lifestyle") == lifestyle:
 				owned += 1
-	return roundi(game.def_num("lifestyle.perk_cost", 300) + game.def_num("lifestyle.perk_cost_growth", 100) * owned)
+	var cost := game.def_num("lifestyle.perk_cost", 300) + game.def_num("lifestyle.perk_cost_growth", 100) * owned
+	if perk is Dictionary and other_branch_taken(game, c, perk):
+		cost *= game.def_num("lifestyle.second_branch_mult", 2.0)
+	return roundi(cost)
+
+
+## Перк из ветки, а в его дереве уже взят перк другой ветки.
+static func other_branch_taken(game: Game, c: Dictionary, perk: Dictionary) -> bool:
+	if perk.get("branch") == null or c.get("lifestyle") == null:
+		return false
+	for pid in c.lifestyle.perks:
+		var pd: Variant = game.content.get_def("perks", pid)
+		if pd != null and pd.get("tree") == perk.get("tree") and pd.get("branch") != null and str(pd.branch) != str(perk.branch):
+			return true
+	return false
 
 
 static func requirements_met(_game: Game, c: Dictionary, perk: Dictionary) -> bool:
 	for r in Data.as_array(perk.get("requires")):
 		if not has_perk(c, r):
 			return false
-	return true
+	var any := Data.as_array(perk.get("requires_any"))
+	return any.is_empty() or any.any(func(r): return has_perk(c, str(r)))
 
 
 static func available_perks(game: Game, c: Dictionary, lifestyle: String) -> Array:
@@ -123,7 +162,7 @@ static func can_unlock(game: Game, c: Dictionary, perk_id: String) -> bool:
 	var p: Variant = game.content.get_def("perks", perk_id)
 	if p == null or has_perk(c, perk_id) or not requirements_met(game, c, p):
 		return false
-	return xp_of(c, p.lifestyle) >= perk_cost(game, c, p.lifestyle)
+	return xp_of(c, p.lifestyle) >= perk_cost(game, c, p.lifestyle, p)
 
 
 ## Открывает перк. free — без траты опыта (из скрипта).
@@ -135,7 +174,7 @@ static func unlock_perk(game: Game, c: Dictionary, perk_id: String, free: bool =
 		return false
 	var st := state_of(c)
 	if not free:
-		st.xp[p.lifestyle] = xp_of(c, p.lifestyle) - perk_cost(game, c, p.lifestyle)
+		st.xp[p.lifestyle] = xp_of(c, p.lifestyle) - perk_cost(game, c, p.lifestyle, p)
 	st.perks.append(p.id)
 	if p.get("trait") != null:
 		Chars.add_trait(game, c, p.trait)
@@ -238,7 +277,10 @@ static func ai_choose_focus(game: Game, c: Dictionary) -> Variant:
 static func ai_choose_perk(game: Game, c: Dictionary, lifestyle: String) -> Variant:
 	var ctx := ScriptContext.make(game, {"type": "character", "id": c.id})
 	var opts := []
+	var xp := xp_of(c, lifestyle)
 	for p in available_perks(game, c, lifestyle):
+		if xp < perk_cost(game, c, lifestyle, p):
+			continue
 		var w := maxf(0.0, Interp.eval_value(ctx, ctx.root, p.ai_will_do) if p.get("ai_will_do") != null else 10.0)
 		if w > 0.0:
 			opts.append({"id": p.id, "w": w})
@@ -382,8 +424,10 @@ func register_script(engine: GameEngine) -> void:
 			v.trigger(f.get("is_shown"), "focuses/%s is_shown" % f.id)
 		for p in e.content.all("perks"):
 			v.ref("lifestyles", p.get("lifestyle"), "perks/" + p.id)
-			for req in Data.as_array(p.get("requires")):
+			for req in Data.as_array(p.get("requires")) + Data.as_array(p.get("requires_any")):
 				v.ref("perks", req, "perks/%s requires" % p.id)
+			if p.get("branch") != null and not (p.branch is String):
+				v.issue("perks/%s: branch — имя ветки (a, b)" % p.id)
 			if p.get("trait") != null:
 				v.ref("traits", p.trait, "perks/" + p.id)
 			v.effect(p.get("effect"), "perks/%s effect" % p.id)

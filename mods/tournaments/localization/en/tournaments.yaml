@@ -32,6 +32,6 @@ ev:
     b: Decline
 msg:
   became_victorious: "Bards sing of your victories — you are now famed as a victorious commander!"
-# Куртуазный рыцарь ядра: с этим модом и турниры славнее
-skill_archetype_desc:
-  courtly_knight: "Diplomacy and prowess. Two more knights in service, and victories in duels and tourneys bring twice the glory."
+# The core «Champion» perk (Knight path): with this mod tournaments are more glorious too
+perk_desc:
+  champion: "Victories in duels and tournaments bring twice the glory."

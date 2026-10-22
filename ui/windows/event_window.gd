@@ -113,14 +113,14 @@ static func build(app: App, pe: Dictionary, on_close: Callable) -> Control:
 	return _frame(title, scene, BB.esc(desc), options)
 
 
-## Метка «голоса навыка»: [Учёность], [Интриги: 65%], [Третейский судья].
+## Метка «голоса навыка»: [Учёность], [Интриги: 65%], [Миротворец].
 static func _voice_label(app: App, opt: Dictionary, target: Dictionary, locked: bool = false) -> String:
 	var g := app.game
 	var sp: Variant = GameEvents.skill_spec(opt)
 	if sp == null:
 		return ""
-	if sp.get("archetype") != null:
-		return "[%s]" % g.name_of("skill_archetypes", sp.archetype)
+	if sp.get("perk") != null:
+		return "[%s]" % g.name_of("perks", sp.perk)
 	var sname := g.name_of("skills", str(sp.get("skill")))
 	var ch := g.events.check_chance(opt, target)
 	if ch >= 0:
@@ -135,8 +135,8 @@ static func _voice_need(app: App, opt: Dictionary) -> String:
 	var sp: Variant = GameEvents.skill_spec(opt)
 	if sp == null:
 		return ""
-	if sp.get("archetype") != null:
-		return app.t("ui.voice_needs_archetype", {"name": g.name_of("skill_archetypes", sp.archetype)})
+	if sp.get("perk") != null:
+		return app.t("ui.voice_needs_perk", {"name": g.name_of("perks", sp.perk)})
 	return app.t("ui.voice_needs_skill", {"skill": g.name_of("skills", str(sp.get("skill"))), "min": int(Data.num(sp.get("min")))})
 
 

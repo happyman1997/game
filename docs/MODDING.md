@@ -158,7 +158,6 @@ defines:
 |---|---|---|
 | `defines` | `core/data/common/defines.yaml` | Числовые константы экономики, армии, демографии, ИИ. |
 | `skills` | `core/data/common/skills.yaml` | Навыки. Новый навык автоматически становится значением в скриптах. `mean`/`spread` — среднее и разброс при рождении (по умолчанию 6 и 5; историческим персонажам без указанного навыка — на 1 выше), `inherit_spread` — разброс вокруг среднего родителей, `hide_if_zero` — не показывать нулевой навык (редкий дар вроде чародейства). `per_point` / `ruler_per_point` — что даёт каждое очко (всем / только правителям), `mastery` — тень мастерства (см. «Навыки: очки, тени и связки»). |
-| `skill_archetypes` | `core/data/common/archetypes.yaml` | Связки навыков: `{ skills: [..], min, icon, modifiers }`. |
 | `traits` | `core/data/common/traits.yaml` | Черты: `category`, `icon`, `modifiers`, `opposites`, `compatibility`, `genetic`/`birth_chance`/`inherit_chance`, `education`, `ai`, `monthly_death_chance`, `monthly_cure_chance`, `duration_days`, `group`, `color` (цвет плашки), `concealed` (скрытая черта — см. «Крюки и секреты»), `portrait` (как черта меняет портрет — см. ниже). |
 | `cultures` | `core/data/common/cultures.yaml` | `color`, `male_names`, `female_names`, `dynasty_pattern` (`name`/`place`), `succession_law`, `skin`/`hair`, `modifiers`, `traits` (врождённые черты всех людей этой культуры — например, раса `dwarf`), `government` (правление по умолчанию). |
 | `faiths` | там же | `religion`, `color`, `icon`, `doctrines` (`polygamy`, `divorce: approval`), `virtues`, `sins` (единоверцы того же культа судят по ним правителя — см. «Храм»), `head_title` (титул главы веры), `heretic` (еретический культ), `modifiers`, `no_holy_war_with` (религии, с которыми эта вера не ведёт священных войн — в обе стороны). Священная война возможна против другой религии, а внутри своей — только против еретика: последователя культа с `heretic: yes` или персонажа с чертой или модификатором `heretic: yes` (условие `is_heretic`; в ядре — Восточный обряд, раскрытый договор с Князем Пепла и изгнание из Света `cast_out_of_light`); еретик — законная цель даже для единоверца. В базовой игре весь мир исповедует одну религию `solar` (Вера Солнечного Императора), а веры — её культы. |
@@ -501,7 +500,7 @@ map_links:                                    # морские переправ�
 
 Вместо ключа почти везде можно написать текст прямо в данных:
 `name: { ru: "Сокольничий", en: "Falconer" }`, или ключ с параметрами:
-`name: { key: decision.begin_trial, params: { name: skill_archetype.warlord } }`
+`name: { key: ui.focus_n, params: { name: focus.focus_wealth } }`
 (строковые параметры тоже переводятся).
 
 Строки интерфейса движка лежат в `locale/`; мод может переопределить любую
@@ -697,7 +696,7 @@ func init(api: ModApi) -> void:
 
   (доступны `lifestyles`, `council`, `prison`, `factions`, `regiments`,
   `secrets`, `laws`, `knights`, `politics`, `personality`, `renown`, `lands`,
-  `populace`, `governments`, `artifacts`, `wilds`, `momentum`, `duels`, `deeds`, `trials`, `spirit`,
+  `populace`, `governments`, `artifacts`, `wilds`, `momentum`, `duels`, `deeds`, `spirit`,
   `upbringing`, `dynasties`;
   интерфейс скрывает вкладки и разделы выключенных механик). Словарь скриптов
   механики (её триггеры, эффекты, значения) остаётся зарегистрированным, так что
@@ -727,15 +726,23 @@ perks:
     lifestyle: martial_lifestyle
     tree: tyranny
     requires: stern_gaze                # или список
+    branch: a                           # ветка развилки (a | b)
     stress_reactions: { execute_prisoner: -15 }   # отклик характера, как у черт (ИИ поступает по нему)
-  royal_architect:
-    lifestyle: stewardship_lifestyle
-    tree: architect
-    requires: master_builder
-    trait: architect                    # черта за завершение дерева
+  iron_fist:
+    lifestyle: martial_lifestyle
+    tree: tyranny
+    requires_any: [scourge, menace]     # вершина: достаточно одной из веток
+    trait: tyrant                       # черта за вершину
     effect: { add_prestige: 100 }       # эффект при открытии (необязательно)
-    unlocks: [great_work]               # какие решения/взаимодействия открывает (для подсказки)
+    unlocks: [public_execution]         # какие решения/взаимодействия открывает (для подсказки)
 ```
+
+Стезя ядра — **развилка**: корень, две ветки по два перка (`branch: a` и
+`branch: b`, каждая начинается от корня) и вершина с `requires_any` — ей
+хватает конца любой ветки. Перк второй ветки (когда в этом дереве уже взят
+перк другой) дороже в `defines.lifestyle.second_branch_mult` раз: сначала
+выбирают путь, но взять и другой можно. Названия веток — `perk_branch.<дерево>_<ветка>`.
+Дерево без `branch` рисуется прямой цепочкой, как прежде.
 
 Деревья — **стези**: каждая — свой способ править, и её перки меняют правила,
 связывая механики. Правило перка — это либо характеристика в `modifiers`,
@@ -754,7 +761,6 @@ perks:
 | `ward_education_mult` | насколько лучше учатся подопечные этого опекуна |
 | `attrition_mult` | потери армий персонажа от истощения |
 | `deed_lifestyle_xp` | опыт текущего образа жизни за каждое деяние |
-| `archetype_skill_reduction` | на сколько ниже порог навыков для призваний (`skill_archetypes`) |
 | `commission_cost_mult`, `commission_quality` | цена заказа вещей и сдвиг шансов к редкому |
 
 Другие моды тоже могут менять стези слиянием — например, мод «Железо и плоть»
@@ -1129,18 +1135,10 @@ skill_archetypes:                                              # связки н
   отклики на поступки и месячный стресс работают как у черт характера.
   Условие `has_mastery: intrigue`; название — `mastery.<навык>`, описание —
   `mastery_desc.<навык>`.
-- **Связки — призвания** (`skill_archetypes`; в коде — archetype) нужно
-  заслужить (механика `trials`, ниже): когда все навыки из `skills` не ниже
-  `min`, открывается испытание; пройденное — призвание навсегда, даже если
-  навыки потом упадут. Без механики `trials` призвание приходит само, пока навыки держатся (сначала тройки-«легенды», потом
-  пары с самыми высокими навыками). Призваний — не больше
-  `defines.character.max_archetypes`. Условие `has_archetype: <id>`
-  открывает особые правила и действия — в ядре у каждого призвания своё
-  (`archetypes.yaml`, `skill_paths.yaml`). Характеристики
-  `self_knight` (правитель бьётся среди своих рыцарей), `law_cost_mult`,
-  `discord_chance`, `battle_survival`, `siege_speed`, `build_time_mult`,
-  `faction_discontent_mult`, `dread_decay_mult` можно давать и чертами, и
-  модификаторами.
+- Характеристики `self_knight` (правитель бьётся среди своих рыцарей),
+  `law_cost_mult`, `discord_chance`, `battle_survival`, `siege_speed`,
+  `build_time_mult`, `faction_discontent_mult`, `dread_decay_mult` можно
+  давать чертами, перками и модификаторами.
 - Навыки по-прежнему читает и движок: управление — налог и лимит домена,
   военное дело полководца — сила армии, учёность — благочестие.
 
@@ -1174,36 +1172,17 @@ skill_archetypes:                                              # связки н
 (доля опыта — `secondary_share`, по умолчанию половина; в `arcana` колдовство
 учится и учёностью).
 
-### Испытания призваний
+### Характеристики-правила стезей
 
-Механика `trials`. Для каждой связки движок сам создаёт решение
-`trial_<id>` («Испытание призвания: …»; своё решение с таким id в данных его
-заменяет). Оно видно, когда навыки дотянули до порога, призвание не обретено,
-нет другого испытания и не исчерпан предел призваний. Испытание — цели
-`trial.goals` за `trial.years` лет (по умолчанию `defines.trials.years`):
-
-- `{ deed: <деяние>, count: N }` — столько деяний (механика `deeds`) с начала
-  испытания; текст — `deed_goal.<деяние>` (или своё `desc`), рядом — прогресс;
-- `{ trigger: { ... }, desc: <ключ> }` — условие, проверяется раз в месяц.
-
-Все цели выполнены — призвание навсегда (`c.vars.archetypes`, хук
-`trial.completed`, деяние-сигнал `trial_completed`). Срок вышел — стресс
-`fail_stress` и перерыв `cooldown_years` на это призвание (`trial.failed`). Без
-`trial` решение даёт призвание сразу. ИИ берёт испытание по `trial.ai_will_do`, а на
-испытании охотнее и чаще принимает решения и взаимодействия, которые ведут к
-его целям (`ai_goal_will`, `ai_goal_frequency`; для деяний-сигналов — по
-`ai_hint` деяния), и чаще воюет, если цели военные (`ai_war_chance`).
-Скрипт: `can_begin_trial: <id>` (или `yes` — хоть на один путь),
-`has_active_trial` (yes/no, id или список), `num_archetypes`,
-эффекты `begin_trial`, `grant_archetype`. Характеристики-правила путей,
-которые читает движок: `scapegoat` (раскрытую интригу валят на придворного),
-`home_advantage` (сила войска на своей земле, %), `domain_fort` (крепости
-домена), `capital_defense` (столица держит осаду дольше), `income_per_hook`,
-`duel_prestige_mult`, `knight_cap`, `loot_mult`, `peace_persuasion`,
-`feud_decay` (ссоры между вассалами — модификаторы мнения с `feud: yes` —
-тают на столько очков в месяц) и `law_no_resentment` (законы не дают минуса
-к мнению вассалов; эту характеристику движок берёт из черт, модификаторов и
-заслуженных призваний — `Stats.raw_stat`).
+Правила бывших «призваний» живут в перках стезей (`lifestyles.yaml`), а
+движок читает их как характеристики: `scapegoat` (раскрытую интригу валят на
+придворного), `home_advantage` (сила войска на своей земле, %), `domain_fort`
+(крепости домена), `capital_defense` (столица держит осаду дольше),
+`income_per_hook`, `duel_prestige_mult`, `knight_cap`, `loot_mult`,
+`peace_persuasion`, `feud_decay` (ссоры между вассалами — модификаторы мнения
+с `feud: yes` — тают на столько очков в месяц) и `law_no_resentment` (законы
+не дают минуса к мнению вассалов; эту характеристику движок берёт из черт,
+модификаторов и перков — `Stats.raw_stat`).
 
 ### Деяния
 
@@ -1216,14 +1195,16 @@ deeds:
   executions:  { icon: "🪓", interactions: [execute_prisoner] }   # принятые взаимодействия (у действующего лица)
   judgments:   { icon: "⚖", events: [court.0004] }          # события, через которые прошёл персонаж
   murders:     { icon: "🩸", schemes: [murder] }            # удачные интриги
-  duels_won:   { icon: "🤺", signal: duel_won, ai_hint: { interactions: [challenge_to_duel] } }  # что помогает ИИ
+  duels_won:   { icon: "🤺", signal: duel_won }
 ```
 
 Сигналы: `battle_won`, `battle_lost`, `siege_won`, `war_won`, `war_lost`,
 `duel_won`, `duel_lost`, `building`, `conversion`, `scheme_success`,
-`discord`, `secret_exposed`, `revolt_led`, `law_changed`, `trial_completed`.
+`discord`, `secret_exposed`, `revolt_led`, `law_changed`.
 Скрипт: эффект `add_deed: <id>` (или `{ id, value }`), значения
-`deeds_<id>`. Хук `deed` — `{character, deed, count}`. Название — `deed.<id>`.
+`deeds_<id>` — годятся в условия (например, ключ к запертому действию: «выиграл
+три войны»). Хук `deed` — `{character, deed, count}`. Название — `deed.<id>`,
+как деяние звучит в условии — `deed_goal.<id>`.
 
 **Прозвища** растут из деяний и ничего не дают, кроме имени:
 
@@ -1248,7 +1229,7 @@ nicknames:
 options:
   - skill: { skill: learning, min: 14 }      # доступен при учёности от 14 (игрок видит его серым)
     effect: { ... }
-  - skill: { archetype: arbiter }            # доступен связке навыков
+  - skill: { perk: peacemaker }              # доступен тому, кто взял перк стези
     effect: { ... }
   - skill: { skill: intrigue, check: 12 }    # проверка: шанс виден в кнопке
     effect: { ... }                          # выполняется всегда
@@ -2134,8 +2115,6 @@ ambitions:
   а пущенный слух охлаждает вассалов соперника — его фракциям легче;
 - **поединки ↔ страх ↔ кураж**: победа в поединке внушает страх, полоса побед
   даёт кураж доблести;
-- **деяния ↔ испытания ↔ ИИ**: призвание заслуживают делами — битвами,
-  постройками, пирами, шантажом; ИИ на испытании сам ищет нужные дела;
 - **желания ↔ мнение ↔ совет и пожалования**: вассал ждёт земли, места в
   совете или побед сюзерена — исполненное желание даёт благодарность,
   затянувшееся копит обиду (а с ней и фракции), пожалованная другому земля

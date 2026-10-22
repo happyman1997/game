@@ -475,20 +475,6 @@ static func register(engine: GameEngine) -> void:
 			return arg.any(func(x): return c.traits.has(x))
 		return c.traits.has(str(arg))
 	, func(ctx, _s, arg): return _t(ctx.game, "tr.has_trait", {"value": " / ".join(Data.as_array(arg).map(func(x): return ctx.game.name_of("traits", x)))}))
-	ct.call("has_archetype", "Есть архетип — связка высоких навыков (skill_archetypes): has_archetype: <id> или yes", func(g, c, arg, _ctx, _s):
-		# с механикой trials архетипы — заслуженные, они лежат прямо в персонаже
-		var earned: Variant = c.vars.get("archetypes") if g.engine.has_feature("trials") else null
-		if arg is bool or (arg is String and (arg == "yes" or arg == "no")):
-			var any: bool = (earned is Array and not earned.is_empty()) if g.engine.has_feature("trials") else not Stats.archetypes(g, c).is_empty()
-			return any == _yes(arg)
-		for a in Data.as_array(arg):
-			if g.engine.has_feature("trials"):
-				if earned is Array and earned.has(str(a)):
-					return true
-			elif Stats.stat(g, c, "archetype:" + str(a)) > 0.0:
-				return true
-		return false
-	, func(ctx, _s, arg): return _t(ctx.game, "tr.has_archetype", {"value": " / ".join(Data.as_array(arg).map(func(x): return ctx.game.name_of("skill_archetypes", x)))}))
 	ct.call("has_mastery", "Легла тень мастерства навыка: has_mastery: intrigue", func(g, c, arg, _ctx, _s):
 		for a in Data.as_array(arg):
 			if Stats.stat(g, c, "mastery:" + str(a)) > 0.0:

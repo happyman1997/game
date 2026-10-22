@@ -56,3 +56,49 @@ ui:
   deeds_tip: "What has been done in a lifetime. Deeds earn nicknames (names only, no effects) and fulfil the goals of calling trials."
   next_nickname: "Nickname “{nick}”: {deed} {have}/{need}"
   nickname_from: "Nickname earned by: {deed}"
+deed:
+  battles_won: Battles won
+  battles_lost: Battles lost
+  sieges_won: Fortresses taken
+  wars_won: Wars won
+  duels_won: Duels won
+  buildings: Buildings
+  conversions: Counties converted
+  schemes: Successful schemes
+  whispers: Discord and rumors sown
+  secrets_exposed: Secrets exposed
+  blackmails: Blackmails
+  executions: Executions
+  captives: Thrown in the dungeon
+  gifts: Gifts and pacts
+  pacts: Alliances and oaths of fealty
+  feasts: Feasts and councils
+  charity: Alms given
+  devotions: Pilgrimages and vows
+  hunts: Hunts
+  judgments: Disputes judged
+  revolts: Revolts raised
+  laws: Reforms
+deed_goal:
+  battles_won: "Win battles"
+  battles_lost: "Lose battles"
+  sieges_won: "Take fortresses"
+  wars_won: "Win a war"
+  duels_won: "Win a duel"
+  buildings: "Complete buildings"
+  conversions: "Convert counties"
+  schemes: "Bring schemes to success"
+  whispers: "Sow discord or spread a rumor"
+  secrets_exposed: "Expose secrets"
+  blackmails: "Blackmail"
+  executions: "Execute a prisoner"
+  captives: "Imprison"
+  gifts: "Send gifts"
+  pacts: "Form an alliance or take a vassal"
+  feasts: "Hold a feast or a Great Council"
+  charity: "Give alms"
+  devotions: "Pilgrimage, confession or mission"
+  hunts: "Go hunting"
+  judgments: "Judge a dispute at court"
+  revolts: "Raise a revolt"
+  laws: "Pass a reform"

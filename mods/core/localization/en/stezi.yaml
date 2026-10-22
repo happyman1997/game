@@ -4,24 +4,26 @@ ui_category:
     stezi: Ways of Rule
 
 decision:
+  golden_age: Proclaim a Golden Age
   royal_progress: Royal Progress
   gather_kin: Gather the Kin
   grand_muster: Grand Muster
   public_execution: Public Execution
   glory_quest: Quest for Glory
   great_work: Great Work
-  take_loan: Lombard Loan
+  take_loan: Changers' Loan
   magnum_opus: Magnum Opus
   miracle: Miracle
   holy_call: Call to Holy War
 decision_desc:
+  golden_age: "Once in a lifetime a sovereign may proclaim a Golden Age: for ten years the land develops faster, the court is calm, the vassals content."
   royal_progress: "You ride through your lands with your court and banners. Your domain counties and vassals will long remember the visit, and word of your majesty travels far."
   gather_kin: "The rulers of your house gather for a family council and bring gifts — a share of their treasuries. The house's fame grows and kin warm to their head."
   grand_muster: "A muster of the host: for two years levies gather more readily, regiments are drilled, the commander is confident and knights are flattered."
   public_execution: "The noblest of your prisoners is executed in the square before the people. Your dread rises by a tier, the capital long remembers the execution, the defiant will hate the tyrant and the kin of the executed become blood enemies."
   glory_quest: "You set out where swords ring: to the lists of a foreign court or to a border where glory is sought. Fight yourself or send your best knight."
   great_work: "Once in a lifetime the Architect may raise in the capital something that outlives him: a cathedral, a keep or a market."
-  take_loan: "Lombard moneylenders give 300 gold at once. Repayment: 2.5 gold a month for twelve years. A new loan only after the old one."
+  take_loan: "Money changers give 300 gold at once. Repayment: 2.5 gold a month for twelve years. A new loan only after the old one."
   magnum_opus: "You sit down to a work that will be copied for centuries. The book becomes a famed relic of your court (illustrious at learning 20)."
   miracle: "A prayer after which the bedridden rise. Heals your wounds and illnesses and those of your family; your domain counties speak of the miracle."
   holy_call: "At war with another cult or a heretic you call your coreligionists to arms: for three years levies are larger, knights fiercer, and coreligionist vassals grateful."
@@ -40,14 +42,18 @@ interaction_desc:
   heart_pact: "A ruling lover will not refuse: they ally with you, or lay down arms if you are at war."
 
 modifier:
+  golden_age: Golden Age
+  hero_legacy: Ancestor's Legacy
   grand_muster: Grand Muster
-  lombard_debt: Lombard Debt
+  lombard_debt: Debt to the Changers
   holy_call: Call to Holy War
   great_cathedral: Great Cathedral
   great_keep: Great Keep
   great_market: Great Market
 
 opinion_modifier:
+  respects_unifier: Respects the victor
+  merchant_gift: Lavish gift
   royal_visit: Royal visit
   new_building_joy: New building
   miracle_witnessed: Witnessed a miracle
@@ -75,10 +81,16 @@ ui:
   need_lover: The ruler must be your lover
 
 ai:
+  respects_unifier: Respects the victor
+  kin_council: Council of kin
+  golden_hand: Open hand
+  peacemaker: Peacemaker's fame
+  menace: Menace
   statesman: A statesman's glory
   perk_alluring: Allure
 
 msg:
+  hero_legacy: "You inherit not only titles but the glory of your forebear."
   pilgrim_relic: "You brought holy relics in a reliquary back from your pilgrimage."
   knight_captured: "[scope:captive_knight] was taken prisoner on the battlefield."
   duel_trophy: "You took the loser's weapon: [scope:duel_trophy]."

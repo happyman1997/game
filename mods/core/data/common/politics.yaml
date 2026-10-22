@@ -201,7 +201,7 @@ interactions:
             - intrigue: ">= 8"
             # или тайный советник за делом, или сам — серый кардинал
             - has_council_task: [disrupt_schemes, find_secrets, fabricate_claims]
-            - has_archetype: gray_eminence
+            - has_perk: gray_eminence
     auto_accept: yes
     hookable: no
     cooldown: { years: 2 }
@@ -214,7 +214,7 @@ interactions:
     ai_potential:
       - NOT: { has_trait: [honest, just] }
       - OR: [ { any_faction_against: yes }, { has_trait: [deceitful, schemer, paranoid] } ]
-      - OR: [ { intrigue: ">= 8" }, { has_council_task: [disrupt_schemes, find_secrets, fabricate_claims] }, { has_archetype: gray_eminence } ]
+      - OR: [ { intrigue: ">= 8" }, { has_council_task: [disrupt_schemes, find_secrets, fabricate_claims] }, { has_perk: gray_eminence } ]
     ai_will_do:
       value: 0
       if:

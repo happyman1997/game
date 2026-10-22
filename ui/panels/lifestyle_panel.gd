@@ -68,16 +68,18 @@ static func build(app: App) -> Control:
 		focus_row.add_child(K.vbox([K.center(b), cap], 2))
 	root.add_child(K.section(app.t("ui.focus"), [focus_row], "star"))
 
-	# деревья перков
+	# деревья перков: прямые — столбцом; с развилкой — корень, две ветки рядом, вершина
 	var trees_row := K.hbox([], 4, BoxContainer.ALIGNMENT_CENTER)
 	for t in trees:
+		var branched: bool = not t.branches.is_empty()
+		var w := 204 if branched else 160
 		var col := K.vbox([], 0)
-		col.custom_minimum_size.x = 160
+		col.custom_minimum_size.x = w
 		var tname := K.label(g.loc.t_or("perk_tree." + t.tree, t.tree), "SubheaderLabel")
 		tname.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		tname.add_theme_font_size_override("font_size", 17)
 		tname.clip_text = true
-		tname.custom_minimum_size.x = 160
+		tname.custom_minimum_size.x = w
 		col.add_child(tname)
 		# как стезя меняет игру; одна высота у всех, чтобы перки стояли рядами
 		var tdesc: Variant = g.loc.raw("perk_tree_desc." + t.tree)
@@ -85,21 +87,52 @@ static func build(app: App) -> Control:
 		dl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		dl.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 		dl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		dl.custom_minimum_size = Vector2(160, 66)
+		dl.custom_minimum_size = Vector2(w, 66)
 		dl.add_theme_font_size_override("font_size", 11)
 		col.add_child(dl)
-		for i in t.perks.size():
-			if i > 0:
-				var link := ColorRect.new()
-				var prev_owned := Lifestyles.has_perk(p, t.perks[i - 1].id)
-				link.color = Color(UiArt.GOLD, 0.8) if prev_owned else Color(UiArt.BRONZE, 0.4)
-				link.custom_minimum_size = Vector2(3, 16)
-				link.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-				col.add_child(link)
-			col.add_child(_perk_node(app, p, t.perks[i], xp, cost))
+		if not branched:
+			_chain(app, p, col, t.perks, xp)
+		else:
+			_chain(app, p, col, t.root, xp)
+			var split := K.hbox([], 4, BoxContainer.ALIGNMENT_CENTER)
+			var keys: Array = t.branches.keys()
+			keys.sort()
+			for b in keys:
+				var bcol := K.vbox([], 0)
+				bcol.custom_minimum_size.x = 100
+				var bl := K.label(g.loc.t_or("perk_branch.%s_%s" % [t.tree, b], ""), "MutedLabel")
+				bl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				bl.add_theme_font_size_override("font_size", 11)
+				bl.custom_minimum_size.x = 100
+				bl.clip_text = true
+				bcol.add_child(_link(Lifestyles.has_perk(p, t.root[-1].id) if not t.root.is_empty() else true))
+				bcol.add_child(bl)
+				_chain(app, p, bcol, t.branches[b], xp)
+				split.add_child(bcol)
+			col.add_child(split)
+			if not t.apex.is_empty():
+				var any_done: bool = t.branches.values().any(func(list): return not list.is_empty() and Lifestyles.has_perk(p, list[-1].id))
+				col.add_child(_link(any_done))
+				_chain(app, p, col, t.apex, xp)
 		trees_row.add_child(col)
 	root.add_child(trees_row)
 	return root
+
+
+## Перки цепочкой: значки сверху вниз, между ними — связки.
+static func _chain(app: App, p: Dictionary, box: Control, perks: Array, xp: int) -> void:
+	for i in perks.size():
+		if i > 0:
+			box.add_child(_link(Lifestyles.has_perk(p, perks[i - 1].id)))
+		box.add_child(_perk_node(app, p, perks[i], xp, Lifestyles.perk_cost(app.game, p, str(perks[i].lifestyle), perks[i])))
+
+
+static func _link(owned: bool) -> Control:
+	var link := ColorRect.new()
+	link.color = Color(UiArt.GOLD, 0.8) if owned else Color(UiArt.BRONZE, 0.4)
+	link.custom_minimum_size = Vector2(3, 16)
+	link.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	return link
 
 
 static func _perk_node(app: App, p: Dictionary, perk: Dictionary, xp: int, cost: int) -> Control:
@@ -120,7 +153,7 @@ static func _perk_node(app: App, p: Dictionary, perk: Dictionary, xp: int, cost:
 	var cap := K.label(g.name_of("perks", perk.id), "GoldLabel" if owned else "SmallLabel")
 	cap.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	cap.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	cap.custom_minimum_size.x = 130
+	cap.custom_minimum_size.x = 96
 	cap.add_theme_font_size_override("font_size", 12)
 	return K.vbox([K.center(b), cap], 0)
 
@@ -154,6 +187,8 @@ static func perk_tip(app: App, p: Dictionary, perk: Dictionary, owned: bool, req
 		acts.append("«%s»" % g.name_of("decisions" if g.content.has("decisions", u) else "interactions", u))
 	if not acts.is_empty():
 		bb += "\n" + BB.gold(app.t("ui.perk_unlocks", {"list": ", ".join(acts)}))
+	if not owned and Lifestyles.other_branch_taken(g, p, perk):
+		bb += "\n" + BB.muted(app.t("ui.perk_second_branch", {"pct": roundi((g.def_num("lifestyle.second_branch_mult", 2.0) - 1.0) * 100.0)}))
 	if owned:
 		bb += "\n" + BB.good("✔ " + app.t("ui.perk_owned"))
 	elif not req_ok:

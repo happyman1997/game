@@ -1,7 +1,7 @@
 # Голоса навыков: варианты, которые дописываются к событиям ядра ($append —
 # сами события остаются в своих файлах). Вариант с полем skill:
 #   { skill: X, min: N }   — доступен при навыке не ниже N (игрок видит его серым);
-#   { archetype: id }      — доступен связке навыков;
+#   { perk: id }           — доступен тому, кто взял перк стези;
 #   { skill: X, check: N } — проверка: шанс виден заранее, затем success/failure.
 # Тексты — ev.<id>.<буква>, буквы продолжают варианты события.
 events:
@@ -43,7 +43,7 @@ events:
             scope:first: { add_opinion: { target: root, modifier: grateful } }
             scope:second: { add_opinion: { target: root, modifier: grateful } }
           ai_chance: 60
-        - skill: { archetype: arbiter }
+        - skill: { perk: peacemaker }
           trigger: { exists: scope:second }
           effect:
             add_prestige: 15
@@ -82,7 +82,7 @@ events:
   court.0008:            # ярмарка
     options:
       $append:
-        - skill: { archetype: merchant_prince }
+        - skill: { perk: golden_hand }
           effect:
             add_gold: 30
             scope:province: { add_province_modifier: { id: trade_fair, years: 3 } }
@@ -229,7 +229,7 @@ events:
   politics.0002:         # тяжба о меже
     options:
       $append:
-        - skill: { archetype: arbiter }
+        - skill: { perk: peacemaker }
           trigger: { exists: scope:second }
           effect:
             add_prestige: 20

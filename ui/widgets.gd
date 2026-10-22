@@ -205,30 +205,6 @@ static func stress_source(g: Game, src: String) -> String:
 	return g.loc.t_or("stress_src." + kind, g.loc.t("stress_src.other"))
 
 
-## Плашка испытания пути: название, сколько целей выполнено; в подсказке —
-## цели с прогрессом и срок.
-static func trial_chip(app: App, c: Dictionary, trial: Dictionary) -> Control:
-	var g := app.game
-	var aid := str(trial.id)
-	var ad: Variant = g.content.get_def("skill_archetypes", aid)
-	var gs := Trials.goals(g, c)
-	var done := gs.filter(func(x): return x.done).size()
-	var aname := g.name_of("skill_archetypes", aid)
-	var chip := K.panel(K.hbox([K.icon("⏳", 16), K.label(app.t("ui.trial_chip", {"name": aname, "done": done, "total": gs.size()}), "SmallLabel")], 3))
-	chip.add_theme_stylebox_override("panel", UiArt.flat(Color("#25303a"), Color(UiArt.GOLD, 0.45), 1, 3, 3))
-	var months := maxi(0, ceili((int(trial.until) - g.date) / 30.4))
-	var tb := BB.title(app.t("ui.trial_title", {"name": aname})) + "\n" + BB.muted(app.t("ui.trial_left", {"months": months}))
-	for x in gs:
-		var line := "%s %s (%d/%d)" % ["✓" if x.done else "•", x.text, x.have, x.need] if x.need > 1 or not x.done else "✓ " + str(x.text)
-		tb += "\n" + (BB.good(line) if x.done else BB.esc(line))
-	var adesc := g.desc_of("skill_archetypes", aid) if ad != null else ""
-	if adesc != "":
-		tb += "\n" + BB.i(adesc)
-	tb += "\n" + BB.muted(app.t("ui.trial_fail_note", {"stress": roundi(g.def_num("trials.fail_stress", 30))}))
-	K.tip(chip, tb)
-	return chip
-
-
 ## Летопись деяний: значки со счётчиками и ближайшие прозвища (null — пусто).
 static func deeds(app: App, c: Dictionary) -> Variant:
 	var g := app.game
@@ -305,29 +281,6 @@ static func traits(app: App, c: Dictionary) -> Control:
 			chip.modulate = Color(1, 1, 1, 0.8)
 		K.tip(chip, tipbb)
 		f.add_child(chip)
-	# архетипы: связки высоких навыков
-	for aid in Stats.archetypes(g, c):
-		var ad: Variant = g.content.get_def("skill_archetypes", aid)
-		var aname := g.name_of("skill_archetypes", aid)
-		var chip := K.panel(K.hbox([K.icon(ad.get("icon", "star"), 16), K.label(aname, "SmallLabel")], 3))
-		chip.add_theme_stylebox_override("panel", UiArt.flat(Color("#4a3c20"), Color(UiArt.GOLD, 0.8), 1, 3, 3))
-		var need := " + ".join(Data.as_array(ad.get("skills")).map(func(x): return g.name_of("skills", x)))
-		var tb := BB.title(aname) + "\n" + BB.muted(app.t("ui.archetype_needs", {"skills": need, "min": int(Data.num(ad.get("min"), 12))}))
-		var adesc := g.desc_of("skill_archetypes", aid)
-		if adesc != "":
-			tb += "\n" + BB.i(adesc)
-		var amods := {}
-		var raw: Variant = ad.get("modifiers")
-		if raw is Dictionary:
-			for k in raw:
-				# правила-флаги описаны в тексте архетипа
-				if k != "self_knight" and k != "scapegoat" and k != "law_no_resentment":
-					amods[k] = raw[k]
-		var mtxt := BB.modifiers(g, amods)
-		if mtxt != "":
-			tb += "\n" + mtxt
-		K.tip(chip, tb)
-		f.add_child(chip)
 	# состояние духа: безмятежность, порыв, надлом
 	var sp: Variant = Spirit.state_of(c) if g.engine.has_feature("spirit") else null
 	var spd: Variant = g.content.get_def("spirit_states", sp) if sp != null else null
@@ -345,10 +298,6 @@ static func traits(app: App, c: Dictionary) -> Control:
 			tb += "\n" + mt
 		K.tip(chip, tb)
 		f.add_child(chip)
-	# испытание пути: цели и срок
-	var trial: Variant = Trials.active(c) if g.engine.has_feature("trials") else null
-	if trial != null:
-		f.add_child(trial_chip(app, c, trial))
 	# тени мастерства: изнанка очень высоких навыков
 	for s in Stats.masteries(g, c):
 		var sd: Variant = g.content.get_def("skills", s)

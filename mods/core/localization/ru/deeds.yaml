@@ -56,3 +56,49 @@ ui:
   deeds_tip: "Что совершено за жизнь. Из деяний растут прозвища (только имя, без эффектов) и цели испытаний призваний."
   next_nickname: "Прозвище «{nick}»: {deed} {have}/{need}"
   nickname_from: "Прозвище заслужено: {deed}"
+deed:
+  battles_won: Победы в битвах
+  battles_lost: Поражения в битвах
+  sieges_won: Взятые крепости
+  wars_won: Выигранные войны
+  duels_won: Победы в поединках
+  buildings: Постройки
+  conversions: Обращённые графства
+  schemes: Удачные интриги
+  whispers: Раздоры и слухи
+  secrets_exposed: Разоблачённые тайны
+  blackmails: Шантаж
+  executions: Казни
+  captives: Узники
+  gifts: Подарки и договоры
+  pacts: Союзы и клятвы
+  feasts: Пиры и советы
+  charity: Милостыня
+  devotions: Паломничества и обеты
+  hunts: Охоты
+  judgments: Рассуженные споры
+  revolts: Мятежи
+  laws: Реформы
+deed_goal:
+  battles_won: "Выиграть битвы"
+  battles_lost: "Проиграть битвы"
+  sieges_won: "Взять крепости"
+  wars_won: "Выиграть войну"
+  duels_won: "Победить в поединке"
+  buildings: "Завершить постройки"
+  conversions: "Обратить графства"
+  schemes: "Довести интриги до успеха"
+  whispers: "Посеять раздор или пустить слух"
+  secrets_exposed: "Разоблачить тайны"
+  blackmails: "Шантажировать"
+  executions: "Казнить пленника"
+  captives: "Бросить в темницу"
+  gifts: "Сделать подарки"
+  pacts: "Заключить союз или принять вассала"
+  feasts: "Устроить пир или Великий совет"
+  charity: "Раздать милостыню"
+  devotions: "Паломничество, исповедь или миссия"
+  hunts: "Сходить на охоту"
+  judgments: "Рассудить спор при дворе"
+  revolts: "Поднять мятеж"
+  laws: "Провести реформу"

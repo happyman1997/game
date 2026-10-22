@@ -1,0 +1,22 @@
+# Statecraft open to every ruler (statecraft.yaml)
+modifier:
+  trade_pact: Trade Pact
+opinion_modifier:
+  trade_partner: Trade partner
+  mediated_peace: Brought peace
+interaction:
+  trade_pact: Propose a Trade Pact
+  mediate_peace: Offer Mediation
+interaction_desc:
+  mediate_peace: "You offer a ruler peace: if they agree, all of their wars end in white peace, and you gain glory. Rulers listen to those they respect and who can speak well."
+  trade_pact: "Merchants of both realms travel freely: for five years both rulers collect more taxes. A good steward is more persuasive."
+decision:
+  search_archives: Search the Archives
+decision_desc:
+  search_archives: "Dig through old charters for a right to one of the neighbouring counties. Whether you find one depends on learning; an Archivist almost surely will."
+msg:
+  archives_claim: "An old charter turned up in the archives: you now have a claim on [scope:claim_target]!"
+ai:
+  war_weary: Tired of war
+  actor_stewardship: Proposer's stewardship
+  actor_diplomacy: Mediator's eloquence

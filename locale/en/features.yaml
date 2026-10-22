@@ -14,6 +14,7 @@ ui:
   lifestyle_xp_month: "+{n} experience per month"
   perks_n: "Perks: {n}"
   perk_owned: Unlocked
+  perk_second_branch: "Second branch of the path: {pct}% more expensive"
   perk_locked: Unlock the previous perk first
   perk_need_xp: "Requires experience: {cost} (you have {xp})"
   perk_unlock: Unlock perk

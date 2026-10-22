@@ -1,20 +1,18 @@
 class_name Deeds
 extends EngineFeature
 ## Деяния: летопись того, что персонаж совершил за жизнь — выигранные битвы,
-## постройки, казни, пиры, поединки. Из неё растут прозвища (nicknames) и
-## цели испытаний архетипов. Сами по себе деяния ничего не дают.
+## постройки, казни, пиры, поединки. Из неё растут прозвища (nicknames), а
+## счётчики деяний (значения deeds_<id>) годятся в условия — например, в ключи
+## к запертым действиям. Сами по себе деяния ничего не дают.
 ##
 ## Данные:
 ##   deeds: { <id>: { icon, order, signal | decisions | interactions | schemes | events } }
 ##     signal — встроенный источник: battle_won, battle_lost, siege_won,
 ##       war_won, war_lost, duel_won, duel_lost, building, conversion,
-##       scheme_success, discord, secret_exposed, revolt_led, law_changed,
-##       trial_completed;
+##       scheme_success, discord, secret_exposed, revolt_led, law_changed;
 ##     decisions — принятые решения, interactions — принятые взаимодействия
 ##       (у действующего лица), schemes — удачные интриги (у заговорщика),
 ##       events — события, через которые прошёл персонаж.
-##     ai_hint: { decisions, interactions } — что помогает добиться деяния
-##       (ИИ на испытании охотнее это делает), если сам источник — сигнал.
 ##   nicknames: { <id>: { deed, count, priority } } — прозвище (ключ
 ##     локализации nick.<id>, женское — nick.<id>_f, если есть) приходит,
 ##     когда счётчик деяния дорос до count; новое заменяет старое, только если
@@ -26,7 +24,7 @@ extends EngineFeature
 
 const OWNER := "core/deeds"
 const SIGNALS := ["battle_won", "battle_lost", "siege_won", "war_won", "war_lost", "duel_won", "duel_lost",
-	"building", "conversion", "scheme_success", "discord", "secret_exposed", "revolt_led", "law_changed", "trial_completed"]
+	"building", "conversion", "scheme_success", "discord", "secret_exposed", "revolt_led", "law_changed"]
 
 
 func _init() -> void:
@@ -57,11 +55,6 @@ static func _index(game: Game) -> Dictionary:
 		for k in ["decisions", "interactions", "schemes", "events"]:
 			for x in Data.as_array(d.get(k)):
 				put.call(k.trim_suffix("s") + ":" + str(x), d.id)
-		var hint: Variant = d.get("ai_hint")
-		if hint is Dictionary:
-			for k in ["decisions", "interactions"]:
-				for x in Data.as_array(hint.get(k)):
-					put.call("hint:" + k.trim_suffix("s") + ":" + str(x), d.id)
 	game.engine.cache["deeds:index"] = m
 	return m
 
@@ -202,7 +195,6 @@ func install(engine: GameEngine) -> void:
 		if not p.accepted and not p.get("negotiated", false):
 			sig.call(p.game, "revolt_led", p.faction.leader)
 	, 0, OWNER)
-	H.on("trial.completed", func(p): sig.call(p.game, "trial_completed", p.character), 0, OWNER)
 	H.on("law.changed", func(p): sig.call(p.game, "law_changed", p.character), 0, OWNER)
 	H.on("event.fired", func(p):
 		if p.target.type == "character":
@@ -225,12 +217,6 @@ func install(engine: GameEngine) -> void:
 				v.ref("schemes", x, "deeds/" + d.id)
 			for x in Data.as_array(d.get("events")):
 				v.ref("events", x, "deeds/" + d.id)
-			var hint: Variant = d.get("ai_hint")
-			if hint is Dictionary:
-				for x in Data.as_array(hint.get("decisions")):
-					v.ref("decisions", x, "deeds/%s ai_hint" % d.id)
-				for x in Data.as_array(hint.get("interactions")):
-					v.ref("interactions", x, "deeds/%s ai_hint" % d.id)
 		for n in e.content.all("nicknames"):
 			if n.get("deed") != null:
 				v.ref("deeds", n.get("deed"), "nicknames/" + n.id)

@@ -1,15 +1,15 @@
 # Деяния (механика deeds): летопись того, что персонаж совершил за жизнь.
-# Из неё растут прозвища и цели испытаний архетипов (archetypes.yaml).
-# Источник — signal (встроенный), decisions, interactions (принятые, у
-# действующего лица), schemes (удачные интриги), events (события персонажа);
-# ai_hint — что помогает ИИ добиться деяния-сигнала. Название — deed.<id>,
-# цель испытания — deed_goal.<id> (прогресс «2/3» дописывается сам).
+# Из неё растут прозвища, а счётчики (значения deeds_<id>) годятся в условия —
+# например, в ключи к запертым действиям. Источник — signal (встроенный),
+# decisions, interactions (принятые, у действующего лица), schemes (удачные
+# интриги), events (события персонажа). Название — deed.<id>; deed_goal.<id>
+# — как деяние звучит в условии («Выиграть битвы»).
 deeds:
   battles_won:     { icon: "⚔", order: 1, signal: battle_won }
   battles_lost:    { icon: "🏳", order: 2, signal: battle_lost }
   sieges_won:      { icon: "🏰", order: 3, signal: siege_won }
   wars_won:        { icon: "👑", order: 4, signal: war_won }
-  duels_won:       { icon: "🤺", order: 5, signal: duel_won, ai_hint: { interactions: [challenge_to_duel] } }
+  duels_won:       { icon: "🤺", order: 5, signal: duel_won }
   buildings:       { icon: "🏗", order: 6, signal: building }
   conversions:     { icon: "✝", order: 7, signal: conversion }
   schemes:         { icon: "🗡", order: 8, signal: scheme_success }

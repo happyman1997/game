@@ -96,10 +96,12 @@ perks:
     # государь слушает народ: ходоки и прошения не робеют и при опасении
     modifiers: { prestige_opinion_mult: 0.5, monthly_prestige: 0.3, complaint_mult: 0.5 }
     ai_will_do: { value: 10, if: { limit: { has_trait: [arrogant, ambitious, gregarious] }, add: 15 } }
+  # ветка «Двор»
   court_etiquette:
     lifestyle: diplomacy_lifestyle
     tree: august
     requires: regal_bearing
+    branch: a
     icon: "🎩"
     modifiers: { general_opinion: 3 }
     stress_reactions: { hold_feast: -10 }
@@ -108,13 +110,34 @@ perks:
     lifestyle: diplomacy_lifestyle
     tree: august
     requires: court_etiquette
+    branch: a
     icon: "🏛"
     modifiers: { diplomacy: 1 }
     ai_will_do: 40
+  # ветка «Миротворец»
+  # ссоры вассалов тают, посредничество в чужих войнах принимают охотнее
+  peacemaker:
+    lifestyle: diplomacy_lifestyle
+    tree: august
+    requires: regal_bearing
+    branch: b
+    icon: "🕊"
+    modifiers: { feud_decay: 3, general_opinion: 3 }
+    ai_will_do: { value: 8, if: { limit: { has_trait: [just, forgiving, calm, content] }, add: 12 } }
+  # побеждённые им не держат зла и охотнее идут в вассалы; вассалы шлют больше войск
+  unifier:
+    lifestyle: diplomacy_lifestyle
+    tree: august
+    requires: peacemaker
+    branch: b
+    icon: "🚩"
+    modifiers: { vassal_levy_mult: 0.1, vassal_opinion: 5 }
+    ai_will_do: 40
+  # вершина — любой из веток
   august_majesty:
     lifestyle: diplomacy_lifestyle
     tree: august
-    requires: statesman
+    requires_any: [statesman, unifier]
     icon: "👑"
     trait: diplomat
     unlocks: [royal_progress]
@@ -127,56 +150,102 @@ perks:
     icon: "🌱"
     modifiers: { fertility: 0.15 }
     ai_will_do: { value: 10, if: { limit: { has_trait: [lustful, gregarious, compassionate] }, add: 10 }, add: { value: num_children, multiply: 2, max: 10 } }
+  # ветка «Кровь»
   blood_ties:
     lifestyle: diplomacy_lifestyle
     tree: family_first
     requires: fecund_line
+    branch: a
     icon: "🩸"
     modifiers: { legacy_cost_mult: -0.25, family_opinion: 10 }
     ai_will_do: 40
-  wise_mentor:
+  # родичи-правители охотнее заключают союзы и браки с главой рода
+  kin_council:
     lifestyle: diplomacy_lifestyle
     tree: family_first
     requires: blood_ties
+    branch: a
+    icon: "🫱"
+    modifiers: { family_opinion: 10 }
+    ai_will_do: 40
+  # ветка «Наставник»
+  wise_mentor:
+    lifestyle: diplomacy_lifestyle
+    tree: family_first
+    requires: fecund_line
+    branch: b
     icon: "🧓"
     modifiers: { ward_education_mult: 0.5, learning: 1 }
     stress_reactions: { choose_guardian: -5 }
     ai_will_do: 40
-  head_of_house:
+  # наследник получает «Наследие предка» — славу и уважение вассалов
+  worthy_heir:
     lifestyle: diplomacy_lifestyle
     tree: family_first
     requires: wise_mentor
+    branch: b
+    icon: "🗝"
+    modifiers: { monthly_prestige: 0.3 }
+    ai_will_do: 40
+  # вершина — любой из веток
+  head_of_house:
+    lifestyle: diplomacy_lifestyle
+    tree: family_first
+    requires_any: [kin_council, worthy_heir]
     icon: "🏰"
     trait: family_patriarch
     effect: { add_dynasty_prestige: 100 }
     unlocks: [gather_kin]
     ai_will_do: 40
 
-  # ================================================ воинское дело: Полководец — маневр и пленные
+  # ================================================ воинское дело: Полководец — манёвр и пленные
   logistics:
     lifestyle: martial_lifestyle
     tree: strategist
     icon: "🐎"
     modifiers: { attrition_mult: -0.5, march_speed: 0.05 }
     ai_will_do: { value: 10, if: { limit: { has_trait: [patient, diligent, ambitious] }, add: 10 }, add: { value: martial, multiply: 0.5 } }
+  # ветка «Манёвр»
   take_alive:
     lifestyle: martial_lifestyle
     tree: strategist
     requires: logistics
+    branch: a
     icon: "⛓"
     modifiers: { commander_advantage: 2 }
     ai_will_do: 40
-  military_drills:
+  # на своей земле войско сильнее, разбитый враг теряет больше
+  ambush:
     lifestyle: martial_lifestyle
     tree: strategist
     requires: take_alive
+    branch: a
+    icon: "🌲"
+    modifiers: { home_advantage: 15, pursuit: 0.5 }
+    ai_will_do: 40
+  # ветка «Хозяин войска»
+  military_drills:
+    lifestyle: martial_lifestyle
+    tree: strategist
+    requires: logistics
+    branch: b
     icon: "🥁"
     modifiers: { regiment_power: 0.15, army_upkeep_mult: -0.15 }
     ai_will_do: 40
-  master_strategist:
+  # добыча вдвое больше, наёмники вдвое дешевле
+  quartermaster:
     lifestyle: martial_lifestyle
     tree: strategist
     requires: military_drills
+    branch: b
+    icon: "⛺"
+    modifiers: { loot_mult: 1, army_upkeep_mult: -0.1 }
+    ai_will_do: 40
+  # вершина — любой из веток
+  master_strategist:
+    lifestyle: martial_lifestyle
+    tree: strategist
+    requires_any: [ambush, quartermaster]
     icon: "♞"
     trait: strategist
     unlocks: [grand_muster]
@@ -197,25 +266,48 @@ perks:
           add: 40
         - limit: { has_trait: [compassionate, forgiving, just] }
           multiply: 0
+  # ветка «Кровь»
   bloody_justice:
     lifestyle: martial_lifestyle
     tree: tyranny
     requires: stern_gaze
+    branch: a
     icon: "🪓"
     stress_reactions: { execute_prisoner: -15, imprison: -5 }
     ai_will_do: 40
-  dungeon_dread:
+  # каждая победа внушает ужас, враг сдаётся раньше
+  scourge:
     lifestyle: martial_lifestyle
     tree: tyranny
     requires: bloody_justice
+    branch: a
+    icon: "💀"
+    modifiers: { peace_persuasion: 25, general_opinion: -5 }
+    ai_will_do: 40
+  # ветка «Темница»
+  dungeon_dread:
+    lifestyle: martial_lifestyle
+    tree: tyranny
+    requires: stern_gaze
+    branch: b
     icon: "🗝"
     modifiers: { dread_per_prisoner: 1 }
     stress_reactions: { release_prisoner: 10 }
     ai_will_do: 40
-  iron_fist:
+  # запугивание действует сильнее, страх копится быстрее
+  menace:
     lifestyle: martial_lifestyle
     tree: tyranny
     requires: dungeon_dread
+    branch: b
+    icon: "🐺"
+    modifiers: { dread_gain_mult: 0.15 }
+    ai_will_do: 40
+  # вершина — любой из веток
+  iron_fist:
+    lifestyle: martial_lifestyle
+    tree: tyranny
+    requires_any: [scourge, menace]
     icon: "⛓"
     trait: tyrant
     unlocks: [intimidate, public_execution]
@@ -229,24 +321,47 @@ perks:
     modifiers: { prowess: 2 }
     stress_reactions: { challenge_to_duel: -10 }
     ai_will_do: { value: 6, if: { limit: { has_trait: [brave, arrogant, wrathful, honest] }, add: 15 }, add: { value: prowess, multiply: 0.8 } }
+  # ветка «Поединщик»
   trophy_taker:
     lifestyle: martial_lifestyle
     tree: chivalry
     requires: knightly_vow
+    branch: a
     icon: "⚔"
     modifiers: { attraction_opinion: 5 }
     ai_will_do: 40
-  sword_brotherhood:
+  # победы в поединках вдвое славнее
+  champion:
     lifestyle: martial_lifestyle
     tree: chivalry
     requires: trophy_taker
+    branch: a
+    icon: "🤺"
+    modifiers: { duel_prestige_mult: 1, prowess: 1 }
+    ai_will_do: 40
+  # ветка «Братство»
+  sword_brotherhood:
+    lifestyle: martial_lifestyle
+    tree: chivalry
+    requires: knightly_vow
+    branch: b
     icon: "🤝"
     modifiers: { knight_cap: 2, knight_effectiveness: 0.15 }
     ai_will_do: 40
-  paragon_of_chivalry:
+  # сам бьётся в рядах своих рыцарей — и рискует, как они
+  warrior_king:
     lifestyle: martial_lifestyle
     tree: chivalry
     requires: sword_brotherhood
+    branch: b
+    icon: "⚔"
+    modifiers: { self_knight: 1, knight_effectiveness: 0.2 }
+    ai_will_do: 40
+  # вершина — любой из веток
+  paragon_of_chivalry:
+    lifestyle: martial_lifestyle
+    tree: chivalry
+    requires_any: [champion, warrior_king]
     icon: "🏇"
     trait: paragon
     unlocks: [glory_quest]
@@ -259,10 +374,12 @@ perks:
     icon: "🧱"
     modifiers: { build_cost_mult: -0.15 }
     ai_will_do: { value: 10, if: { limit: { has_trait: [diligent, patient, ambitious] }, add: 10 } }
+  # ветка «Земли»
   thriving_lands:
     lifestyle: stewardship_lifestyle
     tree: architect
     requires: master_builder
+    branch: a
     icon: "🌾"
     modifiers: { development_growth: 0.1, control_gain: 0.5 }
     ai_will_do: 40
@@ -270,13 +387,34 @@ perks:
     lifestyle: stewardship_lifestyle
     tree: architect
     requires: thriving_lands
+    branch: a
     icon: "🖼"
     modifiers: { commission_cost_mult: -0.4, commission_quality: 0.25 }
     ai_will_do: 40
+  # ветка «Твердыни»
+  # крепости домена на уровень крепче
+  fortifier:
+    lifestyle: stewardship_lifestyle
+    tree: architect
+    requires: master_builder
+    branch: b
+    icon: "🧱"
+    modifiers: { domain_fort: 1 }
+    ai_will_do: 40
+  # столица держит осаду вдвое дольше
+  castellan:
+    lifestyle: stewardship_lifestyle
+    tree: architect
+    requires: fortifier
+    branch: b
+    icon: "🏯"
+    modifiers: { capital_defense: 1, build_cost_mult: -0.1 }
+    ai_will_do: 40
+  # вершина — любой из веток
   royal_architect:
     lifestyle: stewardship_lifestyle
     tree: architect
-    requires: court_splendor
+    requires_any: [court_splendor, castellan]
     icon: "🏗"
     trait: architect
     unlocks: [great_work]
@@ -289,25 +427,48 @@ perks:
     icon: "📋"
     modifiers: { domain_limit: 1 }
     ai_will_do: { value: 10, if: { limit: { has_trait: [greedy, ambitious, diligent] }, add: 10 } }
+  # ветка «Подати»
   tax_collectors:
     lifestyle: stewardship_lifestyle
     tree: administrator
     requires: efficient_rule
+    branch: a
     icon: "🧾"
     modifiers: { tax_mult: 0.1, audit_chance: 3 }
     ai_will_do: 40
-  lombard_loan:
+  # законы вдвое дешевле, не обижают вассалов, а их недовольство реформам не мешает
+  reformer:
     lifestyle: stewardship_lifestyle
     tree: administrator
     requires: tax_collectors
+    branch: a
+    icon: "📖"
+    modifiers: { law_cost_mult: -0.5, law_no_resentment: 1 }
+    ai_will_do: 40
+  # ветка «Золото»
+  lombard_loan:
+    lifestyle: stewardship_lifestyle
+    tree: administrator
+    requires: efficient_rule
+    branch: b
     icon: "🏦"
     modifiers: { monthly_income: 0.3 }
     unlocks: [take_loan]
     ai_will_do: 40
-  great_administrator:
+  # подарки вдвое действеннее, торговые договоры охотнее
+  golden_hand:
     lifestyle: stewardship_lifestyle
     tree: administrator
     requires: lombard_loan
+    branch: b
+    icon: "🪙"
+    modifiers: { vassal_tax_mult: 0.05 }
+    ai_will_do: 40
+  # вершина — любой из веток
+  great_administrator:
+    lifestyle: stewardship_lifestyle
+    tree: administrator
+    requires_any: [reformer, golden_hand]
     icon: "⚖"
     trait: administrator
     unlocks: [bribe]
@@ -320,10 +481,12 @@ perks:
     icon: "👂"
     modifiers: { scheme_power: 5 }
     ai_will_do: { value: 10, if: { limit: { has_trait: [deceitful, paranoid, ambitious, cynical] }, add: 15 } }
+  # ветка «Тайны»
   prying_eyes:
     lifestyle: intrigue_lifestyle
     tree: schemer
     requires: subtle_hand
+    branch: a
     icon: "🪙"
     modifiers: { income_per_hook: 0.5 }
     stress_reactions: { blackmail: -10 }
@@ -332,14 +495,35 @@ perks:
     lifestyle: intrigue_lifestyle
     tree: schemer
     requires: prying_eyes
+    branch: a
     icon: "📜"
     modifiers: { intrigue: 1 }
     unlocks: [sell_secret]
     ai_will_do: 40
+  # ветка «Чужие руки»
+  # раскрытую интригу валят на придворного; раздор сеется удачнее
+  gray_eminence:
+    lifestyle: intrigue_lifestyle
+    tree: schemer
+    requires: subtle_hand
+    branch: b
+    icon: "🎭"
+    modifiers: { scapegoat: 1, discord_chance: 20 }
+    ai_will_do: 40
+  # его убийцы вдвое быстрее, а против него самого убийцам вдвое труднее
+  night_blade:
+    lifestyle: intrigue_lifestyle
+    tree: schemer
+    requires: gray_eminence
+    branch: b
+    icon: "🗡"
+    modifiers: { scheme_defense: 10 }
+    ai_will_do: 40
+  # вершина — любой из веток
   master_schemer:
     lifestyle: intrigue_lifestyle
     tree: schemer
-    requires: secret_trade
+    requires_any: [secret_trade, night_blade]
     icon: "🕷"
     trait: schemer
     unlocks: [compel_service]
@@ -352,25 +536,48 @@ perks:
     icon: "💋"
     modifiers: { attraction_opinion: 10 }
     ai_will_do: { value: 6, if: { limit: { has_trait: [lustful, gregarious, deceitful] }, add: 15 } }
-  pillow_talk:
-    lifestyle: intrigue_lifestyle
-    tree: seducer
-    requires: alluring
-    icon: "🕯"
-    modifiers: { intrigue: 1 }
-    ai_will_do: 40
+  # ветка «Сердца»
   heartbreaker:
     lifestyle: intrigue_lifestyle
     tree: seducer
-    requires: pillow_talk
+    requires: alluring
+    branch: a
     icon: "💔"
     modifiers: { diplomacy: 1 }
     stress_reactions: { seduce: -10 }
     ai_will_do: 40
-  irresistible:
+  # двор очарован, о любви поют, а не шепчутся
+  courtly_love:
     lifestyle: intrigue_lifestyle
     tree: seducer
     requires: heartbreaker
+    branch: a
+    icon: "🌸"
+    modifiers: { attraction_opinion: 10, general_opinion: 3 }
+    ai_will_do: 40
+  # ветка «Тайны алькова»
+  pillow_talk:
+    lifestyle: intrigue_lifestyle
+    tree: seducer
+    requires: alluring
+    branch: b
+    icon: "🕯"
+    modifiers: { intrigue: 1 }
+    ai_will_do: 40
+  # интриги через постель вернее
+  honey_trap:
+    lifestyle: intrigue_lifestyle
+    tree: seducer
+    requires: pillow_talk
+    branch: b
+    icon: "🍯"
+    modifiers: { scheme_power: 10 }
+    ai_will_do: 40
+  # вершина — любой из веток
+  irresistible:
+    lifestyle: intrigue_lifestyle
+    tree: seducer
+    requires_any: [courtly_love, honey_trap]
     icon: "🌹"
     trait: seducer
     unlocks: [heart_pact]
@@ -383,10 +590,12 @@ perks:
     icon: "📕"
     modifiers: { deed_lifestyle_xp: 25, learning: 1 }
     ai_will_do: { value: 10, if: { limit: { has_trait: [diligent, curious, shy, cynical] }, add: 10 } }
+  # ветка «Естество»
   natural_philosophy:
     lifestyle: learning_lifestyle
     tree: scholarship
     requires: avid_reader
+    branch: a
     icon: "🔭"
     modifiers: { development_growth: 0.05, lifestyle_xp_mult: 0.1 }
     ai_will_do: 40
@@ -394,13 +603,34 @@ perks:
     lifestyle: learning_lifestyle
     tree: scholarship
     requires: natural_philosophy
+    branch: a
     icon: "🧠"
-    modifiers: { archetype_skill_reduction: 2, diplomacy: 1, martial: 1, stewardship: 1, intrigue: 1 }
+    modifiers: { diplomacy: 1, martial: 1, stewardship: 1, intrigue: 1 }
     ai_will_do: 40
+  # ветка «Архивы»
+  # каждый год в архивах всплывает чужая тайна, права на земли находятся чаще
+  archivist:
+    lifestyle: learning_lifestyle
+    tree: scholarship
+    requires: avid_reader
+    branch: b
+    icon: "📚"
+    modifiers: { scheme_power: 5 }
+    ai_will_do: 40
+  # осадные машины и расчёт: чужие стены падают быстрее, свои строятся дешевле
+  engineer:
+    lifestyle: learning_lifestyle
+    tree: scholarship
+    requires: archivist
+    branch: b
+    icon: "⚙"
+    modifiers: { siege_speed: 0.3, build_cost_mult: -0.1 }
+    ai_will_do: 40
+  # вершина — любой из веток
   renowned_scholar:
     lifestyle: learning_lifestyle
     tree: scholarship
-    requires: polymath
+    requires_any: [polymath, engineer]
     icon: "🎓"
     trait: scholar
     unlocks: [magnum_opus]
@@ -420,10 +650,12 @@ perks:
           add: 20
         - limit: { ai_righteousness: ">= 3" }
           add: 30
+  # ветка «Тишина»
   inner_peace:
     lifestyle: learning_lifestyle
     tree: theology
     requires: devout_prayer
+    branch: a
     icon: "🕯"
     modifiers: { stress_gain_mult: -0.15, piety_opinion_mult: 0.5 }
     ai_will_do: 40
@@ -431,14 +663,35 @@ perks:
     lifestyle: learning_lifestyle
     tree: theology
     requires: inner_peace
+    branch: a
     icon: "⛪"
     modifiers: { learning: 1 }
     stress_reactions: { execute_prisoner: 15 }
     ai_will_do: 40
+  # ветка «Воин веры»
+  # победы над иноверцами и еретиками угодны Солнцу
+  holy_warrior:
+    lifestyle: learning_lifestyle
+    tree: theology
+    requires: devout_prayer
+    branch: b
+    icon: "✝"
+    modifiers: { battle_survival: 0.15 }
+    ai_will_do: 40
+  # священная война вдвое дешевле
+  sun_sword:
+    lifestyle: learning_lifestyle
+    tree: theology
+    requires: holy_warrior
+    branch: b
+    icon: "☀"
+    modifiers: { knight_effectiveness: 0.1, monthly_piety: 0.3 }
+    ai_will_do: 40
+  # вершина — любой из веток
   doctor_of_theology:
     lifestyle: learning_lifestyle
     tree: theology
-    requires: relic_keeper
+    requires_any: [relic_keeper, sun_sword]
     icon: "✝"
     trait: theologian
     unlocks: [miracle, holy_call]

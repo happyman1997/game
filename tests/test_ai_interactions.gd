@@ -63,9 +63,13 @@ func test_dynasty_head_tribute_and_honor() -> void:
 	kin.gold = 400.0
 	Chars.add_dynasty_renown(g, head.dynasty, 400)
 	check(_does(g, head, "demand_family_tribute", kin.id, 500), "глава рода берёт дань с богатого родича")
+	# недоволен только этот родич; прочих правителей рода глава уже обласкал
+	for x in g.living():
+		if x.id != head.id and x.id != kin.id and not x.titles.is_empty() and Chars.same_dynasty(g, x, head):
+			Opinion.add_opinion(g, x, head, "generic", 80)
 	Opinion.add_opinion(g, kin, head, "generic", -60)
 	Chars.add_dynasty_renown(g, head.dynasty, 400)
-	check(_does(g, head, "honor_kin", kin.id, 120), "и чтит недовольного родича")
+	check(_does(g, head, "honor_kin", kin.id, 600), "и чтит недовольного родича")
 
 
 func test_revoke_needs_authority_or_reason() -> void:

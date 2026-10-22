@@ -61,20 +61,13 @@ static func validate(engine: GameEngine) -> Array:
 				if sp is Dictionary:
 					if sp.get("skill") != null and not c.has("skills", str(sp.skill)):
 						v.issue("%s option %d: нет навыка \"%s\"" % [w, i + 1, sp.skill])
-					if sp.get("archetype") != null and not c.has("skill_archetypes", str(sp.archetype)):
-						v.issue("%s option %d: нет архетипа \"%s\"" % [w, i + 1, sp.archetype])
+					if sp.get("perk") != null and not c.has("perks", str(sp.perk)):
+						v.issue("%s option %d: нет перка \"%s\"" % [w, i + 1, sp.perk])
 					if sp.get("check") != null:
 						v.effect(opts[i].get("success"), "%s option %d success" % [w, i + 1])
 						v.effect(opts[i].get("failure"), "%s option %d failure" % [w, i + 1])
 				elif sp != null:
-					v.issue("%s option %d: skill — словарь { skill, min | check } или { archetype }" % [w, i + 1])
-	for a in c.all("skill_archetypes"):
-		if not (a.get("skills") is Array) or a.skills.size() < 2:
-			v.issue("skill_archetypes/%s: skills — список из двух и более навыков" % a.id)
-			continue
-		for sk in a.skills:
-			if not c.has("skills", str(sk)):
-				v.issue("skill_archetypes/%s: нет навыка \"%s\"" % [a.id, sk])
+					v.issue("%s option %d: skill — словарь { skill, min | check } или { perk }" % [w, i + 1])
 	for d in c.all("decisions"):
 		v.trigger(d.get("is_shown"), "decisions/%s is_shown" % d.id)
 		v.trigger(d.get("ai_potential"), "decisions/%s ai_potential" % d.id)

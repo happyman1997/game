@@ -18,7 +18,6 @@
 | `assembly_supports_war` | character | Сход одобряет наступательную войну (или правление его не требует) | core/governments |
 | `can_be_guardian_of` | character | Может стать опекуном ребёнка: can_be_guardian_of: scope:recipient | core/upbringing |
 | `can_be_regent_of` | character | Может стать регентом: can_be_regent_of: scope:actor | core/upbringing |
-| `can_begin_trial` | character | Может встать на путь связки навыков (испытание): can_begin_trial: <архетип> или yes (хоть на один) | core/trials |
 | `can_manage_upbringing` | character | Распоряжается воспитанием ребёнка: can_manage_upbringing: scope:recipient | core/upbringing |
 | `can_marry` | character | Может вступить в брак с персонажем | core |
 | `can_use_hook_on` | character | Крюк на персонажа можно использовать сейчас | core |
@@ -37,10 +36,8 @@
 | `felt_dread_tier` | character | Ступень страха, которую подданный чувствует перед сюзереном (дерзкие — нижняя, сломленные — выше): felt_dread_tier: "< unease" | core/politics |
 | `global_var` | любой | Сравнение глобальной переменной | core |
 | `government` | character | Правление персонажа (id из governments или список) | core/governments |
-| `has_active_trial` | character | Проходит испытание (yes/no, id архетипа или список) | core/trials |
 | `has_ambition` | character | Есть желание (yes/no) или именно это: has_ambition: land | core/ambitions |
 | `has_any_claim` | character | Есть претензии | core |
-| `has_archetype` | character | Есть архетип — связка высоких навыков (skill_archetypes): has_archetype: <id> или yes | core |
 | `has_artifact` | character | Персонаж держит вещь (реликвию по id или предмет): has_artifact: <id> | core/artifacts |
 | `has_artifact_claim` | character | Притязает на чью-то вещь (yes) или на вещь этого персонажа: has_artifact_claim: scope:recipient | core/artifacts |
 | `has_artifact_type` | character | Есть вещь этого типа: has_artifact_type: sword | core/artifacts |
@@ -214,7 +211,6 @@
 | `awaken_dead` | Мёртвые восстают в провинции: awaken_dead: 30 (сила) | arcana |
 | `become_independent` | Стать независимым | core |
 | `become_vassal_of` | Стать вассалом | core |
-| `begin_trial` | Начать испытание пути: begin_trial: <архетип> | core/trials |
 | `blackmail` | Шантажировать персонажа его самым тяжёлым известным секретом (получить крюк) | core/secrets |
 | `bless_domain` | Светлый чародей благословляет земли домена | arcana |
 | `break_alliance` | Разорвать союз | core |
@@ -256,7 +252,6 @@
 | `gain_title` | Получить титул | core |
 | `give_nickname` | Дать прозвище из nicknames (женская форма — nick.<id>_f): give_nickname: terrible | core/deeds |
 | `give_title` | Пожаловать титул: { title, to } — получатель становится вассалом | core |
-| `grant_archetype` | Дать архетип без испытания: grant_archetype: <архетип> | core/trials |
 | `grant_minor_county` | Пожаловать персонажу самое бедное графство своего домена (не столицу) | core/politics |
 | `hunt_dragon` | Выйти на бой с ближайшим драконом | arcana |
 | `hunt_monsters` | Выследить чудовище в державе: найденная тайна раскрывается | arcana |
@@ -436,7 +431,6 @@
 | `monsters_slain` | character | Сколько чудовищ уничтожил персонаж (слава охотника) | arcana |
 | `monthly_piety` | character | Характеристика: monthly_piety | core |
 | `monthly_prestige` | character | Характеристика: monthly_prestige | core |
-| `num_archetypes` | character | Сколько архетипов заслужено | core/trials |
 | `num_artifacts` | character | Число вещей у персонажа | core/artifacts |
 | `num_buildings` | province | Число построек | core |
 | `num_children` | character | Число живых детей | core |
@@ -642,7 +636,6 @@
 | `momentum` | Удачи и неудачи: успех снимает стресс, провал добавляет | да |
 | `duels` | Поединки: вызов на бой один на один, поборники из рыцарей | да |
 | `deeds` | Деяния: летопись поступков персонажа и прозвища, которые из неё растут | да |
-| `trials` | Испытания архетипов: связку навыков нужно заслужить делами | да |
 | `spirit` | Состояние духа: безмятежность, порывы по характеру, надлом и закалка | да |
 | `upbringing` | Детство, опекуны и воспитание, регентство при малолетнем правителе | да |
 | `dynasties` | Династия: известность рода, наследия, глава рода и младшие ветви | да |
@@ -664,6 +657,6 @@
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `synod_decrees`, `districts`, `grafts`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`, `districts`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council_pay`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `faith_morals`, `faith_head`, `tribute`, `arcana_faith`, `grafts`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `trials`, `spirit`, `karma`, `synod`, `districts`
-- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `trials` (14), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `tribute` (56), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `spirit`, `karma`, `synod`, `districts`
+- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `council` (15), `ambitions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `tribute` (56), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

@@ -108,9 +108,10 @@ func test_scholar_deeds_and_paths() -> void:
 	var xp0 := Lifestyles.xp_of(h, "learning_lifestyle")
 	Deeds.record(g, h, "buildings")
 	check(Lifestyles.xp_of(h, "learning_lifestyle") >= xp0 + 25.0 - 0.01, "деяние — опыт образа жизни")
-	var min0 := Trials.skill_min(g, h, "warlord")
+	var dip0 := Stats.skill(g, h, "diplomacy")
 	_perks(g, h, ["natural_philosophy", "polymath"])
-	check_eq(Trials.skill_min(g, h, "warlord"), min0 - 2.0, "пути открываются раньше")
+	g.stat_cache.clear()
+	check_eq(Stats.skill(g, h, "diplomacy"), dip0 + 1, "всезнание: каждый навык на очко выше")
 
 
 func test_architect_commission_and_sovereign_glory() -> void:
