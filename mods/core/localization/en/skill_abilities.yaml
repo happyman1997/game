@@ -17,7 +17,7 @@ interaction:
   challenge_to_duel: Challenge to a Duel
 interaction_desc:
   spread_rumor: "Spread a nasty rumor about a ruler. Success — they lose prestige and their vassals cool toward them (good for factions). Failure — you are caught red-handed. Chance depends on your intrigue against theirs."
-  challenge_to_duel: "Challenge to single combat. Odds depend on the fighters' prowess; rulers may send a champion — the best of their knights. The winner gains prestige and dread, the loser risks wounds or death. Refusing costs prestige."
+  challenge_to_duel: "Challenge to single combat. The fight goes in exchanges: attack, guard or feint; the strength of each stance comes from prowess, traits, weapon and armor. Rulers may send a champion — the best of their knights. The winner decides the loser's fate: spare, wound or kill. Refusing costs prestige."
 msg:
   plotter_turned: "Turned: [scope:plotter] is now on your hook — the exposed plotter will serve you."
   rumor_spread: "The rumor is out: every court is whispering about [scope:recipient]."

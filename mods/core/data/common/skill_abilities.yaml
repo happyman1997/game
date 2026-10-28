@@ -2,22 +2,7 @@
 # перевербовка и слухи (интриги), поединки (доблесть). Остальное — в
 # характеристиках навыков (skills.yaml) и в движке.
 
-defines:
-  duels:
-    per_point: 4              # шанс = 50 + (доблесть бойца − доблесть противника) × per_point
-    min_chance: 10
-    max_chance: 90
-    champion_margin: 2        # рыцарь бьётся за правителя, если доблестнее его хотя бы на столько
-    win_prestige: 60
-    lose_prestige: 40
-    champion_share: 0.5       # доля славы (и позора), когда бился поборник
-    win_dread: 5
-    death_chance: 0.1         # проигравший боец гибнет (× 1 − battle_survival)
-    wound_chance: 0.5         # иначе — ранен с таким шансом
-    loser_opinion: bested_in_duel
-
 opinion_modifiers:
-  bested_in_duel: { value: -15, years: 5 }
   rumors_about_liege: { value: -10, years: 3 }
   slandered_me: { value: -30, years: 10 }
 

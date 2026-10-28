@@ -92,7 +92,7 @@ grafts:
   silver_tongue:  { part: mouth, tier: 3, price: 240, fortitude: 7, icon: tooth, modifiers: { diplomacy: 3, general_opinion: 5 } }
   # сердце
   relic_heart:    { part: heart, tier: 3, price: 200, fortitude: 3,  icon: reliquary, modifiers: { monthly_piety: 0.5, stress_gain_mult: -0.15 } }
-  lion_heart:     { part: heart, tier: 4, price: 400, fortitude: 12, icon: heart, modifiers: { prowess: 5, martial: 1, battle_survival: 0.1 } }
+  lion_heart:     { part: heart, tier: 4, price: 400, fortitude: 12, icon: heart, modifiers: { prowess: 5, martial: 1, battle_survival: 0.1, duel_vigor: 2 } }
   star_iron_heart: { part: heart, tier: 5, price: 600, fortitude: 14, icon: heart, modifiers: { health: 1.5, battle_survival: 0.25 } }
   # кровь
   galen_humors:   { part: blood, tier: 1, price: 50,  fortitude: 2,  icon: drop, modifiers: { health: 0.5, stress_gain_mult: -0.05 } }
@@ -107,15 +107,15 @@ grafts:
   rune_tattoos:   { part: skin, tier: 2, price: 140, fortitude: 5,  icon: rune, modifiers: { battle_survival: 0.15, prowess: 1 } }
   saint_relic:    { part: skin, tier: 3, price: 200, fortitude: 3,  icon: reliquary, modifiers: { monthly_piety: 0.4, scheme_defense: 10 } }
   shadow_ink:     { part: skin, tier: 3, price: 260, fortitude: 8,  icon: vial, modifiers: { intrigue: 3, scheme_power: 10 } }
-  dragon_scales:  { part: skin, tier: 4, price: 420, fortitude: 10, icon: scales_hide, modifiers: { prowess: 2, battle_survival: 0.25, health: 0.2 } }
+  dragon_scales:  { part: skin, tier: 4, price: 420, fortitude: 10, icon: scales_hide, modifiers: { prowess: 2, battle_survival: 0.25, health: 0.2, duel_vigor: 2, duel_guard: 1 } }
   # кости
   iron_splints:   { part: bones, tier: 1, price: 60,  fortitude: 3,  icon: bone, modifiers: { health: 0.3, prowess: 1 } }
   silver_ribs:    { part: bones, tier: 2, price: 140, fortitude: 5,  icon: bone, modifiers: { battle_survival: 0.15, health: 0.3 } }
   giant_bones:    { part: bones, tier: 4, price: 400, fortitude: 10, icon: bone, modifiers: { prowess: 3, knight_effectiveness: 0.1 } }
   # руки
-  hook_hand:      { part: arms, tier: 1, price: 50,  fortitude: 5,  icon: hook,     cures: [maimed], modifiers: { prowess: 2, dread_gain_mult: 0.1 } }
+  hook_hand:      { part: arms, tier: 1, price: 50,  fortitude: 5,  icon: hook,     cures: [maimed], modifiers: { prowess: 2, dread_gain_mult: 0.1, duel_guile: 1 } }
   iron_hand:      { part: arms, tier: 2, price: 150, fortitude: 8,  icon: gauntlet, cures: [maimed], modifiers: { prowess: 3, siege_speed: 0.05 } }
-  blade_arm:      { part: arms, tier: 4, price: 420, fortitude: 12, icon: sword,    cures: [maimed], modifiers: { prowess: 6, dread_gain_mult: 0.2 } }
+  blade_arm:      { part: arms, tier: 4, price: 420, fortitude: 12, icon: sword,    cures: [maimed], modifiers: { prowess: 6, dread_gain_mult: 0.2, duel_might: 2 } }
   clockwork_arm:  { part: arms, tier: 5, price: 600, fortitude: 12, icon: gear,     cures: [maimed], modifiers: { prowess: 3, stewardship: 1, learning: 1, knight_effectiveness: 0.05 } }
   # ноги
   peg_leg:        { part: legs, tier: 1, price: 30,  fortitude: 3, icon: pegleg, cures: [maimed], modifiers: { health: 0.1 } }

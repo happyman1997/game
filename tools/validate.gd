@@ -26,6 +26,8 @@ func _init() -> void:
 			while not g.state.pending_events.is_empty():
 				g.events.choose(g.state.pending_events[0].uid, 0)
 			g.state.pending_requests.clear()
+			for f in Duels.pending(g).duplicate():
+				Duels.dismiss(g, f.uid)
 			g.tick()
 		if g.living().is_empty():
 			errors += 1

@@ -21,7 +21,7 @@ static var _last_played := {}
 static var _last_any := -100000
 static var _rng := RandomNumberGenerator.new()
 ## Не чаще (мс) для одного и того же звука.
-const MIN_GAP := {"hover": 80, "war": 1500, "event": 400, "notify": 250, "notify_good": 250, "notify_bad": 250}
+const MIN_GAP := {"hover": 80, "war": 1500, "event": 400, "notify": 250, "notify_good": 250, "notify_bad": 250, "clash": 120, "blow": 120}
 
 
 ## Создать плееры и шину (вызывается один раз приложением).
@@ -83,7 +83,7 @@ static func follow(sound: String) -> void:
 
 ## Подготовить все звуки заранее (чтобы первый щелчок не запинался).
 static func warm_up() -> void:
-	for s in ["hover", "click", "click_soft", "click_gold", "tab", "open", "close", "error", "notify", "notify_good", "notify_bad", "event", "coin", "war", "select", "pause", "unpause"]:
+	for s in ["hover", "click", "click_soft", "click_gold", "tab", "open", "close", "error", "notify", "notify_good", "notify_bad", "event", "coin", "war", "select", "pause", "unpause", "clash", "blow"]:
 		_stream(s)
 		# по звуку за кадр — меню не замирает
 		if not _players.is_empty() and _players[0].is_inside_tree():
@@ -156,6 +156,10 @@ static func _synth(sound: String) -> PackedFloat32Array:
 			[0.08, _bell(0.35, 1568.0, [1.0, 2.0, 2.52], [0.12, 0.07, 0.04], [0.8, 0.25, 0.12], 0.004)],
 		]), 3500.0), 0.04)
 		"war": return _level(_warm(_seq([[0.0, _drum(0.6, 1.0)], [0.26, _drum(0.6, 0.7)], [0.52, _drum(0.7, 0.9)]]), 1400.0), 0.1)
+		# схватка: сталь о сталь и глухой удар по щиту
+		"clash": return _level(_warm(_mix([_bell(0.45, 1046.5, [1.0, 2.76, 5.4], [0.12, 0.06, 0.03], [1.0, 0.5, 0.3], 0.001),
+			_scale(_noise_burst(0.08, 2000.0, 7000.0, 0.001, 0.02), 0.6)]), 6000.0), 0.05)
+		"blow": return _level(_warm(_mix([_thock(0.16, 160.0, 90.0, 0.04, 0.002), _scale(_noise_burst(0.06, 300.0, 1500.0, 0.002, 0.02), 0.5)]), 1800.0), 0.07)
 	return PackedFloat32Array()
 
 

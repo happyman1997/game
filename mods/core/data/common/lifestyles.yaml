@@ -322,7 +322,7 @@ perks:
     lifestyle: martial_lifestyle
     tree: chivalry
     icon: "🛡"
-    modifiers: { prowess: 2 }
+    modifiers: { prowess: 2, duel_guard: 1 }
     stress_reactions: { challenge_to_duel: -10 }
     ai_will_do: { value: 6, if: { limit: { has_trait: [brave, arrogant, wrathful, honest] }, add: 15 }, add: { value: prowess, multiply: 0.8 } }
   # ветка «Поединщик»
@@ -333,7 +333,7 @@ perks:
     branch: a
     icon: "⚔"
     unlocks: [glory_quest]
-    modifiers: { attraction_opinion: 5 }
+    modifiers: { attraction_opinion: 5, duel_might: 1 }
     ai_will_do: 40
   # победы в поединках вдвое славнее
   champion:
@@ -342,7 +342,7 @@ perks:
     requires: trophy_taker
     branch: a
     icon: "🤺"
-    modifiers: { duel_prestige_mult: 1, prowess: 1 }
+    modifiers: { duel_prestige_mult: 1, prowess: 1, duel_might: 1, duel_guile: 1 }
     ai_will_do: 40
   # ветка «Братство»
   sword_brotherhood:
@@ -522,7 +522,7 @@ perks:
     requires: gray_eminence
     branch: b
     icon: "🗡"
-    modifiers: { scheme_defense: 10 }
+    modifiers: { scheme_defense: 10, duel_guile: 2 }
     ai_will_do: 40
   # вершина — любой из веток
   master_schemer:

@@ -1,0 +1,106 @@
+# Single combat (engine/features/duels.gd)
+duel:
+  title:
+    duel: Duel
+    mortal: Fight to the Death
+    friendly: Sparring
+    foe: Fight
+  intro:
+    duel: "The circle is drawn, the witnesses wait. The fight goes on until someone falls or yields."
+    mortal: "No mercy: only one walks out of the circle."
+    friendly: "To first blood: whoever loses half their strength first loses."
+    foe: "There is nowhere to run."
+  you: you
+  stance:
+    attack: attack
+    guard: guard
+    feint: feint
+  stance_t:
+    attack: Attack
+    guard: Guard
+    feint: Feint
+  stance_tip:
+    attack: "A straight, heavy blow. Crushes a feint, but a guard catches it."
+    guard: "Meet the blow and answer. Catches an attack, but a feint slips past it."
+    feint: "A false swing and a strike where the opening is. Slips past a guard, but an attack crushes it."
+  power: "Strength: {n}"
+  tell:
+    attack:
+      "1": "{who} grips the hilt with both hands, shoulders tense."
+      "2": "{who} leans forward as if about to lunge."
+      "3": "{who} stares straight at you, breathing hard through clenched teeth."
+    guard:
+      "1": "{who} crouches behind the guard, eyes on your blade."
+      "2": "{who} steps back half a pace and waits."
+      "3": "{who} holds the weapon close, in no hurry to strike."
+    feint:
+      "1": "{who}'s eyes dart from your feet to your shield."
+      "2": "{who} circles, shifting weight from foot to foot."
+      "3": "{who} smiles faintly and lowers the point."
+  tell_acc: "How surely you read them: ≈{n}%"
+  tell_none: "Your opponent gives nothing away."
+  vigor: "Vigor {v} of {m}"
+  round: "Exchange {n} of {m}"
+  your_move: "Your move"
+  yield: Yield
+  yield_tip: "The fight ends now, but yielding is shameful: prestige, and torment for the brave and the proud. The victor decides your fate."
+  mercy_title: "Your opponent is at your mercy. What will you do?"
+  mercy_title_yield: "Your opponent yields. What will you do?"
+  mercy:
+    spare: Spare
+    wound: Wound
+    kill: Kill
+  mercy_tip:
+    spare: "The glory of the magnanimous and a drop of Light; the defeated will remember."
+    wound: "Let them carry a wound to remember the fight (the fallen may be maimed)."
+    kill: "Fear and an end to the quarrel, but the kin of the slain won't forgive. Killing one who yielded is Ash."
+  result:
+    win: Victory
+    lose: Defeat
+  how:
+    fall: "{l} is down."
+    yield: "{l} yields."
+    points: "The fight is stopped, strength spent: the day goes to {w}."
+    first_blood: "First blood: the day goes to {w}."
+  fate:
+    spare: "Outcome: mercy."
+    wound: "Outcome: a wound."
+    kill: "Outcome: death."
+    none: ""
+  fatal: "The blow proved fatal."
+  close: Close
+  log_title: The fight
+  odds: "≈{n}% to win — with even play"
+  log:
+    beat_attack: "{a} — {sa}, {b} — {sb}. The attack crushes the feint: {l} −{d}."
+    beat_guard: "{a} — {sa}, {b} — {sb}. The guard catches the attack and answers: {l} −{d}."
+    beat_feint: "{a} — {sa}, {b} — {sb}. The feint slips past the guard: {l} −{d}."
+    clash: "{a} — {sa}, {b} — {sb}. They clash: {a} −{da}, {b} −{db}."
+    circle: "{a} — {sa}, {b} — {sb}. They circle, catching their breath."
+    outwit: "{a} — {sa}, {b} — {sb}. Both feint, {w} is quicker: {l} −{d}."
+    soft: "(the blow is softened)"
+    crit: "A terrible blow!"
+msg:
+  duel_fall: "Fight: {winner} defeats {loser}."
+  duel_yield: "Fight: {loser} yields to {winner}."
+  duel_spare: "Duel: {winner} defeats {loser} and grants mercy."
+  duel_wound: "Duel: {winner} defeats {loser} and leaves a wound."
+  duel_died: "Fight: {loser} dies by the hand of {winner}."
+  duel_points: "The duel is stopped after {rounds} exchanges: the day goes to {winner}."
+  duel_first_blood: "Sparring: first blood to {winner}."
+fx:
+  duel: "Duel: {a} vs {b}, ≈{chance}% to win"
+  duel_mortal: "Fight to the death: {a} vs {b}, ≈{chance}% to win"
+  duel_friendly: "Sparring: {a} vs {b}, ≈{chance}% to win"
+  fight: "Fight: {a} vs {foe}, ≈{chance}% to win"
+inv_hist:
+  duel_won: "Duel won: {to} over {from}"
+  duel_kill: "Blood in a duel: {to} slew {from}"
+karma_deed:
+  spared_foe: Mercy to the defeated
+  slew_yielded: Killing one who yielded
+stat:
+  duel_might: Attack in single combat
+  duel_guard: Guard in single combat
+  duel_guile: Feint in single combat
+  duel_vigor: Vigor in single combat

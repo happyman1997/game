@@ -231,6 +231,12 @@ func effect(block: Variant, where: String) -> void:
 					rest.erase(x)
 				effect(rest, where)
 			continue
+		if (k == "duel" or k == "fight") and v is Dictionary and not v.has("type"):
+			effect(v.get("on_win"), where)
+			effect(v.get("on_lose"), where)
+			if k == "fight" and not engine.content.has("foes", str(v.get("foe", ""))):
+				_warn(where, "fight: нет врага \"%s\"" % v.get("foe"))
+			continue
 		if r.effects.has(k) or engine.content.has("scripted_effects", k):
 			_check_arg_refs(k, v, where)
 			continue

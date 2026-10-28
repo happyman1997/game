@@ -1,0 +1,122 @@
+# Схватка (механика duels, engine/features/duels.gd): бой один на один
+# обменами. В каждом обмене бойцы выбирают стойку: натиск, защиту или
+# хитрость. Натиск сминает хитрость, хитрость обходит защиту, защита ловит
+# натиск. Сила стойки — доблесть × stance_base плюс вклад черт, вещей, перков
+# и вживлений (duel_might — натиск, duel_guard — защита, duel_guile —
+# хитрость), к хитрости — доля интриги; стойкость — vigor_base + доблесть ×
+# vigor_per_prowess + duel_vigor. Победитель решает судьбу побеждённого.
+
+defines:
+  duels:
+    # профиль бойца
+    stance_base: 0.5          # сила стойки = доблесть × stance_base + вклад черт и вещей
+    guile_intrigue: 0.2       # к хитрости — интрига × столько
+    vigor_base: 7             # стойкость = vigor_base + доблесть × vigor_per_prowess + duel_vigor
+    vigor_per_prowess: 0.2
+    min_vigor: 3
+    old_age: 50               # после этого возраста стойкость тает
+    old_age_loss: 0.15        # за каждый год сверх
+    # обмен
+    damage: 3                 # урон = damage + сила своей стойки × damage_per_power
+    damage_per_power: 0.15    #   + (сила своей − сила чужой) × damage_per_point ± damage_spread
+    damage_per_point: 0.3
+    damage_spread: 1
+    crit_chance: 0.1          # страшный удар — двойной урон
+    soften_base: 25           # шанс смягчить пропущенный удар вдвое, % (+ soften_per_point за очко перевеса своей стойки)
+    soften_per_point: 4
+    clash_mult: 0.75          # два натиска: оба бьют вполсилы
+    circle_recover: 1         # две защиты: оба переводят дух
+    max_rounds: 8             # после стольких обменов верх — за тем, у кого больше сил
+    overkill: 3               # павший ниже −overkill стойкости может не подняться:
+    overkill_death: 0.3       #   с таким шансом (× 1 − battle_survival)
+    friendly_end: 0.5         # учебный бой — до половины стойкости
+    # ИИ
+    yield_at: 0.4             # можно сдаться, когда сил меньше этой доли
+    yield_base: 0.35          # шанс, что ИИ сдастся (− yield_per_bold за очко храбрости)
+    yield_per_bold: 0.1
+    strength_pref: 0.08       # ИИ чаще берёт свою сильную стойку
+    read_base: 0.3            # и бьёт то, чего ждёт от противника (+ read_per_point за очко хитрости)
+    read_per_point: 0.05
+    low_vigor_guard: 0.5      # без сил — в защиту (вспыльчивый — в натиск)
+    # подсказки игроку: верны с шансом tell_base + (своя хитрость − чужая) × tell_per_point
+    tell_base: 45
+    tell_per_point: 3
+    tell_min: 30
+    tell_max: 80
+    # оценка шанса (duel_odds) — логистика от разницы средней силы стоек,
+    # стойкости, сильнейшей стойки и храбрости; подобрана по прогонам боёв
+    # (поменяли числа боя — сверьте: Duels.simulated_odds)
+    odds_stance: 0.5
+    odds_vigor: 0.19
+    odds_peak: 0.08
+    odds_bold: 0.065
+    # поборники
+    champion_margin: 2        # рыцарь бьётся за правителя, если доблестнее его хотя бы на столько
+    champion_share: 0.5       # доля славы (и позора), когда бился поборник
+    # исходы
+    win_prestige: 60
+    lose_prestige: 40
+    foe_prestige: 40          # за врага из данных
+    win_dread: 5
+    yield_prestige: 30        # сдавшийся теряет сверх
+    yield_stress: 20          # храброму и гордому сдаться — мука
+    spare_prestige: 20        # пощадил — слава великодушного
+    spare_karma: 1
+    kill_dread: 10
+    kill_yielded_karma: -3    # убить сдавшегося — Пепел
+    maim_chance: 0.25         # «ранить» павшего: может остаться увечным
+    scar_at: 0.3              # кто был на волосок (стойкость ниже доли) —
+    scar_chance: 0.2          #   может получить шрамы
+    loser_opinion: bested_in_duel
+    # выбор ИИ-победителя: веса пощадить / ранить / убить (плюс нрав, родство, вражда)
+    mercy_spare: 2
+    mercy_wound: 3
+    mercy_kill: 0.3
+
+opinion_modifiers:
+  bested_in_duel: { value: -15, years: 5 }
+  spared_in_duel: { value: 20, years: 10 }
+  slew_my_kin: { value: -40, years: 25 }
+
+# Враги из данных — для эффекта fight. fall — что будет с павшим (или
+# сдавшимся) персонажем, веса: death — гибель (× 1 − battle_survival), wound —
+# рана, spare — отпустят. yields — может ли персонаж сдаться ему.
+foes:
+  bandit:
+    icon: "🗡"
+    attack: 4
+    guard: 3
+    feint: 6
+    vigor: 7
+    style: { feint: 1.6 }
+    bold: -1
+    yields: yes
+    fall: { death: 15, wound: 55, spare: 30 }
+  hedge_knight:
+    icon: "🛡"
+    attack: 6
+    guard: 7
+    feint: 4
+    vigor: 11
+    style: { guard: 1.5 }
+    bold: 2
+    yields: yes
+    fall: { death: 10, wound: 60, spare: 30 }
+  wolf:
+    icon: "🐺"
+    attack: 6
+    guard: 2
+    feint: 5
+    vigor: 7
+    style: { attack: 1.6 }
+    bold: 2
+    fall: { death: 25, wound: 75 }
+  man_eater:
+    icon: "🐻"
+    attack: 9
+    guard: 4
+    feint: 3
+    vigor: 13
+    style: { attack: 2 }
+    bold: 3
+    fall: { death: 35, wound: 65 }

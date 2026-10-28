@@ -455,6 +455,8 @@ func _autopilot_resolve() -> void:
 	while not state.pending_requests.is_empty():
 		var r: Dictionary = state.pending_requests[0]
 		Interactions.resolve_request(self, r.uid, Interactions.ai_would_accept(self, r))
+	for f in Data.as_array(state.get("pending_fights")).duplicate():
+		Duels.dismiss(self, f.uid)
 
 
 ## Решает ли за персонажа ИИ: за всех, кроме игрока, а на автопилоте — и за него.
@@ -468,7 +470,7 @@ func ai_controls(id: Variant) -> bool:
 func tick() -> void:
 	if state.get("game_over") != null:
 		return
-	if autopilot and not (state.pending_events.is_empty() and state.pending_requests.is_empty()):
+	if autopilot and not (state.pending_events.is_empty() and state.pending_requests.is_empty() and Data.as_array(state.get("pending_fights")).is_empty()):
 		_autopilot_resolve()
 	state.date = int(state.date) + 1
 	# Характеристики кэшируются до конца месяца: всё, что их меняет (черты,

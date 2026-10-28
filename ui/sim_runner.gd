@@ -132,7 +132,7 @@ func set_snapshot(s: Dictionary) -> void:
 # ------------------------------------------------------------ поток
 
 func _blocked(g: Game) -> bool:
-	return not g.state.pending_events.is_empty() or not g.state.pending_requests.is_empty() or g.state.game_over != null
+	return not g.state.pending_events.is_empty() or not g.state.pending_requests.is_empty() or not Data.as_array(g.state.get("pending_fights")).is_empty() or g.state.game_over != null
 
 
 func _run() -> void:

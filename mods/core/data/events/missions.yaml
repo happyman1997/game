@@ -144,18 +144,11 @@ events:
     options:
       - effect:
           scope:agent:
-            check:
-              skill: prowess
-              base: 20
-              add:
-                - { desc: skill.prowess, value: { value: prowess, multiply: 3 } }
-                - { desc: trait.brave, limit: { has_trait: brave }, value: 10 }
-              success: { add_prestige: 40 }
-              failure:
-                random_list:
-                  - { weight: 85, add_trait: wounded }
-                  - { weight: 15, death: { reason: duel } }
-        ai_chance: { value: 20, add: { value: ai_boldness, multiply: 5 } }
+            fight:
+              foe: hedge_knight
+              kind: duel
+              on_win: { add_prestige: 40 }
+        ai_chance: { value: 10, add: [ { value: ai_boldness, multiply: 5 }, { value: "scope:agent.foe_odds(hedge_knight)", multiply: 0.2 } ] }
       # заплатить за проезд
       - effect:
           - add_gold: -20
@@ -171,23 +164,19 @@ events:
     options:
       - effect:
           scope:agent:
-            check:
-              skill: prowess
-              base: 25
-              add:
-                - { desc: skill.prowess, value: { value: prowess, multiply: 2 } }
-                - { desc: skill.martial, value: { value: martial, multiply: 2 } }
-              success:
+            fight:
+              foe: bandit
+              kind: duel
+              on_win:
                 - add_prestige: 30
                 - scope:patron: { add_gold: 40 }
-              failure: { add_trait: wounded }
-        ai_chance: 25
+        ai_chance: { value: 10, add: { value: "scope:agent.foe_odds(bandit)", multiply: 0.3 } }
       # бежать — не позор, а здравый смысл
       - effect:
           scope:agent: { add_prestige: -10 }
         ai_chance: { value: 10, add: { value: ai_boldness, multiply: -5 } }
 
-  # Зверь в чаще разоряет деревню
+  # Зверь в чаще разоряет деревню: матёрый волк — а то и людоед
   mission.0008:
     theme: war
     icon: "🐺"
@@ -196,19 +185,18 @@ events:
     options:
       - effect:
           scope:agent:
-            check:
-              skill: prowess
-              base: 15
-              add:
-                - { desc: skill.prowess, value: { value: prowess, multiply: 3 } }
-              success:
-                - add_prestige: 60
-                - create_artifact: { type: trophy_shield, rarity: [common, masterwork], how: trophy }
-              failure:
-                random_list:
-                  - { weight: 80, add_trait: wounded }
-                  - { weight: 20, death: { reason: hunting } }
-        ai_chance: { value: 15, add: { value: ai_boldness, multiply: 5 } }
+            random_list:
+              - weight: 70
+                fight:
+                  foe: wolf
+                  on_win: { add_prestige: 40 }
+              - weight: 30
+                fight:
+                  foe: man_eater
+                  on_win:
+                    - add_prestige: 80
+                    - create_artifact: { type: trophy_shield, rarity: [common, masterwork], how: trophy }
+        ai_chance: { value: 5, add: [ { value: ai_boldness, multiply: 5 }, { value: "scope:agent.foe_odds(wolf)", multiply: 0.2 } ] }
       - effect:
           scope:agent: { add_stress: 5 }
         ai_chance: 15

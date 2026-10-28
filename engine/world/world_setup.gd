@@ -29,6 +29,7 @@ static func empty_state(engine: GameEngine, bookmark: String, date: int, seed: i
 		"scheduled": [],
 		"pending_events": [],
 		"pending_requests": [],
+		"pending_fights": [],
 		"factions": {},
 		"global_flags": {},
 		"global_vars": {},

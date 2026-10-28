@@ -240,7 +240,7 @@
 | `discover_secret` | Узнать случайный секрет кого-то из своей державы | core/secrets |
 | `disinherit` | Лишить наследства (yes) или восстановить в правах (no) | core/dynasties |
 | `divorce` | Развод | core |
-| `duel` | Поединок с персонажем: duel: scope:x (за правителей могут биться поборники) | core/duels |
+| `duel` | Поединок с персонажем: duel: scope:x или { target: scope:x, kind: duel\|mortal\|friendly, champions: no, on_win: [...], on_lose: [...] } (эффекты исхода — в скоупе этой стороны, scope:duel_foe — противник; бьётся игрок — исход позже, после окна схватки) | core/duels |
 | `end_mission` | Прервать поручение (агент возвращается без исхода): end_mission: recalled | core/missions |
 | `end_tribute` | Перестать платить дань: end_tribute: yes | core/tribute |
 | `end_war` | Завершить войну: victory/white_peace/defeat | core |
@@ -249,6 +249,7 @@
 | `faction_negotiate` | Сюзерен уговорил фракцию разойтись без уступок | core/factions |
 | `faction_start_war` | Фракция поднимает мятеж | core/factions |
 | `feed_on_blood` | Вампир утоляет жажду (жертва — пленник или придворный) | arcana |
+| `fight` | Бой с врагом из данных: fight: { foe: wolf, kind: mortal\|duel\|friendly, on_win: [...], on_lose: [...] } (эффекты исхода — в скоупе этого персонажа) | core/duels |
 | `firestorm` | Огненная буря на крупнейшее вражеское войско у границ | arcana |
 | `found_cadet_house` | Основать младшую ветвь рода: found_cadet_house: yes | core/dynasties |
 | `fulfill_ambition` | Исполнить желание персонажа (благодарность — patron): fulfill_ambition: scope:actor | core/ambitions |
@@ -403,7 +404,7 @@
 | `domain_limit` | character | Лимит домена | core |
 | `dread` | character | Страх, который внушает правитель (0–100) | core/politics |
 | `dread_tier_level` | character | Номер ступени страха правителя (0 — нижняя) | core/politics |
-| `duel_odds` | character | Шанс победить персонажа в поединке, %: duel_odds(scope:x) | core/duels |
+| `duel_odds` | character | Шанс победить персонажа в поединке, % (при равной игре): duel_odds(scope:x) | core/duels |
 | `dynasty_level` | character | Уровень славы рода (0 — безвестный) | core/dynasties |
 | `dynasty_prestige` | character | Известность (престиж) династии | core |
 | `dynasty_renown` | character | Известность рода (можно тратить) | core/dynasties |
@@ -413,6 +414,7 @@
 | `fear_of_liege` | character | Страх перед сюзереном (0 у храбрых и гневливых) | core/politics |
 | `fertility` | character | Плодовитость | core |
 | `fief_law_level` | character | Уровень закона группы fief_law (−1, если не действует) | core/laws |
+| `foe_odds` | character | Шанс одолеть врага из данных (foes), %: foe_odds(<id>) | core/duels |
 | `fort_level` | province | Уровень укреплений | core |
 | `fortitude` | character | Сколько стойкости осталось (вживления её подтачивают) | grafts |
 | `general_opinion` | character | Характеристика: general_opinion | core |
@@ -642,7 +644,7 @@
 | `artifacts` | Инвентарь и реликвии: снаряжение, убранство двора, прочность, притязания | да |
 | `wilds` | Дикие земли без владельцев и истощение армий | да |
 | `momentum` | Удачи и неудачи: успех снимает стресс, провал добавляет | да |
-| `duels` | Поединки: вызов на бой один на один, поборники из рыцарей | да |
+| `duels` | Схватка: бой один на один обменами — поединки, бой насмерть, враги из данных | да |
 | `deeds` | Деяния: летопись поступков персонажа и прозвища, которые из неё растут | да |
 | `spirit` | Состояние духа: безмятежность, порывы по характеру, надлом и закалка | да |
 | `upbringing` | Детство, опекуны и воспитание, регентство при малолетнем правителе | да |
@@ -666,6 +668,6 @@
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `synod_decrees`, `districts`, `grafts`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`, `districts`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council_pay`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `faith_morals`, `faith_head`, `tribute`, `arcana_faith`, `grafts`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `deeds`, `spirit`, `karma`, `synod`, `districts`, `missions`
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `foes`, `deeds`, `spirit`, `karma`, `synod`, `districts`, `missions`
 - **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `council` (15), `ambitions` (16), `missions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `tribute` (56), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

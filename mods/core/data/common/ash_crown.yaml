@@ -40,7 +40,7 @@ artifacts:
     requires_feature: artifacts
     icon: sword
     type: sword
-    modifiers: { prowess: 4, martial: 2, commander_advantage: 3 }
+    modifiers: { prowess: 4, martial: 2, commander_advantage: 3, duel_might: 3, duel_guard: 2 }
   # Печать империи: ею скреплялись указы и договоры.
   imperial_seal:
     requires_feature: artifacts

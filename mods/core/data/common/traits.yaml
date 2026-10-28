@@ -13,28 +13,28 @@ traits:
   brave:
     category: personality
     icon: "🦁"
-    modifiers: { martial: 2, prowess: 3, attraction_opinion: 5 }
+    modifiers: { martial: 2, prowess: 3, attraction_opinion: 5, duel_vigor: 1 }
     opposites: [craven]
     compatibility: { brave: 10, craven: -15 }
     ai: { boldness: 3, aggression: 1 }
   craven:
     category: personality
     icon: "🐇"
-    modifiers: { intrigue: 2, prowess: -3, martial: -2 }
+    modifiers: { intrigue: 2, prowess: -3, martial: -2, duel_guard: 1 }
     opposites: [brave]
     compatibility: { brave: -10 }
     ai: { boldness: -3, aggression: -2 }
   calm:
     category: personality
     icon: "🌊"
-    modifiers: { diplomacy: 1, intrigue: 1, stress_gain_mult: -0.1 }
+    modifiers: { diplomacy: 1, intrigue: 1, stress_gain_mult: -0.1, duel_guard: 1 }
     opposites: [wrathful]
     compatibility: { wrathful: -10 }
     ai: { rationality: 2, vengefulness: -1 }
   wrathful:
     category: personality
     icon: "🔥"
-    modifiers: { martial: 3, diplomacy: -1, intrigue: -1 }
+    modifiers: { martial: 3, diplomacy: -1, intrigue: -1, duel_might: 1, duel_guard: -1 }
     opposites: [calm]
     compatibility: { calm: -5, wrathful: -5 }
     ai: { aggression: 2, vengefulness: 2, rationality: -2 }
@@ -123,14 +123,14 @@ traits:
   honest:
     category: personality
     icon: "📜"
-    modifiers: { diplomacy: 2, intrigue: -4, general_opinion: 5 }
+    modifiers: { diplomacy: 2, intrigue: -4, general_opinion: 5, duel_guile: -1 }
     opposites: [deceitful]
     compatibility: { deceitful: -15, honest: 10 }
     ai: { honor: 3 }
   deceitful:
     category: personality
     icon: "🎭"
-    modifiers: { intrigue: 4, diplomacy: -2 }
+    modifiers: { intrigue: 4, diplomacy: -2, duel_guile: 2 }
     opposites: [honest]
     compatibility: { honest: -10 }
     ai: { honor: -3 }
@@ -165,14 +165,14 @@ traits:
   patient:
     category: personality
     icon: "⏳"
-    modifiers: { learning: 2, intrigue: 1 }
+    modifiers: { learning: 2, intrigue: 1, duel_guard: 1, duel_guile: 1 }
     opposites: [impatient]
     compatibility: { impatient: -10 }
     ai: { rationality: 2, aggression: -1 }
   impatient:
     category: personality
     icon: "⚡"
-    modifiers: { martial: 1, learning: -2, prowess: 1 }
+    modifiers: { martial: 1, learning: -2, prowess: 1, duel_might: 1, duel_guard: -1 }
     opposites: [patient]
     ai: { energy: 2, aggression: 1 }
   temperate:
@@ -196,7 +196,7 @@ traits:
   paranoid:
     category: personality
     icon: "👁"
-    modifiers: { intrigue: 3, diplomacy: -1, stress_gain_mult: 0.2 }
+    modifiers: { intrigue: 3, diplomacy: -1, stress_gain_mult: 0.2, duel_guard: 1 }
     opposites: [trusting]
     compatibility: { paranoid: -10 }
     ai: { boldness: -1, vengefulness: 1 }
@@ -227,7 +227,7 @@ traits:
     category: personality
     icon: "🔪"
     weight: 0.5
-    modifiers: { intrigue: 2, diplomacy: -2, general_opinion: -5, dread_gain_mult: 0.25 }
+    modifiers: { intrigue: 2, diplomacy: -2, general_opinion: -5, dread_gain_mult: 0.25, duel_might: 1 }
     opposites: [compassionate]
     compatibility: { compassionate: -20, sadistic: 5 }
     ai: { compassion: -5, vengefulness: 2, aggression: 1 }
@@ -289,7 +289,7 @@ traits:
     birth_chance: 0.03
     inherit_chance: 0.15
     group: intellect
-    modifiers: { diplomacy: 2, martial: 2, stewardship: 2, intrigue: 2, learning: 2 }
+    modifiers: { diplomacy: 2, martial: 2, stewardship: 2, intrigue: 2, learning: 2, duel_guile: 1 }
   slow:
     category: congenital
     icon: "🐌"
@@ -329,7 +329,7 @@ traits:
     birth_chance: 0.03
     inherit_chance: 0.15
     group: physique
-    modifiers: { prowess: 5, health: 0.5, attraction_opinion: 5 }
+    modifiers: { prowess: 5, health: 0.5, attraction_opinion: 5, duel_vigor: 3 }
   weak:
     category: congenital
     icon: "🥀"
@@ -337,14 +337,14 @@ traits:
     birth_chance: 0.02
     inherit_chance: 0.1
     group: physique
-    modifiers: { prowess: -5, health: -0.5 }
+    modifiers: { prowess: -5, health: -0.5, duel_vigor: -2 }
   hale:
     category: congenital
     icon: "🍎"
     genetic: true
     birth_chance: 0.04
     inherit_chance: 0.15
-    modifiers: { health: 1 }
+    modifiers: { health: 1, duel_vigor: 1 }
   infertile:
     category: congenital
     icon: "🚫"
@@ -367,7 +367,7 @@ traits:
   wounded:
     category: health
     icon: "🩸"
-    modifiers: { health: -1, prowess: -3 }
+    modifiers: { health: -1, prowess: -3, duel_vigor: -2 }
     duration_days: 365
     monthly_death_chance: 0.005
   maimed:
@@ -377,7 +377,7 @@ traits:
   scarred:
     category: health
     icon: "⚡"
-    modifiers: { prowess: 2, attraction_opinion: -5, monthly_prestige: 0.1 }
+    modifiers: { prowess: 2, attraction_opinion: -5, monthly_prestige: 0.1, duel_vigor: 1 }
   infirm:
     category: health
     icon: "🦯"
@@ -392,7 +392,7 @@ traits:
   drunkard:
     category: lifestyle
     icon: "🍷"
-    modifiers: { stewardship: -2, stress_gain_mult: -0.25, health: -0.3 }
+    modifiers: { stewardship: -2, stress_gain_mult: -0.25, health: -0.3, duel_vigor: -1 }
   flagellant:
     category: lifestyle
     icon: "🩹"
@@ -404,7 +404,7 @@ traits:
   hunter:
     category: lifestyle
     icon: "🏹"
-    modifiers: { prowess: 2, martial: 1 }
+    modifiers: { prowess: 2, martial: 1, duel_guile: 1 }
   pilgrim:
     category: fame
     icon: "🧭"

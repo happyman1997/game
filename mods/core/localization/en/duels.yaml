@@ -1,0 +1,32 @@
+opinion_modifier:
+  beast_slain: Rid us of the beast
+  beast_bounty: Bounty on the beast
+  beast_ignored: Left us to the beast
+  spared_in_duel: Spared me in a duel
+  slew_my_kin: Slew my kin in a duel
+foe:
+  bandit: a bandit
+  hedge_knight: a hedge knight
+  wolf: a grey wolf
+  man_eater: a man-eating beast
+modifier:
+  cut_straps: Cut Straps
+karma_deed:
+  foul_play: Foul play
+msg:
+  foul_play_found: "The trick is out: everyone knows your opponent's straps were cut on your word."
+ev:
+  duel.0001:
+    t: A Gauntlet at the Feast
+    desc: "In the middle of the feast [scope:challenger.name] rises, cup in hand, and calls you a coward who hides behind other men's swords. A gauntlet falls on the table. The hall goes silent: everyone awaits your answer."
+    a: Accept and fight yourself
+    b: Send a champion
+    c: Cut the straps of his armor at night
+    d: Laugh it off — a ruler does not fight his vassals
+  duel.0002:
+    t: A Beast at the Walls
+    desc: "Grim news from [scope:province.name]: a man-eating beast is killing cattle and people, and the peasants fear to go out into the fields. The elders beg their lord for protection."
+    a: Hunt the beast yourself
+    b: Send your best knight
+    c: Offer hunters a bounty (50 gold)
+    d: Let them deal with it

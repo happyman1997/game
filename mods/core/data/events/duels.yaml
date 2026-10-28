@@ -1,0 +1,136 @@
+# События схватки (duels.yaml): правителя вызывают на поединок, зверь
+# разоряет его землю. Бьётся сам игрок — откроется окно схватки; исход
+# поединка решают обмены (натиск, защита, хитрость), а за правителя может
+# выйти поборник — лучший из рыцарей.
+
+on_actions:
+  on_monthly_pulse:
+    random_events:
+      events:
+        duel.0001: 10
+        duel.0002: 6
+
+opinion_modifiers:
+  # мнение графств (add_county_opinion)
+  beast_slain: { value: 15, years: 5 }
+  beast_bounty: { value: 8, years: 5 }
+  beast_ignored: { value: -15, years: 3 }
+
+modifiers:
+  # подрезанные ремни доспеха: щит болтается, наплечник съезжает
+  cut_straps: { icon: "✂", modifiers: { duel_vigor: -4, duel_guard: -3 } }
+
+events:
+  # ------------------------------------------------------------ дерзкий вызов
+  # На пиру вассал при всех бросает правителю перчатку
+  duel.0001:
+    theme: war
+    icon: "🧤"
+    cooldown: { years: 5 }
+    trigger:
+      is_ruler: yes
+      is_adult: yes
+      is_imprisoned: no
+      NOT: { has_trait: wounded }
+      any_vassal:
+        is_adult: yes
+        prowess: ">= 10"
+        has_trait: [arrogant, wrathful, ambitious, brave]
+        NOT: { is_close_family_of: root }
+    immediate:
+      random_vassal:
+        limit:
+          is_adult: yes
+          prowess: ">= 10"
+          has_trait: [arrogant, wrathful, ambitious, brave]
+          NOT: { is_close_family_of: root }
+        save_scope_as: challenger
+    options:
+      # принять вызов и выйти самому
+      - effect:
+          duel: { target: scope:challenger, champions: no }
+        ai_chance:
+          value: 5
+          add:
+            - { value: ai_boldness, multiply: 5 }
+            - { value: "duel_odds(scope:challenger)", subtract: 40, multiply: 0.5 }
+      # выставить поборника — лучшего из рыцарей
+      - trigger: { has_champion: yes }
+        effect:
+          duel: scope:challenger
+        ai_chance: 15
+      # ночью подрезать ремни его доспеха — нечестно, зато надёжнее
+      - trigger: { intrigue: ">= 8" }
+        effect:
+          - scope:challenger: { add_modifier: { id: cut_straps, months: 1 } }
+          - add_karma: { value: -2, deed: foul_play }
+          - random:
+              chance: 25
+              add_prestige: -60
+              send_message: { text: msg.foul_play_found, kind: bad }
+          - duel: { target: scope:challenger, champions: no }
+        ai_chance: { value: 3, add: { value: ai_honor, multiply: -3 } }
+      # высмеять и отказать: правитель не дерётся с вассалами
+      - effect:
+          - add_prestige: -40
+          - scope:challenger: { add_prestige: 20 }
+        ai_chance: { value: 10, add: { value: ai_boldness, multiply: -5 } }
+
+  # ------------------------------------------------------------ зверь у стен
+  # Зверь-людоед разоряет деревни графства
+  duel.0002:
+    theme: war
+    icon: "🐻"
+    cooldown: { years: 5 }
+    trigger:
+      is_ruler: yes
+      num_counties: ">= 1"
+    immediate:
+      random_domain_province: { save_scope_as: province }
+    options:
+      # выйти на зверя самому
+      - trigger:
+          is_adult: yes
+          is_imprisoned: no
+          NOT: { has_trait: wounded }
+        effect:
+          fight:
+            foe: man_eater
+            on_win:
+              - add_prestige: 100
+              - scope:province: { add_county_opinion: beast_slain }
+              - create_artifact: { type: trophy_shield, rarity: [masterwork, famed], how: trophy }
+            on_lose:
+              - scope:province: { add_county_opinion: beast_ignored }
+        ai_chance:
+          value: 2
+          add:
+            - { value: ai_boldness, multiply: 3 }
+            - { value: "foe_odds(man_eater)", subtract: 40, multiply: 0.4 }
+      # послать лучшего рыцаря
+      - trigger: { num_knights: ">= 1" }
+        effect:
+          ordered_knight:
+            order_by: prowess
+            max: 1
+            fight:
+              foe: man_eater
+              on_win:
+                - add_prestige: 60
+                - root: { add_prestige: 40 }
+                - scope:province: { add_county_opinion: beast_slain }
+              on_lose:
+                - scope:province: { add_county_opinion: beast_ignored }
+        ai_chance: 15
+      # назначить награду охотникам
+      - trigger: { gold: ">= 50" }
+        effect:
+          - add_gold: -50
+          - scope:province: { add_county_opinion: beast_bounty }
+        ai_chance: { value: 10, add: { value: ai_greed, multiply: -3 } }
+      # пусть сами управятся
+      - effect:
+          scope:province:
+            add_county_opinion: beast_ignored
+            add_development: -1
+        ai_chance: 5

@@ -91,7 +91,7 @@ artifact_types:
     icon: sword
     order: 1
     weight: 14
-    modifiers: { prowess: 3 }
+    modifiers: { prowess: 3, duel_might: 1, duel_guard: 1 }
     bonus: [ { martial: 1 }, { commander_advantage: 2 }, { monthly_prestige: 0.2 } ]
     names: 6
   axe:
@@ -99,7 +99,7 @@ artifact_types:
     icon: axe
     order: 2
     weight: 10
-    modifiers: { prowess: 4 }
+    modifiers: { prowess: 4, duel_might: 2 }
     bonus: [ { commander_advantage: 2 }, { dread_gain_mult: 0.15 }, { pursuit: 0.05 } ]
     names: 5
   spear:
@@ -107,7 +107,7 @@ artifact_types:
     icon: spear
     order: 3
     weight: 8
-    modifiers: { prowess: 3 }
+    modifiers: { prowess: 3, duel_guard: 2 }
     bonus: [ { knight_effectiveness: 0.05 }, { martial: 1 }, { pursuit: 0.05 } ]
     names: 5
   mace:
@@ -115,7 +115,7 @@ artifact_types:
     icon: mace
     order: 4
     weight: 6
-    modifiers: { prowess: 3 }
+    modifiers: { prowess: 3, duel_might: 1, duel_vigor: 1 }
     bonus: [ { martial: 1 }, { dread_gain_mult: 0.15 }, { battle_survival: 0.1 } ]
     names: 5
   # шлемы и доспехи
@@ -123,7 +123,7 @@ artifact_types:
     slot: helmet
     icon: helm
     order: 1
-    modifiers: { prowess: 2 }
+    modifiers: { prowess: 2, duel_vigor: 1 }
     bonus: [ { health: 0.15 }, { battle_survival: 0.1 }, { commander_advantage: 1 } ]
     names: 5
   mail:
@@ -131,7 +131,7 @@ artifact_types:
     icon: armor
     order: 1
     weight: 12
-    modifiers: { prowess: 2, health: 0.1 }
+    modifiers: { prowess: 2, health: 0.1, duel_vigor: 2 }
     bonus: [ { battle_survival: 0.1 }, { knight_effectiveness: 0.05 }, { prowess: 1 } ]
     names: 5
   lamellar:
@@ -139,7 +139,7 @@ artifact_types:
     icon: armor
     order: 2
     weight: 6
-    modifiers: { prowess: 3 }
+    modifiers: { prowess: 3, duel_vigor: 2, duel_guard: 1 }
     bonus: [ { battle_survival: 0.1 }, { commander_advantage: 1 }, { health: 0.15 } ]
     names: 4
   # регалии
@@ -193,7 +193,7 @@ artifact_types:
     slot: trinket
     icon: dagger
     order: 4
-    modifiers: { intrigue: 1 }
+    modifiers: { intrigue: 1, duel_guile: 2 }
     bonus: [ { scheme_power: 5 }, { scheme_defense: 5 }, { prowess: 1 } ]
     names: 5
   seal:
@@ -283,7 +283,7 @@ artifacts:
     rarity: illustrious
     icon: sword
     holder: philip
-    modifiers: { prowess: 8, martial: 2, monthly_prestige: 0.5 }
+    modifiers: { prowess: 8, martial: 2, monthly_prestige: 0.5, duel_might: 3, duel_guard: 3 }
   landwaster:
     type: banner
     rarity: illustrious

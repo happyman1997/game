@@ -44,6 +44,7 @@ var sim := SimRunner.new()
 
 var _modals: Array = []
 var _shown_event: Variant = null
+var _shown_fight: Variant = null
 var _dirty := true
 var _dirty_now := false
 var _render_timer := 0.0
@@ -309,6 +310,7 @@ func enter_game(g: Game) -> void:
 	panel_ref = null
 	history = []
 	_shown_event = null
+	_shown_fight = null
 	_close_all_modals()
 	_seen_messages = g.state.messages.size()
 	_last_autosave = -1
@@ -840,6 +842,17 @@ func _render_pending() -> void:
 		modal(K.panel(K.min_size(body, 420)), {"closable": false})
 		return
 	if not _modals.is_empty():
+		return
+	# схватка игрока — прямо сейчас, раньше событий
+	var fights: Array = Data.as_array(g.state.get("pending_fights"))
+	if not fights.is_empty():
+		var fuid := str(fights[0].uid)
+		if _shown_fight != fuid:
+			_shown_fight = fuid
+			var close_f := [Callable()]
+			close_f[0] = modal(FightWindow.build(self, fuid, func():
+				close_f[0].call()
+				_shown_fight = null), {"closable": false, "dim": 0.45, "sound": "clash"})
 		return
 	if not g.state.pending_events.is_empty():
 		var ev: Dictionary = g.state.pending_events[0]
