@@ -1,14 +1,15 @@
-# Land (engine/features/biomes.gd)
+# Land (engine/features/biomes.gd, land by cells — engine/world/land.gd)
 msg:
-  land_changed: "{place}: {from} — now {to}."
-  land_work_done: "{place}: work finished («{work}») — now {to}."
+  land_changed: "{place}: {from} → {to} ({share}% of the land)."
+  land_work_done: "{place}: work finished («{work}», plots: {n}) — {why}."
 fx:
   set_terrain: "{place}: the land becomes — {to}"
+  set_terrain_part: "{place}: {n}% of the land becomes — {to}"
   start_land_work: "{place}: begin work — {work}"
   end_land_work: "{place}: the work stops"
 land:
   not_yours: "The county's holder leads the work"
-  wrong_terrain: "Not for this land"
+  wrong_terrain: "There is no suitable land for this"
   busy: "Work is already under way here"
   at_war: "The county is occupied or under siege"
   not_here: "This is not possible here"
@@ -22,20 +23,38 @@ land:
     war: war
     fire: fire
     event: event
+  end:
+    done: "no suitable land is left"
+    stopped: "stopped after the plot"
+    gold: "not enough gold"
+    owner: "the county is in other hands"
+    war: "the county is occupied"
+    enough: "enough"
   section: Land
   works: Land works
   history: Chronicle of the land
-  work_now: "Work under way: {work} — {n} more months."
+  work_now: "Work under way: {work}, plot {patch} ({share}% of the land) — {n} more months."
+  repeat_on: "Then — the next plot"
+  repeat_off: "This plot is the last"
+  repeat_tip: "Toggle: the work moves on to the next plot by itself (each plot is paid for) or stops after this one."
+  patch_gone: "The land of this plot has already changed by itself."
   start: Begin
   cancel: Stop
   cancel_tip: "Stop the work. What was spent is not returned."
   months: "{n} months"
+  patch: "plot {n}% · {m} months"
   becomes: "Becomes: {to}"
-  cost: "Costs: {n} gold"
+  cost: "{n} gold"
+  room: "Suitable land in the county: {n}%"
+  patches_hint: "The work goes plot by plot. When a plot is done, the work moves on to the next while there is suitable land and gold, or until you stop it."
+  each_patch: "With each plot:"
   during: "While the work goes on:"
-  effects: "The land now:"
+  effects: "What the county's land gives"
+  dominant: "Prevailing: {t}"
+  cells_hint: "The county's land is {n} cells; the map shows what lies where."
+  full_county: "If all the county's land were like this:"
   by: "{who}"
-  log_line: "{year}: {from} → {to} ({why})"
+  log_line: "{year}: {from} → {to}{share} ({why})"
   capital: "For whoever has their capital here:"
   movement: "Army travel: ×{n}"
   defense: "Defenders: +{n}%"

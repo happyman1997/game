@@ -130,8 +130,8 @@ static func effective(game: Game, r: Dictionary, enemy_men: Dictionary, my_men_o
 		if cv != 0.0:
 			penalty += cv * minf(1.0, enemy_men[type] / maxf(1.0, my_men_of_type))
 	penalty = minf(game.def_num("regiments.max_counter", 0.75), penalty)
-	# местность: точное состояние или его группа (дремучий лес — лес)
-	var t := 1.0 + (Data.num(game.terrain_pick(def.get("terrain"), location)) if location != null else 0.0)
+	# местность — по долям клеток: у каждой её значение (или её группы)
+	var t := 1.0 + (Data.num(game.terrain_pick(def.get("terrain"), location, 0.0)) if location != null else 0.0)
 	return float(r.size) * Data.num(def.get("power"), 1.0) * (1.0 - penalty) * maxf(0.1, t)
 
 

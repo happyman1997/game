@@ -93,10 +93,10 @@ on_actions:
             add_development: -1
           # народ долго помнит разорение (причина жалоб «Разорение»)
           add_county_opinion: county_ravaged
-      # осаждающие жгут поля (в летописи земли — победитель)
+      # осаждающие жгут поля — участок графства (в летописи земли — победитель)
       - scope:province:
           if:
-            limit: { terrain: [farmlands, plains] }
+            limit: { has_terrain: { terrain: [farmlands, plains], above: 0.1 } }
             random:
-              chance: 15
-              set_terrain: { to: burnt, cause: war }
+              chance: 35
+              set_terrain: { to: burnt, from: [farmlands, worn_fields, plains, meadow], share: 0.25, cause: war }

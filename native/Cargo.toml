@@ -2,14 +2,14 @@
 name = "korona_core"
 version = "0.1.0"
 edition = "2021"
-description = "Ядро симуляции «Короны и Династии»: клетки карты, пути, путники"
+description = "Ядро симуляции «Короны и Династии»: клетки карты, земля, пути, путники"
 publish = false
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-godot = { version = "0.5.5", features = ["api-4-7"] }
+godot = { version = "0.5.5", features = ["api-4-7", "experimental-threads"] }
 
 [profile.release]
 opt-level = 3

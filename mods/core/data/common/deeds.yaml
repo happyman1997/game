@@ -40,7 +40,7 @@ nicknames:
   conqueror:    { deed: wars_won, count: 3, priority: 5 }
   fearless:     { deed: duels_won, count: 3, priority: 4 }
   builder:      { deed: buildings, count: 6, priority: 2 }
-  plowman:      { deed: lands_tamed, count: 4, priority: 2 }
+  plowman:      { deed: lands_tamed, count: 12, priority: 2 }
   great_builder: { deed: buildings, count: 14, priority: 4 }
   enlightener:  { deed: conversions, count: 4, priority: 3 }
   cunning:      { deed: schemes, count: 4, priority: 2 }

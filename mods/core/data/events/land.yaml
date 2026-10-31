@@ -1,5 +1,6 @@
 # События местности (land.yaml): лесной пожар, усталая пашня, лесной народ
-# просит пощадить лес, разлив у соседа после чужой вырубки.
+# просит пощадить лес, разлив у соседа после чужой вырубки. Пожар и
+# усталость берут участок графства (set_terrain с from и share).
 
 on_actions:
   on_monthly_pulse:
@@ -17,10 +18,10 @@ events:
     cooldown: { years: 6 }
     trigger:
       is_ruler: yes
-      any_domain_province: { terrain: forest, has_land_work: no }
+      any_domain_province: { has_terrain: { terrain: [forest, old_forest], above: 0.15 } }
     immediate:
       random_domain_province:
-        limit: { terrain: forest, has_land_work: no }
+        limit: { has_terrain: { terrain: [forest, old_forest], above: 0.15 } }
         save_scope_as: province
     options:
       # поднять всех на тушение
@@ -31,7 +32,7 @@ events:
         ai_chance: { value: 10, add: { value: ai_compassion, multiply: 3 } }
       # пусть горит — потом распашем
       - effect:
-          scope:province: { set_terrain: { to: burnt_forest, cause: fire } }
+          scope:province: { set_terrain: { to: burnt_forest, from: [forest, old_forest], share: 0.3, cause: fire } }
         ai_chance: { value: 10, add: { value: ai_greed, multiply: 2 } }
 
   # ------------------------------------------------------------ усталая пашня
@@ -41,10 +42,10 @@ events:
     cooldown: { years: 6 }
     trigger:
       is_ruler: yes
-      any_domain_province: { terrain: farmlands, NOT: { terrain: worn_fields }, has_land_work: no }
+      any_domain_province: { terrain_share(farmlands): ">= 0.2", NOT: { has_land_work: fallow } }
     immediate:
       random_domain_province:
-        limit: { terrain: farmlands, NOT: { terrain: worn_fields }, has_land_work: no }
+        limit: { terrain_share(farmlands): ">= 0.2", NOT: { has_land_work: fallow } }
         save_scope_as: province
     options:
       # купить навоз и семена — земля ещё послужит
@@ -53,7 +54,7 @@ events:
         ai_chance: { value: 10, add: { value: stewardship, multiply: 1 } }
       # пусть родит, как родит
       - effect:
-          scope:province: { set_terrain: { to: worn_fields, cause: exhaustion } }
+          scope:province: { set_terrain: { to: worn_fields, from: [farmlands], share: 0.3, cause: exhaustion } }
         ai_chance: { value: 10, add: { value: ai_greed, multiply: 3 } }
 
   # ------------------------------------------------------------ лесной народ

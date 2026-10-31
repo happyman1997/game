@@ -322,7 +322,10 @@ static func get_named_value(ctx: ScriptContext, scope: Variant, name_with_arg: S
 			return 0.0
 		if def.has("scopes") and not def.scopes.has(scope.type):
 			return 0.0
-		var arg: Variant = resolve_scope(ctx, scope, arg_path) if arg_path != "" else null
+		# raw_arg — аргумент как есть (terrain_share(forest)), иначе — путь к скоупу
+		var arg: Variant = null
+		if arg_path != "":
+			arg = arg_path if def.get("raw_arg", false) else resolve_scope(ctx, scope, arg_path)
 		return float(def["get"].call(ctx, scope, arg))
 	var sv: Variant = game.content.get_def("script_values", vname)
 	if sv != null:

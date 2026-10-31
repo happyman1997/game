@@ -92,12 +92,24 @@ func prov_def(id: Variant) -> Variant:
 	return content.get_def("provinces", id)
 
 
-## Нынешняя местность провинции: изменённая людьми и природой (state) или
-## исходная из данных карты.
+## Земля по клеткам (Land): местность каждой клетки, доли провинции.
+var _land: Land = null
+
+
+func land() -> Land:
+	if _land == null:
+		_land = Land.new(self)
+	return _land
+
+
+## Господствующая местность провинции (Land.dominant): самая большая группа
+## её клеток, в ней — самая частая местность. Без клеток — из данных карты.
 func terrain_of(prov_id: Variant) -> String:
-	var p: Variant = state.provinces.get(prov_id)
-	if p != null and p.get("terrain") != null:
-		return str(p.terrain)
+	var l := land()
+	if l.ready():
+		var t := l.dominant(prov_id)
+		if t != "":
+			return t
 	var d: Variant = content.get_def("provinces", prov_id)
 	return str(d.get("terrain", "")) if d != null else ""
 
@@ -112,15 +124,29 @@ func terrain_group(t: String) -> String:
 	return str(d.get("group", t)) if d != null else t
 
 
-## Значение по местности из словаря { местность: значение }: сперва точное
-## состояние, потом его группа (null — нет ни того, ни другого).
-func terrain_pick(d: Variant, prov_id: Variant) -> Variant:
+## Значение по местности из словаря { местность: значение } — по долям
+## клеток провинции: у каждой местности её значение (точное или группы,
+## иначе fallback). null — ни одна местность провинции в словаре не названа.
+func terrain_pick(d: Variant, prov_id: Variant, fallback: Variant = null) -> Variant:
 	if not (d is Dictionary):
 		return null
+	var l := land()
+	if l.ready() and l.count(prov_id) > 0:
+		return l.pick(d, prov_id, fallback)
 	var t := terrain_of(prov_id)
 	if d.has(t):
 		return d[t]
-	return d.get(terrain_group(t))
+	var v: Variant = d.get(terrain_group(t))
+	return v if v != null else null
+
+
+## Числовое свойство местности по долям клеток (movement, defense, attrition…).
+func terrain_num(prov_id: Variant, key: String, fallback: float = 0.0) -> float:
+	var l := land()
+	if l.ready() and l.count(prov_id) > 0:
+		return l.num(prov_id, key, fallback)
+	var td: Variant = terrain_def(prov_id)
+	return Data.num(td.get(key), fallback) if td != null else fallback
 
 
 ## Значение из defines по пути "раздел.ключ". Найденные значения кэшируются

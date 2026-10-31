@@ -87,8 +87,7 @@ static func commander_of(game: Game, a: Dictionary) -> Variant:
 # ------------------------------------------------------------ путь
 
 static func edge_cost(game: Game, from: String, to: String) -> float:
-	var terrain: Variant = game.terrain_def(to)
-	return game.engine.distance(from, to) * (Data.num(terrain.get("movement"), 1.0) if terrain != null else 1.0)
+	return game.engine.distance(from, to) * game.terrain_num(to, "movement", 1.0)
 
 
 ## Кратчайший путь. Возвращает путь без стартовой провинции или null.
@@ -238,7 +237,6 @@ static func _side_power(game: Game, armies: Array, defending: bool, loc: String,
 	var adv = Stats.stat(game, best, "commander_advantage") if best != null else 0.0
 	# личный пример: доблестный полководец ведёт войско в первых рядах
 	adv += Stats.stat(game, best, "personal_example") * 100.0 if best != null else 0.0
-	var terrain: Variant = game.terrain_def(loc)
 	# home_advantage (мастер засад): бой на земле своей державы
 	if best != null and not armies.is_empty():
 		var ha := Stats.stat(game, best, "home_advantage")
@@ -249,7 +247,7 @@ static func _side_power(game: Game, armies: Array, defending: bool, loc: String,
 				adv += ha
 	var power = eff * (1.0 + martial * game.def_num("military.martial_bonus", 0.04) + adv / 100.0) * game.rng.range_float(game.def_num("military.battle_luck_min", 0.85), game.def_num("military.battle_luck_max", 1.15))
 	if defending:
-		power *= 1.0 + (Data.num(terrain.get("defense")) if terrain != null else 0.0)
+		power *= 1.0 + game.terrain_num(loc, "defense")
 	return {"power": power, "men": men, "commander": best}
 
 

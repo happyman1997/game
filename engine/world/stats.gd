@@ -422,11 +422,8 @@ static func prov_stats(game: Game, prov_id: String) -> Dictionary:
 			var md: Variant = game.content.get_def("modifiers", m.id)
 			if md != null:
 				add_into(out, md.get("modifiers"))
-		# местность — нынешняя (её меняют люди и природа): рост и её модификаторы
-		var terrain: Variant = game.terrain_def(prov_id)
-		if terrain != null:
-			add_into(out, {"development_growth": Data.num(terrain.get("development_growth"))})
-			add_into(out, terrain.get("modifiers"))
+		# местность — по долям клеток (их меняют люди и природа): рост и модификаторы
+		add_into(out, game.land().mods(prov_id))
 		var reg := game.engine.province_modifier_providers
 		for id in reg.ids():
 			add_into(out, reg.get_item(id).fn.call(game, prov_id))

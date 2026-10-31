@@ -1,6 +1,9 @@
 // Карта: рельеф, море, раскраска режима карты, границы держав и провинций,
 // оккупация, наведение и выделение. Всё считается по растру провинций
-// (id_tex) и маленьким таблицам данных на каждую провинцию.
+// (id_tex) и маленьким таблицам данных на каждую провинцию. Местность — по
+// клеткам (cell_tex: шестиугольная сетка odd-r, как в ядре): цвета соседних
+// клеток смешиваются, а вблизи у каждой местности свой узор (кроны, борозды,
+// бочаги, пепел).
 shader_type canvas_item;
 render_mode blend_mix;
 
@@ -15,6 +18,12 @@ uniform sampler2D terrain_tex : filter_nearest; // rgb — цвет местно
 uniform sampler2D color_tex : filter_nearest;   // rgb — цвет режима, a — есть ли цвет
 uniform sampler2D realm_tex : filter_nearest;   // rg — держава, ba — поддержава
 uniform sampler2D flags_tex : filter_nearest;   // rgb — цвет оккупанта, a: 1 — оккупация, 0.5 — подсветка
+// Клетки: r — местность (255 — нет), g — 1: здесь идут работы.
+uniform sampler2D cell_tex : filter_nearest;
+// Местности (по индексу): строка 0 — rgb цвет, a — высота; строка 1 — r: узор.
+uniform sampler2D tt_tex : filter_nearest;
+uniform float cell_size = 7.5;
+uniform ivec2 cell_grid = ivec2(0, 0);
 
 uniform int TW = 256;
 uniform vec2 map_size = vec2(1400.0, 1300.0);
@@ -58,6 +67,82 @@ float land_at(vec2 mp, float lod) {
 
 float noise(vec2 p) {
 	return texture(noise_tex, p).r;
+}
+
+// Клетка (столбец, строка) под точкой карты: шестиугольники «остриём вверх»,
+// нечётные строки сдвинуты (odd-r).
+ivec2 hex_at(vec2 p) {
+	float q = (0.57735027 * p.x - 0.33333333 * p.y) / cell_size;
+	float r = (0.66666667 * p.y) / cell_size;
+	float x = q;
+	float z = r;
+	float y = -x - z;
+	float rx = round(x);
+	float ry = round(y);
+	float rz = round(z);
+	float dx = abs(rx - x);
+	float dy = abs(ry - y);
+	float dz = abs(rz - z);
+	if (dx > dy && dx > dz) rx = -ry - rz;
+	else if (dy > dz) ry = -rx - rz;
+	else rz = -rx - ry;
+	int row = int(rz);
+	int col = int(rx) + (row - (row & 1)) / 2;
+	return ivec2(col, row);
+}
+
+// Местность клетки (−1 — нет) и метка работ.
+ivec2 cell_info(ivec2 cr) {
+	if (cr.x < 0 || cr.y < 0 || cr.x >= cell_grid.x || cr.y >= cell_grid.y) return ivec2(-1, 0);
+	vec4 c = texelFetch(cell_tex, cr, 0);
+	int t = int(c.r * 255.0 + 0.5);
+	return ivec2(t >= 255 ? -1 : t, int(c.g * 255.0 + 0.5));
+}
+
+float cell_hash(ivec2 cr) {
+	return fract(sin(float(cr.x) * 12.9898 + float(cr.y) * 78.233) * 43758.5453);
+}
+
+// Узор местности вблизи: 1 — лес, 2 — дремучий, 3 — пашня, 4 — трава,
+// 5 — топь, 6 — пепел, 7 — пни, 8 — вереск.
+vec3 land_pattern(vec3 col, int pat, vec2 mp, ivec2 cr, float detail) {
+	if (detail <= 0.0 || pat == 0) return col;
+	if (pat == 1 || pat == 2) {
+		float n = noise(mp / (pat == 2 ? 1.9 : 2.4) + 0.13);
+		float crown = smoothstep(pat == 2 ? 0.42 : 0.5, pat == 2 ? 0.55 : 0.63, n);
+		col *= mix(1.0, pat == 2 ? 0.66 : 0.76, crown * detail);
+		col += vec3(0.03, 0.05, 0.02) * smoothstep(0.72, 0.8, n) * detail;
+	} else if (pat == 3) {
+		// наделы: полосы вдоль борозд; направление — одно из трёх, по
+		// неровным пятнам шума (границы пятен не совпадают с клетками)
+		float sel = noise(mp / 26.0 + 0.21);
+		float a = sel < 0.42 ? 0.35 : (sel < 0.58 ? 1.4 : 2.45);
+		vec2 dir = vec2(cos(a), sin(a));
+		vec2 perp = vec2(-dir.y, dir.x);
+		float u = dot(mp, dir) / 3.2;
+		float v = dot(mp, perp) / 7.0;
+		vec2 parcel = floor(vec2(u, v));
+		float h = fract(sin(dot(parcel, vec2(12.9898, 78.233)) + a) * 43758.5453);
+		float edge = 1.0 - smoothstep(0.0, 0.07, min(fract(u), 1.0 - fract(u)));
+		float furrow = 0.5 + 0.5 * sin(dot(mp, dir) * 3.1);
+		col *= 1.0 + ((h - 0.5) * 0.16 - furrow * 0.04 - edge * 0.08) * detail;
+	} else if (pat == 4) {
+		col *= 1.0 + (noise(mp / 1.7) - 0.5) * 0.12 * detail;
+	} else if (pat == 5) {
+		float n = noise(mp / 2.8 + 0.31);
+		col = mix(col, vec3(0.30, 0.45, 0.50), smoothstep(0.6, 0.66, n) * 0.6 * detail);
+		col *= 1.0 + (noise(mp / 1.3) - 0.5) * 0.1 * detail;
+	} else if (pat == 6) {
+		float n = noise(mp / 1.6 + 0.57);
+		col *= mix(1.0, 0.55, smoothstep(0.58, 0.66, n) * detail);
+	} else if (pat == 7) {
+		vec2 g = fract(mp / 2.2 + cell_hash(cr)) - 0.5;
+		col = mix(col, vec3(0.42, 0.32, 0.2), (1.0 - smoothstep(0.08, 0.16, length(g))) * 0.6 * detail);
+	} else if (pat == 8) {
+		float n = noise(mp / 1.5 + 0.77);
+		col = mix(col, vec3(0.55, 0.42, 0.55), smoothstep(0.62, 0.7, n) * 0.35 * detail);
+	}
+	return col;
 }
 
 // Высота рельефа: крупные холмы + мелкая фактура, горы — гребнями.
@@ -126,23 +211,38 @@ void fragment() {
 		// ---------------- суша
 		vec4 tinfo = texelFetch(terrain_tex, tcoord(idx), 0);
 		bool waste = tinfo.a > 0.99;
-		// сглаживаем местность между провинциями
-		vec3 tcol = tinfo.rgb;
-		float rough = tinfo.a;
-		float wsum = 1.0;
+		// местность по клеткам: смешиваем соседние клетки (со сдвигом шумом —
+		// края пятен живые, без шестиугольников)
+		vec2 warp = (vec2(noise(mp / 31.0), noise(mp / 31.0 + 0.5)) - 0.5) * cell_size * 1.7;
+		vec2 q = mp + warp;
+		ivec2 ccr = hex_at(q);
+		ivec2 cinf = cell_info(ccr);
+		vec3 tcol = vec3(0.0);
+		float rough = 0.0;
+		float wsum = 0.0;
+		if (cinf.x >= 0) {
+			vec4 tt = texelFetch(tt_tex, ivec2(cinf.x, 0), 0);
+			tcol += tt.rgb * 2.0;
+			rough += tt.a * 2.0;
+			wsum += 2.0;
+		}
 		for (int k = 0; k < 6; k++) {
-			float a = float(k) * 1.0472;
-			vec2 off = vec2(cos(a), sin(a)) * 4.0;
-			int j = prov_at(mp + off);
-			if (j >= 0) {
-				vec4 tj = texelFetch(terrain_tex, tcoord(j), 0);
-				tcol += tj.rgb;
-				rough += tj.a;
+			float a = float(k) * 1.0472 + 0.5236;
+			ivec2 ci = cell_info(hex_at(q + vec2(cos(a), sin(a)) * cell_size * 0.75));
+			if (ci.x >= 0) {
+				vec4 tt = texelFetch(tt_tex, ivec2(ci.x, 0), 0);
+				tcol += tt.rgb;
+				rough += tt.a;
 				wsum += 1.0;
 			}
 		}
-		tcol /= wsum;
-		rough /= wsum;
+		if (wsum > 0.0) {
+			tcol /= wsum;
+			rough /= wsum;
+		} else {
+			tcol = tinfo.rgb;
+			rough = tinfo.a;
+		}
 		if (waste) rough = 0.45;
 		// отмывка рельефа
 		float e = 0.75;
@@ -152,6 +252,16 @@ void fragment() {
 		vec2 grad = vec2(hx - h0, hy - h0) / e;
 		float shade = clamp(1.0 - (grad.x + grad.y) * 3.2, 0.62, 1.3);
 		vec3 terrain = tcol * (0.92 + noise(mp / 40.0) * 0.16) * shade;
+		// вблизи — узор местности клетки и штриховка работ
+		float detail = smoothstep(1.1, 2.6, zoom);
+		if (cinf.x >= 0 && !waste) {
+			int pat = int(texelFetch(tt_tex, ivec2(cinf.x, 1), 0).r * 255.0 + 0.5);
+			terrain = land_pattern(terrain, pat, mp, ccr, detail);
+			if (cinf.y == 1) {
+				float hatch = step(0.62, fract((mp.x + mp.y) / (3.2 * max(1.0, px))));
+				terrain = mix(terrain, vec3(0.96, 0.84, 0.5) * shade, hatch * (0.22 + 0.1 * sin(time * 2.0)) * smoothstep(0.7, 1.4, zoom));
+			}
+		}
 		if (waste) {
 			shade = mix(1.0, shade, 0.45);
 			// непроходимые земли: тёмные, приглушённые, со штриховкой

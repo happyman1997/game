@@ -352,6 +352,9 @@ static func register(engine: GameEngine) -> void:
 			return float(fn.call(ctx.game, c, arg)) if c != null else 0.0
 		}, O)
 
+	reg.values.register("terrain_share", {"scopes": PROV, "raw_arg": true, "doc": "Доля клеток графства с такой местностью (или группой), 0…1: terrain_share(forest)", "get": func(ctx, s, arg):
+		return ctx.game.land().share(s.id, str(arg))
+	}, O)
 	cv.call("age", "Возраст", func(g, c, _a): return Chars.age_of(g, c))
 	reg.values.register("check_chance", {"scopes": CHAR, "doc": "Шанс удачи по проверке checks.<id>, %: check_chance(<id>)", "get": func(ctx, s, arg):
 		return Checks.odds(ctx, s, Checks.spec(ctx.game, str(arg))).success
@@ -619,13 +622,24 @@ static func register(engine: GameEngine) -> void:
 		var d: Variant = ctx.game.content.get_def("provinces", s.id)
 		return d != null and Data.as_array(d.get("holdings")).has(arg)
 	)
-	trig.call("terrain", PROV, "Местность (нынешняя): terrain: forest — лес или его состояние (дремучий лес); список — любая из", func(ctx, s, arg):
+	trig.call("terrain", PROV, "Господствующая местность (самая большая доля клеток): terrain: forest — лес или его состояние (дремучий лес); список — любая из", func(ctx, s, arg):
 		var t: String = ctx.game.terrain_of(s.id)
 		var g: String = ctx.game.terrain_group(t)
 		for x in Data.as_array(arg):
 			if str(x) == t or str(x) == g:
 				return true
 		return false
+	)
+	trig.call("has_terrain", PROV, "Есть земля такой местности (или группы): has_terrain: forest | [heath, burnt] | { terrain: forest, above: 0.3, below: 0.6 } (доля клеток)", func(ctx, s, arg):
+		var what: Variant = arg.get("terrain") if arg is Dictionary else arg
+		var sh: float = ctx.game.land().share(s.id, what)
+		if arg is Dictionary:
+			if arg.has("above") and sh < Data.num(arg.above):
+				return false
+			if arg.has("below") and sh >= Data.num(arg.below):
+				return false
+			return arg.has("above") or arg.has("below") or sh > 0.0
+		return sh > 0.0
 	)
 	trig.call("is_occupied", PROV, "Оккупирована", func(ctx, s, arg):
 		var p: Variant = ctx.game.state.provinces.get(s.id)

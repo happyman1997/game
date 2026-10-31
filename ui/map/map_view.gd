@@ -49,6 +49,8 @@ var _flags_img: Image
 var _color_tex: ImageTexture
 var _realm_tex: ImageTexture
 var _flags_tex: ImageTexture
+var _cell_tex: ImageTexture
+var _tt_land: Land
 var _sig_timer := 0.0
 ## Поток симуляции: раскраска читает мир только в «окне доступа».
 var sim: SimRunner
@@ -160,8 +162,12 @@ func _make_static() -> Dictionary:
 	}
 
 
-## Местность по провинциям (цвет и высота) — нынешняя, из состояния партии.
-## Перестраивается, когда земля меняется (state.land_ver).
+const PATTERNS := {"forest": 1, "old_forest": 2, "fields": 3, "grass": 4, "marsh": 5, "ash": 6, "stumps": 7, "heath": 8}
+
+## Местность — нынешняя, из состояния партии: по провинциям (господствующая —
+## запасной цвет и непроходимые земли) и по клеткам (cell_tex — что рисуется;
+## tt_tex — цвета, высоты и узоры местностей). Перестраивается, когда земля
+## меняется (state.land_ver).
 func _refresh_terrain() -> void:
 	if map == null or game == null:
 		return
@@ -180,14 +186,49 @@ func _refresh_terrain() -> void:
 		else:
 			var td: Variant = c.get_def("terrain", game.terrain_of(pid))
 			if td != null:
-				if td.get("color") is String:
-					col = Color(td.color)
-				elif td.get("color") is Color:
-					col = td.color
+				col = _terrain_color(td)
 				hgt = Data.num(td.get("height"), 0.1)
 		col.a = clampf(hgt, 0.0, 1.0)
 		terr.set_pixel(i % TW, i / TW, col)
 	material_map.set_shader_parameter("terrain_tex", ImageTexture.create_from_image(terr))
+	var land: Land = game.land()
+	if not land.ready():
+		material_map.set_shader_parameter("cell_grid", Vector2i(0, 0))
+		return
+	# таблица местностей (по индексу Land.ids)
+	if _tt_land != land:
+		_tt_land = land
+		var tt := Image.create(256, 2, false, Image.FORMAT_RGBA8)
+		for k in land.ids.size():
+			var td: Variant = c.get_def("terrain", land.ids[k])
+			var col := _terrain_color(td) if td != null else Color("#9a9a7a")
+			col.a = clampf(Data.num(td.get("height"), 0.1) if td != null else 0.1, 0.0, 1.0)
+			tt.set_pixel(k, 0, col)
+			tt.set_pixel(k, 1, Color8(int(PATTERNS.get(str(td.get("pattern", "")) if td != null else "", 0)), 0, 0, 255))
+		material_map.set_shader_parameter("tt_tex", ImageTexture.create_from_image(tt))
+		material_map.set_shader_parameter("cell_size", float(land.core.cell_size()))
+		material_map.set_shader_parameter("cell_grid", Vector2i(land.core.cols(), land.core.rows()))
+	# клетки: местность и метки работ
+	var marks := PackedInt32Array()
+	for p in game.state.provinces.values():
+		var w: Variant = p.get("land_work")
+		if w is Dictionary:
+			for cell in Data.as_array(w.get("cells")):
+				marks.append(int(cell))
+	var img := Image.create_from_data(land.core.cols(), land.core.rows(), false, Image.FORMAT_RG8, land.core.paint(marks))
+	if _cell_tex != null and _cell_tex.get_size() == Vector2(img.get_size()):
+		_cell_tex.update(img)
+	else:
+		_cell_tex = ImageTexture.create_from_image(img)
+		material_map.set_shader_parameter("cell_tex", _cell_tex)
+
+
+func _terrain_color(td: Dictionary) -> Color:
+	if td.get("color") is String:
+		return Color(td.color)
+	if td.get("color") is Color:
+		return td.color
+	return Color("#9a9a7a")
 
 
 # ------------------------------------------------------------ раскраска

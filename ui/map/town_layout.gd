@@ -317,8 +317,9 @@ static func build(g: Game, m: MapData, i: int, s: Dictionary, cons: Variant) -> 
 		t.sprite("apple", fields_at + Vector2.from_angle(rng.randf() * TAU) * 2.0 * k, 3)
 	var forest := int(features.get("forest", 0)) * 8
 	var terr := str(s.get("terrain", ""))
-	# лес вокруг — по нынешней местности: дремучий гуще, после вырубки и пожара — пусто
-	forest += {"old_forest": 7, "forest": 3, "burnt_forest": 1}.get(terr, 0)
+	# лес вокруг — по доле леса в графстве и господствующей местности: дремучий
+	# гуще, после вырубки и пожара — пусто
+	forest += {"old_forest": 4, "forest": 1}.get(terr, 0) + roundi(float(s.get("wood", 0.0)) * 8.0)
 	var wild_at := core - best_dir * clampf(R * 0.55, rc + 3.0 * k, rc + 10.0 * k)
 	for j in forest:
 		t.sprite("pine", wild_at + Vector2.from_angle(rng.randf() * TAU) * rng.randf() * 3.0 * k, 3)

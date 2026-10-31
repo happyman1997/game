@@ -239,7 +239,8 @@ static func settlements_of(g: Game) -> Dictionary:
 		for x in dl:
 			levels += int(x[1])
 		out[p.id] = {"main": main, "districts": dl, "bmap": bmap, "special": special, "great": great, "other": other, "levels": levels, "count": p.buildings.size(),
-			"holdings": hs, "dev": int(Data.num(p.get("development"))), "terrain": g.terrain_of(p.id)}
+			"holdings": hs, "dev": int(Data.num(p.get("development"))), "terrain": g.terrain_of(p.id),
+			"wood": g.land().share(p.id, "forest") if g.land().ready() else 0.0}
 	_settle_key = key
 	_settle_data = out
 	return out
@@ -480,7 +481,7 @@ var _layout_budget := 0
 
 
 static func _sig(s: Dictionary) -> String:
-	return var_to_str([s.districts, s.bmap, s.other, s.special, s.get("holdings", []), int(s.get("dev", 0)) / 5])
+	return var_to_str([s.districts, s.bmap, s.other, s.special, s.get("holdings", []), int(s.get("dev", 0)) / 5, s.get("terrain", ""), roundi(float(s.get("wood", 0.0)) * 5.0)])
 
 
 ## Раскладка поселения из кэша; новых — не больше нескольких за кадр.

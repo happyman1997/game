@@ -72,8 +72,15 @@ static func register_builtin(engine: GameEngine) -> void:
 	add.call("terrain", {"name": "ui.mapmode.terrain", "icon": "mountain", "order": 40, "transparent": true,
 		"color": func(g: Game, p: String): return null,
 		"tooltip": func(g: Game, p: String):
-			var t := g.terrain_of(p)
-			return g.name_of("terrain", t) if t != "" else ""})
+			# состав земли по клеткам: «Лес 64% · Поле 18% · Дремучий лес 18%»
+			var m := g.land().mix(p) if g.land().ready() else {}
+			if m.is_empty():
+				var t := g.terrain_of(p)
+				return g.name_of("terrain", t) if t != "" else ""
+			var parts := PackedStringArray()
+			for t in m:
+				parts.append("%s %d%%" % [g.name_of("terrain", t), roundi(float(m[t]) * 100.0)])
+			return " · ".join(parts)})
 	add.call("diplomacy", {"name": "ui.mapmode.diplomacy", "icon": "handshake", "order": 15,
 		"color": func(g: Game, p: String):
 			var pl: Variant = g.player

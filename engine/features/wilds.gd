@@ -19,9 +19,7 @@ func _init() -> void:
 ## Доля воинов, которую армия теряет за месяц в провинции.
 static func attrition_at(game: Game, prov_id: String) -> float:
 	var a := Stats.prov_stat(game, prov_id, "attrition")
-	var td: Variant = game.terrain_def(prov_id)
-	if td != null:
-		a += Data.num(td.get("attrition"))
+	a += game.terrain_num(prov_id, "attrition")
 	return clampf(a, 0.0, 0.9)
 
 

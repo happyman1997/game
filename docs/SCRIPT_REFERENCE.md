@@ -79,6 +79,7 @@
 | `has_strong_hook_on` | character | Есть сильный крюк на персонажа | core |
 | `has_succession_law` | character | Закон наследования | core |
 | `has_synod_decree` | character | Действует указ Собора веры персонажа: has_synod_decree: <вопрос> | core/synod |
+| `has_terrain` | province | Есть земля такой местности (или группы): has_terrain: forest \| [heath, burnt] \| { terrain: forest, above: 0.3, below: 0.6 } (доля клеток) | core |
 | `has_trait` | character | Есть черта | core |
 | `has_trait_category` | character | Есть черта категории | core |
 | `has_truce_with` | character | Перемирие с персонажем | core |
@@ -166,7 +167,7 @@
 | `synod_declared` | character | Позиция персонажа на созванном Соборе: synod_declared: for \| against \| yes \| no | core/synod |
 | `synod_question` | character | Вопрос созванного Собора: synod_question: anathema | core/synod |
 | `synod_swayed` | character | Голос уже склонён на созванном Соборе | core/synod |
-| `terrain` | province | Местность (нынешняя): terrain: forest — лес или его состояние (дремучий лес); список — любая из | core |
+| `terrain` | province | Господствующая местность (самая большая доля клеток): terrain: forest — лес или его состояние (дремучий лес); список — любая из | core |
 | `tier_is` | title | Ранг титула: county/duchy/kingdom/empire | core |
 | `var` | любой | Сравнение переменной: var: { name: x, value: ">= 2" } | core |
 | `vassal_obligation` | character | Условия службы вассала: vassal_obligation: heavy | core/politics |
@@ -320,7 +321,7 @@
 | `set_realm_law` | Установить закон державы (без цены и перерыва) | core/laws |
 | `set_regent` | Назначить регента правителю-ребёнку: set_regent: scope:x | core/upbringing |
 | `set_succession_law` | Закон наследования | core |
-| `set_terrain` | Изменить местность: set_terrain: burnt или { to, cause } (в летопись — root, если это персонаж) | core/biomes |
+| `set_terrain` | Изменить местность участка графства: set_terrain: burnt или { to, from: [местности или группы], share: 0.25, cause } (без from — любая земля, без share — вся; в летопись — root, если это персонаж) | core/biomes |
 | `set_var` | Переменная: { name, value } | core |
 | `set_vassal_obligation` | Установить вассалу условия службы: set_vassal_obligation: privileged | core/politics |
 | `shift_realm_law` | Сдвинуть закон группы на ступени: shift_realm_law: { group: crown_authority, by: -1 } (без цены) | core/laws |
@@ -433,7 +434,7 @@
 | `karma` | character | Карма «Свет и Пепел» (−100…100) | core/karma |
 | `karma_tier_level` | character | Номер ступени кармы (0 — самая пепельная) | core/karma |
 | `knights_power` | character | Сила рыцарей (в ополченцах) | core/knights |
-| `land_work_months_left` | province | Сколько месяцев осталось работе на земле | core/biomes |
+| `land_work_months_left` | province | Сколько месяцев осталось нынешнему участку работы на земле | core/biomes |
 | `learning` | character | Навык: learning | core |
 | `levies` | character | Ополчение державы | core |
 | `levy` | province | Ополчение провинции | core |
@@ -509,6 +510,7 @@
 | `synod_vote_weight` | character | Вес голоса на Соборе (0 — нет голоса) | core/synod |
 | `tax` | province | Налог провинции | core |
 | `tax_law_level` | character | Уровень закона группы tax_law (−1, если не действует) | core/laws |
+| `terrain_share` | province | Доля клеток графства с такой местностью (или группой), 0…1: terrain_share(forest) | core |
 | `tier` | character | Ранг основного титула (0 — нет земель, 1 — граф ... 4 — император) | core |
 | `title_tier` | title | Ранг титула | core |
 | `tribute_amount` | character | Сколько данник платит в месяц | core/tribute |
@@ -663,7 +665,7 @@
 | `districts` | Районы графства: кварталы с уровнями, сила района масштабирует постройки | да |
 | `tribute` | Дань: доля податей данника — победителю войны за дань | да |
 | `missions` | Поручения: люди правителя уходят в мир с делом | да |
-| `biomes` | Местность: живая земля — работы правителей, природа и война меняют её; летопись земли | да |
+| `biomes` | Местность: живая земля по клеткам — работы правителей участками, природа и война меняют её; летопись земли | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 

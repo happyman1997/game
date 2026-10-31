@@ -1,6 +1,7 @@
 extends SceneTree
-## Замер нового ядра (native/, Rust): клетки карты, поиск пути в Rust и в
-## GDScript, путники со встречами, цена вызова GDScript → Rust.
+## Замер нового ядра (native/, Rust): клетки карты и земля на них, поиск пути
+## в Rust и в GDScript (цена клетки — по её местности), путники со встречами,
+## цена вызова GDScript → Rust.
 ##   native/build.sh && godot --headless --path . -s tools/core_bench.gd
 
 func _astar_gd(nb: PackedInt32Array, cost: PackedFloat32Array, cols: int, a: int, b: int) -> int:
@@ -77,17 +78,12 @@ func _init() -> void:
 		quit()
 		return
 	var e := ToolCommon.engine(ToolCommon.args())
-	var m: MapData = e.map
-	var pc := PackedFloat32Array()
-	pc.resize(m.provinces.size())
-	for i in m.provinces.size():
-		var pd: Variant = e.content.get_def("provinces", m.provinces[i])
-		var td: Variant = e.content.get_def("terrain", str(pd.get("terrain", ""))) if pd != null else null
-		pc[i] = 0.0 if m.impassable[i] == 1 else (Data.num(td.get("movement"), 1.0) if td != null else 1.0)
-	var cm: Object = ClassDB.instantiate("CellMap")
+	var g := e.new_game("b1066", 1)
 	var t0 := Time.get_ticks_usec()
-	var land: int = cm.build(m.width, m.height, m.pixels, pc, 7.5)
-	print("клетки: суши %d из %d, областей суши %d, нарезка %.1f мс" % [land, cm.cell_count(), cm.component_count(), (Time.get_ticks_usec() - t0) / 1000.0])
+	var land := Land.new(g)
+	var cm: Object = land.core
+	print("клетки: суши %d из %d (проходимых %d), областей суши %d; нарезка и раскладка земли %.1f мс" % [
+		cm.cell_count() - Array(cm.terrain_bytes()).count(255), cm.cell_count(), cm.land_count(), cm.component_count(), (Time.get_ticks_usec() - t0) / 1000.0])
 	var bp: Dictionary = cm.bench_paths(1000, 7)
 	print("Rust A*: 1000 путей за %.1f мс (%.3f мс на путь, найдено %d, средняя длина %.0f клеток)" % [bp.ms, bp.ms / 1000.0, bp.found, bp.avg_len])
 	var gr: Dictionary = cm.export_graph()
