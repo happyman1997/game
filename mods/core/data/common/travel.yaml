@@ -1,0 +1,106 @@
+# Путники и шайки (механика travel, engine/features/travel.gd). Люди с
+# поручениями идут по карте по клеткам; в чужих угодьях шайки на них
+# нападают. Шайка — логово в клетке её местности (lair), угодья — radius
+# клеток вокруг; путник в угодьях натыкается на неё с шансом
+# encounter_chance в день (один раз за путь); встреча — схватка с врагом
+# шайки (foe, см. duels.yaml; map_icon — значок на карте). Отбился — шайка слабеет (strength —
+# сколько поражений выдержит). Шайка бьёт графство логова (modifiers), живёт
+# years лет. spawn — природа: раз в год шанс для графства без шайки, где
+# довольно нужной земли (terrain: доля клеток) и выполнено trigger.
+
+defines:
+  travel:
+    speed: 3.0          # «цены пути» в день (тропа по полю — 1, тракт — 0,75)
+
+bands:
+  # Лесные разбойники: из обиженного лесного народа, беглых, разорённых
+  outlaws:
+    icon: "🏹"
+    map_icon: dagger
+    foe: bandit
+    lair: [forest]
+    radius: 3
+    years: 10
+    strength: 3
+    encounter_chance: 20
+    modifiers: { tax_mult: -0.1, levy_mult: -0.05 }
+    spawn:
+      chance: 0.03
+      terrain: { forest: 0.4 }
+      trigger: { county_opinion: "<= -20" }
+  # Беглые с войны: латники без господина грабят дороги
+  deserters:
+    icon: "⚔"
+    map_icon: swords
+    foe: hedge_knight
+    lair: [forest, hills, plains]
+    radius: 3
+    years: 6
+    strength: 2
+    encounter_chance: 25
+    modifiers: { tax_mult: -0.08 }
+  # Волчья стая в глуши
+  wolves:
+    icon: "🐺"
+    map_icon: wolf
+    foe: wolf
+    lair: [old_forest]
+    radius: 2
+    years: 6
+    strength: 2
+    encounter_chance: 15
+    modifiers: { levy_mult: -0.05 }
+    spawn:
+      chance: 0.04
+      terrain: { old_forest: 0.2 }
+  # Людоед: старый медведь в дремучем лесу
+  man_eater:
+    icon: "🐻"
+    map_icon: skull
+    foe: man_eater
+    lair: [old_forest]
+    radius: 2
+    years: 15
+    strength: 1
+    encounter_chance: 10
+    modifiers: { tax_mult: -0.05, levy_mult: -0.05 }
+    spawn:
+      chance: 0.006
+      terrain: { old_forest: 0.3 }
+
+opinion_modifiers:
+  band_routed: { value: 15, years: 5 }
+
+missions:
+  # Разогнать шайку: воин из своих людей идёт к логову и бьётся с ней —
+  # победит в схватке, шайка разбежится
+  hunt_band:
+    icon: "🏹"
+    agent: { is_adult: yes, prowess: ">= 6" }
+    target: county
+    target_trigger: { has_band: yes }
+    months: 1
+    cost: { gold: 10 }
+    event_chance: 0
+    on_arrive:
+      - scope:target: { fight_band: { rout: yes } }
+    check:
+      skill: prowess
+      base: 20
+      add:
+        - { desc: check.band_routed, limit: { scope:target: { has_band: no } }, value: 60 }
+        - { desc: skill.prowess, value: { value: prowess, multiply: 2 } }
+        - { desc: skill.martial, value: { value: martial } }
+    success:
+      - add_prestige: 40
+      - scope:target: { add_county_opinion: band_routed }
+      - scope:patron: { add_prestige: 15 }
+    partial:
+      - add_prestige: 10
+    failure:
+      - add_stress: 10
+    ai_will_do:
+      value: 6
+      if:
+        - limit: { scope:recipient: { prowess: ">= 12" } }
+          add: 10

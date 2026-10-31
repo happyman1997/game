@@ -1,0 +1,19 @@
+# Travellers and bands (travel.yaml)
+bands:
+  outlaws: Forest Outlaws
+  deserters: Deserters
+  wolves: Wolf Pack
+  man_eater: Man-Eater
+band_desc:
+  outlaws: "Wronged forest folk, runaways and the ruined: they rob travellers and carts on the forest roads."
+  deserters: "Men-at-arms without a lord after the war: they take on the roads whatever lies loose."
+  wolves: "A pack in the wilds: it kills livestock and falls on lone travellers."
+  man_eater: "An old bear that has tasted human flesh. Every hearth tells of it."
+mission:
+  hunt_band: Rout a Band
+mission_desc:
+  hunt_band: "A warrior of yours goes to the band's lair and fights it. Win the fight — the band scatters, and the county breathes easier."
+check:
+  band_routed: Band routed
+opinion_modifier:
+  band_routed: Routed a band

@@ -634,6 +634,11 @@ func _tooltip() -> Variant:
 	var army: Variant = overlay.army_at(get_local_mouse_position())
 	if army != null and overlay.army_tooltip.is_valid():
 		return overlay.army_tooltip.call(army)
+	var thing: Variant = overlay.thing_at(get_local_mouse_position())
+	if thing != null and overlay.thing_tooltip.is_valid():
+		var tt: Variant = overlay.thing_tooltip.call(thing.kind, thing.id)
+		if tt != null and str(tt) != "":
+			return tt
 	var hit: Variant = overlay.building_at(get_local_mouse_position())
 	if hit != null and overlay.building_tooltip.is_valid():
 		var tip: Variant = overlay.building_tooltip.call(hit)

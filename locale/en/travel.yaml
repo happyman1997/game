@@ -1,0 +1,21 @@
+# Travellers and bands (engine/features/travel.gd)
+msg:
+  band_spawned: "{place}: a band has appeared — {band}."
+  band_met_won: "{agent} ran into a band ({band}) near {place} — and fought them off."
+  band_met_lost: "{agent} ran into a band ({band}) near {place} — and was beaten."
+fx:
+  spawn_band: "{place}: a band will appear — {band}"
+  fight_band: "Fight with a band ({place})"
+  remove_bands: "{place}: the bands are routed"
+travel:
+  out: "on the road — to {place}"
+  stay: "at the destination — {place}"
+  back: "heading home"
+  days: "~{n} more days"
+  bands: "Bands"
+  band_line: "{band} — strength {n}, {years} more years"
+  band_tip_power: "Strength {n}: this many defeats it can take"
+  band_tip_left: "It will scatter by itself in about {n} years"
+  band_tip_hunt: "To rout it, send a warrior on the «Rout a Band» mission."
+ui:
+  mission_patron: "on behalf of: {name}"

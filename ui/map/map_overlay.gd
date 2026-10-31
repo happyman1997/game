@@ -3,7 +3,8 @@ extends Control
 ## Слой поверх карты: подписи держав (по дуге), поселения графств — вблизи
 ## нарисованные прямо на местности, в режиме «Застройка» — схемой районов,
 ## названия графств при приближении, армии, осады, путь выбранной армии;
-## под всем этим — дороги (линии по клеткам: тропы, тракты, мостовые).
+## под всем этим — дороги (линии по клеткам: тропы, тракты, мостовые);
+## путники с поручениями и логова шаек (механика travel).
 
 var view: MapView
 var labels: Array = []
@@ -12,6 +13,10 @@ var highlighted := {}
 ## Подсказка для армии: Callable(army_id) -> String.
 var army_tooltip: Callable
 var _army_pos: Array = []
+## Путники и шайки на экране: [{pos, kind, id}] — для подсказок.
+var _thing_pos: Array = []
+## Подсказка для путника или шайки: Callable(kind, id) -> String.
+var thing_tooltip: Callable
 ## Нижний край рисунка поселения (экранный y) — название графства идёт под ним.
 var _name_below := {}
 
@@ -33,6 +38,7 @@ func _draw() -> void:
 	_draw_county_names()
 	_draw_sieges(snap)
 	_draw_path(snap)
+	_draw_travel(snap)
 	_draw_armies(snap)
 
 
@@ -183,7 +189,87 @@ static func build_snapshot(g: Game) -> Dictionary:
 			var days := maxf(1.0, Data.num(cons.get("days"), 365))
 			builds[p.id] = {"district": cons.get("district"), "building": cons.get("building"), "level": int(cons.get("level", 0)),
 				"progress": clampf(1.0 - (float(cons.done) - g.date) / days, 0.0, 1.0)}
-	return {"armies": armies, "sieges": sieges, "settlements": settlements_of(g), "builds": builds, "roads": roads_of(g)}
+	return {"armies": armies, "sieges": sieges, "settlements": settlements_of(g), "builds": builds, "roads": roads_of(g),
+		"travelers": travelers_of(g, colors), "bands": bands_of(g)}
+
+
+## Путники с поручениями: точка на карте, цвет державы покровителя.
+static func travelers_of(g: Game, _colors: Dictionary) -> Array:
+	if not g.engine.has_feature("travel") or not g.land().ready():
+		return []
+	var out := []
+	for t in Travel.travelers(g).values():
+		var who: Variant = g.ch(t.who)
+		if who == null:
+			continue
+		var m: Variant = Missions.of(who)
+		var patron: Variant = g.ch(str(m.patron)) if m != null and m.get("patron") != null else null
+		var col := Color("#c8b48a")
+		if patron != null:
+			var top := Titles.top_liege(g, patron)
+			if not top.titles.is_empty():
+				var d: Variant = g.title_def(top.titles[0])
+				if d != null and d.get("color") is String:
+					col = Color(d.color)
+		out.append({"id": t.id, "pos": Travel.position(g, t), "color": col, "phase": t.phase,
+			"mine": patron != null and g.is_player(patron.id)})
+	return out
+
+
+## Логова шаек.
+static func bands_of(g: Game) -> Array:
+	if not g.engine.has_feature("travel") or not g.land().ready():
+		return []
+	var out := []
+	for b in Travel.bands(g).values():
+		var d: Variant = Travel.band_def(g, b)
+		out.append({"id": b.id, "pos": g.land().core.cell_center(int(b.cell)), "icon": str(d.get("map_icon", "dagger")) if d != null else "dagger",
+			"radius": int(Data.num(d.get("radius"), 2)) if d != null else 2})
+	return out
+
+
+## Логова шаек (с кругом угодий вблизи) и путники.
+func _draw_travel(snap: Dictionary) -> void:
+	var z := view.zoom
+	_thing_pos = []
+	if z < 0.8:
+		return
+	var a := smoothstep(0.8, 1.3, z)
+	var cell_px := 7.5 * 1.732 * z
+	for b in snap.get("bands", []):
+		var p := view.map_to_screen(b.pos)
+		if p.x < -80 or p.y < -80 or p.x > size.x + 80 or p.y > size.y + 80:
+			continue
+		var rad := float(b.radius) * cell_px
+		draw_circle(p, rad, Color(0.7, 0.12, 0.08, 0.07 * a))
+		draw_arc(p, rad, 0, TAU, 48, Color(0.55, 0.1, 0.06, 0.35 * a), 1.2)
+		draw_circle(p, 9.0, Color(0.12, 0.05, 0.03, 0.85 * a))
+		draw_arc(p, 9.0, 0, TAU, 24, Color(0.85, 0.3, 0.2, a), 1.5)
+		draw_texture_rect(Icons.texture(str(b.icon), 14, "red"), Rect2(p - Vector2(7, 7), Vector2(14, 14)), false, Color(1, 1, 1, a))
+		_thing_pos.append({"pos": p, "kind": "band", "id": b.id})
+	var horse := Icons.texture("horse", 12, "silver")
+	for t in snap.get("travelers", []):
+		var p := view.map_to_screen(t.pos)
+		if p.x < -40 or p.y < -40 or p.x > size.x + 40 or p.y > size.y + 40:
+			continue
+		var col: Color = t.color
+		draw_circle(p + Vector2(1, 2), 8.0, Color(0, 0, 0, 0.4 * a))
+		draw_circle(p, 8.0, col.darkened(0.3))
+		draw_arc(p, 8.0, 0, TAU, 20, Color("#e8c050") if t.mine else Color("#1a1208"), 1.6)
+		draw_texture_rect(horse, Rect2(p - Vector2(6, 6), Vector2(12, 12)), false, Color(1, 1, 1, a))
+		_thing_pos.append({"pos": p, "kind": "traveler", "id": t.id})
+
+
+## Путник или шайка под точкой экрана: {kind, id} или null.
+func thing_at(pos: Vector2) -> Variant:
+	var best: Variant = null
+	var bd := 12.0
+	for p in _thing_pos:
+		var d: float = p.pos.distance_to(pos)
+		if d < bd:
+			bd = d
+			best = {"kind": p.kind, "id": p.id}
+	return best
 
 
 # ------------------------------------------------------------ дороги

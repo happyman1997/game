@@ -1,0 +1,21 @@
+# Путники и шайки (engine/features/travel.gd)
+msg:
+  band_spawned: "{place}: завелась шайка — {band}."
+  band_met_won: "{agent} наткнулся на шайку ({band}) у {place} — и отбился."
+  band_met_lost: "{agent} наткнулся на шайку ({band}) у {place} — и не отбился."
+fx:
+  spawn_band: "{place}: заведётся шайка — {band}"
+  fight_band: "Схватка с шайкой ({place})"
+  remove_bands: "{place}: шайки разогнаны"
+travel:
+  out: "в пути — к {place}"
+  stay: "на месте — {place}"
+  back: "возвращается домой"
+  days: "ещё ~{n} дн."
+  bands: "Шайки"
+  band_line: "{band} — сила {n}, ещё {years} г."
+  band_tip_power: "Сила {n}: столько поражений выдержит"
+  band_tip_left: "Разойдётся сама лет через {n}"
+  band_tip_hunt: "Разогнать: отправьте воина с поручением «Разогнать шайку»."
+ui:
+  mission_patron: "по поручению: {name}"

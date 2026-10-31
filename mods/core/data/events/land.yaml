@@ -81,12 +81,12 @@ events:
       - trigger: { gold: ">= 30" }
         effect: { add_gold: -30 }
         ai_chance: 15
-      # прогнать — лес мой; кто-то уйдёт в разбойники
+      # прогнать — лес мой; кто-то уйдёт в разбойники (шайка в лесу)
       - effect:
           - scope:province: { add_county_opinion: forest_felled }
           - random:
               chance: 35
-              scope:province: { add_province_modifier: { id: forest_outlaws, years: 5 } }
+              scope:province: { spawn_band: outlaws }
         ai_chance: { value: 10, add: { value: ai_compassion, multiply: -5 } }
 
   # ------------------------------------------------------------ разлив у соседа

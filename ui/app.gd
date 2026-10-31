@@ -95,6 +95,7 @@ func _ready() -> void:
 	map_view.tooltip_provider = province_tooltip
 	map_view.overlay.army_tooltip = army_tooltip
 	map_view.overlay.building_tooltip = building_tooltip
+	map_view.overlay.thing_tooltip = thing_tooltip
 	# звуки и анимации интерфейса: кнопки, окна, переходы
 	UiFx.install(self)
 	boot.call_deferred()
@@ -739,6 +740,51 @@ func army_tooltip(id: Variant) -> String:
 	if cmd != null:
 		parts.append(BB.muted(t("ui.commander") + ": " + Chars.full_name(g, cmd, false)))
 	parts.append(BB.muted(g.name_of("provinces", a.location)))
+	return "\n".join(parts)
+
+
+## Подсказка путника (поручение, куда, сколько ещё) или шайки.
+func thing_tooltip(kind: String, id: Variant) -> String:
+	var g := game
+	if g == null or not g.engine.has_feature("travel"):
+		return ""
+	if kind == "band":
+		var b: Variant = Travel.bands(g).get(id)
+		if b == null:
+			return ""
+		var parts := PackedStringArray([BB.title(g.name_of("bands", str(b.kind)))])
+		var desc: Variant = g.loc.raw("band_desc." + str(b.kind))
+		if desc != null:
+			parts.append(BB.i(BB.esc(desc)))
+		parts.append(BB.muted(g.name_of("provinces", b.province)))
+		parts.append(t("travel.band_tip_power", {"n": int(b.strength)}))
+		parts.append(BB.muted(t("travel.band_tip_left", {"n": maxi(1, roundi((int(b.until) - g.date) / 365.0))})))
+		parts.append(BB.small(BB.muted(t("travel.band_tip_hunt"))))
+		return "\n".join(parts)
+	var tr: Variant = Travel.travelers(g).get(id)
+	if tr == null:
+		return ""
+	var who: Variant = g.ch(tr.who)
+	if who == null:
+		return ""
+	var m: Variant = Missions.of(who)
+	var parts := PackedStringArray([BB.title(Chars.full_name(g, who, true))])
+	if m != null:
+		parts.append(BB.gold(g.name_of("missions", str(m.id))))
+		var patron: Variant = g.ch(str(m.patron)) if m.get("patron") != null else null
+		if patron != null:
+			parts.append(BB.muted(t("ui.mission_patron", {"name": Chars.full_name(g, patron, false)})))
+	var place := g.name_of("provinces", g.land().province_at_cell(int(tr.dest)))
+	match str(tr.phase):
+		"out":
+			parts.append(t("travel.out", {"place": place}))
+			parts.append(BB.muted(t("travel.days", {"n": Travel.route_days(g, tr.route.slice(int(tr.step)))})))
+		"stay":
+			parts.append(t("travel.stay", {"place": place}))
+			parts.append(BB.muted(t("travel.days", {"n": maxi(0, int(tr.stay_until) - g.date)})))
+		_:
+			parts.append(t("travel.back"))
+			parts.append(BB.muted(t("travel.days", {"n": Travel.route_days(g, tr.route.slice(int(tr.step)))})))
 	return "\n".join(parts)
 
 

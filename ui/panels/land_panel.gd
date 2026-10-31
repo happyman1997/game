@@ -44,6 +44,15 @@ static func build(app: App, pid: String) -> Control:
 		rl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		K.tip(rl, func(): return road_tip(app, pid))
 		box.add_child(rl)
+	# шайки в графстве
+	if g.engine.has_feature("travel"):
+		for b in Travel.bands_in(g, pid):
+			var bl := K.label("⚠ " + app.t("travel.band_line", {"band": g.name_of("bands", str(b.kind)), "n": int(b.strength),
+				"years": maxi(1, roundi((int(b.until) - g.date) / 365.0))}), "SmallLabel")
+			bl.add_theme_color_override("font_color", Color("#e08a6a"))
+			var bid: String = b.id
+			K.tip(bl, func(): return app.thing_tooltip("band", bid))
+			box.add_child(bl)
 	# идут работы
 	var w: Variant = Biomes.work_of(g, pid)
 	if w != null:

@@ -6,13 +6,19 @@ extends EngineFeature
 ## всякое (события приходят покровителю), а по возвращении исход решает
 ## проверка его навыков: удача, «отчасти» или провал. Может и не вернуться.
 ## ИИ отправляет своих людей так же.
+## Путь (механика travel): агент идёт по карте от сердца столицы покровителя
+## к цели (у правителя — к его столице; без цели — в дальнее графство),
+## живёт там срок поручения (months), запускает on_arrive и идёт назад;
+## исход — по возвращении. В пути можно наткнуться на шайку. Нет пути по
+## суше — поручение идёт сроком, как прежде.
 ##
 ## Данные (missions):
 ##   icon
 ##   agent: { ... }           — кто может идти (root — агент, scope:patron)
 ##   target: ruler | county   — куда (без поля — без цели: странствие)
 ##   target_trigger: { ... }  — какие цели годятся (root — цель, scope:patron, scope:agent)
-##   months: 8                — срок (значение; root — агент)
+##   months: 8                — срок на месте (значение; root — агент); путь — сверху
+##   on_arrive: [ ... ]       — по прибытии на место (root — агент, scope:patron, scope:target)
 ##   cost: { gold, prestige, piety }
 ##   accept: { ... }          — согласится ли агент (как ai_accept; нет — идёт без спроса)
 ##   events: { <событие>: вес } — события в пути (root — покровитель, scope:agent, scope:target)
@@ -26,7 +32,8 @@ extends EngineFeature
 ## ребёнок без земли), не моложе defines.missions.min_age, не в темнице, не в
 ## совете и не в другом поручении. В отъезде он не служит рыцарем и не
 ## садится в совет.
-## Состояние: агент — c.vars.mission = { id, patron, target, start, until }.
+## Состояние: агент — c.vars.mission = { id, patron, target, start, until, trip }
+## (trip — id путника в state.travelers; until — прикидка возвращения).
 ## Хук mission.ended — {agent, patron, mission, result: success|partial|failure|dead|recalled}.
 
 const OWNER := "core/missions"
@@ -94,12 +101,68 @@ static func start(game: Game, mid: String, agent: Dictionary, patron: Dictionary
 	var scopes := _scopes(patron.id, agent.id, target)
 	var ctx := ScriptContext.make(game, {"type": "character", "id": agent.id}, scopes)
 	var months := maxf(1.0, Interp.eval_value(ctx, ctx.root, d.get("months", 6)))
-	agent.vars["mission"] = {"id": mid, "patron": patron.id, "target": target, "start": game.date, "until": game.date + roundi(months * 30.4)}
+	var m := {"id": mid, "patron": patron.id, "target": target, "start": game.date, "until": game.date + roundi(months * 30.4)}
+	agent.vars["mission"] = m
+	# в путь по карте: от сердца столицы покровителя к цели
+	if game.engine.has_feature("travel"):
+		var home := _home_cell(game, patron)
+		var dest := _dest_cell(game, target, home)
+		var tid := Travel.depart(game, "mission", agent.id, home, dest, {"stay_days": roundi(months * 30.4)})
+		if tid != "":
+			m["trip"] = tid
+			var days := Travel.route_days(game, Travel.travelers(game)[tid].route)
+			m["until"] = game.date + days * 2 + roundi(months * 30.4)
 	game.month_cache.erase("knights:" + patron.id)
 	game.emit("mission.started", {"agent": agent, "patron": patron.id, "mission": mid})
 	if game.is_player(patron.id):
 		game.message(game.loc.t("msg.mission_started", _msg_args(game, mid, agent, target, roundi(months))), "info", {"type": "character", "id": agent.id})
 	game.notify("character")
+
+
+## Сердце столицы покровителя (откуда идут и куда возвращаются).
+static func _home_cell(game: Game, patron: Dictionary) -> int:
+	var cap: Variant = Titles.capital_of(game, patron) if not patron.titles.is_empty() else null
+	if cap == null and patron.get("liege") != null:
+		var l: Variant = game.ch(patron.liege)
+		cap = Titles.capital_of(game, l) if l != null and not l.titles.is_empty() else null
+	return game.land().seat(cap) if cap != null else -1
+
+
+## Куда идти: сердце графства цели или столицы правителя; без цели — дальнее
+## графство той же суши.
+static func _dest_cell(game: Game, target: Variant, home: int) -> int:
+	var land := game.land()
+	if target is Dictionary:
+		if target.get("type") == "province":
+			return land.seat(target.id)
+		if target.get("type") == "character":
+			var r: Variant = game.ch(target.id)
+			var cap: Variant = Titles.capital_of(game, r) if r != null and not r.titles.is_empty() else null
+			return land.seat(cap) if cap != null else -1
+	if home < 0:
+		return -1
+	var from: Vector2 = land.core.cell_center(home)
+	var cands := []
+	for pid in game.state.provinces:
+		var s := land.seat(pid)
+		if s < 0:
+			continue
+		var d: float = (land.core.cell_center(s) as Vector2).distance_to(from)
+		if d > 120.0 and d < 420.0:
+			cands.append(s)
+	return int(game.rng.pick(cands)) if not cands.is_empty() else -1
+
+
+## Агент пришёл на место: on_arrive поручения.
+static func on_arrive(game: Game, agent: Dictionary) -> void:
+	var m: Variant = of(agent)
+	var d: Variant = game.content.get_def("missions", str(m.id)) if m != null else null
+	if d == null or d.get("on_arrive") == null:
+		return
+	var patron: Variant = game.ch(str(m.patron)) if m.get("patron") != null else null
+	var ctx := ScriptContext.make(game, {"type": "character", "id": agent.id}, _scopes(patron.id if patron != null else null, agent.id, m.get("target")))
+	ctx.values["__src"] = "mission:" + str(m.id)
+	Interp.run_effect(ctx, ctx.root, d.on_arrive)
 
 
 static func _scopes(patron_id: Variant, agent_id: String, target: Variant) -> Dictionary:
@@ -122,6 +185,8 @@ static func finish(game: Game, agent: Dictionary, result: String) -> void:
 	if m == null:
 		return
 	agent.vars.erase("mission")
+	if game.engine.has_feature("travel"):
+		Travel.remove(game, m.get("trip"))
 	var patron: Variant = game.ch(str(m.patron)) if m.get("patron") != null else null
 	if patron != null:
 		game.month_cache.erase("knights:" + patron.id)
@@ -143,6 +208,8 @@ static func resolve(game: Game, agent: Dictionary) -> void:
 	var ctx := ScriptContext.make(game, {"type": "character", "id": agent.id}, _scopes(patron.id if patron != null and Chars.is_alive(patron) else null, agent.id, m.get("target")))
 	ctx.values["__src"] = "mission:" + str(m.id)
 	agent.vars.erase("mission")
+	if game.engine.has_feature("travel"):
+		Travel.remove(game, m.get("trip"))
 	var spec: Dictionary = (d.get("check") if d.get("check") is Dictionary else {}).duplicate()
 	for k in ["success", "partial", "failure"]:
 		if d.get(k) != null:
@@ -166,7 +233,9 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 	if c.get("prison") != null:
 		finish(game, c, "captured")
 		return
-	if game.date >= int(m.until):
+	# в пути по карте — исход по возвращении (Travel), иначе — сроком
+	var walking: bool = m.get("trip") != null and game.engine.has_feature("travel") and Travel.travelers(game).has(m.trip)
+	if not walking and game.date >= int(m.until):
 		resolve(game, c)
 		return
 	var d: Variant = game.content.get_def("missions", str(m.id))
@@ -251,6 +320,7 @@ func install(engine: GameEngine) -> void:
 			for ev in (d.events if d.get("events") is Dictionary else {}):
 				v.ref("events", ev, w + " events")
 			v.check(d.get("check") if d.get("check") is Dictionary else {}, w)
+			v.effect(d.get("on_arrive"), w + " on_arrive")
 			for k in ["success", "partial", "failure"]:
 				v.effect(d.get(k), "%s %s" % [w, k])
 	, OWNER)

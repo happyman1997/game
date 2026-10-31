@@ -42,6 +42,7 @@
 | `has_artifact` | character | Персонаж держит вещь (реликвию по id или предмет): has_artifact: <id> | core/artifacts |
 | `has_artifact_claim` | character | Притязает на чью-то вещь (yes) или на вещь этого персонажа: has_artifact_claim: scope:recipient | core/artifacts |
 | `has_artifact_type` | character | Есть вещь этого типа: has_artifact_type: sword | core/artifacts |
+| `has_band` | province | В графстве логово шайки: has_band: yes \| <вид шайки> | core/travel |
 | `has_building` | province | Есть постройка | core |
 | `has_champion` | character | За персонажа в поединке бьётся поборник | core/duels |
 | `has_claim_on` | character | Есть претензия на титул | core |
@@ -256,6 +257,7 @@
 | `faction_start_war` | Фракция поднимает мятеж | core/factions |
 | `feed_on_blood` | Вампир утоляет жажду (жертва — пленник или придворный) | arcana |
 | `fight` | Бой с врагом из данных: fight: { foe: wolf, kind: mortal\|duel\|friendly, on_win: [...], on_lose: [...] } (эффекты исхода — в скоупе этого персонажа) | core/duels |
+| `fight_band` | root (персонаж) бьётся с шайкой графства (самой сильной): fight_band: yes \| { rout: yes } (rout — победа разгоняет шайку совсем) | core/travel |
 | `firestorm` | Огненная буря на крупнейшее вражеское войско у границ | arcana |
 | `found_cadet_house` | Основать младшую ветвь рода: found_cadet_house: yes | core/dynasties |
 | `fulfill_ambition` | Исполнить желание персонажа (благодарность — patron): fulfill_ambition: scope:actor | core/ambitions |
@@ -287,6 +289,7 @@
 | `purge_restless_dead` | Выжечь нежить в самой поражённой провинции державы (purge_restless_dead: { magic: yes } — светом чар, а не ополчением) | arcana |
 | `raise_dread_tier` | Поднять страх правителя на ступень (или на N ступеней): raise_dread_tier: 1 | core/politics |
 | `release_from_prison` | Освободить этого персонажа из темницы | core/prison |
+| `remove_bands` | Разогнать все шайки графства: remove_bands: yes | core/travel |
 | `remove_building` | Убрать постройку | core |
 | `remove_claim` | Убрать претензию | core |
 | `remove_county_opinion` | Убрать модификатор мнения графства | core/populace |
@@ -328,6 +331,7 @@
 | `set_vassal_obligation` | Установить вассалу условия службы: set_vassal_obligation: privileged | core/politics |
 | `shift_realm_law` | Сдвинуть закон группы на ступени: shift_realm_law: { group: crown_authority, by: -1 } (без цены) | core/laws |
 | `sow_discord` | Посеять раздор между вассалом и его ближайшим союзником: sow_discord: scope:recipient | core/politics |
+| `spawn_band` | Завести шайку в графстве: spawn_band: outlaws | core/travel |
 | `spend_dynasty_renown` | Потратить известность рода: spend_dynasty_renown: 100 | core/dynasties |
 | `start_ambition` | Завести желание: start_ambition: land (цель — случайная подходящая) | core/ambitions |
 | `start_disease` | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
@@ -668,6 +672,7 @@
 | `tribute` | Дань: доля податей данника — победителю войны за дань | да |
 | `missions` | Поручения: люди правителя уходят в мир с делом | да |
 | `biomes` | Местность: живая земля по клеткам — работы правителей участками, природа и война меняют её; летопись земли | да |
+| `travel` | Путники идут по карте по клеткам; шайки на дорогах и встречи с ними | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -675,11 +680,11 @@
 
 - **succession_algorithms**: `primogeniture`, `partition`, `seniority`, `elected_member`, `best_master`, `republic_election`, `elective`
 - **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `heretic_realm`, `faction`, `artifact_holder`, `tribute`, `monster_hunt`
-- **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`, `own_artifacts`, `claimed_artifacts`, `mission:embassy`, `mission:foreign_service`, `mission:glory_wandering`, `mission:pilgrimage`, `mission:preaching`
+- **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`, `own_artifacts`, `claimed_artifacts`, `mission:embassy`, `mission:foreign_service`, `mission:glory_wandering`, `mission:pilgrimage`, `mission:preaching`, `mission:hunt_band`
 - **interaction_deciders**: `payer`
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `synod_decrees`, `districts`, `biomes`, `grafts`, `plague_fear`
-- **province_modifier_providers**: `lands`, `populace`, `governments`, `districts`, `biomes`
+- **province_modifier_providers**: `lands`, `populace`, `governments`, `districts`, `biomes`, `bands`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council_pay`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `faith_morals`, `faith_head`, `tribute`, `arcana_faith`, `grafts`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `foes`, `deeds`, `spirit`, `karma`, `synod`, `districts`, `missions`, `land_works`
-- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `council` (15), `ambitions` (16), `missions` (16), `artifacts` (17), `biomes` (18), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `tribute` (56), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `foes`, `deeds`, `spirit`, `karma`, `synod`, `districts`, `missions`, `land_works`, `bands`
+- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `council` (15), `ambitions` (16), `missions` (16), `artifacts` (17), `travel` (17), `biomes` (18), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `tribute` (56), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`
