@@ -1,7 +1,8 @@
 class_name LandPanel
 extends RefCounted
 ## Раздел «Земля» в окне провинции (механика biomes, земля по клеткам):
-## состав земли — полоса долей местностей и что она даёт графству; идущая
+## состав земли — полоса долей местностей и что она даёт графству; дороги
+## графства (у селения и доли тропы, тракта, мостовой); идущая
 ## работа (участок, срок, «дальше — следующий участок»); работы, которые
 ## можно начать (владельцу); летопись земли — кто и когда её менял.
 
@@ -31,6 +32,18 @@ static func build(app: App, pid: String) -> Control:
 		var chip := K.panel(K.hbox([K.icon("mountain", 18), K.label(g.name_of("terrain", t), "SubheaderLabel")], 6), "InsetPanel")
 		K.tip(chip, func(): return terrain_tip(app, t))
 		box.add_child(chip)
+	# дороги
+	if land.ready():
+		var rs := land.roads_of(pid)
+		var parts := []
+		for k in range(land.road_ids.size() - 1, 0, -1):
+			var id: String = land.road_ids[k]
+			if rs.has(id):
+				parts.append("%s %d%%" % [g.name_of("roads", id), roundi(float(rs[id]) * 100.0)])
+		var rl := K.label(app.t("land.roads", {"list": " · ".join(parts)}) if not parts.is_empty() else app.t("land.roads_none"), "SmallLabel")
+		rl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		K.tip(rl, func(): return road_tip(app, pid))
+		box.add_child(rl)
 	# идут работы
 	var w: Variant = Biomes.work_of(g, pid)
 	if w != null:
@@ -123,7 +136,9 @@ static func _work_row(app: App, c: Dictionary, pid: String, d: Dictionary) -> Co
 	var months := Biomes.months_for(g, c, d)
 	var cells := Biomes.patch_size(g, pid, d)
 	var share := roundi(100.0 * cells / maxf(1.0, g.land().count(pid)))
-	var info := "%s · %s" % [app.t("land.patch", {"n": share, "m": months}), app.t("land.becomes", {"to": g.name_of("terrain", str(d.to))})]
+	var road := Biomes.is_road_work(d)
+	var kind := "roads" if road else "terrain"
+	var info := "%s · %s" % [app.t("land.whole_road", {"m": months}) if road else app.t("land.patch", {"n": share, "m": months}), app.t("land.becomes", {"to": g.name_of(kind, str(d.to))})]
 	if cost > 0.0:
 		info = "%s · %s" % [info, app.t("land.cost", {"n": roundi(cost)})]
 	var name := K.label("%s %s" % [str(d.get("icon", "")), g.name_of("land_works", wid)])
@@ -136,8 +151,9 @@ static func _work_row(app: App, c: Dictionary, pid: String, d: Dictionary) -> Co
 	var row := K.hbox([K.vbox([name, sub], 0), K.expand(), b], 8)
 	var tip := func() -> String:
 		var bb := BB.title(g.name_of("land_works", wid)) + "\n" + BB.esc(app.t("land_work_desc." + wid))
-		bb += "\n" + BB.muted(app.t("land.room", {"n": roundi(100.0 * Biomes.room_for(g, pid, d))}))
-		bb += "\n" + BB.muted(app.t("land.patches_hint"))
+		if not road:
+			bb += "\n" + BB.muted(app.t("land.room", {"n": roundi(100.0 * Biomes.room_for(g, pid, d))}))
+			bb += "\n" + BB.muted(app.t("land.patches_hint"))
 		if d.get("during") is Dictionary:
 			var during := {}
 			for k in d.during:
@@ -147,13 +163,37 @@ static func _work_row(app: App, c: Dictionary, pid: String, d: Dictionary) -> Co
 		var lines: Array = Interp.describe_effect(ctx, {"type": "province", "id": pid}, d.get("on_complete"))
 		if not lines.is_empty():
 			bb += "\n" + BB.muted(app.t("land.each_patch")) + "\n" + BB.desc_lines(lines)
-		bb += "\n\n" + terrain_tip(app, str(d.to))
+		bb += "\n\n" + (road_def_tip(app, str(d.to)) if road else terrain_tip(app, str(d.to)))
 		if not why.is_empty():
 			bb += "\n" + BB.bad("\n".join(why.map(func(k): return app.t(k))))
 		return bb
 	K.tip(row, tip)
 	K.tip(b, tip)
 	return row
+
+
+## Дороги графства: у селения и что дорога даёт.
+static func road_tip(app: App, pid: String) -> String:
+	var g := app.game
+	var r := g.land().seat_road(pid)
+	var bb := BB.title(app.t("land.roads", {"list": ""}).strip_edges().trim_suffix(":"))
+	bb += "\n" + BB.muted(app.t("land.seat_road", {"road": g.name_of("roads", r) if r != "" else app.t("land.roads_none")}))
+	if r != "":
+		bb += "\n\n" + road_def_tip(app, r)
+	return bb
+
+
+## Что даёт дорога такого уровня.
+static func road_def_tip(app: App, r: String) -> String:
+	var g := app.game
+	var rd: Variant = g.content.get_def("roads", r)
+	var bb := BB.title(g.name_of("roads", r))
+	if rd == null:
+		return bb
+	bb += "\n" + BB.muted(app.t("land.movement", {"n": K.fmt(Data.num(rd.get("movement"), 1.0), 2)}))
+	if Data.num(rd.get("attrition_mult")) != 0.0:
+		bb += "\n" + BB.muted(app.t("land.road_attrition", {"n": roundi(Data.num(rd.attrition_mult) * 100.0)}))
+	return bb
 
 
 ## Подсказка о состоянии земли: описание и что оно даёт (всей земле графства).
@@ -193,4 +233,7 @@ static func log_line(app: App, pid: String, h: Array) -> String:
 	var share := ""
 	if h.size() > 5:
 		share = ", %d%%" % maxi(1, roundi(100.0 * int(h[5]) / maxf(1.0, g.land().count(pid))))
-	return app.t("land.log_line", {"year": GameDate.parts(int(h[0])).y, "from": g.name_of("terrain", str(h[1])), "to": g.name_of("terrain", str(h[2])), "share": share, "why": why})
+	var kind := "roads" if g.content.has("roads", str(h[2])) else "terrain"
+	if kind == "roads":
+		share = ""
+	return app.t("land.log_line", {"year": GameDate.parts(int(h[0])).y, "from": g.name_of(kind, str(h[1])), "to": g.name_of(kind, str(h[2])), "share": share, "why": why})

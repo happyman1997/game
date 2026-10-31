@@ -59,7 +59,8 @@ faiths:
 
 terrain:
   # Пепелище: мёртвая земля, где ничего не растёт.
-  ash: { color: "#5f5a55", defense: 0.1, movement: 1.5, height: 0.12, development_growth: -0.2 }
+  # Дорог через пепел нет (no_roads): они обрываются у края.
+  ash: { color: "#5f5a55", defense: 0.1, movement: 1.5, height: 0.12, development_growth: -0.2, no_roads: true }
 
 traits:
   # Раса цвергов: браки только между своими, живут вдвое дольше.

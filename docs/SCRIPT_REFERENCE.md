@@ -73,6 +73,7 @@
 | `has_realm_law` | character | Действует закон державы | core/laws |
 | `has_regent` | character | Правителем-ребёнком правит регент | core/upbringing |
 | `has_regiment` | character | Есть отряд этого типа (или любой: yes) | core/regiments |
+| `has_road` | province | Дорога через сердце графства не ниже уровня: has_road: trail \| road \| paved (yes — любая) | core/biomes |
 | `has_scheme` | character | Ведёт интригу: has_scheme: murder или { type, target } | core |
 | `has_secret` | character | Есть секрет (yes или тип) | core/secrets |
 | `has_snubbed_powerful_vassal` | character | Кто-то из влиятельных вассалов не получил места в совете | core/politics |
@@ -236,6 +237,7 @@
 | `create_character` | Создать персонажа: { culture, faith, female, age, traits, dynasty: new\|none\|path, court, save_scope_as } | core |
 | `create_relics` | Мощи праведника — реликварий с его именем: create_relics: { of: scope:predecessor, rarity: famed } (получает текущий персонаж) | core/karma |
 | `cure_ailments` | Снять болезни, раны и порчу | arcana |
+| `damage_roads` | Испортить дороги графства: damage_roads: { share: 0.5, cause: war } — доля тракта и мостовой теряет уровень (в летопись — root, если это персонаж) | core/biomes |
 | `death` | Смерть: yes, причина или { reason, killer } | core |
 | `delay_construction` | Отложить стройку в графстве на столько дней: delay_construction: 180 (меньше нуля — ускорить) | core |
 | `destroy_artifact` | Уничтожить вещь (уникальная — теряется): destroy_artifact: yes | core/artifacts |

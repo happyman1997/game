@@ -15,6 +15,7 @@ extends EngineFeature
 ##   modifiers / owner_modifiers — графству / владельцу, × сила района
 ##   power: [ множители силы ]:
 ##     { kind: terrain, mult: { farmlands: 1.5 } }   — по местности
+##     { kind: road, mult: { road: 1.15, paved: 1.3 } } — по дороге у сердца графства
 ##     { kind: coastal, mult: 1.2 }                   — прибрежное графство
 ##     { kind: border, mult: 1.4 }                    — граница с чужой державой
 ##     { kind: neighbors, district: market, per: 0.12, max: 0.6 }
@@ -233,6 +234,9 @@ static func _factor_value(game: Game, prov_id: String, f: Dictionary, holder: Va
 		"terrain":
 			var m: Variant = game.terrain_pick(f.get("mult"), prov_id, 1.0)
 			return Data.num(m, 1.0) if m != null else 1.0
+		"road":
+			var m: Variant = f.get("mult").get(game.land().seat_road(prov_id)) if f.get("mult") is Dictionary else null
+			return Data.num(m, 1.0) if m != null else 1.0
 		"coastal":
 			return Data.num(f.get("mult"), 1.0) if game.engine.is_coastal(prov_id) else 1.0
 		"border":
@@ -283,6 +287,12 @@ static func _factor(game: Game, prov_id: String, f: Dictionary, holder: Variant)
 			if m == null:
 				return null
 			return {"label": game.loc.t(label_key if label_key != "" else "district.factor.terrain", {"terrain": game.name_of("terrain", t)}), "value": Data.num(m, 1.0)}
+		"road":
+			var r := game.land().seat_road(prov_id)
+			var m: Variant = f.get("mult").get(r) if f.get("mult") is Dictionary and r != "" else null
+			if m == null:
+				return null
+			return {"label": game.loc.t(label_key if label_key != "" else "district.factor.road", {"road": game.name_of("roads", r)}), "value": Data.num(m, 1.0)}
 		"coastal":
 			if not game.engine.is_coastal(prov_id):
 				return null
@@ -680,7 +690,7 @@ func install(engine: GameEngine) -> void:
 			v.effect(d.get("yearly"), where)
 			v.value(d.get("ai_will_do"), where)
 			for f in Data.as_array(d.get("power")):
-				if not (f is Dictionary) or not ["terrain", "coastal", "border", "neighbors", "domain", "trigger"].has(str(f.get("kind"))):
+				if not (f is Dictionary) or not ["terrain", "road", "coastal", "border", "neighbors", "domain", "trigger"].has(str(f.get("kind"))):
 					v.issue("%s: неизвестный множитель силы %s" % [where, str(f)])
 				elif f.kind == "trigger":
 					v.trigger(f.get("limit"), where)

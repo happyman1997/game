@@ -11,7 +11,7 @@ use crate::cells::{CellMap, NONE};
 use crate::rng::Rng;
 
 /// Плавный шум по точке (решётка со стороной scale пикселей), 0…1.
-fn value_noise(seed: u64, x: f32, y: f32, scale: f32) -> f32 {
+pub(crate) fn value_noise(seed: u64, x: f32, y: f32, scale: f32) -> f32 {
     let fx = x / scale;
     let fy = y / scale;
     let x0 = fx.floor();

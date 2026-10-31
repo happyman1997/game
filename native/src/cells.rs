@@ -8,6 +8,7 @@
 
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
+use std::sync::Mutex;
 use std::time::Instant;
 
 use godot::prelude::*;
@@ -48,6 +49,16 @@ pub struct CellMap {
     pub(crate) terr: Vec<u8>,
     /// Цена пути по местностям.
     pub(crate) moves: Vec<f32>,
+    /// Уровень дороги клетки (0 — нет, 1 — тропа, 2 — тракт, 3 — мощёная).
+    pub(crate) road: Vec<u8>,
+    /// По каким сторонам клетки идёт дорога (6 бит).
+    pub(crate) links: Vec<u8>,
+    /// Множитель цены пути по уровню дороги.
+    pub(crate) road_moves: Vec<f32>,
+    /// Плавный шум клетки 0…1 — дороги при прокладке петляют по нему.
+    pub(crate) wiggle: Vec<f32>,
+    /// Рабочие массивы поиска пути (переиспользуются).
+    scratch: Mutex<Scratch>,
     base: Base<RefCounted>,
 }
 
@@ -146,20 +157,44 @@ impl CellMap {
         ((ax - bx).abs()).max((ay - by).abs()).max((az - bz).abs())
     }
 
-    /// Цена клетки по её местности.
+    /// Цена клетки: местность × дорога.
     pub(crate) fn refresh_cost(&mut self, i: usize) {
         let t = self.terr[i] as usize;
-        self.cost[i] = if t < self.moves.len() { self.moves[t].max(0.1) } else { 1.0 };
+        let base = if t < self.moves.len() { self.moves[t].max(0.1) } else { 1.0 };
+        let r = self.road.get(i).copied().unwrap_or(0) as usize;
+        let k = if r < self.road_moves.len() { self.road_moves[r].max(0.05) } else { 1.0 };
+        self.cost[i] = base * k;
     }
 
-    /// A*: путь от a до b включительно (пусто — пути нет).
-    fn path(&self, a: i32, b: i32, scratch: &mut Scratch) -> Vec<i32> {
+    /// Наименьшая возможная цена клетки — для оценки A*.
+    fn min_cost(&self) -> f32 {
+        let m = self.moves.iter().cloned().fold(1.0_f32, f32::min).max(0.1);
+        let r = self.road_moves.iter().cloned().fold(1.0_f32, f32::min).max(0.05);
+        m * r
+    }
+
+    /// Путь от a до b (клетки, включительно; пусто — пути нет). wiggle > 0 —
+    /// цена клеток чуть меняется по плавному шуму (дорога петляет).
+    pub(crate) fn path_cells(&self, a: i32, b: i32, wiggle: f32) -> Vec<i32> {
+        let mut s = self.scratch.lock().unwrap();
+        self.path(a, b, &mut s, wiggle).0
+    }
+
+    /// Цена пути от a до b (−1 — пути нет).
+    pub(crate) fn path_cost_of(&self, a: i32, b: i32) -> f32 {
+        let mut s = self.scratch.lock().unwrap();
+        let (p, c) = self.path(a, b, &mut s, 0.0);
+        if p.is_empty() { -1.0 } else { c }
+    }
+
+    /// A*: путь от a до b включительно (пусто — пути нет) и его цена.
+    fn path(&self, a: i32, b: i32, scratch: &mut Scratch, wiggle: f32) -> (Vec<i32>, f32) {
         let n = self.n();
         if a < 0 || b < 0 || a as usize >= n || b as usize >= n || !self.pass[a as usize] || !self.pass[b as usize] {
-            return Vec::new();
+            return (Vec::new(), 0.0);
         }
         scratch.prepare(n);
-        let min_cost = self.moves.iter().cloned().fold(1.0_f32, f32::min).max(0.1);
+        let min_cost = self.min_cost();
         let mut open = BinaryHeap::new();
         scratch.g[a as usize] = 0.0;
         scratch.touch(a as usize);
@@ -179,7 +214,11 @@ impl CellMap {
                     continue;
                 }
                 let mi = m as usize;
-                let ng = g + (self.cost[ci] + self.cost[mi]) * 0.5;
+                let mut step = (self.cost[ci] + self.cost[mi]) * 0.5;
+                if wiggle > 0.0 {
+                    step *= 1.0 + wiggle * self.wiggle[mi];
+                }
+                let ng = g + step;
                 if scratch.seen[mi] != scratch.stamp || ng < scratch.g[mi] {
                     scratch.touch(mi);
                     scratch.g[mi] = ng;
@@ -189,8 +228,9 @@ impl CellMap {
             }
         }
         if scratch.seen[b as usize] != scratch.stamp {
-            return Vec::new();
+            return (Vec::new(), 0.0);
         }
+        let total = scratch.g[b as usize];
         let mut out = vec![b];
         let mut cur = b;
         while cur != a {
@@ -198,14 +238,14 @@ impl CellMap {
             out.push(cur);
         }
         out.reverse();
-        out
+        (out, total)
     }
 }
 
 /// Рабочие массивы A* — переиспользуются между поисками (метка поколения
 /// вместо очистки).
 #[derive(Default)]
-struct Scratch {
+pub(crate) struct Scratch {
     g: Vec<f32>,
     from: Vec<i32>,
     seen: Vec<u32>,
@@ -345,7 +385,15 @@ impl CellMap {
             }
             self.comp_cells.push(cells);
         }
+        self.wiggle = (0..n as i32)
+            .map(|id| {
+                let (x, y) = self.center(id);
+                crate::land::value_noise(7919, x, y, self.size * 4.0)
+            })
+            .collect();
         self.terr = vec![NONE; n];
+        self.road = vec![0; n];
+        self.links = vec![0; n];
         self.cost = vec![1.0; n];
         self.owned.iter().map(|v| v.len()).sum::<usize>() as i32
     }
@@ -398,10 +446,44 @@ impl CellMap {
         Vector2::new(x, y)
     }
 
+    /// Цена клетки (местность × дорога).
+    #[func]
+    fn cell_cost(&self, cell: i32) -> f32 {
+        self.cost.get(cell as usize).copied().unwrap_or(1.0)
+    }
+
+    /// Шагов между клетками.
+    #[func]
+    fn hex_distance(&self, a: i32, b: i32) -> i32 {
+        if a < 0 || b < 0 {
+            return i32::MAX;
+        }
+        self.hex_dist(a, b)
+    }
+
+    /// Клетки суши не дальше radius шагов от cell.
+    #[func]
+    fn cells_within(&self, cell: i32, radius: i32) -> PackedInt32Array {
+        let mut out = Vec::new();
+        if cell < 0 || cell as usize >= self.n() {
+            return PackedInt32Array::new();
+        }
+        let r0 = cell / self.cols;
+        let c0 = cell % self.cols;
+        for r in (r0 - radius).max(0)..=(r0 + radius).min(self.rows - 1) {
+            for c in (c0 - radius - 1).max(0)..=(c0 + radius + 1).min(self.cols - 1) {
+                let id = r * self.cols + c;
+                if self.prov[id as usize] >= 0 && self.hex_dist(cell, id) <= radius {
+                    out.push(id);
+                }
+            }
+        }
+        PackedInt32Array::from(out.as_slice())
+    }
+
     #[func]
     fn find_path(&self, a: i32, b: i32) -> PackedInt32Array {
-        let mut s = Scratch::default();
-        PackedInt32Array::from(self.path(a, b, &mut s).as_slice())
+        PackedInt32Array::from(self.path_cells(a, b, 0.0).as_slice())
     }
 
     /// Пустой вызов — замер цены перехода GDScript → Rust.
@@ -436,7 +518,7 @@ impl CellMap {
         for _ in 0..pairs {
             let a = self.land[rng.below(self.land.len())];
             let b = self.random_reachable(a, &mut rng);
-            let p = self.path(a, b, &mut s);
+            let (p, _) = self.path(a, b, &mut s, 0.0);
             if !p.is_empty() {
                 found += 1;
                 total_len += p.len();
@@ -471,7 +553,7 @@ impl CellMap {
             for i in 0..n {
                 if step[i] + 1 >= route[i].len() {
                     let dest = self.random_reachable(at[i], &mut rng);
-                    route[i] = self.path(at[i], dest, &mut s);
+                    route[i] = self.path(at[i], dest, &mut s, 0.0).0;
                     step[i] = 0;
                     paths += 1;
                     if route[i].len() < 2 {

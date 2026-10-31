@@ -21,7 +21,13 @@ terrain_desc:
   burnt: "Scorched fields and villages. It will heal in five years or so."
   hills: "Hills: sheep, stone, strong walls."
   mountains: "Mountains: ore and passes."
+roads:
+  trail: Trail
+  road: Highway
+  paved: Paved Road
 land_work:
+  build_road: Build a Highway
+  pave_road: Pave the Highway
   thin_old_forest: Thin the Old Forest
   clear_forest: Clear the Forest
   plough: Plough
@@ -31,6 +37,8 @@ land_work:
   plough_meadow: Plough the Meadow
   plant_forest: Plant a Forest
 land_work_desc:
+  build_road: "Clear and firm up the county's trails into a highway: armies pass faster and lose fewer men, the market town by the highway trades more briskly. People welcome roads."
+  pave_road: "Pave the highway with stone: the fastest way, armies hardly lose men, the market town on the paved road grows rich. Costly and slow — but built for ages."
   thin_old_forest: "Fell timber and cut rides: the wilderness becomes ordinary forest, and the logs are sold."
   clear_forest: "Clear the forest for ploughland: logs and charcoal for sale. Hunters, charcoal burners and beekeepers lose their living and won't forgive it; neighbours downstream may be flooded — and they will know whose doing it was."
   plough: "Plough a clearing, burnt forest, heath or burnt land — it becomes plains."

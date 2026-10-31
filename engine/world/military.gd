@@ -86,7 +86,12 @@ static func commander_of(game: Game, a: Dictionary) -> Variant:
 
 # ------------------------------------------------------------ путь
 
+## Цена перехода между соседними графствами: по клеткам от сердца до сердца
+## (местность и дороги — Land.travel_cost); переправа — по прямой.
 static func edge_cost(game: Game, from: String, to: String) -> float:
+	var c: Variant = game.land().travel_cost(from, to) if game.land().ready() else null
+	if c != null:
+		return float(c)
 	return game.engine.distance(from, to) * game.terrain_num(to, "movement", 1.0)
 
 

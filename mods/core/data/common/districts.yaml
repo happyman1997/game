@@ -47,6 +47,7 @@ districts:
     modifiers: { tax_mult: 0.05 }
     power:
       - { kind: neighbors, district: market, per: 0.12, max: 0.6 }
+      - { kind: road, mult: { road: 1.15, paved: 1.3 } }
       - { kind: trigger, limit: { development: ">= 20" }, mult: 1.2, desc: district.factor.big_town }
     ai_will_do: { value: 10, if: { limit: { ai_greed: ">= 1" }, add: 6 } }
 

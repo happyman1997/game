@@ -1,13 +1,20 @@
 # Местность (engine/features/biomes.gd, земля по клеткам — engine/world/land.gd)
 msg:
+  road_changed: "{place}: дорога — {from} → {to}."
   land_changed: "{place}: {from} → {to} ({share}% земли)."
   land_work_done: "{place}: работы окончены («{work}», участков: {n}) — {why}."
 fx:
+  damage_roads: "{place}: дороги разбиты"
   set_terrain: "{place}: местность станет — {to}"
   set_terrain_part: "{place}: {n}% земли станет — {to}"
   start_land_work: "{place}: начать работы — {work}"
   end_land_work: "{place}: работы прекращены"
 land:
+  road_attrition: "Потери войск в графстве: {n}%"
+  roads: "Дороги: {list}"
+  roads_none: "Дорог нет"
+  seat_road: "У селения — {road}"
+  whole_road: "вся такая дорога графства · {m} мес."
   not_yours: "Работы ведёт владелец графства"
   wrong_terrain: "Для этого нет подходящей земли"
   busy: "Здесь уже идут работы"

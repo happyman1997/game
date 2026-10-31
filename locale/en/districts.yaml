@@ -4,6 +4,7 @@ district:
     level: "Level {n}"
   factor:
     terrain: "Terrain: {terrain}"
+    road: "Road: {road}"
     coastal: By the sea
     border: Borderland
     neighbors: "Trade routes: {district} in neighbouring counties — {n}"

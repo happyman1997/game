@@ -20,6 +20,12 @@ func _init() -> void:
 static func attrition_at(game: Game, prov_id: String) -> float:
 	var a := Stats.prov_stat(game, prov_id, "attrition")
 	a += game.terrain_num(prov_id, "attrition")
+	# дорога через сердце графства — войску легче (roads.<id>.attrition_mult)
+	var road := game.land().seat_road(prov_id) if game.land().ready() else ""
+	if road != "":
+		var rd: Variant = game.content.get_def("roads", road)
+		if rd != null:
+			a *= maxf(0.0, 1.0 + Data.num(rd.get("attrition_mult")))
 	return clampf(a, 0.0, 0.9)
 
 

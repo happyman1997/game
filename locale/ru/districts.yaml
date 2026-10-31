@@ -4,6 +4,7 @@ district:
     level: "Уровень {n}"
   factor:
     terrain: "Местность: {terrain}"
+    road: "Дорога: {road}"
     coastal: У моря
     border: Пограничье
     neighbors: "Торговые пути: {district} у соседей — {n}"

@@ -2,7 +2,8 @@ class_name MapOverlay
 extends Control
 ## Слой поверх карты: подписи держав (по дуге), поселения графств — вблизи
 ## нарисованные прямо на местности, в режиме «Застройка» — схемой районов,
-## названия графств при приближении, армии, осады, путь выбранной армии.
+## названия графств при приближении, армии, осады, путь выбранной армии;
+## под всем этим — дороги (линии по клеткам: тропы, тракты, мостовые).
 
 var view: MapView
 var labels: Array = []
@@ -27,6 +28,7 @@ func _draw() -> void:
 	var snap := _snapshot()
 	_name_below.clear()
 	_hits.clear()
+	_draw_roads(snap)
 	_draw_settlements(snap)
 	_draw_county_names()
 	_draw_sieges(snap)
@@ -181,7 +183,65 @@ static func build_snapshot(g: Game) -> Dictionary:
 			var days := maxf(1.0, Data.num(cons.get("days"), 365))
 			builds[p.id] = {"district": cons.get("district"), "building": cons.get("building"), "level": int(cons.get("level", 0)),
 				"progress": clampf(1.0 - (float(cons.done) - g.date) / days, 0.0, 1.0)}
-	return {"armies": armies, "sieges": sieges, "settlements": settlements_of(g), "builds": builds}
+	return {"armies": armies, "sieges": sieges, "settlements": settlements_of(g), "builds": builds, "roads": roads_of(g)}
+
+
+# ------------------------------------------------------------ дороги
+# Линии дорог пересобираются, только когда меняются дороги (state.road_ver).
+
+static var _roads_key := ""
+static var _roads_data := {}
+
+
+## {уровень: {pts, color, width}} — отрезки в координатах карты.
+static func roads_of(g: Game) -> Dictionary:
+	var land: Land = g.land()
+	if not land.ready():
+		return {}
+	var key := "%d:%d" % [g.get_instance_id(), int(g.state.get("road_ver", 0))]
+	if key == _roads_key:
+		return _roads_data
+	var seg: Dictionary = land.segments()
+	var pts: PackedVector2Array = seg.pts
+	var lv: PackedByteArray = seg.lv
+	var by := {}
+	for i in lv.size():
+		var k := int(lv[i])
+		if not by.has(k):
+			by[k] = PackedVector2Array()
+		by[k].append(pts[i * 2])
+		by[k].append(pts[i * 2 + 1])
+	var out := {}
+	for k in by:
+		var rd: Variant = g.content.get_def("roads", land.road_ids[k]) if k < land.road_ids.size() else null
+		out[k] = {"pts": by[k], "color": Color(str(rd.get("color", "#6b4a2b"))) if rd != null else Color("#6b4a2b"),
+			"width": Data.num(rd.get("width"), 1.0) if rd != null else 1.0}
+	_roads_key = key
+	_roads_data = out
+	return out
+
+
+## Дороги — в координатах карты (сдвиг и масштаб камеры), толщина не тоньше
+## пикселя; тракт и мостовая — с тёмной каймой. Видны при приближении.
+func _draw_roads(snap: Dictionary) -> void:
+	var z := view.zoom
+	var a := smoothstep(0.75, 1.25, z)
+	var roads: Dictionary = snap.get("roads", {})
+	if a <= 0.0 or roads.is_empty():
+		return
+	draw_set_transform(-view.origin * z, 0.0, Vector2(z, z))
+	var keys := roads.keys()
+	keys.sort()
+	for k in keys:
+		var r: Dictionary = roads[k]
+		# толщина — в экранных пикселях, вблизи чуть толще
+		var w := maxf(1.0, float(r.width) * (0.7 + 0.3 * z)) / z
+		var col: Color = r.color
+		if int(k) >= 2:
+			draw_multiline(r.pts, Color(0.12, 0.08, 0.04, 0.55 * a), w + 1.2 / z)
+		col.a = (0.55 if int(k) == 1 else 0.9) * a
+		draw_multiline(r.pts, col, w)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 # ------------------------------------------------------------ поселения

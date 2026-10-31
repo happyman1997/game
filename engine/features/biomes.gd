@@ -21,6 +21,9 @@ extends EngineFeature
 ## работа берётся за следующий участок — пока есть подходящая земля и
 ## золото, пока владелец не остановит её (repeat) и, у ИИ, пока ему хочется
 ## (ai_will_do × defines.land.ai_continue_mult, %).
+## Дороги (Land, roads: тропа → тракт → мощёная) — работы с layer: road: from
+## и to — уровни дороги, участок — все такие дорожные клетки графства. Война
+## портит дороги (эффект damage_roads).
 ## Природа: раз в год каждая клетка может сама перейти в другое состояние
 ## (terrain.drift: вырубка зарастает от опушки, брошенная пашня дичает, пашня
 ## устаёт, пожарище затягивается). Клетки под работой природа не трогает.
@@ -35,7 +38,7 @@ extends EngineFeature
 ##     capital_modifiers: { health, … },       — правителю, чья столица здесь (по доле)
 ##     start: { местность: доля, … },          — начальная раскладка (Land)
 ##     drift: [ { to, years, near, trigger, cause } ] }  — природа (шанс клетки 1/years в год)
-##   land_works.<id>: { icon, from: [состояния], to, grow_from: [местности или группы],
+##   land_works.<id>: { icon, layer (road — работа на дорогах), from: [состояния], to, grow_from: [местности или группы],
 ##     share, months, cost: { gold },  — участок: доля клеток, месяцы и золото на участок
 ##     potential: { … },      — где можно (скоуп — провинция; root и scope:actor — кто начинает)
 ##     during: { … },         — модификаторы графству, пока идёт работа (× доля участка)
@@ -141,32 +144,81 @@ static func set_terrain(game: Game, pid: String, to: String, by: Variant = null,
 	return set_cells(game, pid, cells, to, by, cause)
 
 
+## Сменить уровень дороги клеток графства (как set_cells, но для дорог).
+static func set_roads(game: Game, pid: String, cells: PackedInt32Array, to: String, by: Variant = null, cause: String = "", kind: String = "event") -> int:
+	var p: Variant = _p(game, pid)
+	if p == null or not game.content.has("roads", to):
+		return 0
+	var r := game.land().change_road(pid, cells, to)
+	if int(r.n) <= 0:
+		return 0
+	_log(game, p, str(r.from), to, by, cause, int(r.n))
+	game.state["land_ver"] = int(game.state.get("land_ver", 0)) + 1
+	game.state["road_ver"] = int(game.state.get("road_ver", 0)) + 1
+	game.stat_cache.erase("prov:" + pid)
+	game.emit("land.road_changed", {"province": pid, "from": str(r.from), "to": to, "by": by, "cause": cause, "cells": int(r.n)})
+	if kind != "nature":
+		var t: Variant = game.state.titles.get(pid)
+		var holder: Variant = game.ch(t.holder) if t != null else null
+		if holder != null and kind == "event" and game.is_player(holder.id) and (by == null or not game.is_player(by)):
+			game.message(game.loc.t("msg.road_changed", {"place": game.scope_name({"type": "province", "id": pid}),
+				"from": game.name_of("roads", str(r.from)), "to": game.name_of("roads", to)}), "info", {"type": "province", "id": pid})
+	return int(r.n)
+
+
+## Испортить дороги графства: доля share дорожных клеток (тракт и мощёная)
+## теряет уровень.
+static func damage_roads(game: Game, pid: String, share: float, by: Variant = null, cause: String = "war") -> int:
+	var land := game.land()
+	# сперва выбрать, потом портить: мостовая не проваливается сразу в тропу
+	var hits := {}
+	for k in [3, 2]:
+		if k >= land.road_ids.size():
+			continue
+		var hit := PackedInt32Array()
+		for c in land.road_cells(pid, [land.road_ids[k]]):
+			if game.rng.chance(share):
+				hit.append(c)
+		hits[k] = hit
+	var n := 0
+	for k in hits:
+		n += set_roads(game, pid, hits[k], land.road_ids[k - 1], by, cause)
+	return n
+
+
 # ------------------------------------------------------------ работы
+
+static func is_road_work(d: Variant) -> bool:
+	return d is Dictionary and str(d.get("layer", "")) == "road"
+
 
 static func work_of(game: Game, pid: String) -> Variant:
 	var p: Variant = _p(game, pid)
 	return p.get("land_work") if p != null else null
 
 
-## Работы, для которых в графстве есть подходящая земля.
+## Работы, для которых в графстве есть подходящая земля (или дорога).
 static func works_here(game: Game, pid: String) -> Array:
-	var land := game.land()
-	var m := land.mix(pid)
-	return game.content.all("land_works").filter(func(d):
-		for t in Data.as_array(d.get("from")):
-			if m.has(str(t)):
-				return true
-		return false)
+	return game.content.all("land_works").filter(func(d): return Biomes.room_for(game, pid, d) > 0.0)
 
 
-## Клеток в участке работы.
+## Клеток в участке работы (на дорогах — вся такая дорога графства).
 static func patch_size(game: Game, pid: String, d: Dictionary) -> int:
+	if is_road_work(d):
+		return game.land().road_cells(pid, Data.as_array(d.get("from"))).size()
 	var n := game.land().count(pid)
 	return maxi(1, roundi(n * Data.num(d.get("share"), game.def_num("land.patch_share", 0.25))))
 
 
-## Доля земли графства, на которой работа ещё возможна (её from).
+## Доля земли графства, на которой работа ещё возможна (её from; на
+## дорогах — доля дорожных клеток такого уровня).
 static func room_for(game: Game, pid: String, d: Dictionary) -> float:
+	if is_road_work(d):
+		var rs := game.land().roads_of(pid)
+		var r := 0.0
+		for t in Data.as_array(d.get("from")):
+			r += float(rs.get(str(t), 0.0))
+		return r
 	var m := game.land().mix(pid)
 	var s := 0.0
 	for t in Data.as_array(d.get("from")):
@@ -224,7 +276,11 @@ static func _grow_from(d: Dictionary) -> Array:
 
 ## Взять следующий участок: заплатить, выбрать клетки, назначить срок.
 static func _next_patch(game: Game, c: Dictionary, pid: String, d: Dictionary, w: Dictionary) -> bool:
-	var cells := game.land().patch(pid, Data.as_array(d.get("from")), _grow_from(d), patch_size(game, pid, d), _seed(game))
+	var cells: PackedInt32Array
+	if is_road_work(d):
+		cells = game.land().road_cells(pid, Data.as_array(d.get("from")))
+	else:
+		cells = game.land().patch(pid, Data.as_array(d.get("from")), _grow_from(d), patch_size(game, pid, d), _seed(game))
 	if cells.is_empty():
 		return false
 	var cost := cost_for(game, c, d)
@@ -331,12 +387,13 @@ static func _finish_patch(game: Game, pid: String) -> void:
 	var land := game.land()
 	var from := Data.as_array(d.get("from"))
 	# клетки, которые за это время не изменила природа или война
+	var road := is_road_work(d)
 	var cells := PackedInt32Array()
 	for c in Data.as_array(w.get("cells")):
-		if from.has(land.terrain_at(int(c))):
+		if from.has(land.road_at(int(c)) if road else land.terrain_at(int(c))):
 			cells.append(int(c))
 	var by: Variant = game.ch(w.by)
-	var n := set_cells(game, pid, cells, str(d.to), w.by, str(w.id), "work")
+	var n := set_roads(game, pid, cells, str(d.to), w.by, str(w.id), "work") if road else set_cells(game, pid, cells, str(d.to), w.by, str(w.id), "work")
 	w["done"] = int(w.get("done", 0)) + 1
 	if by != null and Chars.is_alive(by) and n > 0:
 		var ctx := _ctx(game, by, pid)
@@ -473,9 +530,10 @@ func install(engine: GameEngine) -> void:
 	engine.content_validators.register("land_works", func(e: GameEngine, v: ScriptValidator):
 		for d in e.content.all("land_works"):
 			var w := "land_works/" + str(d.id)
+			var layer := "roads" if Biomes.is_road_work(d) else "terrain"
 			for t in Data.as_array(d.get("from")):
-				v.ref("terrain", t, w + " from")
-			v.ref("terrain", d.get("to"), w + " to")
+				v.ref(layer, t, w + " from")
+			v.ref(layer, d.get("to"), w + " to")
 			for t in Data.as_array(d.get("grow_from")):
 				Biomes._ref_terrain_or_group(e, v, t, w + " grow_from")
 			v.trigger(d.get("potential"), w + " potential")
@@ -548,6 +606,23 @@ func register_script(engine: GameEngine) -> void:
 			if share < 1.0:
 				return ctx.game.loc.t("fx.set_terrain_part", {"place": ctx.game.scope_name(s), "to": ctx.game.name_of("terrain", to), "n": roundi(share * 100.0)})
 			return ctx.game.loc.t("fx.set_terrain", {"place": ctx.game.scope_name(s), "to": ctx.game.name_of("terrain", to)}),
+	}, OWNER)
+	r.effects.register("damage_roads", {"scopes": PR, "doc": "Испортить дороги графства: damage_roads: { share: 0.5, cause: war } — доля тракта и мостовой теряет уровень (в летопись — root, если это персонаж)",
+		"apply": func(ctx, s, arg):
+			var share := Data.num(arg.get("share"), 0.5) if arg is Dictionary else Data.num(arg, 0.5)
+			var cause := str(arg.get("cause", "war")) if arg is Dictionary else "war"
+			var by: Variant = ctx.root.id if ctx.root.get("type") == "character" else null
+			Biomes.damage_roads(ctx.game, s.id, share, by, cause),
+		"describe": func(ctx, s, _a):
+			return ctx.game.loc.t("fx.damage_roads", {"place": ctx.game.scope_name(s)}),
+	}, OWNER)
+	r.triggers.register("has_road", {"scopes": PR, "doc": "Дорога через сердце графства не ниже уровня: has_road: trail | road | paved (yes — любая)", "eval": func(ctx, s, arg):
+		var land: Land = ctx.game.land()
+		var lv := land.road_ids.find(land.seat_road(s.id))
+		var need := 1 if (arg is bool or str(arg) == "yes") else land.road_ids.find(str(arg))
+		if str(arg) == "no":
+			return lv <= 0
+		return need > 0 and lv >= need
 	}, OWNER)
 	r.effects.register("start_land_work", {"scopes": PR, "doc": "Начать работу на земле от имени root (он платит): start_land_work: <id>",
 		"apply": func(ctx, s, arg):

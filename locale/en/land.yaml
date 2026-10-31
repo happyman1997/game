@@ -1,13 +1,20 @@
 # Land (engine/features/biomes.gd, land by cells — engine/world/land.gd)
 msg:
+  road_changed: "{place}: the road — {from} → {to}."
   land_changed: "{place}: {from} → {to} ({share}% of the land)."
   land_work_done: "{place}: work finished («{work}», plots: {n}) — {why}."
 fx:
+  damage_roads: "{place}: the roads are broken"
   set_terrain: "{place}: the land becomes — {to}"
   set_terrain_part: "{place}: {n}% of the land becomes — {to}"
   start_land_work: "{place}: begin work — {work}"
   end_land_work: "{place}: the work stops"
 land:
+  road_attrition: "Army losses in the county: {n}%"
+  roads: "Roads: {list}"
+  roads_none: "No roads"
+  seat_road: "By the settlement — {road}"
+  whole_road: "all such road in the county · {m} months"
   not_yours: "The county's holder leads the work"
   wrong_terrain: "There is no suitable land for this"
   busy: "Work is already under way here"

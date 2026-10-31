@@ -32,6 +32,8 @@ defines:
     ai_reserve_gold: 50         # ИИ берётся за работу, если после оплаты останется столько
     ai_counties_per_work: 4     # одна работа на столько графств домена
     ai_continue_mult: 2.5       # ИИ ведёт работу дальше с шансом ai_will_do × это, %
+    offroad_movement: 1.15      # цена пути по клетке без дороги (× местность)
+    travel_scale: 1.06          # путь войск по клеткам → прежние единицы расстояния (подогнано: по тропам — как прежде)
 
 terrain:
   # ---------------------------------------------------------------- леса
@@ -311,6 +313,53 @@ land_works:
           add: 4
         - limit: { scope:province: { has_terrain: [heath, burnt] } }
           add: 3
+
+  # ---------------------------------------------------------------- дороги
+  # Проложить тракт: тропы графства станут трактом — войска быстрее, посад
+  # у тракта сильнее
+  build_road:
+    layer: road
+    icon: "🛤"
+    from: [trail]
+    to: road
+    months: 12
+    cost: { gold: 60 }
+    on_complete:
+      - add_county_opinion: new_roads
+    ai_will_do:
+      value: 4
+      add:
+        - { value: stewardship, multiply: 0.4 }
+        - { value: "scope:province.development", multiply: 0.3 }
+      if:
+        # тракт у селения разбит войной — чинить
+        - limit: { scope:province: { has_road: road } }
+          add: 15
+
+  # Замостить тракт: дорого и долго, зато на века
+  pave_road:
+    layer: road
+    icon: "🧱"
+    from: [road]
+    to: paved
+    months: 24
+    cost: { gold: 160 }
+    potential: { development: ">= 12" }
+    ai_will_do:
+      value: 1
+      add: { value: stewardship, multiply: 0.2 }
+
+# Дороги по клеткам: тропа → тракт → мощёная. Сеть прокладывается в начале
+# партии (тракты между столицами соседних герцогств, тропы между соседними
+# графствами); тракт и мостовую строят работы на земле (layer: road), война
+# их портит. movement — множитель цены пути по клетке (без дороги —
+# defines.land.offroad_movement); attrition_mult — потери армий в графстве,
+# где дорога проходит через его сердце; color и width — как рисовать
+# (толщина в экранных пикселях).
+roads:
+  trail: { level: 1, movement: 1.0, color: "#7a5a36", width: 1.0 }
+  road:  { level: 2, movement: 0.75, attrition_mult: -0.2, color: "#6b4a2b", width: 1.7 }
+  paved: { level: 3, movement: 0.6, attrition_mult: -0.35, color: "#8f8a80", width: 2.2 }
 
 opinion_modifiers:
   # мнение графств (add_county_opinion)

@@ -12,10 +12,18 @@ extends RefCounted
 ## (поля у селения, лес — по краям и языками внутрь). Раскладка не зависит от
 ## зерна партии: начало у всех одинаковое.
 ##
-## Состояние живёт в ядре; в сохранение (state.land_cells: {ids, cells, data})
-## оно попадает перед записью (SaveGame) и читается при загрузке. Старые
-## сохранения (местность целиком у графства, state.provinces.<id>.terrain)
-## раскладываются заново от той местности.
+## Дороги (roads: тропа, тракт, мощёная) — тоже по клеткам: уровень и
+## связи с соседними клетками. Цена пути по клетке — местность × дорога
+## (без дороги — defines.land.offroad_movement). Сеть прокладывается в начале
+## партии: тракты между столицами соседних герцогств, тропы между соседними
+## графствами (от «сердца» графства — клетки у его середины, где селение);
+## новые пути прибиваются к готовым дорогам. Путь войск между графствами
+## (travel_cost) — по клеткам, по дорогам быстрее.
+##
+## Состояние живёт в ядре; в сохранение (state.land_cells: {ids, cells, data,
+## roads}) оно попадает перед записью (SaveGame) и читается при загрузке.
+## Старые сохранения (местность целиком у графства,
+## state.provinces.<id>.terrain) раскладываются заново от той местности.
 
 const CELL_SIZE := 7.5
 
@@ -25,7 +33,14 @@ var core: Object
 var ids := PackedStringArray()
 var index := {}
 var groups := PackedStringArray()
+## Уровень дороги → id (0 — "": дороги нет).
+var road_ids := PackedStringArray([""])
 var _cells := {}
+var _seats := {}
+var _travel := {}
+var _travel_ver := -1
+var _segments: Variant = null
+var _road_shares := {}
 var _mix := {}
 var _dom := {}
 var _agg := {}
@@ -52,8 +67,18 @@ func _init(g: Game) -> void:
 		groups.append(str(d.get("group", d.id)))
 		moves.append(Data.num(d.get("movement"), 1.0))
 	core.set_moves(moves)
-	if not _load(g.state.get("land_cells")):
+	var rdefs: Array = g.content.all("roads").duplicate()
+	rdefs.sort_custom(func(a, b): return int(Data.num(a.get("level"))) < int(Data.num(b.get("level"))))
+	var rmoves := PackedFloat32Array([g.def_num("land.offroad_movement", 1.15)])
+	for d in rdefs:
+		road_ids.append(str(d.id))
+		rmoves.append(Data.num(d.get("movement"), 1.0))
+	core.set_road_moves(rmoves)
+	var saved: Variant = g.state.get("land_cells")
+	if not _load(saved):
 		_seed()
+	if not _load_roads(saved):
+		_build_roads()
 	g.state.erase("land_cells")
 
 
@@ -117,13 +142,187 @@ func _load(saved: Variant) -> bool:
 	return core.load_terrain(bytes)
 
 
+func _load_roads(saved: Variant) -> bool:
+	if not (saved is Dictionary) or not (saved.get("roads") is String) or int(Data.num(saved.get("cells"))) != core.cell_count():
+		return false
+	var raw := Marshalls.base64_to_raw(str(saved.roads))
+	var bytes := raw.decompress(core.cell_count() * 2, FileAccess.COMPRESSION_DEFLATE)
+	return bytes.size() == core.cell_count() * 2 and core.load_roads(bytes)
+
+
 ## Записать землю в состояние (перед сохранением).
 func save_into(state: Dictionary) -> void:
 	if core == null:
 		return
 	var bytes: PackedByteArray = core.terrain_bytes()
+	var roads: PackedByteArray = core.road_bytes()
 	state["land_cells"] = {"ids": Array(ids), "cells": core.cell_count(),
-		"data": Marshalls.raw_to_base64(bytes.compress(FileAccess.COMPRESSION_DEFLATE))}
+		"data": Marshalls.raw_to_base64(bytes.compress(FileAccess.COMPRESSION_DEFLATE)),
+		"roads": Marshalls.raw_to_base64(roads.compress(FileAccess.COMPRESSION_DEFLATE))}
+
+
+# ------------------------------------------------------------ дороги
+
+## «Сердце» графства — его клетка у середины провинции (там селение).
+func seat(pid: Variant) -> int:
+	var s: Variant = _seats.get(pid)
+	if s != null:
+		return s
+	var best := -1
+	var i := _pi(pid)
+	if i >= 0 and core != null:
+		var c := game.engine.map.center_of(str(pid))
+		var bd := INF
+		for cell in cells(pid):
+			var d: float = (core.cell_center(cell) as Vector2).distance_squared_to(c)
+			if d < bd:
+				bd = d
+				best = cell
+	_seats[pid] = best
+	return best
+
+
+## Сеть дорог в начале партии: тракты между столицами соседних герцогств,
+## тропы между соседними графствами.
+func _build_roads() -> void:
+	var map: MapData = game.engine.map
+	var duchy_of := {}
+	for pid in map.provinces:
+		var pd: Variant = game.content.get_def("provinces", pid)
+		if pd != null and pd.get("duchy") != null:
+			duchy_of[pid] = str(pd.duchy)
+	var pairs := {}
+	for pid in map.provinces:
+		var a: Variant = duchy_of.get(pid)
+		if a == null:
+			continue
+		for n in map.land_neighbors.get(pid, []):
+			var b: Variant = duchy_of.get(n)
+			if b != null and b != a:
+				pairs[[a, b] if str(a) < str(b) else [b, a]] = true
+	var keys := pairs.keys()
+	keys.sort()
+	for k in keys:
+		var ca: Variant = _duchy_capital(k[0])
+		var cb: Variant = _duchy_capital(k[1])
+		if ca != null and cb != null:
+			core.trace_road(seat(ca), seat(cb), 2)
+	for pid in map.provinces:
+		if map.impassable[map.index[pid]] == 1:
+			continue
+		for n in map.land_neighbors.get(pid, []):
+			if str(pid) < str(n) and map.impassable[map.index[n]] == 0:
+				core.trace_road(seat(pid), seat(n), 1)
+	# мёртвая земля (terrain.no_roads) — дороги обрываются у её края
+	var dead := []
+	for d in game.content.all("terrain"):
+		if d.get("no_roads", false):
+			dead.append(str(d.id))
+	if not dead.is_empty():
+		core.clear_roads_on(mask(dead, false))
+
+
+func _duchy_capital(did: String) -> Variant:
+	var d: Variant = game.content.get_def("titles", did)
+	var cap: Variant = d.get("capital") if d != null else null
+	return cap if cap != null and game.engine.map.index.has(cap) else null
+
+
+## Цена пути войска между соседними графствами — по клеткам от сердца до
+## сердца (по дорогам быстрее); в единицах прежнего расстояния. null — пути
+## по суше нет (переправа).
+func travel_cost(from: Variant, to: Variant) -> Variant:
+	var ver := int(game.state.get("land_ver", 0))
+	if ver != _travel_ver:
+		_travel.clear()
+		_travel_ver = ver
+	var key := "%s|%s" % [from, to]
+	if _travel.has(key):
+		return _travel[key]
+	var out: Variant = null
+	if core != null:
+		var c: float = core.path_cost(seat(from), seat(to))
+		if c >= 0.0:
+			out = c * core.cell_size() * 1.7320508 * game.def_num("land.travel_scale", 1.0)
+	_travel[key] = out
+	return out
+
+
+## Уровень дороги клетки (id или "").
+func road_at(cell: int) -> String:
+	var lv: int = core.road_at(cell) if core != null else 0
+	return road_ids[lv] if lv < road_ids.size() else ""
+
+
+## Дорога у сердца графства (id или "").
+func seat_road(pid: Variant) -> String:
+	return road_at(seat(pid))
+
+
+## Доли дорог графства: {уровень: доля дорожных клеток} и "cells" — сколько.
+func roads_of(pid: Variant) -> Dictionary:
+	var r: Variant = _road_shares.get(pid)
+	if r != null:
+		return r
+	var out := {}
+	var n := 0
+	for cell in cells(pid):
+		var id := road_at(cell)
+		if id != "":
+			out[id] = int(out.get(id, 0)) + 1
+			n += 1
+	var shares := {}
+	for id in out:
+		shares[id] = float(out[id]) / n
+	shares["cells"] = n
+	_road_shares[pid] = shares
+	return shares
+
+
+## Битовая маска уровней дорог по id.
+func road_mask(what: Variant) -> int:
+	var m := 0
+	for x in Data.as_array(what):
+		var k := road_ids.find(str(x))
+		if k > 0:
+			m |= 1 << k
+	return m
+
+
+## Дорожные клетки графства с уровнями из списка id.
+func road_cells(pid: Variant, levels: Variant) -> PackedInt32Array:
+	var i := _pi(pid)
+	if core == null or i < 0:
+		return PackedInt32Array()
+	return core.road_cells(i, road_mask(levels))
+
+
+## Сменить уровень дороги клеток графства: {n, from}.
+func change_road(pid: Variant, list: PackedInt32Array, to: String) -> Dictionary:
+	var lv := road_ids.find(to)
+	if core == null or lv < 0 or list.is_empty():
+		return {"n": 0, "from": ""}
+	var was := {}
+	for c in list:
+		var t := road_at(c)
+		if t != to:
+			was[t] = int(was.get(t, 0)) + 1
+	var from := ""
+	for t in was:
+		if from == "" or was[t] > was[from]:
+			from = t
+	var n: int = core.set_road(list, lv)
+	if n > 0:
+		_road_shares.erase(pid)
+		_segments = null
+	return {"n": n, "from": from}
+
+
+## Линии дорог для карты: {pts, lv} (пересобираются после перемен).
+func segments() -> Dictionary:
+	if _segments == null and core != null:
+		_segments = core.road_segments()
+	return _segments if _segments != null else {"pts": PackedVector2Array(), "lv": PackedByteArray()}
 
 
 # ------------------------------------------------------------ состав провинции
