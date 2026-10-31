@@ -9,6 +9,7 @@ ledger:
   regiment_wages: Regiment wages
   district_upkeep: District upkeep
   construction: Construction
+  land_works: Land works
   decisions: Decisions
   interactions: Interactions
   events: Events

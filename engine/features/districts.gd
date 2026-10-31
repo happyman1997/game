@@ -231,8 +231,7 @@ static func power(game: Game, prov_id: String, did: String) -> float:
 static func _factor_value(game: Game, prov_id: String, f: Dictionary, holder: Variant) -> float:
 	match str(f.get("kind", "")):
 		"terrain":
-			var pdef: Variant = game.content.get_def("provinces", prov_id)
-			var m: Variant = f.get("mult", {}).get(str(pdef.get("terrain", ""))) if pdef != null and f.get("mult") is Dictionary else null
+			var m: Variant = game.terrain_pick(f.get("mult"), prov_id)
 			return Data.num(m, 1.0) if m != null else 1.0
 		"coastal":
 			return Data.num(f.get("mult"), 1.0) if game.engine.is_coastal(prov_id) else 1.0
@@ -279,9 +278,8 @@ static func _factor(game: Game, prov_id: String, f: Dictionary, holder: Variant)
 	var label_key := str(f.get("desc", ""))
 	match str(f.get("kind", "")):
 		"terrain":
-			var pdef: Variant = game.content.get_def("provinces", prov_id)
-			var t := str(pdef.get("terrain", "")) if pdef != null else ""
-			var m: Variant = f.get("mult", {}).get(t) if f.get("mult") is Dictionary else null
+			var t := game.terrain_of(prov_id)
+			var m: Variant = game.terrain_pick(f.get("mult"), prov_id)
 			if m == null:
 				return null
 			return {"label": game.loc.t(label_key if label_key != "" else "district.factor.terrain", {"terrain": game.name_of("terrain", t)}), "value": Data.num(m, 1.0)}

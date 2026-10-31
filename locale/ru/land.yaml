@@ -1,0 +1,44 @@
+# Местность (engine/features/biomes.gd)
+msg:
+  land_changed: "{place}: {from} — теперь {to}."
+  land_work_done: "{place}: работы окончены («{work}») — теперь {to}."
+fx:
+  set_terrain: "{place}: местность станет — {to}"
+  start_land_work: "{place}: начать работы — {work}"
+  end_land_work: "{place}: работы прекращены"
+land:
+  not_yours: "Работы ведёт владелец графства"
+  wrong_terrain: "Не для этой земли"
+  busy: "Здесь уже идут работы"
+  at_war: "Графство занято врагом или в осаде"
+  not_here: "Здесь это невозможно"
+  no_gold: "Не хватает золота"
+  no_work: "Нет такой работы"
+  cause:
+    nature: природа
+    regrowth: заросло
+    exhaustion: земля устала
+    rest: земля отдохнула
+    war: война
+    fire: пожар
+    event: событие
+  section: Земля
+  works: Работы на земле
+  history: Летопись земли
+  work_now: "Идут работы: {work} — ещё {n} мес."
+  start: Начать
+  cancel: Прекратить
+  cancel_tip: "Прекратить работы. Потраченное не вернётся."
+  months: "{n} мес."
+  becomes: "Станет: {to}"
+  cost: "Стоит: {n} золота"
+  during: "Пока идут работы:"
+  effects: "Земля сейчас:"
+  by: "{who}"
+  log_line: "{year}: {from} → {to} ({why})"
+  capital: "Тому, чья столица здесь:"
+  movement: "Путь войск: ×{n}"
+  defense: "Обороняющимся: +{n}%"
+  none_here: "На этой земле сейчас нечего делать."
+stat:
+  land_work_speed: Скорость работ на земле

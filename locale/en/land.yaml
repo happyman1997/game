@@ -1,0 +1,44 @@
+# Land (engine/features/biomes.gd)
+msg:
+  land_changed: "{place}: {from} — now {to}."
+  land_work_done: "{place}: work finished («{work}») — now {to}."
+fx:
+  set_terrain: "{place}: the land becomes — {to}"
+  start_land_work: "{place}: begin work — {work}"
+  end_land_work: "{place}: the work stops"
+land:
+  not_yours: "The county's holder leads the work"
+  wrong_terrain: "Not for this land"
+  busy: "Work is already under way here"
+  at_war: "The county is occupied or under siege"
+  not_here: "This is not possible here"
+  no_gold: "Not enough gold"
+  no_work: "No such work"
+  cause:
+    nature: nature
+    regrowth: overgrown
+    exhaustion: soil exhausted
+    rest: soil rested
+    war: war
+    fire: fire
+    event: event
+  section: Land
+  works: Land works
+  history: Chronicle of the land
+  work_now: "Work under way: {work} — {n} more months."
+  start: Begin
+  cancel: Stop
+  cancel_tip: "Stop the work. What was spent is not returned."
+  months: "{n} months"
+  becomes: "Becomes: {to}"
+  cost: "Costs: {n} gold"
+  during: "While the work goes on:"
+  effects: "The land now:"
+  by: "{who}"
+  log_line: "{year}: {from} → {to} ({why})"
+  capital: "For whoever has their capital here:"
+  movement: "Army travel: ×{n}"
+  defense: "Defenders: +{n}%"
+  none_here: "There is nothing to be done on this land now."
+stat:
+  land_work_speed: Land work speed

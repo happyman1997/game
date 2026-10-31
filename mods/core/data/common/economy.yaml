@@ -1,12 +1,4 @@
-# Местность, владения и постройки.
-terrain:
-  farmlands: { color: "#a9b56a", defense: 0.0, movement: 1.0, height: 0.05, development_growth: 0.06 }
-  plains:    { color: "#c2c07e", defense: 0.0, movement: 1.0, height: 0.1 }
-  forest:    { color: "#4f7a43", defense: 0.2, movement: 1.3, height: 0.2 }
-  hills:     { color: "#9a8a5a", defense: 0.3, movement: 1.4, height: 0.45 }
-  mountains: { color: "#8a8178", defense: 0.5, movement: 1.8, height: 0.85, development_growth: -0.05 }
-  wetlands:  { color: "#6f8f7a", defense: 0.25, movement: 1.6, height: 0.02 }
-
+# Владения и постройки (местность — land.yaml).
 holdings:
   castle: { icon: "🏰", tax: 0.5, levy: 180, fort: 2 }
   city:   { icon: "🏙", tax: 1.0, levy: 80, fort: 1 }

@@ -130,12 +130,12 @@ faith_desc:
   wolf_cult: "The North honours the Winter Wolf — a war god, the Emperor's sworn brother. Courage and fury are virtues here, and the beast in a man is a gift, not a curse."
 
 terrain:
-  farmlands: Farmlands
+  farmlands: Rich Farmland
   plains: Plains
   forest: Forest
   hills: Hills
   mountains: Mountains
-  wetlands: Wetlands
+  wetlands: Marsh
 
 holding:
   castle: Castle

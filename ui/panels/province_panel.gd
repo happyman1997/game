@@ -96,7 +96,7 @@ static func build(app: App, id: String) -> Control:
 	root.add_child(_kv([
 		[app.t("ui.holder"), W.char_link(app, holder.id, true) if holder != null else app.t("ui.none")],
 		[app.t("ui.occupant"), W.char_link(app, ctrl.id, true)] if ctrl != null and holder != null and ctrl.id != holder.id else null,
-		[app.t("ui.terrain"), g.name_of("terrain", def.get("terrain"))],
+		[app.t("ui.terrain"), g.name_of("terrain", g.terrain_of(id))],
 		[app.t("ui.culture"), g.name_of("cultures", st.culture)],
 		[app.t("ui.faith"), g.name_of("faiths", st.faith)],
 		[app.t("ui.development"), K.fmt(st.development)],
@@ -137,6 +137,9 @@ static func build(app: App, id: String) -> Control:
 			mods.add_child(chip)
 		root.add_child(mods)
 
+	# земля: её состояние, работы и летопись (механика biomes)
+	if g.engine.has_feature("biomes") and g.state.provinces.has(id):
+		root.add_child(LandPanel.build(app, id))
 	# поселение: районы и их постройки (механика districts)
 	if Districts.on(g):
 		for sec in SettlementPanel.build(app, id):

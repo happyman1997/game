@@ -11,6 +11,8 @@ nick:
   conqueror_f: "the Conqueror"
   fearless: "the Fearless"
   fearless_f: "the Fearless"
+  plowman: "the Ploughman"
+  plowman_f: "the Ploughwoman"
   builder: "the Builder"
   builder_f: "the Builder"
   great_builder: "the Great Builder"
@@ -79,6 +81,7 @@ deed:
   judgments: Disputes judged
   revolts: Revolts raised
   laws: Reforms
+  lands_tamed: Lands transformed
 deed_goal:
   battles_won: "Win battles"
   battles_lost: "Lose battles"
@@ -102,3 +105,4 @@ deed_goal:
   judgments: "Judge a dispute at court"
   revolts: "Raise a revolt"
   laws: "Pass a reform"
+  lands_tamed: "Transform the land"

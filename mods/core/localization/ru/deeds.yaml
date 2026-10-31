@@ -11,6 +11,8 @@ nick:
   conqueror_f: "Завоевательница"
   fearless: "Бесстрашный"
   fearless_f: "Бесстрашная"
+  plowman: "Пахарь"
+  plowman_f: "Пахарица"
   builder: "Строитель"
   builder_f: "Строительница"
   great_builder: "Зодчий"
@@ -79,6 +81,7 @@ deed:
   judgments: Рассуженные споры
   revolts: Мятежи
   laws: Реформы
+  lands_tamed: Преображённые земли
 deed_goal:
   battles_won: "Выиграть битвы"
   battles_lost: "Проиграть битвы"
@@ -102,3 +105,4 @@ deed_goal:
   judgments: "Рассудить спор при дворе"
   revolts: "Поднять мятеж"
   laws: "Провести реформу"
+  lands_tamed: "Преобразить землю"

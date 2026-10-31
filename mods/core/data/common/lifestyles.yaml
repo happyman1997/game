@@ -631,7 +631,7 @@ perks:
     requires: archivist
     branch: b
     icon: "⚙"
-    modifiers: { siege_speed: 0.3, build_cost_mult: -0.1 }
+    modifiers: { siege_speed: 0.3, build_cost_mult: -0.1, land_work_speed: 0.3 }
     ai_will_do: 40
   # вершина — любой из веток
   renowned_scholar:

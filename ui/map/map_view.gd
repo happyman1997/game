@@ -41,6 +41,7 @@ var _drag_origin := Vector2.ZERO
 var _dragging := false
 var _signature := ""
 var _dirty := true
+var _terrain_ver := -1
 var _time := 0.0
 var _color_img: Image
 var _realm_img: Image
@@ -87,6 +88,8 @@ func set_game(g: Game) -> void:
 		map = g.engine.map
 		_build_static()
 		first = true
+	# местность своя у каждой партии (её меняют люди и природа)
+	_refresh_terrain()
 	_dirty = true
 	if first:
 		fit.call_deferred()
@@ -124,7 +127,6 @@ func _build_static() -> void:
 	m.set_shader_parameter("id_tex", st.id)
 	m.set_shader_parameter("land_tex", st.land)
 	m.set_shader_parameter("noise_tex", st.noise)
-	m.set_shader_parameter("terrain_tex", st.terrain)
 	m.set_shader_parameter("color_tex", _color_tex)
 	m.set_shader_parameter("realm_tex", _realm_tex)
 	m.set_shader_parameter("flags_tex", _flags_tex)
@@ -150,34 +152,42 @@ func _make_static() -> Dictionary:
 	noise.seed = 1066
 	var nimg := noise.get_seamless_image(256, 256, false, false, 0.1, true)
 	nimg.generate_mipmaps()
-	# Местность по провинциям: цвет и высота.
+	print("Карта: текстуры подготовлены за %d мс" % (Time.get_ticks_msec() - t0))
+	return {
+		"id": ImageTexture.create_from_image(id_img),
+		"land": ImageTexture.create_from_image(water),
+		"noise": ImageTexture.create_from_image(nimg),
+	}
+
+
+## Местность по провинциям (цвет и высота) — нынешняя, из состояния партии.
+## Перестраивается, когда земля меняется (state.land_ver).
+func _refresh_terrain() -> void:
+	if map == null or game == null:
+		return
+	_terrain_ver = int(game.state.get("land_ver", 0))
 	var P := map.provinces.size()
 	var th := maxi(1, ceili(P / float(TW)))
 	var terr := Image.create(TW, th, false, Image.FORMAT_RGBA8)
 	var c := game.content
 	for i in P:
 		var pid: String = map.provinces[i]
-		var pd: Variant = c.get_def("provinces", pid)
 		var col := Color("#9a9a7a")
 		var hgt := 0.1
 		if map.impassable[i] == 1:
 			col = Color("#7d746a")
 			hgt = 1.0
-		elif pd != null:
-			var td: Variant = c.get_def("terrain", str(pd.get("terrain", "")))
+		else:
+			var td: Variant = c.get_def("terrain", game.terrain_of(pid))
 			if td != null:
 				if td.get("color") is String:
 					col = Color(td.color)
+				elif td.get("color") is Color:
+					col = td.color
 				hgt = Data.num(td.get("height"), 0.1)
 		col.a = clampf(hgt, 0.0, 1.0)
 		terr.set_pixel(i % TW, i / TW, col)
-	print("Карта: текстуры подготовлены за %d мс" % (Time.get_ticks_msec() - t0))
-	return {
-		"id": ImageTexture.create_from_image(id_img),
-		"land": ImageTexture.create_from_image(water),
-		"noise": ImageTexture.create_from_image(nimg),
-		"terrain": ImageTexture.create_from_image(terr),
-	}
+	material_map.set_shader_parameter("terrain_tex", ImageTexture.create_from_image(terr))
 
 
 # ------------------------------------------------------------ раскраска
@@ -466,6 +476,8 @@ func _process(delta: float) -> void:
 	_sig_timer -= delta
 	if (_dirty or _sig_timer <= 0.0) and (sim == null or sim.try_enter()):
 		_sig_timer = 0.2
+		if game != null and int(game.state.get("land_ver", 0)) != _terrain_ver:
+			_refresh_terrain()
 		var sig := _compute_signature()
 		if _dirty or sig != _signature:
 			_signature = sig

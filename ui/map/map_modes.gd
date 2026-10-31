@@ -9,8 +9,7 @@ static func realm_color(game: Game, prov: String) -> Variant:
 	var h: Variant = game.ch(t.holder) if t != null else null
 	if h == null:
 		# ничейная земля — цветом своей местности
-		var pd: Variant = game.content.get_def("provinces", prov)
-		var td: Variant = game.content.get_def("terrain", str(pd.get("terrain", ""))) if pd != null else null
+		var td: Variant = game.terrain_def(prov)
 		return td.color if td != null and td.get("color") != null else "#7a7468"
 	var top := Titles.top_liege(game, h)
 	if top.titles.is_empty():
@@ -73,8 +72,8 @@ static func register_builtin(engine: GameEngine) -> void:
 	add.call("terrain", {"name": "ui.mapmode.terrain", "icon": "mountain", "order": 40, "transparent": true,
 		"color": func(g: Game, p: String): return null,
 		"tooltip": func(g: Game, p: String):
-			var d: Variant = g.prov_def(p)
-			return g.name_of("terrain", d.get("terrain")) if d != null and d.get("terrain") != null else ""})
+			var t := g.terrain_of(p)
+			return g.name_of("terrain", t) if t != "" else ""})
 	add.call("diplomacy", {"name": "ui.mapmode.diplomacy", "icon": "handshake", "order": 15,
 		"color": func(g: Game, p: String):
 			var pl: Variant = g.player

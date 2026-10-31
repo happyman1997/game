@@ -193,7 +193,7 @@ static var _settle_data := {}
 
 
 static func settlements_of(g: Game) -> Dictionary:
-	var key := "%d:%d" % [g.get_instance_id(), int(g.state.get("build_ver", 0))]
+	var key := "%d:%d:%d" % [g.get_instance_id(), int(g.state.get("build_ver", 0)), int(g.state.get("land_ver", 0))]
 	if key == _settle_key:
 		return _settle_data
 	var out := {}
@@ -239,7 +239,7 @@ static func settlements_of(g: Game) -> Dictionary:
 		for x in dl:
 			levels += int(x[1])
 		out[p.id] = {"main": main, "districts": dl, "bmap": bmap, "special": special, "great": great, "other": other, "levels": levels, "count": p.buildings.size(),
-			"holdings": hs, "dev": int(Data.num(p.get("development"))), "terrain": str(pd.get("terrain", "")) if pd != null else ""}
+			"holdings": hs, "dev": int(Data.num(p.get("development"))), "terrain": g.terrain_of(p.id)}
 	_settle_key = key
 	_settle_data = out
 	return out

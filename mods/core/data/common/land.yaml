@@ -1,0 +1,284 @@
+# Местность (механика biomes, engine/features/biomes.gd): у земли есть
+# состояние, и его меняют люди, природа и война. Состояние даёт графству
+# доход и набор (modifiers), рост (development_growth), оборону, скорость
+# войск; group — к какой местности оно относится для полков, районов и
+# условия terrain (дремучий лес — тоже лес). capital_modifiers — тому, чья
+# столица здесь. drift — что делает природа: раз в год шанс 1/years перейти
+# в другое состояние (root — провинция), пока на земле не идёт работа.
+# Работы (land_works) начинает владелец графства в окне провинции; они идут
+# месяцами (быстрее при хорошем управлении), стоят золота и меняют землю, а
+# on_complete — их изнанка.
+
+defines:
+  land:
+    history_size: 12            # сколько записей в летописи земли
+    speed_per_stewardship: 0.02 # каждое очко управления ускоряет работы на 2%
+    min_speed_mult: 0.4         # быстрее, чем за 40% срока, не выйдет
+    ai_frequency_months: 12     # как часто ИИ думает о своей земле
+    ai_reserve_gold: 50         # ИИ берётся за работу, если после оплаты останется столько
+    ai_counties_per_work: 4     # одна работа на столько графств домена
+
+terrain:
+  # ---------------------------------------------------------------- леса
+  # Дремучий лес: глушь, звери, разбойники — мало дохода, много укрытия
+  old_forest:
+    group: forest
+    color: "#2f5a33"
+    defense: 0.3
+    movement: 1.5
+    height: 0.24
+    development_growth: -0.04
+    modifiers: { tax_mult: -0.2, levy_mult: -0.15 }
+  forest:
+    color: "#4f7a43"
+    defense: 0.2
+    movement: 1.3
+    height: 0.2
+    development_growth: -0.01
+    modifiers: { tax_mult: -0.1 }
+    drift:
+      # глухой малолюдный лес дичает в дремучий
+      - { to: old_forest, years: 60, trigger: { development: "<= 5" } }
+  # Гарь: выгоревший лес; не распашешь — лет через десять отрастёт
+  burnt_forest:
+    group: forest
+    color: "#5b5a40"
+    defense: 0.1
+    movement: 1.2
+    height: 0.14
+    development_growth: -0.03
+    modifiers: { tax_mult: -0.2, levy_mult: -0.1 }
+    drift:
+      - { to: forest, years: 10, cause: regrowth }
+  # Вырубка: пни и подлесок; не распашешь — зарастёт
+  clearing:
+    group: plains
+    color: "#a3a46a"
+    defense: 0.05
+    movement: 1.1
+    height: 0.12
+    development_growth: 0.02
+    modifiers: { tax_mult: -0.05 }
+    drift:
+      - { to: forest, years: 12, cause: regrowth }
+
+  # ---------------------------------------------------------------- поля
+  plains:
+    color: "#c2c07e"
+    height: 0.1
+    drift:
+      # без хозяина поле дичает
+      - { to: heath, years: 8, trigger: { has_holder: no } }
+  # Тучная пашня: хлеб и люди; со временем устаёт
+  farmlands:
+    color: "#a9b56a"
+    height: 0.05
+    development_growth: 0.06
+    modifiers: { tax_mult: 0.1, levy_mult: 0.05 }
+    drift:
+      - { to: worn_fields, years: 60, cause: exhaustion }
+      - { to: heath, years: 8, trigger: { has_holder: no } }
+  # Истощённая пашня: родит скудно; под паром отдохнёт
+  worn_fields:
+    group: farmlands
+    color: "#bdb27c"
+    height: 0.06
+    development_growth: -0.02
+    modifiers: { tax_mult: -0.1 }
+    drift:
+      - { to: plains, years: 20, cause: rest }
+  # Луг на месте осушенной топи: сено, кони, жирная земля
+  meadow:
+    group: plains
+    color: "#8fb06a"
+    height: 0.04
+    defense: 0.05
+    development_growth: 0.02
+    modifiers: { tax_mult: 0.05, levy_mult: 0.1 }
+    drift:
+      # без присмотра канавы заплывают
+      - { to: wetlands, years: 40, trigger: { has_holder: no } }
+  # Пустошь: вереск и камень
+  heath:
+    group: plains
+    color: "#a89a6e"
+    defense: 0.05
+    movement: 1.1
+    height: 0.12
+    development_growth: -0.04
+    modifiers: { tax_mult: -0.2, levy_mult: -0.15 }
+    drift:
+      - { to: forest, years: 30, trigger: { development: "<= 4" }, cause: regrowth }
+  # Пожарище: выжженные поля и деревни; лет через пять затянется
+  burnt:
+    group: plains
+    color: "#6a5c4c"
+    height: 0.1
+    development_growth: -0.05
+    modifiers: { tax_mult: -0.3, levy_mult: -0.25 }
+    drift:
+      - { to: plains, years: 5, cause: regrowth }
+
+  # ---------------------------------------------------------------- вода и камень
+  wetlands:
+    color: "#6f8f7a"
+    defense: 0.25
+    movement: 1.6
+    height: 0.02
+    development_growth: -0.02
+    modifiers: { tax_mult: -0.1 }
+    # болотная лихорадка
+    capital_modifiers: { health: -0.3 }
+  hills:
+    color: "#9a8a5a"
+    defense: 0.3
+    movement: 1.4
+    height: 0.45
+  mountains:
+    color: "#8a8178"
+    defense: 0.5
+    movement: 1.8
+    height: 0.85
+    development_growth: -0.05
+
+land_works:
+  # Проредить дремучий лес: строевой лес на продажу, глушь отступает
+  thin_old_forest:
+    icon: "🌲"
+    from: [old_forest]
+    to: forest
+    months: 24
+    cost: { gold: 50 }
+    on_complete:
+      - scope:actor: { add_gold: 35 }
+    ai_will_do:
+      value: 6
+      add: { value: ai_greed, multiply: 2 }
+
+  # Свести лес под пашню: брёвна и уголь на продажу, но лесной народ
+  # (охотники, углежоги, бортники) ропщет, а у соседей ниже — разливы
+  clear_forest:
+    icon: "🪓"
+    from: [forest]
+    to: clearing
+    months: 30
+    cost: { gold: 70 }
+    during: { tax_mult: -0.05 }
+    on_complete:
+      - scope:actor: { add_gold: 50 }
+      - add_county_opinion: forest_felled
+      - every_neighbor:
+          limit:
+            has_holder: yes
+            terrain: [farmlands, plains, wetlands]
+            NOT: { has_province_modifier: flooding }
+          random:
+            chance: 30
+            add_province_modifier: { id: flooding, years: 4 }
+            save_scope_as: flooded
+            holder:
+              if:
+                limit: { NOT: { is_same_as: scope:actor } }
+                add_opinion: { target: scope:actor, modifier: flooded_my_land }
+                trigger_event: land.0004
+    ai_will_do:
+      value: 4
+      add:
+        - { value: ai_greed, multiply: 3 }
+        - { value: "scope:province.development", multiply: 0.4 }
+      if:
+        - limit: { has_trait: compassionate }
+          multiply: 0.5
+
+  # Распахать вырубку, пустошь или пожарище — станут полем
+  plough:
+    icon: "⚒"
+    from: [clearing, heath, burnt, burnt_forest]
+    to: plains
+    months: 18
+    cost: { gold: 40 }
+    ai_will_do:
+      value: 12
+      if:
+        # вырубку и гарь — непременно, иначе зарастут
+        - limit: { scope:province: { terrain: [clearing, burnt_forest] } }
+          add: 30
+
+  # Унавозить и распахать поле — станет тучной пашней (нужны руки)
+  improve_fields:
+    icon: "🌾"
+    from: [plains]
+    to: farmlands
+    months: 36
+    cost: { gold: 90 }
+    potential: { development: ">= 6" }
+    ai_will_do:
+      value: 8
+      add:
+        - { value: stewardship, multiply: 0.8 }
+        - { value: ai_greed, multiply: 2 }
+
+  # Оставить истощённую пашню под паром: два года меньше хлеба
+  fallow:
+    icon: "🌱"
+    from: [worn_fields]
+    to: farmlands
+    months: 24
+    during: { tax_mult: -0.3 }
+    ai_will_do:
+      value: 30
+      add: { value: stewardship, multiply: 1 }
+
+  # Осушить топь: годы работы и много золота — но лихорадка уходит, а луг жирный
+  drain_marsh:
+    icon: "🌊"
+    from: [wetlands]
+    to: meadow
+    months: 60
+    cost: { gold: 180 }
+    on_complete:
+      - add_county_opinion: marsh_drained
+    ai_will_do:
+      value: 3
+      add: { value: stewardship, multiply: 0.4 }
+
+  # Распахать луг
+  plough_meadow:
+    icon: "⚒"
+    from: [meadow]
+    to: farmlands
+    months: 24
+    cost: { gold: 60 }
+    ai_will_do:
+      value: 4
+      add: { value: ai_greed, multiply: 1 }
+
+  # Насадить лес: внукам на брёвна и дичь
+  plant_forest:
+    icon: "🌳"
+    from: [clearing, heath, burnt, burnt_forest, worn_fields]
+    to: forest
+    months: 72
+    cost: { gold: 40 }
+    on_complete:
+      - add_county_opinion: forest_planted
+    ai_will_do:
+      value: 1
+      if:
+        - limit: { has_trait: [compassionate, patient] }
+          add: 4
+        - limit: { scope:province: { terrain: [heath, burnt] } }
+          add: 3
+
+opinion_modifiers:
+  # мнение графств (add_county_opinion)
+  forest_felled: { value: -15, years: 10 }
+  forest_planted: { value: 10, years: 10 }
+  marsh_drained: { value: 10, years: 5 }
+  forest_spared: { value: 10, years: 5 }
+  # мнение персонажей
+  flooded_my_land: { value: -20, years: 10 }
+
+modifiers:
+  flooding: { icon: "🌊", modifiers: { tax_mult: -0.25, development_growth: -0.05 } }
+  forest_outlaws: { icon: "🏹", modifiers: { tax_mult: -0.15, levy_mult: -0.1 } }

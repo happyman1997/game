@@ -462,8 +462,7 @@ static func _setup_world(game: Game) -> void:
 	# Оборотень где-то в лесах.
 	var woods := game.living().filter(func(c):
 		var h: Variant = home_of(game, c)
-		var d: Variant = game.content.get_def("provinces", h) if h != null else null
-		return d != null and d.get("terrain") == "forest" and Chars.age_of(game, c) >= 18 and c.titles.is_empty())
+		return h != null and game.terrain_group(game.terrain_of(h)) == "forest" and Chars.age_of(game, c) >= 18 and c.titles.is_empty())
 	if not woods.is_empty():
 		var w: Dictionary = rng.pick(woods)
 		Chars.add_trait(game, w, "lycanthrope")

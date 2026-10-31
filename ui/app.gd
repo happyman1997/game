@@ -669,8 +669,8 @@ func province_tooltip(id: String) -> String:
 			info.append(g.name_of("cultures", st.culture))
 		if st.faith != null:
 			info.append(g.name_of("faiths", st.faith))
-		if def.get("terrain") != null:
-			info.append(g.name_of("terrain", def.terrain))
+		if g.terrain_of(id) != "":
+			info.append(g.name_of("terrain", g.terrain_of(id)))
 		parts.append(BB.muted(" · ".join(info)))
 		# районы поселения: «Детинец II · Торговый посад I»
 		if Districts.on(g) and st.get("districts") is Dictionary and not st.districts.is_empty():

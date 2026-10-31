@@ -92,6 +92,37 @@ func prov_def(id: Variant) -> Variant:
 	return content.get_def("provinces", id)
 
 
+## Нынешняя местность провинции: изменённая людьми и природой (state) или
+## исходная из данных карты.
+func terrain_of(prov_id: Variant) -> String:
+	var p: Variant = state.provinces.get(prov_id)
+	if p != null and p.get("terrain") != null:
+		return str(p.terrain)
+	var d: Variant = content.get_def("provinces", prov_id)
+	return str(d.get("terrain", "")) if d != null else ""
+
+
+func terrain_def(prov_id: Variant) -> Variant:
+	return content.get_def("terrain", terrain_of(prov_id))
+
+
+## Группа местности (дремучий лес — тоже лес): поле group или сам id.
+func terrain_group(t: String) -> String:
+	var d: Variant = content.get_def("terrain", t)
+	return str(d.get("group", t)) if d != null else t
+
+
+## Значение по местности из словаря { местность: значение }: сперва точное
+## состояние, потом его группа (null — нет ни того, ни другого).
+func terrain_pick(d: Variant, prov_id: Variant) -> Variant:
+	if not (d is Dictionary):
+		return null
+	var t := terrain_of(prov_id)
+	if d.has(t):
+		return d[t]
+	return d.get(terrain_group(t))
+
+
 ## Значение из defines по пути "раздел.ключ". Найденные значения кэшируются
 ## до конца месяца (моды, меняющие defines на ходу, увидят изменение с нового месяца).
 func def_num(path: String, fallback: float = 0.0) -> float:

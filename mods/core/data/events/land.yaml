@@ -1,0 +1,108 @@
+# События местности (land.yaml): лесной пожар, усталая пашня, лесной народ
+# просит пощадить лес, разлив у соседа после чужой вырубки.
+
+on_actions:
+  on_monthly_pulse:
+    random_events:
+      events:
+        land.0001: 3
+        land.0002: 3
+        land.0003: 20
+
+events:
+  # ------------------------------------------------------------ лесной пожар
+  land.0001:
+    theme: realm
+    icon: "🔥"
+    cooldown: { years: 6 }
+    trigger:
+      is_ruler: yes
+      any_domain_province: { terrain: forest, has_land_work: no }
+    immediate:
+      random_domain_province:
+        limit: { terrain: forest, has_land_work: no }
+        save_scope_as: province
+    options:
+      # поднять всех на тушение
+      - trigger: { gold: ">= 30" }
+        effect:
+          - add_gold: -30
+          - scope:province: { add_county_opinion: forest_spared }
+        ai_chance: { value: 10, add: { value: ai_compassion, multiply: 3 } }
+      # пусть горит — потом распашем
+      - effect:
+          scope:province: { set_terrain: { to: burnt_forest, cause: fire } }
+        ai_chance: { value: 10, add: { value: ai_greed, multiply: 2 } }
+
+  # ------------------------------------------------------------ усталая пашня
+  land.0002:
+    theme: realm
+    icon: "🌾"
+    cooldown: { years: 6 }
+    trigger:
+      is_ruler: yes
+      any_domain_province: { terrain: farmlands, NOT: { terrain: worn_fields }, has_land_work: no }
+    immediate:
+      random_domain_province:
+        limit: { terrain: farmlands, NOT: { terrain: worn_fields }, has_land_work: no }
+        save_scope_as: province
+    options:
+      # купить навоз и семена — земля ещё послужит
+      - trigger: { gold: ">= 40" }
+        effect: { add_gold: -40 }
+        ai_chance: { value: 10, add: { value: stewardship, multiply: 1 } }
+      # пусть родит, как родит
+      - effect:
+          scope:province: { set_terrain: { to: worn_fields, cause: exhaustion } }
+        ai_chance: { value: 10, add: { value: ai_greed, multiply: 3 } }
+
+  # ------------------------------------------------------------ лесной народ
+  # Пока сводят лес, к господину приходят охотники, углежоги и бортники
+  land.0003:
+    theme: realm
+    icon: "🪓"
+    cooldown: { years: 3 }
+    trigger:
+      is_ruler: yes
+      any_domain_province: { has_land_work: clear_forest }
+    immediate:
+      random_domain_province:
+        limit: { has_land_work: clear_forest }
+        save_scope_as: province
+    options:
+      # пощадить лес — работы прекратить
+      - effect:
+          scope:province:
+            end_land_work: yes
+            add_county_opinion: forest_spared
+        ai_chance: { value: 5, add: { value: ai_compassion, multiply: 5 } }
+      # заплатить им отступное
+      - trigger: { gold: ">= 30" }
+        effect: { add_gold: -30 }
+        ai_chance: 15
+      # прогнать — лес мой; кто-то уйдёт в разбойники
+      - effect:
+          - scope:province: { add_county_opinion: forest_felled }
+          - random:
+              chance: 35
+              scope:province: { add_province_modifier: { id: forest_outlaws, years: 5 } }
+        ai_chance: { value: 10, add: { value: ai_compassion, multiply: -5 } }
+
+  # ------------------------------------------------------------ разлив у соседа
+  # root — владелец залитого графства, scope:flooded — оно, scope:actor —
+  # кто свёл лес выше по течению
+  land.0004:
+    theme: realm
+    icon: "🌊"
+    triggered_only: yes
+    trigger: { exists: scope:flooded }
+    options:
+      # строить дамбы
+      - trigger: { gold: ">= 40" }
+        effect:
+          - add_gold: -40
+          - scope:flooded: { remove_province_modifier: flooding }
+        ai_chance: { value: 10, add: { value: stewardship, multiply: 1 } }
+      # проклинать соседа и ждать, пока вода сойдёт
+      - effect: { add_stress: 5 }
+        ai_chance: 10

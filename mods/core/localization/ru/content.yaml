@@ -130,12 +130,12 @@ faith_desc:
   wolf_cult: "Север чтит Зимнего Волка — бога-воина, побратима Императора. Храбрость и ярость здесь добродетели, а зверь в человеке — дар, а не проклятие."
 
 terrain:
-  farmlands: Пашни
-  plains: Равнины
-  forest: Леса
+  farmlands: Тучная пашня
+  plains: Равнина
+  forest: Лес
   hills: Холмы
   mountains: Горы
-  wetlands: Болота
+  wetlands: Топь
 
 holding:
   castle: Замок

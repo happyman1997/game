@@ -162,7 +162,8 @@ defines:
 | `traits` | `core/data/common/traits.yaml` | Черты: `category`, `icon`, `modifiers`, `opposites`, `compatibility`, `genetic`/`birth_chance`/`inherit_chance`, `education`, `ai`, `monthly_death_chance`, `monthly_cure_chance`, `duration_days`, `group`, `color` (цвет плашки), `concealed` (скрытая черта — см. «Крюки и секреты»), `portrait` (как черта меняет портрет — см. ниже). |
 | `cultures` | `core/data/common/cultures.yaml` | `color`, `male_names`, `female_names`, `dynasty_pattern` (`name`/`place`), `succession_law`, `skin`/`hair`, `modifiers`, `traits` (врождённые черты всех людей этой культуры — например, раса `dwarf`), `government` (правление по умолчанию). |
 | `faiths` | там же | `religion`, `color`, `icon`, `doctrines` (`polygamy`, `divorce: approval`), `virtues`, `sins` (единоверцы того же культа судят по ним правителя — см. «Храм»), `head_title` (титул главы веры), `heretic` (еретический культ), `modifiers`, `no_holy_war_with` (религии, с которыми эта вера не ведёт священных войн — в обе стороны). Священная война возможна против другой религии, а внутри своей — только против еретика: последователя культа с `heretic: yes` или персонажа с чертой или модификатором `heretic: yes` (условие `is_heretic`; в ядре — Восточный обряд, раскрытый договор с Князем Пепла и изгнание из Света `cast_out_of_light`); еретик — законная цель даже для единоверца. В базовой игре весь мир исповедует одну религию `solar` (Вера Солнечного Императора), а веры — её культы. |
-| `terrain`, `holdings`, `buildings` | `core/data/common/economy.yaml` | Местность (оборона, скорость, высота рельефа, `attrition` — потери армий в месяц), владения (налог, ополчение, крепость), постройки (`holding`, `requires`, `cost`, `days`, `modifiers`, `owner_modifiers`, `trigger`; `district` и `level` — район, в котором стоит постройка, и его нужный уровень; `yearly` — эффект раз в год, см. «Районы»; `special: yes` — особая постройка: не строится и не занимает места, её дают графству данные карты или эффект `add_building`, а действует она на того, кто держит графство). |
+| `terrain` | `core/data/common/land.yaml` | Местность и её состояния (оборона, скорость, высота рельефа, `attrition` — потери армий в месяц; `group`, `modifiers`, `capital_modifiers`, `drift` — см. «Местность»). |
+| `holdings`, `buildings` | `core/data/common/economy.yaml` | Владения (налог, ополчение, крепость), постройки (`holding`, `requires`, `cost`, `days`, `modifiers`, `owner_modifiers`, `trigger`; `district` и `level` — район, в котором стоит постройка, и его нужный уровень; `yearly` — эффект раз в год, см. «Районы»; `special: yes` — особая постройка: не строится и не занимает места, её дают графству данные карты или эффект `add_building`, а действует она на того, кто держит графство). |
 | `map`, `landmasses`, `provinces`, `map_links` | `core/data/map/` | Карта — см. раздел 7. |
 | `titles` | `core/data/map/titles.yaml` | Иерархия де-юре: `tier`, `liege`, `color`, `capital`, `coa` (герб), `no_create`. Графства создаются из провинций автоматически. |
 | `dynasties`, `characters`, `bookmarks` | `core/data/history/` | Исторические персонажи и стартовые даты. |
@@ -941,7 +942,7 @@ regiment_types:
     cost: { gold: 50 }
     upkeep: 0.35         # в месяц; в поднятой армии × raised_upkeep_mult
     counters: { heavy_cavalry: 0.6 }   # до 60% силы рыцарей снимается, если пикинёров не меньше
-    terrain: { hills: 0.2 }            # бонус к силе на местности
+    terrain: { hills: 0.2 }            # бонус к силе на местности (состояние или его группа: forest — и дремучий лес)
     can_recruit: { culture: [english, norse] }
     ai_will_do: 10
 ```
@@ -1679,6 +1680,66 @@ missions:
 (или `{ id, agent, target }` — в скоупе покровителя) и `end_mission`. Хуки
 `mission.started`, `mission.ended` (`result`: success, partial, failure,
 dead, recalled, captured).
+
+### Местность
+
+Механика `biomes` (`engine/features/biomes.gd`, данные —
+`core/data/common/land.yaml`, события — `core/data/events/land.yaml`): у
+земли есть состояние, и его меняют люди, природа и война. Нынешнее
+состояние лежит в провинции (нет — исходное `terrain` из данных карты; в
+коде — `Game.terrain_of`); от него зависят доход и набор (`modifiers`), рост
+развития, оборона, скорость войск, полки и районы. `group` — к какой
+местности состояние относится: полки, районы и условие `terrain` ищут
+сперва само состояние, потом его группу (дремучий лес и гарь — тоже лес).
+`capital_modifiers` — правителю, чья столица здесь (топь — лихорадка).
+
+```yaml
+terrain:
+  clearing:                      # вырубка
+    group: plains
+    color: "#a3a46a"
+    height: 0.12
+    defense: 0.05
+    movement: 1.1
+    development_growth: 0.02
+    modifiers: { tax_mult: -0.05 }
+    drift:                       # природа: раз в год шанс 1/years (root — провинция), пока не идёт работа
+      - { to: forest, years: 12, cause: regrowth }
+
+land_works:
+  clear_forest:                  # «Свести лес» — в окне провинции, у её владельца
+    icon: "🪓"
+    from: [forest]               # к каким состояниям подходит
+    to: clearing                 # во что превратит
+    months: 30                   # срок (быстрее с управлением владельца и land_work_speed)
+    cost: { gold: 70 }           # × (1 + build_cost_mult)
+    potential: { development: ">= 6" }   # где можно (скоуп — провинция, root и scope:actor — кто начинает)
+    during: { tax_mult: -0.05 }  # модификаторы графства, пока идёт работа
+    on_complete: [ ... ]         # изнанка по окончании (скоуп — провинция, root и scope:actor)
+    ai_will_do: { value: 5 }     # желание ИИ (root — правитель, scope:province)
+```
+
+В ядре: дремучий лес, лес, гарь, вырубка, равнина, тучная и истощённая
+пашня, луг, топь, пустошь, пожарище, холмы, горы; работы — проредить
+дремучий лес, свести лес (брёвна на продажу, но графство ропщет, а у
+соседей-низин бывают разливы — и они запоминают, кто виноват), распахать,
+унавозить поля, оставить под пар, осушить топь, распахать луг, насадить
+лес. Природа: вырубка и гарь зарастают, глухой лес дичает, пашня устаёт,
+брошенное поле становится пустошью, пожарище затягивается. Война: при
+взятии графства победитель может сжечь поля. События: лесной пожар, усталая
+пашня, лесной народ просит пощадить лес, разлив у соседа. Деяние
+`lands_tamed` и прозвище «Пахарь».
+
+Летопись земли — `p.land_log`: `[дата, было, стало, кто, причина]` (видна в
+окне провинции). Скрипт: условия `terrain: forest` (или список; состояние
+или группа), `has_land_work: yes | <id>`, `has_holder`; значение
+`land_work_months_left`; эффекты `set_terrain: burnt` или `{ to, cause }`
+(в летопись — root, если это персонаж), `start_land_work: <id>` (root
+платит), `end_land_work`. Хуки `land.changed` `{province, from, to, by,
+cause}`, `land.work_started`, `land.work_done`; on_action `on_land_changed`
+(root — владелец графства, `scope:province`, `scope:actor`). Числа —
+`defines.land`; статья казны — `land_works`; характеристика `land_work_speed`
+(у перка «Механик»). Карта перекрашивается, когда меняется земля.
 
 ### Дань
 

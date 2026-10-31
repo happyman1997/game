@@ -9,6 +9,7 @@ ledger:
   regiment_wages: Жалованье отрядов
   district_upkeep: Содержание районов
   construction: Стройка
+  land_works: Работы на земле
   decisions: Решения
   interactions: Предложения
   events: События

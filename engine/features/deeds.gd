@@ -24,7 +24,7 @@ extends EngineFeature
 
 const OWNER := "core/deeds"
 const SIGNALS := ["battle_won", "battle_lost", "siege_won", "war_won", "war_lost", "duel_won", "duel_lost",
-	"building", "conversion", "scheme_success", "discord", "secret_exposed", "revolt_led", "law_changed"]
+	"building", "conversion", "scheme_success", "discord", "secret_exposed", "revolt_led", "law_changed", "land_tamed"]
 
 
 func _init() -> void:
@@ -171,6 +171,10 @@ func install(engine: GameEngine) -> void:
 	H.on("duel", func(p):
 		sig.call(p.game, "duel_won", p.winner)
 		sig.call(p.game, "duel_lost", p.loser)
+	, 0, OWNER)
+	H.on("land.work_done", func(p):
+		if p.get("by") != null:
+			sig.call(p.game, "land_tamed", p.by)
 	, 0, OWNER)
 	H.on("building.completed", func(p):
 		if p.get("by") != null:

@@ -27,6 +27,7 @@ deeds:
   judgments:       { icon: "⚖", order: 20, events: [court.0004, politics.0002, politics.0004, family.0002, feast.0002] }
   revolts:         { icon: "📯", order: 21, signal: revolt_led }
   laws:            { icon: "📜", order: 22, signal: law_changed }
+  lands_tamed:     { icon: "🌾", order: 23, signal: land_tamed }
 
 # Прозвища (только имя, без эффектов): nick.<id>, женское — nick.<id>_f.
 # Новое прозвище заменяет прежнее, только если priority выше; прозвища из
@@ -39,6 +40,7 @@ nicknames:
   conqueror:    { deed: wars_won, count: 3, priority: 5 }
   fearless:     { deed: duels_won, count: 3, priority: 4 }
   builder:      { deed: buildings, count: 6, priority: 2 }
+  plowman:      { deed: lands_tamed, count: 4, priority: 2 }
   great_builder: { deed: buildings, count: 14, priority: 4 }
   enlightener:  { deed: conversions, count: 4, priority: 3 }
   cunning:      { deed: schemes, count: 4, priority: 2 }

@@ -54,12 +54,14 @@
 | `has_global_flag` | любой | Есть глобальный флаг | core |
 | `has_graft` | character | Есть вживление (yes/no или id): has_graft: iron_hand | grafts |
 | `has_guardian` | character | У ребёнка есть опекун | core/upbringing |
+| `has_holder` | province | У графства есть владелец (нет — земля брошена): has_holder: yes | core/biomes |
 | `has_holder_culture` | province | Графство одной культуры с владельцем | core/lands |
 | `has_holder_faith` | province | Графство одной веры с владельцем | core/lands |
 | `has_holding` | province | Есть владение типа | core |
 | `has_hook_on` | character | Есть крюк на персонажа | core |
 | `has_imprisonment_reason` | character | Есть законный повод заключить персонажа (преступление против этого персонажа) | core/prison |
 | `has_known_trait` | character | Есть черта, известная всем (не скрытая или разоблачённая) | core |
+| `has_land_work` | province | На земле идёт работа: has_land_work: yes \| <id работы> | core/biomes |
 | `has_lifestyle` | character | Текущий фокус принадлежит образу жизни | core/lifestyles |
 | `has_mastery` | character | Легла тень мастерства навыка: has_mastery: intrigue | core |
 | `has_modifier` | character | Есть модификатор (или любой из списка) | core |
@@ -164,7 +166,7 @@
 | `synod_declared` | character | Позиция персонажа на созванном Соборе: synod_declared: for \| against \| yes \| no | core/synod |
 | `synod_question` | character | Вопрос созванного Собора: synod_question: anathema | core/synod |
 | `synod_swayed` | character | Голос уже склонён на созванном Соборе | core/synod |
-| `terrain` | province | Местность | core |
+| `terrain` | province | Местность (нынешняя): terrain: forest — лес или его состояние (дремучий лес); список — любая из | core |
 | `tier_is` | title | Ранг титула: county/duchy/kingdom/empire | core |
 | `var` | любой | Сравнение переменной: var: { name: x, value: ">= 2" } | core |
 | `vassal_obligation` | character | Условия службы вассала: vassal_obligation: heavy | core/politics |
@@ -241,6 +243,7 @@
 | `disinherit` | Лишить наследства (yes) или восстановить в правах (no) | core/dynasties |
 | `divorce` | Развод | core |
 | `duel` | Поединок с персонажем: duel: scope:x или { target: scope:x, kind: duel\|mortal\|friendly, champions: no, on_win: [...], on_lose: [...] } (эффекты исхода — в скоупе этой стороны, scope:duel_foe — противник; бьётся игрок — исход позже, после окна схватки) | core/duels |
+| `end_land_work` | Прервать работу на земле (без возврата затрат) | core/biomes |
 | `end_mission` | Прервать поручение (агент возвращается без исхода): end_mission: recalled | core/missions |
 | `end_tribute` | Перестать платить дань: end_tribute: yes | core/tribute |
 | `end_war` | Завершить войну: victory/white_peace/defeat | core |
@@ -317,6 +320,7 @@
 | `set_realm_law` | Установить закон державы (без цены и перерыва) | core/laws |
 | `set_regent` | Назначить регента правителю-ребёнку: set_regent: scope:x | core/upbringing |
 | `set_succession_law` | Закон наследования | core |
+| `set_terrain` | Изменить местность: set_terrain: burnt или { to, cause } (в летопись — root, если это персонаж) | core/biomes |
 | `set_var` | Переменная: { name, value } | core |
 | `set_vassal_obligation` | Установить вассалу условия службы: set_vassal_obligation: privileged | core/politics |
 | `shift_realm_law` | Сдвинуть закон группы на ступени: shift_realm_law: { group: crown_authority, by: -1 } (без цены) | core/laws |
@@ -324,6 +328,7 @@
 | `spend_dynasty_renown` | Потратить известность рода: spend_dynasty_renown: 100 | core/dynasties |
 | `start_ambition` | Завести желание: start_ambition: land (цель — случайная подходящая) | core/ambitions |
 | `start_disease` | Начать эпидемию в провинции: start_disease: bubonic_plague | plague |
+| `start_land_work` | Начать работу на земле от имени root (он платит): start_land_work: <id> | core/biomes |
 | `start_mission` | Отправить с поручением (в скоупе покровителя): start_mission: <поручение> (агент — scope:recipient, цель — scope:target) или { id, agent, target } | core/missions |
 | `start_scheme` | Начать интригу: { type, target } | core |
 | `stress_reaction` | Отклик характера на поступок из события: stress_reaction: <id из defines.personality.event_actions> | core/personality |
@@ -389,6 +394,7 @@
 | `deeds_gifts` | character | Деяния: gifts | core/deeds |
 | `deeds_hunts` | character | Деяния: hunts | core/deeds |
 | `deeds_judgments` | character | Деяния: judgments | core/deeds |
+| `deeds_lands_tamed` | character | Деяния: lands_tamed | core/deeds |
 | `deeds_laws` | character | Деяния: laws | core/deeds |
 | `deeds_pacts` | character | Деяния: pacts | core/deeds |
 | `deeds_revolts` | character | Деяния: revolts | core/deeds |
@@ -427,6 +433,7 @@
 | `karma` | character | Карма «Свет и Пепел» (−100…100) | core/karma |
 | `karma_tier_level` | character | Номер ступени кармы (0 — самая пепельная) | core/karma |
 | `knights_power` | character | Сила рыцарей (в ополченцах) | core/knights |
+| `land_work_months_left` | province | Сколько месяцев осталось работе на земле | core/biomes |
 | `learning` | character | Навык: learning | core |
 | `levies` | character | Ополчение державы | core |
 | `levy` | province | Ополчение провинции | core |
@@ -656,6 +663,7 @@
 | `districts` | Районы графства: кварталы с уровнями, сила района масштабирует постройки | да |
 | `tribute` | Дань: доля податей данника — победителю войны за дань | да |
 | `missions` | Поручения: люди правителя уходят в мир с делом | да |
+| `biomes` | Местность: живая земля — работы правителей, природа и война меняют её; летопись земли | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -665,9 +673,9 @@
 - **cb_targets**: `claim`, `de_jure`, `independent_ruler`, `independence`, `adjacent_county`, `holy_war`, `heretic_realm`, `faction`, `artifact_holder`, `tribute`, `monster_hunt`
 - **interaction_targets**: `grantable_titles`, `revocable_titles`, `recipient_claims`, `own_artifacts`, `claimed_artifacts`, `mission:embassy`, `mission:foreign_service`, `mission:glory_wandering`, `mission:pilgrimage`, `mission:preaching`
 - **interaction_deciders**: `payer`
-- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `synod_decrees`, `districts`, `grafts`, `plague_fear`
-- **province_modifier_providers**: `lands`, `populace`, `governments`, `districts`
+- **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `synod_decrees`, `districts`, `biomes`, `grafts`, `plague_fear`
+- **province_modifier_providers**: `lands`, `populace`, `governments`, `districts`, `biomes`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council_pay`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `faith_morals`, `faith_head`, `tribute`, `arcana_faith`, `grafts`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `foes`, `deeds`, `spirit`, `karma`, `synod`, `districts`, `missions`
-- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `council` (15), `ambitions` (16), `missions` (16), `artifacts` (17), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `tribute` (56), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `foes`, `deeds`, `spirit`, `karma`, `synod`, `districts`, `missions`, `land_works`
+- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `council` (15), `ambitions` (16), `missions` (16), `artifacts` (17), `biomes` (18), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `tribute` (56), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

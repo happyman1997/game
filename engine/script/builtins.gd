@@ -619,9 +619,13 @@ static func register(engine: GameEngine) -> void:
 		var d: Variant = ctx.game.content.get_def("provinces", s.id)
 		return d != null and Data.as_array(d.get("holdings")).has(arg)
 	)
-	trig.call("terrain", PROV, "Местность", func(ctx, s, arg):
-		var d: Variant = ctx.game.content.get_def("provinces", s.id)
-		return d != null and d.get("terrain") == arg
+	trig.call("terrain", PROV, "Местность (нынешняя): terrain: forest — лес или его состояние (дремучий лес); список — любая из", func(ctx, s, arg):
+		var t: String = ctx.game.terrain_of(s.id)
+		var g: String = ctx.game.terrain_group(t)
+		for x in Data.as_array(arg):
+			if str(x) == t or str(x) == g:
+				return true
+		return false
 	)
 	trig.call("is_occupied", PROV, "Оккупирована", func(ctx, s, arg):
 		var p: Variant = ctx.game.state.provinces.get(s.id)

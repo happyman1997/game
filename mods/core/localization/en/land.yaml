@@ -1,0 +1,72 @@
+# Land (land.yaml, events/land.yaml)
+terrain:
+  burnt_forest: Burnt Forest
+  old_forest: Old-growth Forest
+  clearing: Clearing
+  worn_fields: Worn Fields
+  meadow: Meadow
+  heath: Heath
+  burnt: Burnt Land
+terrain_desc:
+  burnt_forest: "A burnt-out forest. Unploughed, it grows back within a decade."
+  old_forest: "Wilderness, beasts and outlaws: little income and few people, but no army gets through."
+  forest: "The forest feeds hunters, charcoal burners and beekeepers, but there is no ploughland in it."
+  clearing: "Stumps and undergrowth. Unploughed, it is forest again within a decade."
+  plains: "Fields and pastures. Without a lord they turn to heath."
+  farmlands: "Bread and people. In time the soil tires — it needs to lie fallow."
+  worn_fields: "The soil is tired and yields little. Fallow will restore it."
+  meadow: "Hay, horses and rich soil where the marsh once was."
+  wetlands: "Marsh: reeds, fish and fever. No army gets through, but there is no bread either."
+  heath: "Heather and stone. Ploughing it is hard labour."
+  burnt: "Scorched fields and villages. It will heal in five years or so."
+  hills: "Hills: sheep, stone, strong walls."
+  mountains: "Mountains: ore and passes."
+land_work:
+  thin_old_forest: Thin the Old Forest
+  clear_forest: Clear the Forest
+  plough: Plough
+  improve_fields: Manure the Fields
+  fallow: Leave Fallow
+  drain_marsh: Drain the Marsh
+  plough_meadow: Plough the Meadow
+  plant_forest: Plant a Forest
+land_work_desc:
+  thin_old_forest: "Fell timber and cut rides: the wilderness becomes ordinary forest, and the logs are sold."
+  clear_forest: "Clear the forest for ploughland: logs and charcoal for sale. Hunters, charcoal burners and beekeepers lose their living and won't forgive it; neighbours downstream may be flooded — and they will know whose doing it was."
+  plough: "Plough a clearing, burnt forest, heath or burnt land — it becomes plains."
+  improve_fields: "Years of manure and deep ploughing turn plains into rich farmland. It needs hands — development 6 or more."
+  fallow: "For two years the land rests and yields less — then it is rich again."
+  drain_marsh: "Five years of ditches and dams: the marsh becomes meadow and the fever leaves, but enemies pass more easily too."
+  plough_meadow: "Plough the drained meadow — it becomes rich farmland."
+  plant_forest: "Plant a forest: timber and game for your grandchildren, shade and mushrooms for the people."
+opinion_modifier:
+  forest_felled: Cleared our forest
+  forest_planted: Planted a forest
+  marsh_drained: Drained the marsh
+  forest_spared: Spared the forest
+  flooded_my_land: Flooded my land
+modifier:
+  flooding: Flooding
+  forest_outlaws: Forest Outlaws
+ev:
+  land.0001:
+    t: Forest Fire
+    desc: "Smoke hangs over [scope:province.name]: the forest is burning. Unless people are raised to fight it, the fire will leave only burnt land."
+    a: Raise everyone to fight the fire (30 gold)
+    b: Let it burn — we'll plough it later
+  land.0002:
+    t: The Soil is Tired
+    desc: "The elders of [scope:province.name] say the fields are tired and the ears are small. You can buy manure and seed — or let it yield what it will."
+    a: Buy manure and seed (40 gold)
+    b: Let it yield what it will
+  land.0003:
+    t: The Forest Folk
+    desc: "Hunters, charcoal burners and beekeepers from [scope:province.name] have come to plead: don't destroy the forest — they cannot live without it."
+    a: Spare the forest and stop the work
+    b: Pay them off (30 gold)
+    c: Drive them away — the forest is mine
+  land.0004:
+    t: Flood
+    desc: "[scope:actor.name] cleared the forest upstream — and the water has come into [scope:flooded.name]: meadows and cellars are flooded."
+    a: Build dikes (40 gold)
+    b: Curse the neighbour and wait for the water to recede

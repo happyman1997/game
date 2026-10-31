@@ -118,7 +118,7 @@ static func disband(game: Game, c: Dictionary, reg_id: String) -> void:
 
 
 ## Сила полка с учётом контр противника и местности (в «ополченцах»).
-static func effective(game: Game, r: Dictionary, enemy_men: Dictionary, my_men_of_type: float, terrain: Variant) -> float:
+static func effective(game: Game, r: Dictionary, enemy_men: Dictionary, my_men_of_type: float, location: Variant) -> float:
 	var def: Variant = game.content.get_def("regiment_types", r.type)
 	if def == null:
 		return float(r.size)
@@ -130,8 +130,8 @@ static func effective(game: Game, r: Dictionary, enemy_men: Dictionary, my_men_o
 		if cv != 0.0:
 			penalty += cv * minf(1.0, enemy_men[type] / maxf(1.0, my_men_of_type))
 	penalty = minf(game.def_num("regiments.max_counter", 0.75), penalty)
-	var tm: Variant = def.get("terrain")
-	var t := 1.0 + (Data.num(tm.get(terrain)) if (terrain != null and tm is Dictionary) else 0.0)
+	# местность: точное состояние или его группа (дремучий лес — лес)
+	var t := 1.0 + (Data.num(game.terrain_pick(def.get("terrain"), location)) if location != null else 0.0)
 	return float(r.size) * Data.num(def.get("power"), 1.0) * (1.0 - penalty) * maxf(0.1, t)
 
 
@@ -147,14 +147,13 @@ static func army_bonus(game: Game, a: Dictionary, enemies: Array = [], location:
 	var mine := {}
 	for r in regs:
 		mine[r.type] = float(mine.get(r.type, 0.0)) + float(r.size)
-	var pd: Variant = game.content.get_def("provinces", location if location != null else a.location)
-	var terrain: Variant = pd.get("terrain") if pd != null else null
+	var loc: Variant = location if location != null else a.location
 	# regiment_power владельца — муштра (военное дело правителя)
 	var owner: Variant = game.ch(a.owner)
 	var drill := maxf(0.0, 1.0 + Stats.stat(game, owner, "regiment_power")) if owner != null else 1.0
 	var bonus := 0.0
 	for r in regs:
-		bonus += effective(game, r, enemy_men, mine.get(r.type, float(r.size)), terrain) * drill - float(r.size)
+		bonus += effective(game, r, enemy_men, mine.get(r.type, float(r.size)), loc) * drill - float(r.size)
 	return bonus
 
 
