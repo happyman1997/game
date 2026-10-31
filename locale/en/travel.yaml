@@ -1,5 +1,6 @@
 # Travellers and bands (engine/features/travel.gd)
 msg:
+  caravan_robbed: "The caravan from {from} to {to} was robbed near {place} ({band})."
   band_spawned: "{place}: a band has appeared — {band}."
   band_met_won: "{agent} ran into a band ({band}) near {place} — and fought them off."
   band_met_lost: "{agent} ran into a band ({band}) near {place} — and was beaten."
@@ -8,6 +9,8 @@ fx:
   fight_band: "Fight with a band ({place})"
   remove_bands: "{place}: the bands are routed"
 travel:
+  caravan: Caravan
+  caravan_route: "from {from} to {to}"
   out: "on the road — to {place}"
   stay: "at the destination — {place}"
   back: "heading home"

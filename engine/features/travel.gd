@@ -16,15 +16,25 @@ extends EngineFeature
 ## для графства, где довольно её местности). Разбить шайку — поручение с
 ## on_arrive: { scope:target: { fight_band: yes } } (охота).
 ##
+## Караваны: посад (район market) уровня N раз в months_per_level / N
+## месяцев отправляет караван к другому посаду не дальше max_cost «цены
+## пути» (не к врагу); караван идёт по дорогам и, дойдя, приносит владельцам
+## обоих концов доход (статья «Торговля»): тем больше, чем крупнее посады и
+## длиннее путь, а по тракту у обоих — ещё больше. Шайка в угодьях может
+## караван разграбить — и сама крепнет.
+##
 ## Данные:
 ##   bands.<id>: { icon, foe, lair: [местности или группы], radius, years,
 ##     strength, encounter_chance, modifiers: { … },
 ##     spawn: { chance, terrain: { местность: доля }, trigger } }  — природа (в год; root — графство)
 ##   defines.travel: { speed }
+##   defines.caravans: { months_per_level, max_cost, base_value, value_per_level,
+##     long_days, road_bonus, origin_share }
 ## Состояние: state.travelers {id: {id, kind, who, route, step, budget, phase,
 ##   home, dest, stay_until, met}}, state.bands {id: {id, kind, cell, province,
 ##   strength, until}}. Хуки: travel.arrived {traveler}, band.spawned {band},
-##   band.encounter {traveler, band, won}, band.gone {band, why}.
+##   band.encounter {character, band, won}, band.gone {band, why},
+##   caravan.arrived {from, to, value}, caravan.robbed {from, to, band}.
 
 const OWNER := "core/travel"
 
@@ -148,6 +158,10 @@ static func daily(game: Game) -> void:
 
 static func _arrive(game: Game, t: Dictionary) -> void:
 	game.emit("travel.arrived", {"traveler": t})
+	if t.kind == "caravan":
+		remove(game, t.id)
+		_trade(game, t)
+		return
 	if t.kind != "mission":
 		remove(game, t.id)
 		return
@@ -250,7 +264,12 @@ static func bands_near(game: Game, cell: int) -> Array:
 
 
 static func _meet_bands(game: Game, t: Dictionary) -> void:
-	if t.kind != "mission" or bands(game).is_empty():
+	if bands(game).is_empty():
+		return
+	if t.kind == "caravan":
+		_rob(game, t)
+		return
+	if t.kind != "mission":
 		return
 	var cell := cell_of(t)
 	for b in bands_near(game, cell):
@@ -317,10 +336,104 @@ static func yearly(game: Game) -> void:
 			spawn_band(game, str(d.id), pid)
 
 
+# ------------------------------------------------------------ караваны
+
+static func _market(game: Game, pid: String) -> int:
+	return Districts.level(game, pid, "market") if game.engine.has_feature("districts") else 0
+
+
+static func _top(game: Game, pid: String) -> Variant:
+	var t: Variant = game.state.titles.get(pid)
+	var h: Variant = game.ch(t.holder) if t != null else null
+	return Titles.top_liege(game, h) if h != null else null
+
+
+## Раз в месяц: посады отправляют караваны.
+static func monthly(game: Game) -> void:
+	var land := game.land()
+	if not land.ready() or not game.engine.has_feature("districts"):
+		return
+	var markets := []
+	for pid in game.state.provinces:
+		var lv := _market(game, pid)
+		if lv > 0 and land.seat(pid) >= 0 and game.state.titles.get(pid) != null and game.state.titles[pid].holder != null:
+			markets.append([pid, lv])
+	if markets.size() < 2:
+		return
+	var per := maxf(1.0, game.def_num("caravans.months_per_level", 12))
+	var max_cost := game.def_num("caravans.max_cost", 140)
+	for m in markets:
+		if not game.rng.chance(float(m[1]) / per):
+			continue
+		var from: String = m[0]
+		var a := land.seat(from)
+		var at: Vector2 = land.core.cell_center(a)
+		var top_a: Variant = _top(game, from)
+		var cands := []
+		for o in markets:
+			if o[0] == from:
+				continue
+			var d: float = (land.core.cell_center(land.seat(o[0])) as Vector2).distance_to(at)
+			# по прямой не дальше пути, который караван осилит
+			if d > max_cost * land.core.cell_size() * 1.7320508 * 0.9:
+				continue
+			var top_b: Variant = _top(game, o[0])
+			if top_a != null and top_b != null and top_a.id != top_b.id and Wars.is_at_war_with(game, top_a.id, top_b.id):
+				continue
+			cands.append(o)
+		var pick: Variant = game.rng.weighted(cands, func(o): return float(o[1]))
+		if pick == null:
+			continue
+		var b := land.seat(pick[0])
+		var cost: float = land.core.path_cost(a, b)
+		if cost < 0.0 or cost > max_cost:
+			continue
+		depart(game, "caravan", null, a, b, {"from": from, "to": pick[0], "levels": int(m[1]) + int(pick[1])})
+
+
+## Караван дошёл: доход обоим концам.
+static func _trade(game: Game, t: Dictionary) -> void:
+	var days := float(route_days(game, t.route))
+	var v := (game.def_num("caravans.base_value", 6) + game.def_num("caravans.value_per_level", 4) * float(t.get("levels", 2))) \
+		* clampf(days / maxf(1.0, game.def_num("caravans.long_days", 20)), 0.6, 2.0)
+	var land := game.land()
+	if land.seat_road(str(t.get("from", ""))) in ["road", "paved"] and land.seat_road(str(t.get("to", ""))) in ["road", "paved"]:
+		v *= 1.0 + game.def_num("caravans.road_bonus", 0.25)
+	var share := game.def_num("caravans.origin_share", 0.5)
+	for pair in [[t.get("from"), share], [t.get("to"), 1.0 - share]]:
+		var ti: Variant = game.state.titles.get(pair[0]) if pair[0] != null else null
+		var h: Variant = game.ch(ti.holder) if ti != null else null
+		if h != null and Chars.is_alive(h):
+			Treasury.add(game, h, v * float(pair[1]), "trade")
+	game.emit("caravan.arrived", {"from": t.get("from"), "to": t.get("to"), "value": v})
+
+
+## Шайка в угодьях может разграбить караван — и крепнет.
+static func _rob(game: Game, t: Dictionary) -> void:
+	for b in bands_near(game, cell_of(t)):
+		if t.met.has(b.id):
+			continue
+		t.met[b.id] = true
+		var d: Variant = band_def(game, b)
+		if not game.rng.chance(Data.num(d.get("encounter_chance"), 15) / 100.0):
+			continue
+		remove(game, t.id)
+		b.strength = mini(int(b.strength) + 1, int(Data.num(d.get("strength"), 3)) + 2)
+		game.emit("caravan.robbed", {"from": t.get("from"), "to": t.get("to"), "band": b})
+		for pid in [t.get("from"), t.get("to")]:
+			var ti: Variant = game.state.titles.get(pid) if pid != null else null
+			if ti != null and ti.holder != null and game.is_player(ti.holder):
+				game.message(game.loc.t("msg.caravan_robbed", {"from": game.scope_name({"type": "province", "id": t.get("from")}),
+					"to": game.scope_name({"type": "province", "id": t.get("to")}), "band": game.name_of("bands", str(b.kind)),
+					"place": game.scope_name({"type": "province", "id": b.province})}), "bad", {"type": "province", "id": b.province})
+				break
+		return
+
+
 # ------------------------------------------------------------ установка
 
 func install(engine: GameEngine) -> void:
-	engine.systems.register("travel", {"id": "travel", "order": 17, "on_day": Travel.daily, "on_year": Travel.yearly}, OWNER)
+	engine.systems.register("travel", {"id": "travel", "order": 17, "on_day": Travel.daily, "on_month": Travel.monthly, "on_year": Travel.yearly}, OWNER)
 	# шайка бьёт подать графства, где её логово
 	engine.province_modifier_providers.register("bands", {"fn": func(game: Game, pid: String) -> Variant:
 		var all := Travel.bands(game)

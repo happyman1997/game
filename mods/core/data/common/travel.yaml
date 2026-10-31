@@ -11,6 +11,19 @@
 defines:
   travel:
     speed: 3.0          # «цены пути» в день (тропа по полю — 1, тракт — 0,75)
+  # Караваны: посад уровня N раз в months_per_level / N месяцев отправляет
+  # караван к другому посаду (не дальше max_cost «цены пути», не к врагу).
+  # Доход — (base_value + value_per_level × сумма уровней посадов) × длина
+  # пути (дни / long_days, от 0,6 до 2); у обоих посадов тракт — ещё
+  # road_bonus; origin_share — доля посада, откуда караван.
+  caravans:
+    months_per_level: 12
+    max_cost: 140
+    base_value: 6
+    value_per_level: 4
+    long_days: 20
+    road_bonus: 0.25
+    origin_share: 0.5
 
 bands:
   # Лесные разбойники: из обиженного лесного народа, беглых, разорённых

@@ -1,5 +1,6 @@
 # Treasury (engine/world/treasury.gd): ledger entries and the Treasury window.
 ledger:
+  trade: Trade (caravans)
   domain_tax: Domain taxes
   vassal_tax: Vassal taxes
   liege_tax: Tax to liege

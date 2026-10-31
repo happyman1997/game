@@ -1,5 +1,6 @@
 # Казна (engine/world/treasury.gd): статьи книги и окно «Казна».
 ledger:
+  trade: Торговля (караваны)
   domain_tax: Налоги с домена
   vassal_tax: Налоги вассалов
   liege_tax: Налог сюзерену

@@ -199,6 +199,15 @@ static func travelers_of(g: Game, _colors: Dictionary) -> Array:
 		return []
 	var out := []
 	for t in Travel.travelers(g).values():
+		if t.kind == "caravan":
+			var top: Variant = Travel._top(g, str(t.get("from", "")))
+			var cc := Color("#c8a050")
+			if top != null and not top.titles.is_empty():
+				var td: Variant = g.title_def(top.titles[0])
+				if td != null and td.get("color") is String:
+					cc = Color(td.color)
+			out.append({"id": t.id, "pos": Travel.position(g, t), "color": cc, "phase": t.phase, "mine": false, "caravan": true})
+			continue
 		var who: Variant = g.ch(t.who)
 		if who == null:
 			continue
@@ -248,15 +257,18 @@ func _draw_travel(snap: Dictionary) -> void:
 		draw_texture_rect(Icons.texture(str(b.icon), 14, "red"), Rect2(p - Vector2(7, 7), Vector2(14, 14)), false, Color(1, 1, 1, a))
 		_thing_pos.append({"pos": p, "kind": "band", "id": b.id})
 	var horse := Icons.texture("horse", 12, "silver")
+	var bag := Icons.texture("bag", 12, "gold")
 	for t in snap.get("travelers", []):
 		var p := view.map_to_screen(t.pos)
 		if p.x < -40 or p.y < -40 or p.x > size.x + 40 or p.y > size.y + 40:
 			continue
 		var col: Color = t.color
-		draw_circle(p + Vector2(1, 2), 8.0, Color(0, 0, 0, 0.4 * a))
-		draw_circle(p, 8.0, col.darkened(0.3))
-		draw_arc(p, 8.0, 0, TAU, 20, Color("#e8c050") if t.mine else Color("#1a1208"), 1.6)
-		draw_texture_rect(horse, Rect2(p - Vector2(6, 6), Vector2(12, 12)), false, Color(1, 1, 1, a))
+		var r := 6.5 if t.get("caravan", false) else 8.0
+		draw_circle(p + Vector2(1, 2), r, Color(0, 0, 0, 0.4 * a))
+		draw_circle(p, r, col.darkened(0.3))
+		draw_arc(p, r, 0, TAU, 20, Color("#e8c050") if t.mine else Color("#1a1208"), 1.6)
+		var tex := bag if t.get("caravan", false) else horse
+		draw_texture_rect(tex, Rect2(p - Vector2(r - 2, r - 2), Vector2(r - 2, r - 2) * 2), false, Color(1, 1, 1, a))
 		_thing_pos.append({"pos": p, "kind": "traveler", "id": t.id})
 
 

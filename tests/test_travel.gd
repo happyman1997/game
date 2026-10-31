@@ -160,3 +160,68 @@ func test_save_keeps_travelers_and_bands() -> void:
 	var step := int(t2.step)
 	_tick(g2, 6)
 	check(int(t2.step) > step, "путник идёт дальше после загрузки")
+
+
+## Два посада с хозяевами — откуда и куда пустить караван.
+func _two_markets(g: Game) -> Array:
+	var out := []
+	for pid in ["c_winchester", "c_london", "c_york", "c_kent", "c_sussex"]:
+		if Districts.level(g, pid, "market") > 0 and g.land().seat(pid) >= 0:
+			out.append(pid)
+	return out
+
+
+func test_markets_send_caravans() -> void:
+	var g := _game()
+	var ms := _two_markets(g)
+	check(ms.size() >= 2, "есть посады: %s" % str(ms))
+	var cfg: Dictionary = g.defines.caravans
+	var per: Variant = cfg.months_per_level
+	cfg.months_per_level = 1
+	Travel.monthly(g)
+	cfg.months_per_level = per
+	var caravans := Travel.travelers(g).values().filter(func(t): return t.kind == "caravan")
+	check(caravans.size() >= 5, "посады отправили караваны (%d)" % caravans.size())
+	var c: Dictionary = caravans[0]
+	check(c.get("from") != c.get("to") and Districts.level(g, str(c.to), "market") > 0, "караван идёт в другой посад")
+
+
+func test_caravan_pays_both_ends() -> void:
+	var g := _game()
+	var ms := _two_markets(g)
+	var a: String = ms[0]
+	var b: String = ms[1]
+	var land := g.land()
+	var ha: Dictionary = g.ch(g.state.titles[a].holder)
+	var hb: Dictionary = g.ch(g.state.titles[b].holder)
+	var ga := float(ha.gold)
+	var gb := float(hb.gold)
+	var paid := [0.0]
+	g.engine.hooks.on("caravan.arrived", func(p): paid[0] += float(p.value), 0, "test")
+	var tid := Travel.depart(g, "caravan", null, land.seat(a), land.seat(b), {"from": a, "to": b, "levels": 2})
+	var t: Dictionary = Travel.travelers(g)[tid]
+	t.step = t.route.size() - 1
+	Travel.daily(g)
+	check(paid[0] > 0.0, "караван дошёл и принёс %.1f" % paid[0])
+	check(float(ha.gold) > ga or ha.id == hb.id, "доход посаду, откуда караван")
+	check(float(hb.gold) > gb, "и посаду, куда")
+	check(not Travel.travelers(g).has(tid), "каравана больше нет")
+
+
+func test_band_robs_caravan() -> void:
+	var g := _game()
+	var ms := _two_markets(g)
+	var land := g.land()
+	var band: Dictionary = Travel.spawn_band(g, "deserters", ms[0])
+	band.cell = land.seat(ms[0])
+	var d: Dictionary = g.content.get_def("bands", "deserters")
+	var chance: Variant = d.encounter_chance
+	d.encounter_chance = 100
+	var robbed := [0]
+	g.engine.hooks.on("caravan.robbed", func(_p): robbed[0] += 1, 0, "test")
+	var s0 := int(band.strength)
+	var tid := Travel.depart(g, "caravan", null, land.seat(ms[0]), land.seat(ms[1]), {"from": ms[0], "to": ms[1], "levels": 2})
+	Travel.daily(g)
+	d.encounter_chance = chance
+	check(robbed[0] == 1 and not Travel.travelers(g).has(tid), "шайка разграбила караван")
+	check(int(band.strength) > s0, "и окрепла")

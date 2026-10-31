@@ -764,6 +764,10 @@ func thing_tooltip(kind: String, id: Variant) -> String:
 	var tr: Variant = Travel.travelers(g).get(id)
 	if tr == null:
 		return ""
+	if tr.kind == "caravan":
+		return "\n".join(PackedStringArray([BB.title(t("travel.caravan")),
+			t("travel.caravan_route", {"from": g.name_of("provinces", tr.get("from")), "to": g.name_of("provinces", tr.get("to"))}),
+			BB.muted(t("travel.days", {"n": Travel.route_days(g, tr.route.slice(int(tr.step)))}))]))
 	var who: Variant = g.ch(tr.who)
 	if who == null:
 		return ""
