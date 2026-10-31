@@ -284,7 +284,7 @@ static func register(engine: GameEngine) -> void:
 		if c == null or c.dynasty == null:
 			return []
 		var g: Game = ctx.game
-		return _chars(g.living().filter(func(x): return x.id != c.id and Chars.same_dynasty(g, x, c)))
+		return _chars(g.dynasty_members(Chars.dynasty_root(g, c.dynasty)).filter(func(x): return x.id != c.id and x.death == null))
 	)
 	lst.call("ally", CHAR, "Союзники", func(ctx, s): return _ids_to_chars(ctx.game, Wars.allies_of(ctx.game, s.id)))
 	lst.call("war_enemy", CHAR, "Враги по войнам", func(ctx, s): return _ids_to_chars(ctx.game, Wars.enemies_of(ctx.game, s.id)))

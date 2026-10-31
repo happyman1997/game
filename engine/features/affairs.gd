@@ -85,8 +85,9 @@ static func all(game: Game) -> Array:
 	return out
 
 
-## Дела, которые видит c: {mine, others}.
-static func visible_to(game: Game, c: Dictionary) -> Dictionary:
+## Дела, которые видит c: {mine, others}. list — готовый список всех дел
+## (ИИ берёт дневной, чтобы не собирать его заново для каждого правителя).
+static func visible_to(game: Game, c: Dictionary, list: Variant = null) -> Dictionary:
 	var realm := {}
 	for pid in Titles.realm_counties(game, c):
 		realm[pid] = true
@@ -96,7 +97,7 @@ static func visible_to(game: Game, c: Dictionary) -> Dictionary:
 			near[n] = true
 	var mine := []
 	var others := []
-	for a in all(game):
+	for a in (list if list is Array else all(game)):
 		if a.actor == c.id:
 			mine.append(a)
 			continue
@@ -104,9 +105,10 @@ static func visible_to(game: Game, c: Dictionary) -> Dictionary:
 			continue
 		var to_me: bool = a.get("target") is Dictionary and a.target.get("type") == "character" and a.target.id == c.id
 		if to_me or (a.place != null and near.has(a.place)):
-			a["to_me"] = to_me
-			a["in_realm"] = a.place != null and realm.has(a.place)
-			others.append(a)
+			var b: Dictionary = a.duplicate()
+			b["to_me"] = to_me
+			b["in_realm"] = a.place != null and realm.has(a.place)
+			others.append(b)
 	return {"mine": mine, "others": others}
 
 
@@ -331,7 +333,8 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 	var reserve := game.def_num("affairs.ai_reserve_gold", 60)
 	var best: Variant = null
 	var best_w := 0.0
-	for a in visible_to(game, c).others:
+	var list: Array = game.cached_daily("affairs:all", func(): return Affairs.all(game))
+	for a in visible_to(game, c, list).others:
 		for d in for_affair(game, a):
 			if float(c.gold) - cost_for(game, c, d) < reserve or not blockers(game, c, a, d).is_empty():
 				continue

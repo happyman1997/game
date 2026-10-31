@@ -57,15 +57,14 @@ static func is_house(game: Game, dyn_id: Variant) -> bool:
 static func members(game: Game, root_id: Variant) -> Array:
 	if root_id == null:
 		return []
-	return game.cached_monthly("dynmem:" + str(root_id), func():
-		return game.living().filter(func(x): return x.dynasty != null and Chars.dynasty_root(game, x.dynasty) == root_id))
+	return game.dynasty_members(root_id).filter(func(x): return x.death == null)
 
 
 ## Живые члены одного дома (без ветвей).
 static func house_members(game: Game, dyn_id: Variant) -> Array:
 	if dyn_id == null:
 		return []
-	return game.living().filter(func(x): return x.dynasty == dyn_id)
+	return game.dynasty_members(Chars.dynasty_root(game, dyn_id)).filter(func(x): return x.dynasty == dyn_id and x.death == null)
 
 
 ## Младшие ветви рода.
@@ -359,7 +358,6 @@ func install(engine: GameEngine) -> void:
 			var d: Variant = Dynasties.rec(game, did)
 			if d != null and d.get("head") == c.id:
 				Dynasties._set_head(game, d, Dynasties._pick_head(game, did, c), c)
-		game.month_cache.erase("dynmem:" + str(Chars.dynasty_root(game, c.dynasty)))
 	, 0, OWNER)
 	engine.modifier_providers.register("dynasty", {"fn": func(game: Game, c: Dictionary) -> Variant:
 		if c.dynasty == null:

@@ -14,6 +14,8 @@ var rng: Rng
 var events: GameEvents
 
 var _living_cache: Variant = null
+## Живые члены родов по корню рода (сбрасывается вместе со списком живых).
+var _by_dynasty: Variant = null
 var _rulers_cache: Variant = null
 var _by_liege: Variant = null
 ## Кэш характеристик персонажей (сбрасывается раз в месяц и при изменениях).
@@ -231,6 +233,7 @@ func mark_chars_dirty(ids: Array) -> void:
 ## Сбрасывает только индексы персонажей (без кэша характеристик): рождения, браки, смена двора.
 func mark_index_dirty() -> void:
 	_living_cache = null
+	_by_dynasty = null
 	_rulers_cache = null
 	_by_liege = null
 	realm_cache.clear()
@@ -260,6 +263,7 @@ func mark_claims_dirty() -> void:
 ## их дневной кэш и состав держав сохраняются.
 func mark_people_dirty() -> void:
 	_living_cache = null
+	_by_dynasty = null
 	_rulers_cache = null
 	_by_liege = null
 	for k in day_cache.keys():
@@ -275,6 +279,25 @@ func living() -> Array:
 				out.append(c)
 		_living_cache = out
 	return _living_cache
+
+
+## Живые члены рода со всеми ветвями (root_id — корень рода). Указатель
+## строится раз до смены состава людей: линии наследования, главы родов и
+## списки родни не перебирают всех живых.
+func dynasty_members(root_id: Variant) -> Array:
+	if root_id == null:
+		return []
+	if _by_dynasty == null:
+		var idx := {}
+		for c in living():
+			if c.dynasty == null:
+				continue
+			var r: Variant = Chars.dynasty_root(self, c.dynasty)
+			if not idx.has(r):
+				idx[r] = []
+			idx[r].append(c)
+		_by_dynasty = idx
+	return _by_dynasty.get(root_id, [])
 
 
 func rulers() -> Array:

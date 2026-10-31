@@ -74,7 +74,7 @@ static func blood_line(game: Game, c: Dictionary, gender: Variant) -> Array:
 		nephews.append_array(alive_children(game, s))
 	push.call(nephews)
 	if c.dynasty != null:
-		var dyn = game.living().filter(func(x): return x.id != c.id and Chars.same_dynasty(game, x, c))
+		var dyn = game.dynasty_members(Chars.dynasty_root(game, c.dynasty)).filter(func(x): return x.id != c.id and x.death == null)
 		push.call(dyn.filter(func(x): return Chars.is_adult(game, x)))
 		push.call(dyn)
 	return out.filter(func(id): return Succession.can_inherit(game.ch(id)))
@@ -98,7 +98,7 @@ static func builtin_algorithms() -> Dictionary:
 			"heirs": func(game: Game, c: Dictionary, law: Dictionary) -> Array:
 				var dyn := []
 				if c.dynasty != null:
-					dyn = game.living().filter(func(x): return x.id != c.id and Chars.same_dynasty(game, x, c) and Chars.is_adult(game, x) and Succession.can_inherit(x))
+					dyn = game.dynasty_members(Chars.dynasty_root(game, c.dynasty)).filter(func(x): return x.id != c.id and Chars.is_adult(game, x) and Succession.can_inherit(x))
 				var sorted := gender_sort(game, dyn, law.get("gender"))
 				Data.sort_by(sorted, func(x): return x.birth)
 				var ids = sorted.map(func(x): return x.id)
