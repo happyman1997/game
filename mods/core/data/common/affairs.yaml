@@ -1,0 +1,203 @@
+# Дела (механика affairs, engine/features/affairs.gd): свои и чужие дела в
+# одном окне и вмешательство в чужие. Помощь — открыто, хозяин дела
+# запомнит добром (helped_my_affairs); вред — тайно, проверкой: от исхода
+# зависит шанс раскрытия (discovery, %); раскрыли — хозяин запомнит
+# (meddled_in_my_affairs) и, может быть, не только это (on_discovered).
+# Скоупы: root — кто вмешивается, scope:actor — хозяин дела, scope:province
+# — где дело, scope:agent — посланец (у поручений); scope:affair_to_me и
+# scope:affair_in_realm — 1, если дело касается меня или идёт в моей державе.
+
+defines:
+  affairs:
+    ai_frequency_months: 3   # как часто ИИ смотрит на чужие дела
+    ai_reserve_gold: 60      # ИИ вмешивается, если после платы останется столько
+    help_opinion: 15         # мнение хозяина дела о помощнике
+    discovered_opinion: -30  # мнение хозяина дела о раскрытом вредителе
+
+opinion_modifiers:
+  helped_my_affairs: { value: 15, years: 5 }
+  meddled_in_my_affairs: { value: -30, years: 10 }
+
+interventions:
+  # ---------------------------------------------------------------- работы на земле
+  # Прислать людей и волов: участок пойдёт быстрее
+  send_workers:
+    affair: [land_work, road_work]
+    side: help
+    icon: "🤝"
+    cost: { gold: 30 }
+    potential: { NOT: { is_at_war_with: scope:actor } }
+    effect: { affair_hasten: 0.35 }
+    ai_will_do:
+      value: -2
+      add:
+        - { value: "opinion(scope:actor)", multiply: 0.25 }
+        - { limit: { scope:actor: { is_vassal_of: root } }, value: 6 }
+
+  # Подбить лесной народ против чужой вырубки: работы встанут, а в лесу,
+  # глядишь, заведутся разбойники
+  stir_forest_folk:
+    affair: [land_work]
+    works: [clear_forest, thin_old_forest]
+    side: hinder
+    icon: "🏹"
+    cost: { gold: 30 }
+    check:
+      skill: intrigue
+      base: 35
+      add:
+        - { desc: skill.intrigue, value: { value: intrigue, multiply: 3 } }
+        - { desc: check.victim_intrigue, value: { value: "scope:actor.intrigue", multiply: -2 } }
+    success:
+      - affair_cancel: yes
+      - scope:province:
+          add_county_opinion: forest_felled
+          random: { chance: 50, spawn_band: outlaws }
+    partial:
+      - affair_delay: 0.5
+    discovery: { success: 20, partial: 30, failure: 60 }
+    ai_will_do:
+      value: -5
+      add:
+        - { value: "opinion(scope:actor)", multiply: -0.25 }
+        - { value: intrigue, multiply: 0.4 }
+        - { value: ai_compassion, multiply: -2 }
+        - { limit: { is_at_war_with: scope:actor }, value: 10 }
+
+  # Испортить работы: сломать запруды, увести волов
+  spoil_works:
+    affair: [land_work, road_work]
+    side: hinder
+    icon: "🪓"
+    cost: { gold: 25 }
+    check:
+      skill: intrigue
+      base: 40
+      add:
+        - { desc: skill.intrigue, value: { value: intrigue, multiply: 3 } }
+        - { desc: check.victim_intrigue, value: { value: "scope:actor.intrigue", multiply: -2 } }
+    success: { affair_delay: 0.6 }
+    partial: { affair_delay: 0.3 }
+    discovery: { success: 15, partial: 25, failure: 55 }
+    ai_will_do:
+      value: -5
+      add:
+        - { value: "opinion(scope:actor)", multiply: -0.25 }
+        - { value: intrigue, multiply: 0.3 }
+        - { limit: { is_at_war_with: scope:actor }, value: 10 }
+
+  # ---------------------------------------------------------------- стройка
+  # Прислать каменщиков
+  send_masons:
+    affair: [construction]
+    side: help
+    icon: "🧱"
+    cost: { gold: 50 }
+    potential: { NOT: { is_at_war_with: scope:actor } }
+    effect: { affair_hasten: 0.3 }
+    ai_will_do:
+      value: -4
+      add:
+        - { value: "opinion(scope:actor)", multiply: 0.25 }
+        - { limit: { scope:actor: { is_vassal_of: root } }, value: 6 }
+
+  # Поджечь леса стройки: работы отойдут назад
+  fire_the_works:
+    affair: [construction]
+    side: hinder
+    icon: "🔥"
+    cost: { gold: 40 }
+    check:
+      skill: intrigue
+      base: 30
+      add:
+        - { desc: skill.intrigue, value: { value: intrigue, multiply: 3 } }
+        - { desc: check.victim_intrigue, value: { value: "scope:actor.intrigue", multiply: -2 } }
+    success: { affair_delay: 0.5 }
+    partial: { affair_delay: 0.25 }
+    discovery: { success: 25, partial: 35, failure: 65 }
+    ai_will_do:
+      value: -6
+      add:
+        - { value: "opinion(scope:actor)", multiply: -0.25 }
+        - { value: intrigue, multiply: 0.3 }
+        - { value: ai_compassion, multiply: -2 }
+        - { limit: { is_at_war_with: scope:actor }, value: 10 }
+
+  # ---------------------------------------------------------------- поручения
+  # Принять посла с почётом: его дело пойдёт лучше
+  honor_envoy:
+    affair: [mission]
+    works: [embassy, foreign_service]
+    side: help
+    icon: "🍷"
+    cost: { gold: 15 }
+    potential: { scope:affair_to_me: ">= 1" }
+    effect: { affair_aid: 15 }
+    ai_will_do:
+      value: 2
+      add: { value: "opinion(scope:actor)", multiply: 0.2 }
+
+  # Дать охрану путнику в своих землях: шайки ему не страшны
+  escort_traveler:
+    affair: [mission]
+    side: help
+    icon: "🛡"
+    cost: { gold: 20 }
+    potential:
+      scope:affair_in_realm: ">= 1"
+      NOT: { is_at_war_with: scope:actor }
+    effect:
+      - affair_escort: yes
+      - affair_aid: 5
+    ai_will_do:
+      value: -3
+      add: { value: "opinion(scope:actor)", multiply: 0.2 }
+
+  # Задержать путника на заставе: дело затянется и пойдёт хуже (такое
+  # трудно скрыть)
+  detain_traveler:
+    affair: [mission]
+    side: hinder
+    icon: "⛓"
+    cost: { gold: 10 }
+    potential: { scope:affair_in_realm: ">= 1" }
+    check:
+      skill: intrigue
+      base: 70
+      add:
+        - { desc: skill.intrigue, value: { value: intrigue, multiply: 2 } }
+    success:
+      - affair_delay: 0.5
+      - affair_aid: -10
+    partial: { affair_delay: 0.25 }
+    discovery: { success: 60, partial: 70, failure: 90 }
+    ai_will_do:
+      value: -5
+      add:
+        - { value: "opinion(scope:actor)", multiply: -0.2 }
+        - { limit: { is_at_war_with: scope:actor }, value: 15 }
+
+  # Засада на посланца: наёмники на дороге; проиграет схватку — дело пойдёт
+  # хуже, а то и не вернётся
+  ambush_traveler:
+    affair: [mission]
+    side: hinder
+    icon: "🗡"
+    cost: { gold: 50 }
+    check:
+      skill: intrigue
+      base: 30
+      add:
+        - { desc: skill.intrigue, value: { value: intrigue, multiply: 3 } }
+        - { desc: check.victim_intrigue, value: { value: "scope:actor.intrigue", multiply: -2 } }
+    success: { affair_ambush: { foe: hedge_knight, aid: -30 } }
+    partial: { affair_ambush: { foe: bandit, aid: -20 } }
+    discovery: { success: 20, partial: 35, failure: 70 }
+    ai_will_do:
+      value: -9
+      add:
+        - { value: "opinion(scope:actor)", multiply: -0.25 }
+        - { value: intrigue, multiply: 0.3 }
+        - { value: ai_compassion, multiply: -3 }
+        - { limit: { is_at_war_with: scope:actor }, value: 10 }

@@ -345,6 +345,7 @@ func _tabs() -> Array:
 		{"id": "military", "icon": "swords", "name": t("ui.tab.military")},
 		{"id": "wars", "icon": "fire", "name": t("ui.tab.wars")},
 		{"id": "intrigue", "icon": "dagger", "name": t("ui.tab.intrigue")},
+		{"id": "affairs", "icon": "map", "name": t("ui.tab.affairs")},
 		{"id": "decisions", "icon": "scroll", "name": t("ui.tab.decisions")},
 		{"id": "log", "icon": "book", "name": t("ui.tab.log")},
 	])

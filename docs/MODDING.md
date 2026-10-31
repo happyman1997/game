@@ -1878,6 +1878,52 @@ yes | <вид>`; эффекты `spawn_band: <вид>`, `fight_band: yes | { rou
 `{band, why}`. Состояние — `state.travelers`, `state.bands`; в коде —
 `Travel.depart`, `Travel.spawn_band`, `Travel.bands_in`, `Travel.position`.
 
+### Дела
+
+Механика `affairs` (`engine/features/affairs.gd`, данные —
+`core/data/common/affairs.yaml`, окно «Дела» — вкладка с клавишей G). Всё,
+что затеяли люди, — поручения, работы на земле и дорогах, стройка, интриги —
+одним списком: кто, что, где, сколько сделано. Свои дела видно всегда;
+чужие — в своей державе и в соседних с ней графствах, а ещё послы и путники,
+которые идут к тебе или твоими землями. Чужих интриг не видно.
+
+В видимое чужое дело можно вмешаться — один раз на дело:
+
+```yaml
+interventions:
+  spoil_works:
+    affair: [land_work, road_work]   # land_work, road_work, construction, mission
+    works: [clear_forest]            # необязательно: только к этим работам, поручениям, районам или постройкам
+    side: hinder                     # help — открыто, без проверки; hinder — тайно, проверкой
+    icon: "🪓"
+    cost: { gold: 25 }
+    potential: { ... }               # root — кто вмешивается, scope:actor — хозяин дела, scope:province,
+                                     # scope:agent (у поручений), scope:affair_to_me / scope:affair_in_realm — 1 или 0
+    check: { skill: intrigue, base: 40, add: [...] }
+    success: { affair_delay: 0.6 }
+    partial: { affair_delay: 0.3 }
+    discovery: { success: 15, partial: 25, failure: 55 }   # шанс раскрытия по исходу, %
+    on_discovered: [ ... ]           # если раскрыли (root — кто вмешался)
+    ai_will_do: { ... }              # root — ИИ, scope:actor — хозяин дела
+```
+
+Помощь (`side: help`, поле `effect`) хозяин дела запоминает добром
+(`helped_my_affairs`, `defines.affairs.help_opinion`); раскрытый вред —
+недобром (`meddled_in_my_affairs`, `defines.affairs.discovered_opinion`),
+нераскрытый — хозяину приходит весть «кто-то вредит». Эффекты над делом
+(только в вмешательстве): `affair_hasten: 0.3` (доля оставшегося срока
+долой), `affair_delay: 0.4` (доля всего срока сверху), `affair_cancel:
+yes`, `affair_aid: 15` (поручению — к проверке по возвращении),
+`affair_escort: yes` (путнику не страшны шайки), `affair_ambush: { foe,
+aid }` (посланец бьётся с наёмниками; проиграл — минус к проверке). В
+ядре: прислать людей и волов, подбить лесной народ против вырубки, испортить
+работы, прислать каменщиков, поджечь леса стройки, принять посла с почётом,
+дать охрану путнику, задержать на заставе, засада на дороге. ИИ вмешивается
+так же (раз в `defines.affairs.ai_frequency_months`). Хук `affair.meddled`
+`{who, affair, intervention, side, result, discovered}`; статья казны за
+тайные дела — `intrigue`. В коде: `Affairs.all`, `Affairs.visible_to`,
+`Affairs.meddle`.
+
 ### Дань
 
 Механика `tribute` (`engine/features/tribute.gd`, данные —

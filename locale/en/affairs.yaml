@@ -1,0 +1,43 @@
+# Affairs (engine/features/affairs.gd, the Affairs window)
+msg:
+  affair_helped: "{who}: {what} — your affair «{affair}» will go faster."
+  affair_exposed: "Exposed: {who} was harming your affair «{affair}» ({what})."
+  affair_caught: "You have been exposed: {who} knows who is behind «{what}»."
+  affair_harmed: "Someone is harming your affair «{affair}»."
+fx:
+  affair_hasten: "The affair goes faster: −{n}% of the remaining time"
+  affair_delay: "The affair drags on: +{n}% of its time"
+  affair_cancel: "The affair is foiled"
+  affair_aid: "To the errand's check on return: {n}"
+  affair_escort: "An escort for the traveller: bands hold no fear for them"
+  affair_ambush: "Ambush: the envoy fights hired men"
+affairs:
+  on_success: "On success:"
+  own: "Your own affair"
+  gone: "The affair is over"
+  already: "You have already meddled in this affair"
+  no_gold: "Not enough gold"
+  not_now: "Not possible now"
+  mine: My Affairs
+  others: Others' Affairs Nearby
+  none_mine: "No affairs of your own: start land works, building, or send someone on an errand."
+  none_others: "Nothing is happening nearby."
+  bands: Threats in the Realm
+  hint: "Your own affairs are always in view; others' — in your realm and next to it, plus envoys and travellers coming to you or crossing your lands. Help openly, harm in secret — at the risk of exposure."
+  by: "{who}"
+  days: "{n} more days"
+  to_me: "to you"
+  chance: "Success {s}% · partial {p}% · failure {f}%"
+  discovery: "Exposure: on success {s}%, partial {p}%, failure {f}%"
+  help_note: "Open: the owner will remember it kindly"
+  kind:
+    land_work: Land works
+    road_work: Roads
+    construction: Building
+    mission: Errand
+    scheme: Scheme
+ledger:
+  intrigue: Secret dealings
+ui:
+  tab:
+    affairs: Affairs

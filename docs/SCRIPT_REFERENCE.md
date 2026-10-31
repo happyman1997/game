@@ -213,6 +213,12 @@
 | `add_skill` | Навсегда изменить навык: { skill, value } | core |
 | `add_stress` | Изменить стресс | core |
 | `add_trait` | Добавить черту | core |
+| `affair_aid` | В вмешательстве: поручению — к проверке по возвращении: affair_aid: 15 (минус — вред) | core/affairs |
+| `affair_ambush` | В вмешательстве: засада на посланца — affair_ambush: { foe: hedge_knight, aid: -30 } (проиграл схватку — минус к проверке) | core/affairs |
+| `affair_cancel` | В вмешательстве: дело сорвано — affair_cancel: yes | core/affairs |
+| `affair_delay` | В вмешательстве: дело затянется — affair_delay: 0.4 (доля всего срока сверху) | core/affairs |
+| `affair_escort` | В вмешательстве: путнику дать охрану — шайки ему не страшны: affair_escort: yes | core/affairs |
+| `affair_hasten` | В вмешательстве: дело идёт быстрее — affair_hasten: 0.3 (доля оставшегося срока долой) | core/affairs |
 | `annex_war_targets` | Присоединить цели войны (в контексте войны) | core |
 | `appoint_councillor` | Назначить в совет: { position, who } | core/council |
 | `arcane_witness` | Риск свидетелей: { secret, chance } — кто-то при дворе узнаёт тайну | arcana |
@@ -673,6 +679,7 @@
 | `missions` | Поручения: люди правителя уходят в мир с делом | да |
 | `biomes` | Местность: живая земля по клеткам — работы правителей участками, природа и война меняют её; летопись земли | да |
 | `travel` | Путники идут по карте по клеткам; шайки на дорогах и встречи с ними | да |
+| `affairs` | Дела: свои и чужие дела в одном окне; вмешательство — помочь или тайно помешать | да |
 
 Отключение: `defines.disabled_features: [id, ...]`.
 
@@ -685,6 +692,6 @@
 - **modifier_providers**: `buildings`, `stress`, `lifestyle`, `council`, `prison`, `realm_laws`, `vassal_obligation`, `dread_tier`, `governments`, `artifacts`, `spirit`, `regency`, `dynasty`, `karma_tier`, `synod_decrees`, `districts`, `biomes`, `grafts`, `plague_fear`
 - **province_modifier_providers**: `lands`, `populace`, `governments`, `districts`, `biomes`, `bands`
 - **opinion_providers**: `stored`, `traits`, `general`, `attraction`, `culture`, `faith`, `family`, `liege`, `claim`, `council_pay`, `council`, `politics`, `renown`, `artifacts`, `upbringing`, `dynasty`, `ambitions`, `faith_morals`, `faith_head`, `tribute`, `arcana_faith`, `grafts`
-- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `foes`, `deeds`, `spirit`, `karma`, `synod`, `districts`, `missions`, `land_works`, `bands`
-- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `council` (15), `ambitions` (16), `missions` (16), `artifacts` (17), `travel` (17), `biomes` (18), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `tribute` (56), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
+- **content_validators**: `lifestyles`, `council`, `factions`, `regiments`, `secrets`, `secret_audit`, `laws`, `dread_tiers`, `politics`, `personality`, `populace`, `governments`, `artifacts`, `foes`, `deeds`, `spirit`, `karma`, `synod`, `districts`, `missions`, `land_works`, `bands`, `interventions`
+- **systems**: `upkeep` (0), `economy` (10), `dynasties` (11), `personality` (12), `spirit` (12), `council` (15), `ambitions` (16), `missions` (16), `artifacts` (17), `travel` (17), `biomes` (18), `affairs` (19), `demography` (20), `upbringing` (21), `prison` (22), `lifestyles` (25), `events` (30), `wilds` (35), `schemes` (40), `secrets` (42), `military` (50), `regiments` (52), `war` (55), `tribute` (56), `politics` (57), `governments` (57), `factions` (58), `karma` (58), `populace` (59), `synod` (59), `construction` (60), `districts` (61), `plague` (65), `arcana` (66), `grafts` (66), `ai` (70), `development` (80), `laws` (85)
 - **ui.map_modes**: `arcana`, `plague`

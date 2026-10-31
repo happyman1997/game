@@ -39,6 +39,7 @@ static func build(app: App, ref: Dictionary) -> Dictionary:
 					"military": body = MilitaryPanel.build(app)
 					"wars": body = WarsPanel.build(app)
 					"intrigue": body = TabPanels.intrigue(app)
+					"affairs": body = AffairsPanel.build(app)
 					"decisions": body = TabPanels.decisions(app)
 					"log": body = TabPanels.log(app)
 					_:

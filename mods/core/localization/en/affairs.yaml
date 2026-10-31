@@ -1,0 +1,27 @@
+# Affairs and meddling (affairs.yaml)
+intervention:
+  send_workers: Send Workers and Oxen
+  stir_forest_folk: Stir Up the Forest Folk
+  spoil_works: Spoil the Works
+  send_masons: Send Masons
+  fire_the_works: Fire the Scaffolding
+  honor_envoy: Receive with Honour
+  escort_traveler: Provide an Escort
+  detain_traveler: Detain at the Toll
+  ambush_traveler: Ambush on the Road
+intervention_desc:
+  send_workers: "Open help: the plot goes faster, and the owner of the works will remember it kindly."
+  stir_forest_folk: "Secretly stir the hunters, charcoal-burners and bee-keepers against another's clearing: the works stop, and outlaws may appear in the forest. If exposed, the owner won't forgive."
+  spoil_works: "Secretly break the dams and drive off the oxen: the works drag on. If exposed, the owner won't forgive."
+  send_masons: "Open help: the building goes faster, and the owner will remember it kindly."
+  fire_the_works: "Secretly set fire to another's scaffolding: the works fall back. If exposed, the owner won't forgive."
+  honor_envoy: "An envoy is coming to you: receive them with honour — their errand goes better, and their lord will remember."
+  escort_traveler: "A traveller crosses your lands: give them an escort — bands hold no fear for them."
+  detain_traveler: "Hold another's traveller at the toll: their errand drags on and goes worse. Hard to keep secret."
+  ambush_traveler: "Hire men and ambush another's envoy: lose the fight and their errand goes worse — or they never return."
+check:
+  victim_intrigue: Cunning of the affair's owner
+  affair_aid: Others' help or harm on the road
+opinion_modifier:
+  helped_my_affairs: Helped my affairs
+  meddled_in_my_affairs: Meddled in my affairs

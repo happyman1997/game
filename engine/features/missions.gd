@@ -215,6 +215,11 @@ static func resolve(game: Game, agent: Dictionary) -> void:
 		if d.get(k) != null:
 			spec[k] = d[k]
 	spec["name"] = "mission." + str(m.id)
+	# чужая помощь или вред в пути (механика affairs)
+	if Data.num(m.get("aid")) != 0.0:
+		var add: Array = Data.as_array(spec.get("add")).duplicate()
+		add.append({"desc": "check.affair_aid", "value": Data.num(m.aid)})
+		spec["add"] = add
 	var result := Checks.run(ctx, ctx.root, spec)
 	if patron != null:
 		game.month_cache.erase("knights:" + patron.id)

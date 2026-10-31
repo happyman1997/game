@@ -426,7 +426,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 ## Горячие клавиши разделов (WASD двигают карту).
 const TAB_KEYS := {
 	KEY_L: "lifestyle", KEY_R: "realm", KEY_Y: "dynasty", KEY_M: "military",
-	KEY_X: "wars", KEY_I: "intrigue", KEY_N: "decisions", KEY_J: "log", KEY_B: "inventory",
+	KEY_X: "wars", KEY_I: "intrigue", KEY_N: "decisions", KEY_J: "log", KEY_B: "inventory", KEY_G: "affairs",
 }
 
 

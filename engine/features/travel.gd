@@ -138,6 +138,9 @@ static func daily(game: Game) -> void:
 			if game.date >= int(t.stay_until):
 				_head_home(game, t)
 			continue
+		# задержали в пути (вмешательство в чужое дело)
+		if t.get("wait_until") != null and game.date < int(t.wait_until):
+			continue
 		var r: Array = t.route
 		t.budget = float(t.budget) + speed
 		while int(t.step) + 1 < r.size():
@@ -264,7 +267,7 @@ static func bands_near(game: Game, cell: int) -> Array:
 
 
 static func _meet_bands(game: Game, t: Dictionary) -> void:
-	if bands(game).is_empty():
+	if bands(game).is_empty() or t.get("escort", false):
 		return
 	if t.kind == "caravan":
 		_rob(game, t)
