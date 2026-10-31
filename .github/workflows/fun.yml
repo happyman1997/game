@@ -47,6 +47,9 @@ jobs:
       - name: Подключение Godot
         run: echo "$HOME/godot" >> "$GITHUB_PATH"
 
+      - name: Ядро на Rust
+        run: ./native/build.sh
+
       - name: Импорт ресурсов
         run: godot --headless --path . --import || true
 

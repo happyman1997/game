@@ -1,0 +1,388 @@
+//! Клетки карты (разведка): шестиугольная сетка поверх растровой карты,
+//! у каждой клетки суши — провинция и цена пути; поиск пути A*; путники,
+//! которые ходят по клеткам и встречаются, оказавшись рядом.
+//!
+//! Сетка «нечётные строки сдвинуты» (odd-r): центр клетки (c, r) —
+//! x = size·√3·(c + ½·(r & 1)), y = size·1,5·r.
+
+use std::cmp::Ordering;
+use std::collections::{BinaryHeap, HashMap};
+use std::time::Instant;
+
+use godot::prelude::*;
+
+use crate::rng::Rng;
+
+const SQRT3: f32 = 1.732_050_8;
+/// Соседи для чётных и нечётных строк: (dc, dr).
+const NB_EVEN: [(i32, i32); 6] = [(1, 0), (0, -1), (-1, -1), (-1, 0), (-1, 1), (0, 1)];
+const NB_ODD: [(i32, i32); 6] = [(1, 0), (1, -1), (0, -1), (-1, 0), (0, 1), (1, 1)];
+
+#[derive(GodotClass)]
+#[class(base = RefCounted, init)]
+pub struct CellMap {
+    cols: i32,
+    rows: i32,
+    size: f32,
+    /// Провинция клетки (индекс в MapData.provinces), −1 — вода или непроходимо.
+    prov: Vec<i32>,
+    /// Цена входа в клетку (по местности провинции).
+    cost: Vec<f32>,
+    /// Соседи клетки (−1 — нет).
+    nb: Vec<[i32; 6]>,
+    /// Номера клеток суши.
+    land: Vec<i32>,
+    /// Связная область суши клетки (−1 — вода); клетки суши по областям.
+    comp: Vec<i32>,
+    comp_cells: Vec<Vec<i32>>,
+    base: Base<RefCounted>,
+}
+
+#[derive(Copy, Clone, PartialEq)]
+struct Open {
+    f: f32,
+    cell: i32,
+}
+
+impl Eq for Open {}
+
+impl Ord for Open {
+    fn cmp(&self, other: &Self) -> Ordering {
+        // BinaryHeap — максимум; нам нужен минимум f
+        other.f.partial_cmp(&self.f).unwrap_or(Ordering::Equal).then_with(|| other.cell.cmp(&self.cell))
+    }
+}
+
+impl PartialOrd for Open {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl CellMap {
+    /// Случайная клетка той же области суши, что и from.
+    fn random_reachable(&self, from: i32, rng: &mut Rng) -> i32 {
+        let k = self.comp[from as usize];
+        if k < 0 {
+            return from;
+        }
+        let cells = &self.comp_cells[k as usize];
+        cells[rng.below(cells.len())]
+    }
+
+    fn center(&self, id: i32) -> (f32, f32) {
+        let c = id % self.cols;
+        let r = id / self.cols;
+        (self.size * SQRT3 * (c as f32 + 0.5 * (r & 1) as f32), self.size * 1.5 * r as f32)
+    }
+
+    /// Шагов между клетками (по кубическим координатам) — оценка для A*.
+    fn hex_dist(&self, a: i32, b: i32) -> i32 {
+        let cube = |id: i32| {
+            let c = id % self.cols;
+            let r = id / self.cols;
+            let x = c - (r - (r & 1)) / 2;
+            (x, r, -x - r)
+        };
+        let (ax, ay, az) = cube(a);
+        let (bx, by, bz) = cube(b);
+        ((ax - bx).abs()).max((ay - by).abs()).max((az - bz).abs())
+    }
+
+    /// A*: путь от a до b включительно (пусто — пути нет).
+    fn path(&self, a: i32, b: i32, scratch: &mut Scratch) -> Vec<i32> {
+        let n = self.prov.len();
+        if a < 0 || b < 0 || a as usize >= n || b as usize >= n || self.prov[a as usize] < 0 || self.prov[b as usize] < 0 {
+            return Vec::new();
+        }
+        scratch.prepare(n);
+        let min_cost = 1.0_f32;
+        let mut open = BinaryHeap::new();
+        scratch.g[a as usize] = 0.0;
+        scratch.touch(a as usize);
+        open.push(Open { f: self.hex_dist(a, b) as f32 * min_cost, cell: a });
+        while let Some(Open { cell, .. }) = open.pop() {
+            if cell == b {
+                break;
+            }
+            let ci = cell as usize;
+            if scratch.closed[ci] == scratch.stamp {
+                continue;
+            }
+            scratch.closed[ci] = scratch.stamp;
+            let g = scratch.g[ci];
+            for &m in self.nb[ci].iter() {
+                if m < 0 {
+                    continue;
+                }
+                let mi = m as usize;
+                let ng = g + (self.cost[ci] + self.cost[mi]) * 0.5;
+                if scratch.seen[mi] != scratch.stamp || ng < scratch.g[mi] {
+                    scratch.touch(mi);
+                    scratch.g[mi] = ng;
+                    scratch.from[mi] = cell;
+                    open.push(Open { f: ng + self.hex_dist(m, b) as f32 * min_cost, cell: m });
+                }
+            }
+        }
+        if scratch.seen[b as usize] != scratch.stamp {
+            return Vec::new();
+        }
+        let mut out = vec![b];
+        let mut cur = b;
+        while cur != a {
+            cur = scratch.from[cur as usize];
+            out.push(cur);
+        }
+        out.reverse();
+        out
+    }
+}
+
+/// Рабочие массивы A* — переиспользуются между поисками (метка поколения
+/// вместо очистки).
+#[derive(Default)]
+struct Scratch {
+    g: Vec<f32>,
+    from: Vec<i32>,
+    seen: Vec<u32>,
+    closed: Vec<u32>,
+    stamp: u32,
+}
+
+impl Scratch {
+    fn prepare(&mut self, n: usize) {
+        if self.g.len() != n {
+            self.g = vec![0.0; n];
+            self.from = vec![-1; n];
+            self.seen = vec![0; n];
+            self.closed = vec![0; n];
+            self.stamp = 0;
+        }
+        self.stamp = self.stamp.wrapping_add(1);
+        if self.stamp == 0 {
+            self.seen.iter_mut().for_each(|x| *x = 0);
+            self.closed.iter_mut().for_each(|x| *x = 0);
+            self.stamp = 1;
+        }
+    }
+
+    fn touch(&mut self, i: usize) {
+        self.seen[i] = self.stamp;
+    }
+}
+
+#[godot_api]
+impl CellMap {
+    /// Нарезать карту на клетки. pixels — индекс провинции на пиксель (−1 —
+    /// вода), prov_cost — цена пути по провинциям (≤ 0 — непроходима),
+    /// size — радиус клетки в пикселях. Возвращает число клеток суши.
+    #[func]
+    fn build(&mut self, width: i32, height: i32, pixels: PackedInt32Array, prov_cost: PackedFloat32Array, size: f32) -> i32 {
+        let px = pixels.as_slice();
+        let pc = prov_cost.as_slice();
+        self.size = size.max(1.0);
+        self.cols = ((width as f32) / (self.size * SQRT3)).ceil() as i32 + 1;
+        self.rows = ((height as f32) / (self.size * 1.5)).ceil() as i32 + 1;
+        let n = (self.cols * self.rows) as usize;
+        self.prov = vec![-1; n];
+        self.cost = vec![1.0; n];
+        self.land.clear();
+        for id in 0..n as i32 {
+            let (x, y) = self.center(id);
+            let (xi, yi) = (x as i32, y as i32);
+            if xi < 0 || yi < 0 || xi >= width || yi >= height {
+                continue;
+            }
+            let p = px[(yi * width + xi) as usize];
+            if p < 0 || p as usize >= pc.len() || pc[p as usize] <= 0.0 {
+                continue;
+            }
+            self.prov[id as usize] = p;
+            self.cost[id as usize] = pc[p as usize];
+            self.land.push(id);
+        }
+        self.nb = vec![[-1; 6]; n];
+        for id in 0..n as i32 {
+            if self.prov[id as usize] < 0 {
+                continue;
+            }
+            let c = id % self.cols;
+            let r = id / self.cols;
+            let dirs = if r & 1 == 0 { &NB_EVEN } else { &NB_ODD };
+            for (k, (dc, dr)) in dirs.iter().enumerate() {
+                let (nc, nr) = (c + dc, r + dr);
+                if nc < 0 || nr < 0 || nc >= self.cols || nr >= self.rows {
+                    continue;
+                }
+                let m = nr * self.cols + nc;
+                if self.prov[m as usize] >= 0 {
+                    self.nb[id as usize][k] = m;
+                }
+            }
+        }
+        // связные области суши (острова, материк)
+        self.comp = vec![-1; n];
+        self.comp_cells.clear();
+        for &start in self.land.iter() {
+            if self.comp[start as usize] >= 0 {
+                continue;
+            }
+            let k = self.comp_cells.len() as i32;
+            let mut cells = vec![start];
+            self.comp[start as usize] = k;
+            let mut i = 0;
+            while i < cells.len() {
+                let c = cells[i] as usize;
+                for &m in self.nb[c].iter() {
+                    if m >= 0 && self.comp[m as usize] < 0 {
+                        self.comp[m as usize] = k;
+                        cells.push(m);
+                    }
+                }
+                i += 1;
+            }
+            self.comp_cells.push(cells);
+        }
+        self.land.len() as i32
+    }
+
+    #[func]
+    fn component_count(&self) -> i32 {
+        self.comp_cells.len() as i32
+    }
+
+    #[func]
+    fn land_count(&self) -> i32 {
+        self.land.len() as i32
+    }
+
+    #[func]
+    fn cell_count(&self) -> i32 {
+        self.prov.len() as i32
+    }
+
+    #[func]
+    fn province_of(&self, cell: i32) -> i32 {
+        self.prov.get(cell as usize).copied().unwrap_or(-1)
+    }
+
+    #[func]
+    fn find_path(&self, a: i32, b: i32) -> PackedInt32Array {
+        let mut s = Scratch::default();
+        PackedInt32Array::from(self.path(a, b, &mut s).as_slice())
+    }
+
+    /// Пустой вызов — замер цены перехода GDScript → Rust.
+    #[func]
+    fn noop(&self, x: i32) -> i32 {
+        x + 1
+    }
+
+    /// Граф клеток для сравнения с GDScript: соседи (по 6 на клетку), цены.
+    #[func]
+    fn export_graph(&self) -> VarDictionary {
+        let mut nb = Vec::with_capacity(self.nb.len() * 6);
+        for row in self.nb.iter() {
+            nb.extend_from_slice(row);
+        }
+        let mut d = VarDictionary::new();
+        d.set("cols", self.cols);
+        d.set("nb", &PackedInt32Array::from(nb.as_slice()));
+        d.set("cost", &PackedFloat32Array::from(self.cost.as_slice()));
+        d.set("land", &PackedInt32Array::from(self.land.as_slice()));
+        d
+    }
+
+    /// Замер: pairs поисков пути между случайными клетками суши.
+    #[func]
+    fn bench_paths(&self, pairs: i32, seed: i64) -> VarDictionary {
+        let mut rng = Rng::new(seed as u64);
+        let mut s = Scratch::default();
+        let t0 = Instant::now();
+        let mut found = 0;
+        let mut total_len = 0usize;
+        for _ in 0..pairs {
+            let a = self.land[rng.below(self.land.len())];
+            let b = self.random_reachable(a, &mut rng);
+            let p = self.path(a, b, &mut s);
+            if !p.is_empty() {
+                found += 1;
+                total_len += p.len();
+            }
+        }
+        let mut d = VarDictionary::new();
+        d.set("ms", t0.elapsed().as_secs_f64() * 1000.0);
+        d.set("found", found);
+        d.set("avg_len", if found > 0 { total_len as f64 / found as f64 } else { 0.0 });
+        d
+    }
+
+    /// Замер: agents путников days дней ходят по клеткам к случайным целям
+    /// (speed — сколько «цены пути» проходят за день); каждый день —
+    /// пространственный индекс и подсчёт встреч (двое в одной или соседней
+    /// клетке).
+    #[func]
+    fn bench_movers(&self, agents: i32, days: i32, speed: f32, seed: i64) -> VarDictionary {
+        let mut rng = Rng::new(seed as u64);
+        let mut s = Scratch::default();
+        let n = agents.max(0) as usize;
+        let mut at: Vec<i32> = (0..n).map(|_| self.land[rng.below(self.land.len())]).collect();
+        let mut route: Vec<Vec<i32>> = vec![Vec::new(); n];
+        let mut step: Vec<usize> = vec![0; n];
+        let mut budget: Vec<f32> = vec![0.0; n];
+        let t0 = Instant::now();
+        let mut paths = 0u64;
+        let mut moves = 0u64;
+        let mut encounters = 0u64;
+        let mut grid: HashMap<i32, Vec<u32>> = HashMap::with_capacity(n * 2);
+        for _ in 0..days {
+            for i in 0..n {
+                if step[i] + 1 >= route[i].len() {
+                    let dest = self.random_reachable(at[i], &mut rng);
+                    route[i] = self.path(at[i], dest, &mut s);
+                    step[i] = 0;
+                    paths += 1;
+                    if route[i].len() < 2 {
+                        continue;
+                    }
+                }
+                budget[i] += speed;
+                while step[i] + 1 < route[i].len() {
+                    let next = route[i][step[i] + 1];
+                    let c = (self.cost[at[i] as usize] + self.cost[next as usize]) * 0.5;
+                    if budget[i] < c {
+                        break;
+                    }
+                    budget[i] -= c;
+                    step[i] += 1;
+                    at[i] = next;
+                    moves += 1;
+                }
+            }
+            grid.clear();
+            for (i, &c) in at.iter().enumerate() {
+                grid.entry(c).or_default().push(i as u32);
+            }
+            for (i, &c) in at.iter().enumerate() {
+                // в своей клетке — с теми, у кого номер больше; в соседних — тоже
+                if let Some(v) = grid.get(&c) {
+                    encounters += v.iter().filter(|&&j| j as usize > i).count() as u64;
+                }
+                for &m in self.nb[c as usize].iter() {
+                    if m >= 0 {
+                        if let Some(v) = grid.get(&m) {
+                            encounters += v.iter().filter(|&&j| j as usize > i).count() as u64;
+                        }
+                    }
+                }
+            }
+        }
+        let mut d = VarDictionary::new();
+        d.set("ms", t0.elapsed().as_secs_f64() * 1000.0);
+        d.set("paths", paths as i64);
+        d.set("moves", moves as i64);
+        d.set("encounters", encounters as i64);
+        d
+    }
+}

@@ -12,12 +12,67 @@ env:
   GODOT_VERSION: "4.7.2"
 
 jobs:
+  # Ядро на Rust (native/) — своя библиотека для каждой системы.
+  native:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            lib: libkorona_core.so
+          - os: windows-latest
+            lib: korona_core.dll
+          - os: macos-latest
+            lib: libkorona_core.dylib
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Кэш сборки Rust
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            native/target
+          key: rust-${{ matrix.os }}-${{ hashFiles('native/Cargo.lock') }}
+      - name: Сборка ядра
+        if: runner.os != 'macOS'
+        shell: bash
+        run: |
+          cd native
+          cargo build --release
+          mkdir -p ../bin
+          cp target/release/${{ matrix.lib }} ../bin/
+      # для macOS — одна библиотека и для Intel, и для Apple Silicon
+      - name: Сборка ядра (macOS, universal)
+        if: runner.os == 'macOS'
+        run: |
+          cd native
+          rustup target add x86_64-apple-darwin aarch64-apple-darwin
+          cargo build --release --target x86_64-apple-darwin
+          cargo build --release --target aarch64-apple-darwin
+          mkdir -p ../bin
+          lipo -create -output ../bin/libkorona_core.dylib \
+            target/x86_64-apple-darwin/release/libkorona_core.dylib \
+            target/aarch64-apple-darwin/release/libkorona_core.dylib
+      - uses: actions/upload-artifact@v4
+        with:
+          name: core-${{ runner.os }}
+          path: bin/${{ matrix.lib }}
+
   build:
+    needs: native
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Ядро на Rust для всех систем
+        uses: actions/download-artifact@v4
+        with:
+          pattern: core-*
+          path: bin
+          merge-multiple: true
 
       - name: Кэш Godot и шаблонов экспорта
         id: cache-godot
@@ -60,8 +115,9 @@ jobs:
           test -f build/windows/CrownAndDynasty.exe
           test -f build/linux/CrownAndDynasty.x86_64
           test -f build/macos/CrownAndDynasty.zip
-          (cd build/windows && zip -q -9 ../../dist/CrownAndDynasty-windows.zip CrownAndDynasty.exe)
-          (cd build/linux && chmod +x CrownAndDynasty.x86_64 && tar -czf ../../dist/CrownAndDynasty-linux.tar.gz CrownAndDynasty.x86_64)
+          ls -la build/windows build/linux
+          (cd build/windows && zip -q -9 ../../dist/CrownAndDynasty-windows.zip *)
+          (cd build/linux && chmod +x CrownAndDynasty.x86_64 && tar -czf ../../dist/CrownAndDynasty-linux.tar.gz *)
           cp build/macos/CrownAndDynasty.zip dist/CrownAndDynasty-macos.zip
           ls -la dist
 

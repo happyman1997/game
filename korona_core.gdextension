@@ -1,0 +1,13 @@
+; Ядро симуляции на Rust (native/). Сборка: native/build.sh (кладёт библиотеку в bin/)
+[configuration]
+entry_symbol = "gdext_rust_init"
+compatibility_minimum = 4.7
+reloadable = true
+
+[libraries]
+linux.debug.x86_64 = "res://bin/libkorona_core.so"
+linux.release.x86_64 = "res://bin/libkorona_core.so"
+windows.debug.x86_64 = "res://bin/korona_core.dll"
+windows.release.x86_64 = "res://bin/korona_core.dll"
+macos.debug = "res://bin/libkorona_core.dylib"
+macos.release = "res://bin/libkorona_core.dylib"
