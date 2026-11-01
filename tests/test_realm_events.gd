@@ -15,10 +15,12 @@ func _game() -> Game:
 func _prepare(g: Game) -> Dictionary:
 	var h: Dictionary = g.ch("harold")
 	h.gold = 600.0
+	g.touch(h)
 	Laws.change(g, h, "tax_law_2", true)
 	Laws.change(g, h, "church_law_2", true)
 	var v: Dictionary = g.vassals_of(h.id)[0]
 	v.gold = 300.0
+	g.touch(v)
 	Leverage.add_hook(g, h, v)
 	var w: Dictionary = g.ch("william")
 	for id in w.children:

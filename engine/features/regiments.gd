@@ -92,6 +92,7 @@ static func recruit(game: Game, c: Dictionary, type: String, free: bool = false)
 		var cst := cost(game, c, def)
 		Treasury.add(game, c, -cst.gold, "regiments")
 		c.prestige -= cst.prestige
+		game.touch(c)
 	var r := {"id": game.new_id("reg"), "type": type, "size": int(Data.num(def.get("size"), 100))}
 	if c.get("regiments") == null:
 		c["regiments"] = []

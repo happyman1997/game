@@ -71,6 +71,7 @@ func test_build_road_work() -> void:
 	check(pid != "", "есть графство с тропами")
 	var h := _holder(g, pid)
 	h.gold = 1000.0
+	g.touch(h)
 	check(Biomes.works_here(g, pid).any(func(d): return d.id == "build_road"), "можно проложить тракт")
 	check(Biomes.start(g, h, pid, "build_road"), "начать тракт")
 	Biomes.work_of(g, pid).until = g.date

@@ -80,6 +80,7 @@ static func _battle_casualties(game: Game, owner_id: String, won: bool) -> void:
 			Chars.add_trait(game, k, str(game.def_val("knights.wound_trait", "wounded")))
 		elif won:
 			k.prestige += game.def_num("knights.prestige_per_battle", 10)
+			game.touch(k)
 	game.month_cache.erase("knights:" + owner.id)
 	game.month_cache.erase("kpow:" + owner.id)
 

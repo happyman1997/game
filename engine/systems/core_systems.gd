@@ -38,6 +38,7 @@ static func _upkeep_month(game: Game) -> void:
 	for c in game.living():
 		if not c.modifiers.is_empty():
 			c.modifiers = c.modifiers.filter(func(m): return m.get("expires") == null or m.expires > now)
+			game.touch(c)
 		for k in c.flags.keys():
 			var v: Variant = c.flags[k]
 			if k.begins_with("trait_expires:") and v <= now:
@@ -69,6 +70,7 @@ static func _economy_char(game: Game, c: Dictionary) -> void:
 		var piety := Economy.monthly_piety(game, c)
 		c.prestige += prestige
 		c.piety += piety
+		game.touch(c)
 		if c.dynasty != null and prestige > 0:
 			Chars.add_dynasty_renown(game, c.dynasty, prestige * game.def_num("economy.dynasty_prestige_share", 0.1))
 	else:
@@ -77,6 +79,7 @@ static func _economy_char(game: Game, c: Dictionary) -> void:
 			Treasury.add(game, c, flat, "other_income", true)
 	if c.stress > 0:
 		c.stress = maxf(0.0, float(c.stress) - game.def_num("character.stress_decay", 2))
+		game.touch(c)
 	var lvl = floori(float(c.stress) / 100.0)
 	var prev = int(Data.num(c.vars.get("stress_level")))
 	if lvl > prev:
@@ -256,10 +259,12 @@ static func _trim_court(game: Game, r: Dictionary) -> void:
 			var p: Variant = game.ch(pid)
 			if p != null:
 				p.children = p.children.filter(func(x): return x != c.id)
+				game.touch(p)
 		for s in game.state.schemes.values():
 			if s.owner == c.id or s.target == c.id:
 				game.state.schemes.erase(s.id)
 		game.state.characters.erase(c.id)
+		game.forget(c.id)
 	game.mark_people_dirty()
 	game.month_cache.clear() # рыцари, советы и т. п. могли ссылаться на ушедших
 
@@ -279,6 +284,7 @@ static func _prune_dead(game: Game) -> void:
 		if founders.has(c.id):
 			continue
 		game.state.characters.erase(c.id)
+		game.forget(c.id)
 	game.mark_people_dirty()
 
 

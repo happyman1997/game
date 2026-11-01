@@ -28,7 +28,9 @@ func test_odds_and_breakdown() -> void:
 	var g := _game()
 	var h: Dictionary = g.ch("harold")
 	h.skills["learning"] = 10
+	g.touch(h)
 	h.stress = 0.0
+	g.touch(h)
 	g.stat_cache.clear()
 	var ctx := _ctx(g, h)
 	var o := Checks.odds(ctx, ctx.root, SPEC)
@@ -36,6 +38,7 @@ func test_odds_and_breakdown() -> void:
 	check(o.partial > 0.0 and is_equal_approx(o.success + o.partial + o.failure, 100.0), "три исхода в сумме дают 100")
 	check(o.parts.size() >= 2, "разбор: основа и навык")
 	h.stress = 200.0
+	g.touch(h)
 	var o2 := Checks.odds(ctx, ctx.root, SPEC)
 	check(o2.success < o.success, "стресс мешает")
 	var no_partial: Dictionary = SPEC.duplicate()
@@ -75,14 +78,17 @@ func test_learned_find_archives_more_often() -> void:
 	var ctx := _ctx(g, h)
 	var spec: Dictionary = dec.effect.check
 	h.skills["learning"] = 2
+	g.touch(h)
 	g.stat_cache.clear()
 	var low: float = Checks.odds(ctx, ctx.root, spec).success
 	h.skills["learning"] = 18
+	g.touch(h)
 	g.stat_cache.clear()
 	var high: float = Checks.odds(ctx, ctx.root, spec).success
 	check(high > low + 30.0, "учёный находит чаще (%.0f%% против %.0f%%)" % [high, low])
 	# средний учёный: Архивариусу находка почти верна
 	h.skills["learning"] = 8
+	g.touch(h)
 	g.stat_cache.clear()
 	var mid: float = Checks.odds(ctx, ctx.root, spec).success
 	Lifestyles.unlock_perk(g, h, "archivist", true)

@@ -104,6 +104,7 @@ static func change_stress(game: Game, c: Dictionary, v: float, src: String = "")
 		v *= maxf(0.0, 1.0 + Stats.stat(game, c, "stress_gain_mult"))
 	var before := float(c.stress)
 	c.stress = maxf(0.0, before + v)
+	game.touch(c)
 	var d := float(c.stress) - before
 	if absf(d) >= 0.5:
 		var log: Array = c.vars.get("stress_log", [])
@@ -142,6 +143,7 @@ static func add_trait(game: Game, c: Dictionary, t: String) -> bool:
 		kept.append(x)
 	kept.append(t)
 	c.traits = kept
+	game.touch(c)
 	if def.get("duration_days") != null:
 		c.flags["trait_expires:" + t] = game.date + int(def.duration_days)
 	game.stat_cache.erase(c.id)
@@ -154,6 +156,7 @@ static func remove_trait(game: Game, c: Dictionary, t: String) -> bool:
 	if i < 0:
 		return false
 	c.traits.remove_at(i)
+	game.touch(c)
 	c.flags.erase("trait_expires:" + t)
 	game.stat_cache.erase(c.id)
 	game.emit("character.trait_removed", {"character": c, "trait": t})
@@ -259,6 +262,7 @@ static func marry(game: Game, a: Dictionary, b: Dictionary) -> void:
 		a.spouses.append(b.id)
 	if not b.spouses.has(a.id):
 		b.spouses.append(a.id)
+	game.touch_all([a, b])
 	# Жена переезжает ко двору мужа (или наоборот, если муж безземельный, а жена правит).
 	var host: Dictionary = a
 	var guest: Dictionary = b
@@ -278,6 +282,7 @@ static func marry(game: Game, a: Dictionary, b: Dictionary) -> void:
 static func divorce(game: Game, a: Dictionary, b: Dictionary) -> void:
 	a.spouses = a.spouses.filter(func(s): return s != b.id)
 	b.spouses = b.spouses.filter(func(s): return s != a.id)
+	game.touch_all([a, b])
 	if not a.former_spouses.has(b.id):
 		a.former_spouses.append(b.id)
 	if not b.former_spouses.has(a.id):
@@ -292,6 +297,7 @@ static func set_liege(game: Game, c: Dictionary, liege: Variant) -> void:
 		return
 	var old: Variant = c.liege
 	c.liege = liege
+	game.touch(c)
 	game.mark_index_dirty()
 	# мнение о сюзерене зависит от сюзеренитета
 	game.stat_cache.erase("op:%s>%s" % [c.id, old])
@@ -470,6 +476,7 @@ static func create_character(game: Game, o: Dictionary) -> Dictionary:
 	# взрослый с рождения в мире — совершеннолетия у него уже не будет
 	if is_adult(game, c):
 		c.flags["adult"] = 0
+	game.touch_all([c, father, mother])
 	game.mark_people_dirty()
 	return c
 

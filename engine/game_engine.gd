@@ -365,9 +365,15 @@ func bookmarks() -> Array:
 
 
 func new_game(bookmark_id: String, seed: int = -1) -> Game:
-	return WorldSetup.setup_new_game(self, bookmark_id, seed)
+	var g := WorldSetup.setup_new_game(self, bookmark_id, seed)
+	if Game.check_world:
+		g.world()
+	return g
 
 
 ## {game, warnings, error}
 func load_game(json: String) -> Dictionary:
-	return SaveGame.deserialize(self, json)
+	var res := SaveGame.deserialize(self, json)
+	if Game.check_world and res.get("game") != null:
+		res.game.world()
+	return res

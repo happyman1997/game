@@ -742,6 +742,9 @@ static func run_effect_key(ctx: ScriptContext, scope: Variant, key: String, arg:
 			game.script_error("Эффект \"%s\" нельзя применить к скоупу типа %s" % [key, scope.type if scope != null else "null"])
 			return
 		eff.apply.call(ctx, scope, arg)
+		# эффект мог изменить персонажа — копия в ядре должна это знать
+		if scope != null and scope.type == "character":
+			game.touch(game.ch(scope.id))
 		return
 	var se: Variant = game.content.get_def("scripted_effects", key)
 	if se != null:

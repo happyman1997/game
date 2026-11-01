@@ -103,6 +103,7 @@ static func change(game: Game, c: Dictionary, law_id: String, free: bool = false
 		Treasury.add(game, c, -cst.gold, "laws")
 		c.prestige -= cst.prestige
 		c.piety -= cst.piety
+		game.touch(c)
 		c.flags["law_cd:" + str(law.group)] = game.date + roundi(Data.num(gd.get("cooldown_years"), 5) * 365)
 	var prev: Variant = current(game, c, law.group)
 	if c.get("laws") == null:

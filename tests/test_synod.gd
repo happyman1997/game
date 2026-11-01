@@ -41,6 +41,7 @@ func test_voters_and_player_vote() -> void:
 	check(not vs.any(func(v): return Wars.is_heretic(g, v.c)), "еретики не голосуют")
 	check(not vs.any(func(v): return v.c.id == head.id), "Великий Светоч сам не голосует")
 	h.piety = 2000.0
+	g.touch(h)
 	g.stat_cache.erase(h.id)
 	check(Synod.vote_weight(g, h, head) > Synod.vote_weight(g, g.ch(vs[-1].c.id), head) - 10.0, "вес голоса — по благочестию")
 	var a := _call(g, "tithe")
@@ -136,6 +137,7 @@ func test_excommunicate_tyrant() -> void:
 	var head: Dictionary = g.ch(g.state.titles[HT].holder)
 	var tyrant: Dictionary = g.ch("philip")
 	tyrant.piety = -500.0
+	g.touch(tyrant)
 	Politics._set_dread(g, tyrant, 95.0)
 	g.stat_cache.clear()
 	var a := _call(g, "excommunicate_tyrant")
@@ -177,6 +179,7 @@ func test_sway_interaction() -> void:
 	Opinion.add_opinion(g, voter, h, "temple_gift", 80)
 	g.stat_cache.clear()
 	h.gold = 1000.0
+	g.touch(h)
 	var def: Dictionary = g.content.get_def("interactions", "synod_sway_for")
 	var res := Interactions.execute(g, def, h, voter)
 	check(res == "accepted" or res == "pending", "голос склоняют (%s)" % res)

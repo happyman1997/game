@@ -50,7 +50,9 @@ func test_ash_attrition_and_settling() -> void:
 	check(int(a.size) < before, "армия теряет людей в пепле")
 	Military.disband_army(g, a.id)
 	w.gold = 1000.0
+	g.touch(w)
 	w.prestige = 1000.0
+	g.touch(w)
 	var settle: Dictionary = g.content.get_def("decisions", "settle_ashlands")
 	check(Decisions.take(g, settle, w), "заселение пепелища")
 	check(Titles.domain_counties(g, w).any(func(c): return ["c_ash_waste", "c_sonnenstadt"].has(c)), "графство пепелища стало своим")
@@ -71,7 +73,9 @@ func test_crown_and_empire() -> void:
 	for c in ["c_sonnenstadt", "c_kronhafen", "c_glockenfurt", "c_altenrhein", "c_silberau", "c_rosental", "c_nebelwald", "c_weinberg", "c_sternwald"]:
 		Titles.transfer_title(g, c, w.id)
 	w.gold = 1000.0
+	g.touch(w)
 	w.prestige = 3000.0
+	g.touch(w)
 	var rest: Dictionary = g.content.get_def("decisions", "restore_sun_empire")
 	check(Decisions.can_take(g, rest, w), "можно возродить империю: %s" % [Decisions.blockers(g, rest, w)])
 	Decisions.take(g, rest, w)

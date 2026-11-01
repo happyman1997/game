@@ -384,6 +384,7 @@ static func declare_war(game: Game, attacker: Dictionary, t: Dictionary, opts: D
 		Treasury.add(game, attacker, -cost.gold, "war")
 		attacker.prestige -= cost.prestige
 		attacker.piety -= cost.piety
+		game.touch(attacker)
 	var w := new_war_record()
 	w.id = game.new_id("war")
 	w.cb = t.cb

@@ -1,6 +1,8 @@
 extends SceneTree
 ## Безголовая симуляция для проверки баланса:
 ##   godot --headless --path . -s tools/sim.gd -- --years 50 --seed 1 [--verbose] [--mods core,my_mod] [--bookmark b1066]
+##     [--days N] — вместо лет прогнать N дней;
+##     [--check-world] — сверять копию персонажей в ядре каждый день (--check-world-systems — после каждой системы)
 ## Печатает итоги по годам: живые персонажи, державы, войны, крупнейшие державы.
 
 
@@ -11,11 +13,25 @@ func _init() -> void:
 	var seed := int(a.get("seed", 1))
 	var verbose: bool = a.has("verbose")
 	var bm: String = a.get("bookmark", e.bookmarks()[0].id if not e.bookmarks().is_empty() else "")
+	Game.check_world = a.has("check-world") or a.has("check-world-systems")
+	Game.check_world_systems = a.has("check-world-systems")
 	var g := e.new_game(bm, seed)
 	var stats := {"deaths": 0, "wars": 0}
 	e.hooks.on("character.death", func(_p): stats.deaths += 1)
 	e.hooks.on("war.declared", func(_p): stats.wars += 1)
 	var t0 := Time.get_ticks_msec()
+	var days := int(a.get("days", 0))
+	if days > 0:
+		for d in days:
+			while not g.state.pending_events.is_empty():
+				g.events.choose(g.state.pending_events[0].uid, 0)
+			g.state.pending_requests.clear()
+			for f in Duels.pending(g).duplicate():
+				Duels.dismiss(g, f.uid)
+			g.tick()
+		print("Всего: %.1f с на %d дней" % [(Time.get_ticks_msec() - t0) / 1000.0, days])
+		quit()
+		return
 	for y in years:
 		var ty := Time.get_ticks_msec()
 		for d in 365:

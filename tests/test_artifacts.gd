@@ -62,6 +62,7 @@ func test_durability_repair_melt() -> void:
 	var it := Artifacts.create(g, "mail", "masterwork", harold)
 	it.durability = 10.0
 	harold.gold = 500.0
+	g.touch(harold)
 	var cost := Artifacts.repair_cost(g, it)
 	check(cost > 0.0, "ремонт стоит золота")
 	check(Artifacts.repair(g, harold, it), "починено")
@@ -127,6 +128,7 @@ func test_commission() -> void:
 	var g := _game()
 	var harold: Dictionary = g.ch("harold")
 	harold.gold = 1000.0
+	g.touch(harold)
 	var n0 := Artifacts.items_of(g, harold).size()
 	check(Artifacts.commission_blockers(g, harold, "fine").is_empty(), "можно заказать")
 	check(Artifacts.commission(g, harold, "goblet", "fine"), "заказ принят")

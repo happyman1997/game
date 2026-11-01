@@ -37,6 +37,7 @@ func test_fief_rights_faction() -> void:
 		var c: Variant = g.ch(cid)
 		if c != null:
 			c.death = g.date
+			g.touch(c)
 	check(Factions.ai_join_score(g, v, def, h) > s0, "бездетный вступает охотнее")
 	var f: Variant = Factions.create(g, "fief_rights_faction", v)
 	check(f != null, "фракция создана")

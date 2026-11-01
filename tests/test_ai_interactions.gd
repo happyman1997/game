@@ -59,8 +59,11 @@ func test_dynasty_head_tribute_and_honor() -> void:
 	for x in g.living():
 		if x.id != head.id and Chars.same_dynasty(g, x, head):
 			x.gold = 0.0
+			g.touch(x)
 	head.gold = 80.0
+	g.touch(head)
 	kin.gold = 400.0
+	g.touch(kin)
 	Chars.add_dynasty_renown(g, head.dynasty, 400)
 	check(_does(g, head, "demand_family_tribute", kin.id, 500), "глава рода берёт дань с богатого родича")
 	# недоволен только этот родич; прочих правителей рода глава уже обласкал
@@ -80,4 +83,5 @@ func test_revoke_needs_authority_or_reason() -> void:
 	check(not _does(g, h, "revoke_title", v.id, 40), "без власти и повода — титул не отнимает")
 	check(Laws.change(g, h, "crown_authority_3", true), "абсолютная власть")
 	h.prestige = 1000.0
+	g.touch(h)
 	check(_does(g, h, "revoke_title", v.id, 300), "при абсолютной власти — отнимает у ненавидящего")

@@ -31,6 +31,17 @@ var realm_cache := {}
 var _reported_errors := {}
 ## Во время генерации мира on_action и сообщения отключены.
 var quiet := false
+## Копия персонажей в ядре (CoreWorld, native/src/world.rs) — шаг переезда
+## симуляции в Rust. Создаётся при первом обращении из state.characters;
+## каждое изменение словаря персонажа сообщается ядру через touch().
+var _world: Variant = null
+## Режим сверки (тесты, tools/sim.gd --check-world): после каждого дня копия
+## в ядре сравнивается с персонажами, расхождение — ошибка с именами полей.
+static var check_world := false
+## Сверять и после каждой системы дня — чтобы найти, где забыли touch().
+static var check_world_systems := false
+## Партии, созданные в режиме сверки (их сверяет запуск тестов после теста).
+static var checked_games: Array = []
 ## Автопилот: ИИ ведёт и персонажа игрока (наблюдение, замер интереса
 ## tools/fun_report.gd). Игрок остаётся игроком — ему идут сообщения, вести
 ## и его события, — но выбор в событиях, ответы на предложения и все решения
@@ -43,6 +54,8 @@ func _init(e: GameEngine, st: Dictionary) -> void:
 	state = st
 	rng = Rng.new(st.rng)
 	events = GameEvents.new(self)
+	if check_world:
+		checked_games.append(weakref(self))
 
 
 # ------------------------------------------------------------ доступ
@@ -196,6 +209,62 @@ func new_id(prefix: String) -> String:
 	var n = int(state.next_id)
 	state.next_id = n + 1
 	return prefix + str(n)
+
+
+# ------------------------------------------------------------ ядро
+
+## Копия персонажей в ядре (null — ядро не собрано).
+func world() -> Variant:
+	if _world == null and ClassDB.class_exists("CoreWorld"):
+		var w: Variant = ClassDB.instantiate("CoreWorld")
+		w.setup(PackedStringArray(Chars.skill_ids(self)))
+		w.sync_all(state.characters)
+		_world = w
+	return _world
+
+
+## Персонаж изменился — сообщить ядру (зовите после любой правки словаря).
+func touch(c: Variant) -> void:
+	if _world != null and c is Dictionary:
+		_world.sync(c)
+
+
+## Несколько персонажей разом (по словарям или id).
+func touch_all(list: Array) -> void:
+	if _world == null:
+		return
+	for x in list:
+		var c: Variant = ch(x) if (x is String or x is StringName) else x
+		if c is Dictionary:
+			_world.sync(c)
+
+
+## Персонаж удалён из state.characters.
+func forget(id: String) -> void:
+	if _world != null:
+		_world.forget(id)
+
+
+## Сверка копии в ядре с персонажами: расхождения — ошибка, копия
+## выправляется, чтобы одна пропущенная правка не сыпала ошибками дальше.
+func check_world_now(where: String) -> bool:
+	var w: Variant = world()
+	if w == null:
+		return true
+	var bad: Dictionary = w.verify(state.characters)
+	if bad.is_empty():
+		return true
+	var parts := []
+	for id in bad.keys().slice(0, 6):
+		parts.append("%s: %s" % [id, ", ".join(bad[id])])
+	push_error("Ядро разошлось с персонажами (%s, день %d): %s%s" % [where, int(state.date), "; ".join(parts),
+		" …ещё %d" % (bad.size() - 6) if bad.size() > 6 else ""])
+	for id in bad:
+		if state.characters.has(id):
+			w.sync(state.characters[id])
+		else:
+			w.forget(id)
+	return false
 
 
 # ------------------------------------------------------------ индексы
@@ -557,10 +626,14 @@ func tick() -> void:
 	# модификаторы, титулы, перки, законы), сбрасывает кэш явно.
 	day_cache.clear()
 	var p = GameDate.parts(state.date)
+	if check_world:
+		check_world_now("между днями")
 	var systems := engine.ordered_systems()
 	for s in systems:
 		if s.has("on_day"):
 			s.on_day.call(self)
+			if check_world_systems:
+				check_world_now(str(s.id) + ".on_day")
 	if p.d == 1:
 		month_cache.clear()
 		_def_cache.clear()
@@ -578,6 +651,8 @@ func tick() -> void:
 					if c.death != null:
 						break
 					s.on_character_month.call(self, c)
+					if check_world_systems:
+						check_world_now(str(s.id) + ".on_character_month")
 	# Помесячные и годовые обработчики разнесены по первым дням месяца
 	# (system.month_day или по порядку), чтобы не было одного тяжёлого дня.
 	var spread := maxi(1, int(def_num("engine.month_spread_days", 4)))
@@ -590,9 +665,15 @@ func tick() -> void:
 				continue
 			if s.has("on_month"):
 				s.on_month.call(self)
+				if check_world_systems:
+					check_world_now(str(s.id) + ".on_month")
 			if p.m == 1 and s.has("on_year"):
 				s.on_year.call(self)
+				if check_world_systems:
+					check_world_now(str(s.id) + ".on_year")
 	emit("day")
+	if check_world:
+		check_world_now("день")
 	notify("tick")
 
 

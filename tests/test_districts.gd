@@ -58,6 +58,7 @@ func test_slots_and_found_district() -> void:
 	var h: Dictionary = g.ch("harold")
 	var pid := "c_winchester"
 	h.gold = 5000.0
+	g.touch(h)
 	check(Decisions.start_building(g, h, pid, "walls"), "стены в детинце")
 	g.state.provinces[pid].construction.done = g.date
 	Decisions.daily_construction(g)
@@ -113,6 +114,7 @@ func test_ai_builds_districts() -> void:
 	var g := _game()
 	var h: Dictionary = g.ch("philip")
 	h.gold = 3000.0
+	g.touch(h)
 	var before := 0
 	for cid in Titles.domain_counties(g, h):
 		before += int(g.state.provinces[cid].construction != null)
@@ -138,6 +140,7 @@ func test_great_works() -> void:
 	var g := _game()
 	var h: Dictionary = g.ch("harold")
 	h.gold = 5000.0
+	g.touch(h)
 	var pid := "c_winchester"
 	var p: Dictionary = g.state.provinces[pid]
 	var mint := func(where: String) -> Variant:

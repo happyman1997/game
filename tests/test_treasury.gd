@@ -37,6 +37,7 @@ func test_one_off_categories() -> void:
 	var g := _game()
 	var h: Dictionary = g.ch("harold")
 	h.gold = 1000.0
+	g.touch(h)
 	check(Decisions.start_building(g, h, "c_winchester", "walls"), "стены заложены")
 	var t := Treasury.totals(g, h)
 	check(float(t.get("construction", 0.0)) < 0.0, "стройка — статья «Стройка»")
@@ -80,7 +81,9 @@ func test_history_and_forecast() -> void:
 			x = c
 			break
 	x.gold = 10.0
+	g.touch(x)
 	x.modifiers.append({"id": "lombard_debt", "expires": null})
+	g.touch(x)
 	g.stat_cache.erase(x.id)
 	var fc := Treasury.forecast(g, x)
 	check(is_equal_approx(float(fc.monthly), -2.5), "сальдо −2,5 (%.2f)" % float(fc.monthly))
@@ -99,6 +102,7 @@ func test_ai_saves_for_goal() -> void:
 			cost = float(x.cost.gold)
 	check(cost > 100.0, "подъём посада дорогой (%.0f)" % cost)
 	p.gold = 50.0
+	g.touch(p)
 	p.vars["ai_goal"] = {"kind": "district", "id": "market", "province": pid, "level": lvl + 1, "cost": cost, "since": g.date}
 	g.state.provinces[pid].construction = null
 	Ai._consider_building(g, p)
@@ -106,6 +110,7 @@ func test_ai_saves_for_goal() -> void:
 	check(not Ai.can_spend(g, p, 45.0), "крупная трата не трогает отложенное")
 	check(Ai.can_spend(g, p, 5.0), "мелочь можно")
 	p.gold = cost + 100.0
+	g.touch(p)
 	check(Ai.can_spend(g, p, 50.0), "когда хватает и на цель — можно")
 	Ai._consider_building(g, p)
 	var cons: Variant = g.state.provinces[pid].construction

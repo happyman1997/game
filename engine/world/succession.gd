@@ -162,6 +162,7 @@ static func kill_character(game: Game, c: Dictionary, reason: String = "natural"
 	if not game.engine.hooks.veto("character.before_death", {"game": game, "character": c, "reason": reason, "killer": killer}):
 		return
 	c.death = game.date
+	game.touch(c)
 	c.death_reason = reason
 	c.killer = killer
 	game.mark_chars_dirty([c.id, c.liege] + c.spouses)
@@ -172,12 +173,14 @@ static func kill_character(game: Game, c: Dictionary, reason: String = "natural"
 		if s == null:
 			continue
 		s.spouses = s.spouses.filter(func(x): return x != c.id)
+		game.touch(s)
 		if not s.former_spouses.has(c.id):
 			s.former_spouses.append(c.id)
 	for x in c.spouses:
 		if not c.former_spouses.has(x):
 			c.former_spouses.append(x)
 	c.spouses = []
+	game.touch(c)
 	c.pregnancy = null
 	for id in game.state.schemes.keys():
 		var sch: Dictionary = game.state.schemes[id]
@@ -258,6 +261,7 @@ static func inherit(game: Game, c: Dictionary) -> Variant:
 		Titles.transfer_title(game, t, distribution[t], primary.id)
 	Treasury.add(game, primary, float(c.gold), "inheritance")
 	c.gold = 0.0
+	game.touch(c)
 
 	# Сюзеренитет наследников.
 	var heir_chars := []
@@ -311,6 +315,7 @@ static func inherit(game: Game, c: Dictionary) -> Variant:
 		if a.commander == c.id:
 			a.commander = null
 	c.titles = []
+	game.touch(c)
 	game.mark_chars_dirty([c.id, primary.id] + heir_chars.map(func(h): return h.id))
 	for h in heir_chars:
 		game.on_action("on_inheritance", {"type": "character", "id": h.id}, {"predecessor": {"type": "character", "id": c.id}})

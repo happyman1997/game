@@ -68,6 +68,7 @@ static func take(game: Game, def: Dictionary, c: Dictionary) -> bool:
 	Treasury.add(game, c, -cst.gold, Treasury.cat_of_src(game, "decision:" + str(def.id)))
 	c.prestige -= cst.prestige
 	c.piety -= cst.piety
+	game.touch(c)
 	if def.get("cooldown") != null:
 		c.flags["dec:" + str(def.id)] = game.date + GameDate.duration_days(def.cooldown)
 	var ctx := context(game, c)
@@ -186,6 +187,7 @@ static func start_building(game: Game, c: Dictionary, prov_id: String, building_
 	var cst = building_cost(game, cand.def, c, prov_id)
 	Treasury.add(game, c, -cst.gold, "construction")
 	c.prestige -= cst.prestige
+	game.touch(c)
 	# build_time_mult — быстрее строят умелые управители (за очко управления)
 	var days := Data.num(cand.def.get("days"), 365) * maxf(0.3, 1.0 + Stats.stat(game, c, "build_time_mult"))
 	game.state.provinces[prov_id].construction = {"building": building_id, "done": game.date + int(days), "days": int(days), "by": c.id}

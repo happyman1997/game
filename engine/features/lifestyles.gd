@@ -176,6 +176,7 @@ static func unlock_perk(game: Game, c: Dictionary, perk_id: String, free: bool =
 	if not free:
 		st.xp[p.lifestyle] = xp_of(c, p.lifestyle) - perk_cost(game, c, p.lifestyle, p)
 	st.perks.append(p.id)
+	game.touch(c)
 	if p.get("trait") != null:
 		Chars.add_trait(game, c, p.trait)
 	if p.get("effect") != null:

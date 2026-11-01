@@ -199,6 +199,7 @@ static func transfer_title(game: Game, title_id: String, new_holder_id: Variant,
 
 	if old != null:
 		old.titles = old.titles.filter(func(x): return x != title_id)
+		game.touch(old)
 		if old.capital == title_id:
 			var dom := domain_counties(game, old)
 			old.capital = dom[0] if not dom.is_empty() else null
@@ -212,6 +213,7 @@ static func transfer_title(game: Game, title_id: String, new_holder_id: Variant,
 		neo.titles.append(title_id)
 		_sort_titles(game, neo)
 		neo.claims = neo.claims.filter(func(x): return x != title_id)
+		game.touch(neo)
 		if neo.capital == null or not neo.titles.has(neo.capital):
 			var td: Variant = game.content.get_def("titles", neo.titles[0])
 			var cap: Variant = td.get("capital") if td != null else null
@@ -341,6 +343,7 @@ static func create_title(game: Game, c: Dictionary, title_id: String) -> bool:
 	var cost := title_action_cost(game, title_id, "create")
 	Treasury.add(game, c, -cost.gold, "titles")
 	c.prestige -= cost.prestige
+	game.touch(c)
 	transfer_title(game, title_id, c.id)
 	game.message(game.loc.t("msg.title_created", {"who": game.scope_name({"type": "character", "id": c.id}), "title": full_name(game, title_id)}), "good", {"type": "title", "id": title_id})
 	return true
@@ -359,6 +362,7 @@ static func usurp_title(game: Game, c: Dictionary, title_id: String) -> bool:
 	var cost := title_action_cost(game, title_id, "usurp")
 	Treasury.add(game, c, -cost.gold, "titles")
 	c.prestige -= cost.prestige
+	game.touch(c)
 	transfer_title(game, title_id, c.id)
 	game.message(
 		game.loc.t("msg.title_usurped", {"who": game.scope_name({"type": "character", "id": c.id}), "title": full_name(game, title_id), "from": game.scope_name({"type": "character", "id": old.id})}),

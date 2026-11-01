@@ -113,6 +113,7 @@ func test_hunter_routs_band() -> void:
 		var b: Dictionary = Travel.spawn_band(g, "deserters", "c_kent")
 		var a := _agent(g, h)
 		a.skills.prowess = 30
+		g.touch(a)
 		Missions.start(g, "hunt_band", a, h, {"type": "province", "id": "c_kent"})
 		var m: Variant = Missions.of(a)
 		var t: Dictionary = Travel.travelers(g)[m.trip]

@@ -310,6 +310,7 @@ static func found_house(game: Game, c: Dictionary) -> Variant:
 	for x in moved:
 		if Chars.is_alive(x):
 			x.dynasty = d.id
+			game.touch(x)
 	game.month_cache.clear()
 	game.mark_chars_dirty(moved.map(func(x): return x.id))
 	game.emit("dynasty.house_founded", {"house": d.id, "parent": parent, "character": c})

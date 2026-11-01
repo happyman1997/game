@@ -66,6 +66,7 @@ func test_intimidate_vassal() -> void:
 	check(not vs.is_empty(), "есть покорный вассал с золотом")
 	var v: Dictionary = vs[0]
 	v.gold = 200.0
+	g.touch(v)
 	Politics.add_dread(g, h, 100)
 	var def: Dictionary = g.content.get_def("interactions", "intimidate")
 	check(Interactions.is_shown(g, def, h, v), "можно запугать")
@@ -125,6 +126,7 @@ func test_architect_commission_and_sovereign_glory() -> void:
 	check(Artifacts.commission_cost(g, h, "fine") < c0, "заказ дешевле")
 	# слава Государя весит больше
 	h.prestige = 3000.0
+	g.touch(h)
 	var base := Renown.opinion_for(g, "prestige", Renown.level_of(g, h, "prestige"))
 	_perks(g, h, ["regal_bearing"])
 	check(Renown.boosted(g, h, "prestige", base) > base, "слава поднимает мнение сильнее")
@@ -142,9 +144,12 @@ func test_treasurer_loan_and_bribe() -> void:
 	var v: Dictionary = g.vassals_of("harold").filter(func(x): return not x.traits.has("honest") and not x.traits.has("just"))[0]
 	# жадного ловкий казначей подкупит наверняка (удача или «взял, но не ушёл»)
 	v.traits.append("greedy")
+	g.touch(v)
 	h.skills["intrigue"] = 20
+	g.touch(h)
 	g.stat_cache.clear()
 	h.gold = 500.0
+	g.touch(h)
 	var bribe: Dictionary = g.content.get_def("interactions", "bribe")
 	var op0 := Opinion.opinion(g, v, h)
 	check_eq(Interactions.execute(g, bribe, h, v), "accepted", "подкуп принят")
@@ -185,6 +190,7 @@ func test_spider_sells_secret() -> void:
 	var s: Variant = Secrets.add_secret(g, victim, "secret_embezzler", null, ["harold"])
 	check(s != null, "у Вильгельма есть тайна, Гарольд её знает")
 	buyer.gold = 300.0
+	g.touch(buyer)
 	var def: Dictionary = g.content.get_def("interactions", "sell_secret")
 	check(Interactions.is_shown(g, def, h, buyer), "можно продать тайну")
 	check(Interactions.blockers(g, def, h, buyer).is_empty(), "есть что продать: %s" % [Interactions.blockers(g, def, h, buyer)])

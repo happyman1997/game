@@ -20,6 +20,7 @@ static func add(game: Game, c: Dictionary, amount: float, cat: String, regular :
 	if amount == 0.0:
 		return
 	c.gold = float(c.gold) + amount
+	game.touch(c)
 	if c.titles.is_empty() and c.id != game.state.player:
 		return
 	var lg := _ledger(game, c)

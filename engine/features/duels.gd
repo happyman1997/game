@@ -583,17 +583,21 @@ static func _conclude(game: Game, f: Dictionary, mercy: String) -> void:
 	if sw != null:
 		var wp := game.def_num("duels.foe_prestige" if foe_fight else "duels.win_prestige", 60) * mult
 		sw.prestige += wp * (share if fw.id != sw.id else 1.0) * maxf(0.0, 1.0 + Stats.stat(game, sw, "duel_prestige_mult"))
+		game.touch(sw)
 		if fw.id != sw.id:
 			fw.prestige += wp * share
+			game.touch(fw)
 		if not friendly and not foe_fight and not sw.titles.is_empty() and game.engine.has_feature("politics"):
 			Politics.add_dread(game, sw, game.def_num("duels.win_dread", 5))
 	if sl != null and not foe_fight:
 		sl.prestige -= game.def_num("duels.lose_prestige", 40) * mult * (share if fl.id != sl.id else 1.0)
+		game.touch(sl)
 		if not friendly and game.content.has("opinion_modifiers", str(game.def_val("duels.loser_opinion", "bested_in_duel"))):
 			Opinion.add_opinion(game, sl, sw, str(game.def_val("duels.loser_opinion", "bested_in_duel")))
 	# сдался — позор, храбрецу и гордецу — мука
 	if f.how == "yield" and fl != null:
 		fl.prestige -= game.def_num("duels.yield_prestige", 30)
+		game.touch(fl)
 		if fl.traits.has("brave") or fl.traits.has("arrogant"):
 			Chars.change_stress(game, fl, game.def_num("duels.yield_stress", 20), "duel")
 	var died := false
@@ -602,6 +606,7 @@ static func _conclude(game: Game, f: Dictionary, mercy: String) -> void:
 			"spare":
 				if fw != null:
 					fw.prestige += game.def_num("duels.spare_prestige", 20)
+					game.touch(fw)
 					if game.engine.has_feature("karma"):
 						Karma.add(game, fw, game.def_num("duels.spare_karma", 1), "spared_foe")
 					if game.content.has("opinion_modifiers", "spared_in_duel"):

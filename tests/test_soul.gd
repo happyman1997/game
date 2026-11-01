@@ -78,6 +78,7 @@ func test_deeds_in_data() -> void:
 	check(Karma.value(h) <= -15.0, "казнь без вины — пепел (%.0f)" % Karma.value(h))
 	var alms: Dictionary = g.content.get_def("decisions", "give_alms")
 	h.gold = 500.0
+	g.touch(h)
 	var k0 := Karma.value(h)
 	check(Decisions.take(g, alms, h), "милостыня")
 	check(Karma.value(h) > k0, "милостыня — шаг к Свету")
@@ -86,6 +87,7 @@ func test_deeds_in_data() -> void:
 	check(Decisions.is_shown(g, pil, h), "паломничество к Пепелищу доступно грешнику")
 	var k1 := Karma.value(h)
 	h.gold = 500.0
+	g.touch(h)
 	check(Decisions.take(g, pil, h), "паломничество совершено")
 	check(Karma.value(h) > k1, "у Пепелища пепел сходит")
 

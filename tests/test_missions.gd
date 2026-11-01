@@ -16,6 +16,7 @@ func _agent(g: Game, patron: Dictionary) -> Dictionary:
 			return c
 	var c := Chars.create_character(g, {"culture": patron.culture, "faith": patron.faith, "age": 24, "female": false})
 	c.liege = patron.id
+	g.touch(c)
 	g.mark_chars_dirty([c.id, patron.id])
 	return c
 
@@ -37,6 +38,7 @@ func test_who_can_go() -> void:
 	check(not Missions.can_go(g, "embassy", w, h), "чужой правитель — не ваш человек")
 	var kid := Chars.create_character(g, {"culture": h.culture, "faith": h.faith, "age": 8, "female": false})
 	kid.liege = h.id
+	g.touch(kid)
 	g.mark_chars_dirty([kid.id, h.id])
 	check(not Missions.can_go(g, "embassy", kid, h), "ребёнка не отправить")
 
@@ -51,6 +53,7 @@ func test_embassy_round_trip() -> void:
 	check(not opts.is_empty(), "есть к кому ехать")
 	var tgt: Dictionary = opts[0].ref
 	h.gold = 500.0
+	g.touch(h)
 	check_eq(Interactions.execute(g, def, h, a, {"target": tgt}), "accepted", "посол отправлен")
 	check(Missions.is_away(a), "посол в отъезде")
 	check(not Knights.is_candidate(g, h, a), "в отъезде — не рыцарь")
@@ -101,8 +104,11 @@ func test_son_asks_to_see_the_world() -> void:
 	var h: Dictionary = g.ch("harold")
 	var son := Chars.create_character(g, {"culture": h.culture, "faith": h.faith, "age": 18, "female": false, "father": h.id})
 	son.liege = h.id
+	g.touch(son)
 	son.skills["prowess"] = 12
+	g.touch(son)
 	son.traits.append("brave")
+	g.touch(son)
 	g.mark_chars_dirty([son.id, h.id])
 	g.state.player = null
 	check(g.events.fire("mission.0020", {"type": "character", "id": h.id}), "сын просится в мир")

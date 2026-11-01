@@ -79,6 +79,7 @@ func test_work_goes_by_patches() -> void:
 	var g := _game()
 	var h := _holder(g, "c_sussex")
 	h.gold = 500.0
+	g.touch(h)
 	Biomes.set_terrain(g, "c_sussex", "forest", null, "test")
 	check(Biomes.blockers(g, h, "c_sussex", "drain_marsh").has("land.wrong_terrain"), "топь не осушить в лесу")
 	var w0: Dictionary = g.ch("william")
@@ -115,6 +116,7 @@ func test_work_ends_without_land_or_gold() -> void:
 	var g := _game()
 	var h := _holder(g, "c_sussex")
 	h.gold = 500.0
+	g.touch(h)
 	Biomes.set_terrain(g, "c_sussex", "plains", null, "test")
 	var cells := g.land().cells("c_sussex")
 	g.land().change("c_sussex", PackedInt32Array([cells[0]]), "clearing")
@@ -125,6 +127,7 @@ func test_work_ends_without_land_or_gold() -> void:
 	Biomes.set_terrain(g, "c_sussex", "forest", null, "test")
 	check(Biomes.start(g, h, "c_sussex", "clear_forest"), "свести лес")
 	h.gold = 0.0
+	g.touch(h)
 	Biomes.work_of(g, "c_sussex").until = g.date
 	Biomes.monthly(g)
 	check(Biomes.work_of(g, "c_sussex") == null, "нет золота — работа окончена")
@@ -138,6 +141,7 @@ func test_neighbors_get_flooded() -> void:
 	var hits := 0
 	for i in 40:
 		h.gold = 500.0
+		g.touch(h)
 		Biomes.set_terrain(g, "c_sussex", "forest", null, "test")
 		for n in lows:
 			g.state.provinces[n].modifiers = g.state.provinces[n].modifiers.filter(func(m): return m.id != "flooding")
@@ -196,6 +200,7 @@ func test_ai_tends_land_and_save_keeps_cells() -> void:
 	g.engine.hooks.on("land.work_started", func(_p): started[0] += 1, 0, "test")
 	for c in g.rulers():
 		c.gold = maxf(float(c.gold), 400.0)
+		g.touch(c)
 	_to_month_end(g, 13)
 	check(started[0] > 0, "ИИ берётся за свою землю (%d работ за год)" % started[0])
 	Biomes.set_terrain(g, "c_sussex", "old_forest", "harold", "test", null, 0.5)

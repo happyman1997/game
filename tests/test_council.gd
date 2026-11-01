@@ -78,6 +78,7 @@ func test_project_events_run_clean() -> void:
 	var h: Dictionary = g.ch("harold")
 	Council.fill(g, h)
 	h.gold = 500.0
+	g.touch(h)
 	var issues0 := g.engine.issues.size()
 	var councillor: String = h.council[Council.seated(g, h)[0]].holder
 	for t in g.content.all("council_tasks"):

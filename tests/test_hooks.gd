@@ -28,6 +28,7 @@ func test_demand_gold_weak_hook() -> void:
 	check(not Interactions.is_shown(g, def, h, v), "без крюка — не видно")
 	Leverage.add_hook(g, h, v)
 	v.gold = 300.0
+	g.touch(v)
 	check(Interactions.is_shown(g, def, h, v), "с крюком — видно")
 	check(Interactions.acceptance(g, def, h, v).auto, "отказать нельзя")
 	var hg := float(h.gold)
@@ -76,7 +77,9 @@ func test_ai_uses_hooks() -> void:
 	var h: Dictionary = g.ch("harold")
 	var v := _vassal(g, h)
 	v.gold = 400.0
+	g.touch(v)
 	h.gold = 10.0
+	g.touch(h)
 	Leverage.add_hook(g, h, v)
 	var used := [false]
 	var fn := func(p):

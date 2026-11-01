@@ -116,6 +116,7 @@ func test_relief_from_heir() -> void:
 	var heir: Variant = Succession.primary_heir(g, v)
 	check(heir != null, "у вассала есть наследник")
 	v.gold = 300.0
+	g.touch(v)
 	var hg := float(h.gold)
 	Succession.kill_character(g, v)
 	var nh: Dictionary = g.ch(heir.id)
@@ -135,6 +136,7 @@ func test_escheat_childless_count() -> void:
 		var ch: Variant = g.ch(cid)
 		if ch != null:
 			ch.death = g.date
+			g.touch(ch)
 	var titles: Array = v.titles.duplicate()
 	# у игрока лен не отбирают
 	g.state.player = v.id

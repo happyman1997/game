@@ -50,6 +50,7 @@ func test_banner_opens_muster() -> void:
 	var h: Dictionary = g.ch("harold")
 	var def: Dictionary = g.content.get_def("decisions", "grand_muster")
 	h.prestige = 0.0
+	g.touch(h)
 	_fresh(g)
 	check(_locked(g, def, h), "смотр заперт")
 	Artifacts.create(g, "banner", "common", h)
@@ -88,7 +89,9 @@ func test_honest_refuse_bribes() -> void:
 	var bribe: Dictionary = g.content.get_def("interactions", "bribe")
 	var v: Dictionary = g.vassals_of(h.id)[0]
 	v.traits = v.traits.filter(func(t): return t != "greedy")
+	g.touch(v)
 	v.traits.append("honest")
+	g.touch(v)
 	_fresh(g)
 	var ctx := ScriptContext.make(g, {"type": "character", "id": h.id}, {"actor": {"type": "character", "id": h.id}, "recipient": {"type": "character", "id": v.id}})
 	var spec: Dictionary = Interp.flatten_effects(bribe.on_accept)[0][1]

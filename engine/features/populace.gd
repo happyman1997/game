@@ -469,6 +469,7 @@ static func take_counties(game: Game, leader: Dictionary, f: Dictionary, create_
 		Prison.release(game, leader)
 	if leader.dynasty == null:
 		leader.dynasty = Chars.create_dynasty(game, leader.culture, leader.id).id
+		game.touch(leader)
 	Chars.set_liege(game, leader, null)
 	for cid in counties:
 		Titles.transfer_title(game, cid, leader.id, holder.liege if holder != null else null)

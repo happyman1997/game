@@ -37,6 +37,7 @@ func test_progress_fulfil_gratitude() -> void:
 	Ambitions.check(g, v)
 	check(Ambitions.current(v) != null, "пока не исполнено")
 	v.gold = float(v.gold) + float(pr.need) + 1.0
+	g.touch(v)
 	Ambitions.check(g, v)
 	check(Ambitions.current(v) == null, "исполнено — снято")
 	check(Opinion.has_opinion_modifier(v, harold, "ambition_fulfilled"), "благодарность сюзерену")
@@ -74,6 +75,7 @@ func test_liege_grants_ambition() -> void:
 	var v := _vassal(g)
 	var harold: Dictionary = g.ch("harold")
 	harold.gold = 2000.0
+	g.touch(harold)
 	Ambitions.start(g, v, "wealth")
 	# игрок — сюзерен — может исполнить сам
 	check(Ambitions.grantable_by(g, v, harold), "можно исполнить своими силами")
@@ -185,6 +187,7 @@ func test_independence_ambition() -> void:
 	for f in g.content.all("faiths"):
 		if str(f.id) != str(h.faith):
 			v.faith = f.id
+			g.touch(v)
 			break
 	var opt2: Array = Ambitions.options(g, v).filter(func(o): return o.id == "independence")
 	check(not opt2.is_empty() and float(opt2[0].weight) > w0, "иноверец мечтает сильнее (%.1f → %.1f)" % [w0, opt2[0].weight if not opt2.is_empty() else 0.0])

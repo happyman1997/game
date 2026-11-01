@@ -22,6 +22,8 @@ class ErrorCatcher extends Logger:
 func _init() -> void:
 	var catcher := ErrorCatcher.new()
 	OS.add_logger(catcher)
+	# копия персонажей в ядре сверяется со словарями после каждого дня и теста
+	Game.check_world = true
 	var filter := ""
 	var args := OS.get_cmdline_user_args()
 	if args.size() > 0:
@@ -42,6 +44,11 @@ func _init() -> void:
 			var t := Time.get_ticks_msec()
 			catcher.errors.clear()
 			await tc.call(m)
+			for ref in Game.checked_games:
+				var g: Variant = ref.get_ref()
+				if g != null:
+					g.check_world_now("конец теста")
+			Game.checked_games.clear()
 			for err in catcher.errors:
 				tc.failures.append("ошибка выполнения: " + err)
 			total += 1

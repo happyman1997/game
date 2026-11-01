@@ -50,6 +50,7 @@ static func imprison(game: Game, jailer: Dictionary, prisoner: Dictionary, reaso
 	if not game.engine.hooks.veto("prison.before_imprison", {"game": game, "jailer": jailer, "prisoner": prisoner, "reason": reason}):
 		return false
 	prisoner["prison"] = {"by": jailer.id, "since": game.date, "home": prisoner.liege, "war": war}
+	game.touch(prisoner)
 	game.month_cache.erase(INDEX_KEY)
 	# армии остаются без него
 	for a in game.state.armies.values():
@@ -68,6 +69,7 @@ static func release(game: Game, prisoner: Dictionary, reason: String = "released
 		return
 	var jailer: String = prisoner.prison.by
 	prisoner.prison = null
+	game.touch(prisoner)
 	game.mark_chars_dirty([prisoner.id, jailer])
 	if Chars.is_alive(prisoner):
 		game.message(game.loc.t("msg.prison_" + reason, {"who": game.scope_name({"type": "character", "id": prisoner.id})}),
@@ -194,6 +196,7 @@ func install(engine: GameEngine) -> void:
 	engine.hooks.on("character.death", func(p):
 		if p.character.get("prison") != null:
 			p.character.prison = null
+			p.game.touch(p.character)
 	, 0, OWNER)
 	# Плен лидера вражеской стороны даёт счёт войны.
 	engine.hooks.on("war.score", func(p):

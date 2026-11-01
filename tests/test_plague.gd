@@ -37,6 +37,7 @@ func test_outbreak_event_in_domain() -> void:
 	check(not pe.is_empty(), "вспышка в графстве домена — событие игроку")
 	if not pe.is_empty():
 		h.gold = 200.0
+		g.touch(h)
 		g.events.choose(pe[-1].uid, 0)
 		check(g.state.provinces[pid].modifiers.any(func(m): return m.id == "quarantine"), "карантин — в том самом графстве")
 

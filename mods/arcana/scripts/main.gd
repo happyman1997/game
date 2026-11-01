@@ -517,6 +517,7 @@ static func _char_month(game: Game, c: Dictionary) -> void:
 ## Черта пути снята (исцеление, обряд): убрать её уровни и счётчики.
 static func _drop_path(game: Game, c: Dictionary, mods: Array, vars: Array) -> void:
 	c.modifiers = c.modifiers.filter(func(m): return not mods.has(m.id))
+	game.touch(c)
 	for v in vars:
 		c.vars.erase(v)
 	game.stat_cache.erase(c.id)
@@ -536,11 +537,13 @@ static func _vampire_month(game: Game, c: Dictionary) -> void:
 		Chars.change_stress(game, c, 6.0)
 		if not has_mod:
 			c.modifiers.append({"id": "bloodthirst"})
+			game.touch(c)
 			game.stat_cache.erase(c.id)
 		if game.is_player(c.id) and th >= 70 and th < 80:
 			game.events.trigger("arcana.0012", {"type": "character", "id": c.id})
 	elif has_mod:
 		c.modifiers = c.modifiers.filter(func(m): return m.id != "bloodthirst")
+		game.touch(c)
 		game.stat_cache.erase(c.id)
 	# ИИ-вампир (в том числе придворный, у которого нет решений) кормится сам
 	if game.ai_controls(c.id) and th >= 50.0 and game.rng.chance(0.7):
@@ -565,6 +568,7 @@ static func add_potency(game: Game, c: Dictionary, v: float) -> void:
 	if want != "":
 		c.modifiers.append({"id": want})
 	game.stat_cache.erase(c.id)
+	game.touch(c)
 	if tier > before and game.is_player(c.id):
 		game.message(t(game, "msg_tier_vampire", {"tier": t(game, "vampire_tier_%d" % tier), "powers": t(game, "vampire_powers_%d" % tier)}), "good")
 
@@ -594,6 +598,7 @@ static func add_beast(game: Game, c: Dictionary, v: float) -> void:
 		if stage != "":
 			c.modifiers.append({"id": stage})
 		game.stat_cache.erase(c.id)
+		game.touch(c)
 		if game.is_player(c.id) and stage != "":
 			game.message(t(game, "msg_" + stage), "good" if stage != "wolf_feral" else "bad")
 	if b <= -100.0:
@@ -866,6 +871,7 @@ static func purge(game: Game, c: Dictionary, magic: bool = false) -> void:
 	if float(e.strength) <= 0.0:
 		_cleanse(game, prov, who)
 		c.prestige = float(c.prestige) + 50.0
+		game.touch(c)
 	elif game.is_player(c.id):
 		game.message(t(game, "msg_purge_partial", {"place": pname(game, prov), "left": roundi(e.strength)}), "info", {"type": "province", "id": prov})
 
@@ -997,6 +1003,7 @@ static func hunt_dragon(game: Game, c: Dictionary) -> void:
 		var hoard := roundi(float(d.hoard))
 		Treasury.add(game, c, hoard, "loot")
 		c.prestige = float(c.prestige) + 500.0
+		game.touch(c)
 		Chars.add_trait(game, c, "dragonslayer")
 		add_monster_kill(game, c, 3)
 		st.dragons.erase(lair)
@@ -1042,6 +1049,7 @@ static func feed(game: Game, c: Dictionary) -> void:
 	var v: Variant = _victim_for(game, c)
 	c.vars["blood_thirst"] = 0.0 if v != null else maxf(0.0, thirst(c) - 30.0)
 	c.modifiers = c.modifiers.filter(func(m): return m.id != "bloodthirst")
+	game.touch(c)
 	game.stat_cache.erase(c.id)
 	if v == null:
 		if game.is_player(c.id):
@@ -1055,6 +1063,7 @@ static func feed(game: Game, c: Dictionary) -> void:
 		add_potency(game, c, 2.0)
 	else:
 		v.modifiers.append({"id": "drained", "expires": game.date + 365})
+		game.touch(v)
 		game.stat_cache.erase(v.id)
 		if game.is_player(c.id):
 			game.message(t(game, "msg_feed_ok", {"who": cname(game, v.id)}), "info", {"type": "character", "id": v.id})
@@ -1184,6 +1193,7 @@ static func hunt_monsters(game: Game, c: Dictionary) -> void:
 				Secrets.expose(game, c, x, s)
 				return
 	c.prestige = float(c.prestige) + 25.0
+	game.touch(c)
 	if game.is_player(c.id):
 		game.message(t(game, "msg_hunt_nothing"), "info")
 

@@ -503,6 +503,7 @@ static func start(game: Game, c: Dictionary, prov_id: String, did: String) -> bo
 		return false
 	Treasury.add(game, c, -cand.cost.gold, "construction")
 	c.prestige -= cand.cost.prestige
+	game.touch(c)
 	game.state.provinces[prov_id].construction = {"district": did, "level": cand.level, "done": game.date + int(cand.days), "days": int(cand.days), "by": c.id}
 	mark(game)
 	game.emit("district.started", {"province": prov_id, "district": did, "level": cand.level, "by": c.id})

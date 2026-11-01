@@ -82,9 +82,11 @@ func test_statecraft_open_to_all() -> void:
 	# посредничество слушают охотнее, если посредник речист
 	var med: Dictionary = g.content.get_def("interactions", "mediate_peace")
 	h.skills["diplomacy"] = 4
+	g.touch(h)
 	g.stat_cache.clear()
 	var low := float(Interactions.acceptance(g, med, h, w).total)
 	h.skills["diplomacy"] = 20
+	g.touch(h)
 	g.stat_cache.clear()
 	var high := float(Interactions.acceptance(g, med, h, w).total)
 	check(high > low, "красноречие посредника помогает (%.0f против %.0f)" % [high, low])

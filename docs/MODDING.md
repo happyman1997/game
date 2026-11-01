@@ -586,6 +586,7 @@ func init(api: ModApi) -> void:
 	api.trigger("is_falconer", {"scopes": ["character"], "doc": "Сокольничий",
 		"eval": func(ctx, scope, _arg): return ctx.game.ch(scope.id).traits.has("falconer")})
 	api.effect("release_falcon", {
+		# эффект над персонажем: интерпретатор сам сообщит ядру об изменении
 		"apply": func(ctx, scope, arg): ctx.game.ch(scope.id).prestige += Data.num(arg, 10),
 		"describe": func(_ctx, _scope, arg): return "+%s престижа за сокола" % arg,
 	})
@@ -670,10 +671,23 @@ func init(api: ModApi) -> void:
 | `api.log(msg)` | Сообщение в консоль с именем мода. |
 
 Используйте функции мира (`Chars.add_trait`, `Titles.transfer_title`,
-`Succession.kill_character`, `Wars.declare_war`…), а не меняйте состояние
+`Succession.kill_character`, `Wars.declare_war`, `Treasury.add`,
+`Chars.change_stress`, `Opinion.add_opinion`…), а не меняйте состояние
 напрямую: они поддерживают индексы и вызывают хуки. Если всё же меняете
 `liege`/`titles` вручную — вызовите `game.mark_dirty()` (сброс всех кэшей)
 или дешевле — `game.mark_chars_dirty([id, ...])` для затронутых персонажей.
+
+**Копия персонажей в ядре.** Симуляция по частям переезжает в ядро на Rust
+(`native/`), и ядро держит плотную копию персонажей: золото, престиж,
+благочестие, стресс, здоровье, навыки, культура, вера, род, сюзерен, родители,
+супруги, дети, черты, титулы, претензии, темница, модификаторы, перки, мнения.
+Функции мира и эффекты скриптового языка сообщают ядру об изменениях сами.
+Если скрипт мода меняет эти поля словаря персонажа напрямую
+(`c.prestige += 50`, `c.modifiers.append(...)`), сразу после этого вызовите
+`game.touch(c)` (несколько — `game.touch_all([c, d])`). Удалили персонажа из
+`game.state.characters` — `game.forget(id)`. Пропуск ловит сверка: тесты и
+`tools/sim.gd -- --check-world` (или `--check-world-systems` — после каждой
+системы дня) сравнивают копию со словарями и называют расходящиеся поля.
 
 **Сохранения.** Всё состояние партии — обычные словари (`game.state`),
 сохранение — это их JSON. Данные мода храните в

@@ -17,6 +17,7 @@ func test_install_and_remove() -> void:
 	var g := _game()
 	var h: Dictionary = g.ch("harold")
 	h.gold = 1000.0
+	g.touch(h)
 	var s0: float = M.fortitude(g, h)
 	var pr0 := Stats.stat(g, h, "prowess")
 	check(M.blockers(g, h, "wire_sinews").is_empty(), "можно вживить")
@@ -56,6 +57,7 @@ func test_fortitude_traits_possession_and_exorcism() -> void:
 	if got:
 		check_eq(M.status(g, h), "possessed", "статус — одержимость")
 		h.gold = 500.0
+		g.touch(h)
 		check(M.exorcise(g, h), "экзорцизм")
 		check(not h.traits.has("iron_possession"), "бесы изгнаны")
 		check_eq(float(h.gold), 500.0 - M.exorcism_cost(g), "экзорцист оплачен")
@@ -128,6 +130,7 @@ func test_save_and_ai() -> void:
 	e.hooks.on("grafts.installed", func(_p): bought[0] += 1)
 	for r in g.rulers():
 		r.gold = 2000.0
+		g.touch(r)
 		for _i in 20:
 			M._ai_buy(g, r)
 		if bought[0] > 0:

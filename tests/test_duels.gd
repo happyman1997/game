@@ -16,8 +16,11 @@ func _game() -> Game:
 func _fighter(g: Game, prowess: float, traits: Array = []) -> Dictionary:
 	var c := Chars.create_character(g, {"culture": "saxon", "faith": g.ch("harold").faith, "age": 30, "female": false})
 	c.traits = traits.duplicate()
+	g.touch(c)
 	c.skills["prowess"] = prowess
+	g.touch(c)
 	c.skills["intrigue"] = 5
+	g.touch(c)
 	g.stat_cache.erase(c.id)
 	g.stat_cache.erase("ai:" + c.id)
 	return c
@@ -114,8 +117,10 @@ func test_player_fight_waits_and_mercy() -> void:
 	var h: Dictionary = g.ch("harold")
 	var foe := _fighter(g, 10)
 	foe.children = []
+	g.touch(foe)
 	var son := Chars.create_character(g, {"culture": "saxon", "faith": h.faith, "age": 20, "female": false, "father": foe.id})
 	foe.children.append(son.id)
+	g.touch(foe)
 	Duels.duel(g, h, foe, {"champions": false})
 	check_eq(Duels.pending(g).size(), 1, "игрок бьётся сам — бой ждёт его ходов")
 	var f: Dictionary = Duels.pending(g)[0]
@@ -209,8 +214,10 @@ func test_challenge_event() -> void:
 	var h: Dictionary = g.ch("harold")
 	var v: Dictionary = g.vassals_of(h.id)[0]
 	v.skills["prowess"] = 14
+	g.touch(v)
 	if not v.traits.has("arrogant"):
 		v.traits.append("arrogant")
+		g.touch(v)
 	g.stat_cache.clear()
 	var dueled := [0]
 	g.engine.hooks.on("duel", func(_p): dueled[0] += 1, 0, "test")

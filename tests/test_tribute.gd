@@ -78,6 +78,7 @@ func test_offer_and_refuse() -> void:
 	var def: Dictionary = g.content.get_def("interactions", "offer_tribute")
 	check(Interactions.is_shown(g, def, d, h), "воюющий может откупиться данью")
 	h.traits.append("greedy")
+	g.touch(h)
 	g.stat_cache.clear()
 	var r := Interactions.execute(g, def, d, h)
 	if r == "accepted":

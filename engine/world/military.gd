@@ -290,6 +290,8 @@ static func _battle(game: Game, w: Dictionary, loc: String, att: Array, def: Arr
 	var bp = game.def_num("military.battle_prestige", 20)
 	win_owner.prestige += bp
 	lose_owner.prestige -= bp / 2.0
+	game.touch(win_owner)
+	game.touch(lose_owner)
 
 	game.message(game.loc.t("msg.battle", {
 		"place": game.name_of("provinces", loc),

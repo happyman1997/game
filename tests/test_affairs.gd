@@ -23,6 +23,7 @@ func _vassal_county(g: Game) -> Array:
 
 func _start_work(g: Game, pid: String, c: Dictionary) -> String:
 	c.gold = 500.0
+	g.touch(c)
 	for d in Biomes.works_here(g, pid):
 		if Biomes.blockers(g, c, pid, d.id).is_empty() and Biomes.start(g, c, pid, d.id):
 			return str(d.id)
@@ -51,6 +52,7 @@ func test_help_hastens_and_endears() -> void:
 	var until := int(w.until)
 	var op := Opinion.opinion(g, vc[1], h)
 	h.gold = 500.0
+	g.touch(h)
 	check_eq(Affairs.meddle(g, h, "work:" + vc[0], "send_workers"), "help", "помог людьми")
 	check(int(w.until) < until, "участок пойдёт быстрее (%d → %d)" % [until, int(w.until)])
 	check(Opinion.opinion(g, vc[1], h) > op, "вассал запомнил добром")
@@ -69,7 +71,9 @@ func test_hinder_by_check_and_exposure() -> void:
 		var w: Dictionary = Biomes.work_of(g, vc[0])
 		var until := int(w.until)
 		h.gold = 500.0
+		g.touch(h)
 		h.skills.intrigue = 40
+		g.touch(h)
 		var seen := [false]
 		g.engine.hooks.on("affair.meddled", func(p): seen[0] = p.discovered, 0, "test")
 		var res := Affairs.meddle(g, h, "work:" + vc[0], "spoil_works")
@@ -107,6 +111,7 @@ func test_envoy_to_me_and_traveler() -> void:
 			a = x
 	check(a != null and a.get("to_me", false), "посол к Гарольду — в чужих делах, «к вам»")
 	h.gold = 500.0
+	g.touch(h)
 	check_eq(Affairs.meddle(g, h, a.key, "honor_envoy"), "help", "принял с почётом")
 	check_eq(Data.num(Missions.of(agent).get("aid")), 15.0, "послу — к проверке +15")
 
@@ -118,7 +123,9 @@ func test_fire_the_works() -> void:
 	var p: Dictionary = g.state.provinces[vc[0]]
 	p.construction = {"building": "market", "done": g.date + 300, "days": 300, "by": vc[1].id}
 	h.gold = 500.0
+	g.touch(h)
 	h.skills.intrigue = 40
+	g.touch(h)
 	var done := int(p.construction.done)
 	var res := Affairs.meddle(g, h, "build:" + vc[0], "fire_the_works")
 	if res in ["success", "partial"]:
@@ -134,6 +141,7 @@ func test_ai_meddles() -> void:
 	g.engine.hooks.on("affair.meddled", func(_p): n[0] += 1, 0, "test")
 	for c in g.rulers():
 		c.gold = maxf(float(c.gold), 600.0)
+		g.touch(c)
 		var dom := Titles.domain_counties(g, c)
 		if not dom.is_empty():
 			_start_work(g, dom[0], c)

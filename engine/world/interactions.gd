@@ -236,6 +236,7 @@ static func execute(game: Game, def: Dictionary, actor: Dictionary, recipient: D
 	Treasury.add(game, actor, -cst.gold, Treasury.cat_of_src(game, "interaction:" + str(def.id)))
 	actor.prestige -= cst.prestige
 	actor.piety -= cst.piety
+	game.touch(actor)
 	if def.get("cooldown") != null:
 		actor.flags[_cooldown_key(def, recipient)] = game.date + GameDate.duration_days(def.cooldown)
 

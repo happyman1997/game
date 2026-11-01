@@ -57,9 +57,11 @@ static func add_opinion(game: Game, a: Dictionary, b: Dictionary, mod_id: String
 				e.value = v
 				e.expires = expires
 				game.stat_cache.erase("op:%s>%s" % [a.id, b.id])
+				game.touch(a)
 				return
 	list.append({"mod": mod_id, "value": v, "expires": expires})
 	game.stat_cache.erase("op:%s>%s" % [a.id, b.id])
+	game.touch(a)
 
 
 static func remove_opinion(game: Game, a: Dictionary, b: Dictionary, mod_id: String) -> void:
@@ -69,6 +71,7 @@ static func remove_opinion(game: Game, a: Dictionary, b: Dictionary, mod_id: Str
 	if a.opinions[b.id].is_empty():
 		a.opinions.erase(b.id)
 	game.stat_cache.erase("op:%s>%s" % [a.id, b.id])
+	game.touch(a)
 
 
 static func has_opinion_modifier(a: Dictionary, b: Dictionary, mod_id: String) -> bool:
@@ -80,6 +83,8 @@ static func has_opinion_modifier(a: Dictionary, b: Dictionary, mod_id: String) -
 ## судья) она тает ещё на feud_decay очков в месяц.
 static func decay_opinions(game: Game) -> void:
 	for c in game.living():
+		if c.opinions.is_empty():
+			continue
 		for target in c.opinions.keys():
 			var kept := []
 			for e in c.opinions[target]:
@@ -101,6 +106,7 @@ static func decay_opinions(game: Game) -> void:
 				c.opinions[target] = kept
 			else:
 				c.opinions.erase(target)
+		game.touch(c)
 
 
 ## Дополнительное затухание ссоры c с target: оба — вассалы одного сюзерена.

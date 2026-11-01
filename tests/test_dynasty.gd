@@ -58,6 +58,7 @@ func test_coming_of_age_education() -> void:
 	Upbringing.set_guardian(g, kid, gdn)
 	# вырос — через месяц после шестнадцатилетия
 	kid.birth = g.date - 16 * GameDate.DAYS_PER_YEAR - 10
+	g.touch(kid)
 	CoreSystems._demography_char(g, kid)
 	check(kid.flags.has("adult"), "совершеннолетие отмечено")
 	check(kid.traits.has("education_stewardship_4"), "много очков — высший уровень образования в направлении")
@@ -90,6 +91,7 @@ func test_regency() -> void:
 	check(Stats.stat_breakdown(g, heir, "tax_mult").any(func(p): return str(p.label).contains(Chars.char_name(g, r))), "регент в разбивке налога")
 	# вырос — регентство кончается
 	heir.birth = g.date - 17 * GameDate.DAYS_PER_YEAR
+	g.touch(heir)
 	heir.flags["adult"] = 0
 	Upbringing.monthly_char(g, heir)
 	check(Upbringing.regent_of(g, heir) == null, "регентство окончено")

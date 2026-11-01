@@ -56,9 +56,11 @@ func test_great_lightbearer() -> void:
 	check(Temple.head_of(g, g.ch("gero_eisenwart")) == null, "у ереси нет Великого Светоча")
 	# мнение Храма — по лицу: благочестию
 	h.piety = -200.0
+	g.touch(h)
 	_fresh(g, head, h)
 	var low := Opinion.opinion(g, head, h)
 	h.piety = 2500.0
+	g.touch(h)
 	_fresh(g, head, h)
 	check(Opinion.opinion(g, head, h) > low, "благочестивому Храм благоволит больше (%d → %d)" % [low, Opinion.opinion(g, head, h)])
 	# преемника избирают жрецы-светочи
@@ -76,15 +78,19 @@ func test_excommunication_and_coronation_follow_the_head() -> void:
 	var def: Dictionary = g.content.get_def("events", "soul.0005")
 	var tgt := {"type": "character", "id": h.id}
 	h.piety = 3000.0
+	g.touch(h)
 	_fresh(g, head, h)
 	check(not g.events.can_fire(def, tgt, ScriptContext.make(g, tgt)), "лицо спасает: благочестивого лицемера не отлучают")
 	h.piety = -200.0
+	g.touch(h)
 	_fresh(g, head, h)
 	check(g.events.can_fire(def, tgt, ScriptContext.make(g, tgt)), "нечестивого с пеплом на душе — отлучают")
 	# коронация — лишь с благословения Великого Светоча
 	var cor: Dictionary = g.content.get_def("decisions", "coronation")
 	h.gold = 1000.0
+	g.touch(h)
 	h.piety = 3000.0
+	g.touch(h)
 	_fresh(g, head, h)
 	check(Decisions.can_take(g, cor, h), "благочестивого помажут")
 	var gold0 := float(head.gold)
@@ -97,7 +103,9 @@ func test_gift_and_absolution() -> void:
 	var h: Dictionary = g.ch("harold")
 	var head: Dictionary = Temple.head_of(g, h)
 	h.gold = 1000.0
+	g.touch(h)
 	h.piety = 500.0
+	g.touch(h)
 	_fresh(g, head, h)
 	var op0 := Opinion.opinion(g, head, h)
 	check_eq(Interactions.execute(g, g.content.get_def("interactions", "temple_gift"), h, head), "accepted", "дар Храму принят")
@@ -107,6 +115,7 @@ func test_gift_and_absolution() -> void:
 	var ctx := ScriptContext.make(g, {"type": "character", "id": h.id})
 	Interp.run_effect(ctx, ctx.root, {"add_modifier": {"id": "cast_out_of_light", "years": 10}})
 	h.piety = 3000.0
+	g.touch(h)
 	_fresh(g, head, h)
 	check_eq(Interactions.execute(g, g.content.get_def("interactions", "beg_absolution"), h, head), "accepted", "покаяние принято")
 	check(not h.modifiers.any(func(m): return m.id == "cast_out_of_light"), "отлучение снято")
@@ -122,10 +131,13 @@ func test_divorce_by_leave_of_the_temple() -> void:
 		Chars.marry(g, h, w)
 	check(Decisions.is_shown(g, dv, h), "солнечный обряд — развод с дозволения Храма")
 	h.piety = -200.0
+	g.touch(h)
 	h.gold = 500.0
+	g.touch(h)
 	_fresh(g, head, h)
 	check(not Decisions.can_take(g, dv, h), "без благосклонности Великого Светоча — нельзя")
 	h.piety = 3000.0
+	g.touch(h)
 	Opinion.add_opinion(g, head, h, "temple_gift")
 	_fresh(g, head, h)
 	var n0: int = h.spouses.size()
@@ -160,7 +172,9 @@ func test_temple_taken_and_freed() -> void:
 	check(not head.titles.has("d_sun_throne"), "Жерве в изгнании")
 	var cor: Dictionary = g.content.get_def("decisions", "coronation")
 	h.gold = 1000.0
+	g.touch(h)
 	h.piety = 3000.0
+	g.touch(h)
 	check(not Decisions.can_take(g, cor, h), "помазать некому")
 	# освобождение Храма
 	var t: Variant = null

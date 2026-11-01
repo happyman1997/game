@@ -53,6 +53,7 @@ func test_ash_path() -> void:
 	# дорога назад до третьей печати — Пепелище
 	var pil: Dictionary = g.content.get_def("decisions", "ash_pilgrimage")
 	h.gold = 500.0
+	g.touch(h)
 	check(Decisions.take(g, pil, h), "паломничество к Пепелищу")
 	check(not h.traits.has("ash_marked") and not h.traits.has("ash_pact"), "Пепелище отпустило")
 
@@ -104,6 +105,7 @@ func test_light_path() -> void:
 	check(Chars.trait_visible(g, w, "ash_marked", "harold"), "святой видит метку пепла")
 	# отмолить душу
 	h.piety = 500.0
+	g.touch(h)
 	var def: Dictionary = g.content.get_def("interactions", "pray_for_soul")
 	check(Interactions.is_shown(g, def, h, w), "можно отмолить душу")
 	Interactions.execute(g, def, h, w)

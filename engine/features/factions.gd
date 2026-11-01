@@ -482,6 +482,7 @@ func install(engine: GameEngine) -> void:
 				continue
 			if game.rng.chance(game.def_num("factions.sibling_claim_chance", 0.5)):
 				chd.claims.append(t)
+				game.touch(chd)
 				game.mark_claims_dirty()
 	, 0, OWNER)
 
