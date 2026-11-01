@@ -92,6 +92,11 @@ func _ready() -> void:
 	sim.snapshot_fn = MapOverlay.build_snapshot
 	map_view.sim = sim
 	map_view.army_clicked.connect(func(id): locked(select_army.bind(id)))
+	map_view.thing_clicked.connect(func(kind, id):
+		if kind == "battlefield":
+			var f: Variant = Battle.field(game, id)
+			if f != null:
+				open_battle(f))
 	map_view.tooltip_provider = province_tooltip
 	map_view.overlay.army_tooltip = army_tooltip
 	map_view.overlay.building_tooltip = building_tooltip
@@ -743,10 +748,30 @@ func army_tooltip(id: Variant) -> String:
 	return "\n".join(parts)
 
 
-## Подсказка путника (поручение, куда, сколько ещё) или шайки.
+## Окно битвы (запись войны или поле битвы с отчётом).
+func open_battle(rec: Dictionary) -> void:
+	if rec.get("report") == null:
+		return
+	var close := [Callable()]
+	close[0] = modal(BattleWindow.build(self, rec, func(): close[0].call()), {"closable": true, "dim": 0.4, "sound": "clash"})
+
+
+## Подсказка поля битвы, путника (поручение, куда, сколько ещё) или шайки.
 func thing_tooltip(kind: String, id: Variant) -> String:
 	var g := game
-	if g == null or not g.engine.has_feature("travel"):
+	if g == null:
+		return ""
+	if kind == "battlefield":
+		var f: Variant = Battle.field(g, id)
+		if f == null:
+			return ""
+		var d := GameDate.parts(int(f.date))
+		return "\n".join(PackedStringArray([BB.title(t("battle.title", {"place": g.name_of("provinces", f.location)})),
+			t("battle.field_tip", {"date": "%d.%d.%d" % [d.d, d.m, d.y], "winner": Chars.full_name(g, g.ch(f.winner), false) if g.ch(f.winner) != null else "?",
+				"loser": Chars.full_name(g, g.ch(f.loser), false) if g.ch(f.loser) != null else "?",
+				"a": K.fmt(float(f.lose_loss)), "b": K.fmt(float(f.win_loss))}),
+			BB.small(BB.muted(t("battle.field_open")))]))
+	if not g.engine.has_feature("travel"):
 		return ""
 	if kind == "band":
 		var b: Variant = Travel.bands(g).get(id)

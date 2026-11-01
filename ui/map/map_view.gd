@@ -7,6 +7,8 @@ extends Control
 signal province_clicked(id: String)
 signal province_right_clicked(id: String)
 signal army_clicked(id: String)
+## Нажатие на метку на карте (поле битвы, логово, путник): kind, id.
+signal thing_clicked(kind: String, id: Variant)
 
 const MIN_ZOOM := 0.3
 const MAX_ZOOM := 9.0
@@ -622,6 +624,10 @@ func _click(pos: Vector2) -> void:
 	var army: Variant = overlay.army_at(pos)
 	if army != null:
 		army_clicked.emit(army)
+		return
+	var thing: Variant = overlay.thing_at(pos)
+	if thing != null and thing.kind == "battlefield":
+		thing_clicked.emit(thing.kind, thing.id)
 		return
 	var p := province_at_screen(pos)
 	if p >= 0:

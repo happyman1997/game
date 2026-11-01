@@ -97,7 +97,7 @@ static func build(app: App) -> Control:
 		for b in battles.slice(0, 5):
 			var won: bool = (b.att_won and side == "att") or (not b.att_won and side == "def")
 			var d := GameDate.parts(int(b.date))
-			bl.add_child(K.rich("%s  %s %s — %s %s (%s / %s)" % [
+			var brow: Control = K.rich("%s  %s %s — %s %s (%s / %s)" % [
 				BB.muted("%d.%d.%d" % [d.d, d.m, d.y]),
 				BB.icon("swords"),
 				BB.c(app.t("ui.battle_won" if won else "ui.battle_lost"), BB.GOOD if won else BB.BAD),
@@ -105,7 +105,11 @@ static func build(app: App) -> Control:
 				BB.char_link(g, b.winner),
 				BB.good("−" + K.fmt(b.win_loss)) if won else BB.bad("−" + K.fmt(b.lose_loss)),
 				BB.bad("−" + K.fmt(b.lose_loss)) if won else BB.good("−" + K.fmt(b.win_loss)),
-			], false))
+			], false)
+			if b.get("report") != null:
+				var bb: Dictionary = b
+				brow = K.hbox([brow, K.expand(), K.button(app.t("battle.open"), func(): app.open_battle(bb), {"variation": "FlatButton"})], 6)
+			bl.add_child(brow)
 		if battles.is_empty():
 			bl.add_child(K.label(app.t("ui.no_battles"), "MutedLabel"))
 		box.add_child(K.vbox([K.label(app.t("ui.battles"), "GoldLabel"), bl], 3))

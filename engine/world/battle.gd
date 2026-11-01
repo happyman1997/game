@@ -173,7 +173,34 @@ static func fight(game: Game, loc: String, att: Array, def: Array, defender_side
 	return r
 
 
-## Потери из отчёта — в армии и их отряды. Возвращает потери по армиям.
+## Поле битвы на карте (state.battlefields): остаётся defines.battle.field_years
+## лет, не больше field_max последних.
+static func add_field(game: Game, rec: Dictionary) -> void:
+	var fields: Array = Data.as_array(game.state.get("battlefields")).duplicate()
+	var f := rec.duplicate()
+	f["id"] = game.new_id("bf")
+	fields.append(f)
+	game.state["battlefields"] = fields
+	prune_fields(game)
+
+
+static func prune_fields(game: Game) -> void:
+	var keep := int(Data.num(_d(game, "field_years", 2)) * GameDate.DAYS_PER_YEAR)
+	var mx := int(Data.num(_d(game, "field_max", 30)))
+	var fields: Array = Data.as_array(game.state.get("battlefields")).filter(func(f): return game.date - int(f.date) <= keep)
+	if fields.size() > mx:
+		fields = fields.slice(fields.size() - mx)
+	game.state["battlefields"] = fields
+
+
+static func field(game: Game, id: Variant) -> Variant:
+	for f in Data.as_array(game.state.get("battlefields")):
+		if f.id == id:
+			return f
+	return null
+
+
+## Потери из отчёта — в армии и их отряды.
 static func apply_losses(game: Game, r: Dictionary, armies: Array) -> void:
 	var by_key := {}
 	for side in r.units:

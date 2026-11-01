@@ -322,6 +322,7 @@ static func _battle(game: Game, w: Dictionary, loc: String, att: Array, def: Arr
 	var rec := {"date": game.date, "location": loc, "winner": win_owner.id, "loser": lose_owner.id, "win_loss": win_loss, "lose_loss": lose_loss, "att_won": att_wins}
 	if report != null:
 		rec["report"] = report
+		Battle.add_field(game, rec)
 	w.battles.append(rec)
 	if w.battles.size() > 12:
 		w.battles = w.battles.slice(w.battles.size() - 12)

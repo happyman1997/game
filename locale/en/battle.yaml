@@ -1,0 +1,50 @@
+# Battle (engine/world/battle.gd, window ui/windows/battle_window.gd)
+battle:
+  title: "Battle of {place}"
+  result: "{winner} defeated {loser}"
+  result_refused: "{loser} refused battle and fell back before {winner}"
+  days: "{n} days of fighting"
+  side_att: Attackers
+  side_def: Defenders
+  commander: "Commander: {name}"
+  no_commander: "No commander"
+  morale: Morale
+  men: Army
+  lost: Losses
+  fled: "fled"
+  course: Course of battle
+  units: Troops
+  knights: Knights in the melee
+  turns: Turning points
+  close: Close
+  levy: Levies
+  phase:
+    skirmish: Skirmish
+    melee: "Day {n}"
+    pursuit: Pursuit
+  ev:
+    skirmish: "The {side} won the skirmish: {n} more enemy dead"
+    charge: "{side}: the cavalry charged"
+    duel: "{a} overcame {b}"
+    levy_fled: "{side}: the levies flee ({n})"
+    broke: "The {side} wavered and ran"
+    refused: "The {side} refused battle and fell back"
+    withdrew: "The {side} withdrew from the field"
+    pursuit: "The {side} cut down the fleeing: {n} more dead"
+    commander_fell: "A commander fell — {a}"
+  fate:
+    killed: "slain by {by}"
+    wounded: "wounded — {by}"
+    captured: "taken prisoner — {by}"
+    driven_off: "driven off — {by}"
+  no_melee: "no melee"
+  cmd_fate_short:
+    wounded: "wounded in the front ranks"
+    killed: "fell in battle"
+  cmd_fate:
+    wounded: "{name} was wounded in the front ranks"
+    killed: "{name} fell in battle"
+  field: "Battlefield"
+  field_tip: "{date}: {winner} defeated {loser}. {a} and {b} fell."
+  field_open: "Click for the battle report"
+  open: "Battle report"

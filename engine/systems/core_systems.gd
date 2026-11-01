@@ -290,6 +290,7 @@ static func _prune_dead(game: Game) -> void:
 
 static func _war_month(game: Game) -> void:
 	Wars.validate_wars(game)
+	Battle.prune_fields(game)
 	for w in game.state.wars.values():
 		Wars.update_ticking(game, w)
 

@@ -190,7 +190,20 @@ static func build_snapshot(g: Game) -> Dictionary:
 			builds[p.id] = {"district": cons.get("district"), "building": cons.get("building"), "level": int(cons.get("level", 0)),
 				"progress": clampf(1.0 - (float(cons.done) - g.date) / days, 0.0, 1.0)}
 	return {"armies": armies, "sieges": sieges, "settlements": settlements_of(g), "builds": builds, "roads": roads_of(g),
-		"travelers": travelers_of(g, colors), "bands": bands_of(g)}
+		"travelers": travelers_of(g, colors), "bands": bands_of(g), "fields": fields_of(g)}
+
+
+## Поля битв: метка в графстве, со временем бледнеет.
+static func fields_of(g: Game) -> Array:
+	var out := []
+	var m: MapData = g.engine.map
+	var keep := maxf(1.0, Data.num(g.def_val("battle.field_years", 2)) * GameDate.DAYS_PER_YEAR)
+	for f in Data.as_array(g.state.get("battlefields")):
+		if not m.index.has(f.location):
+			continue
+		var age := clampf((g.date - int(f.date)) / keep, 0.0, 1.0)
+		out.append({"id": f.id, "pos": m.center_of(f.location) + Vector2(20, 8), "fade": 1.0 - age * 0.7})
+	return out
 
 
 ## Путники с поручениями: точка на карте, цвет державы покровителя.
@@ -256,6 +269,17 @@ func _draw_travel(snap: Dictionary) -> void:
 		draw_arc(p, 9.0, 0, TAU, 24, Color(0.85, 0.3, 0.2, a), 1.5)
 		draw_texture_rect(Icons.texture(str(b.icon), 14, "red"), Rect2(p - Vector2(7, 7), Vector2(14, 14)), false, Color(1, 1, 1, a))
 		_thing_pos.append({"pos": p, "kind": "band", "id": b.id})
+	var swords := Icons.texture("swords", 14, "silver")
+	for f in snap.get("fields", []):
+		var p := view.map_to_screen(f.pos)
+		if p.x < -40 or p.y < -40 or p.x > size.x + 40 or p.y > size.y + 40:
+			continue
+		var fa: float = a * float(f.fade)
+		draw_circle(p + Vector2(1, 2), 9.0, Color(0, 0, 0, 0.35 * fa))
+		draw_circle(p, 9.0, Color(0.25, 0.06, 0.04, 0.85 * fa))
+		draw_arc(p, 9.0, 0, TAU, 24, Color(0.75, 0.62, 0.4, fa), 1.4)
+		draw_texture_rect(swords, Rect2(p - Vector2(7, 7), Vector2(14, 14)), false, Color(1, 1, 1, fa))
+		_thing_pos.append({"pos": p, "kind": "battlefield", "id": f.id})
 	var horse := Icons.texture("horse", 12, "silver")
 	var bag := Icons.texture("bag", 12, "gold")
 	for t in snap.get("travelers", []):

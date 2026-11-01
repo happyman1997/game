@@ -1,0 +1,50 @@
+# Сражение (engine/world/battle.gd, окно ui/windows/battle_window.gd)
+battle:
+  title: "Битва у {place}"
+  result: "{winner} разбил {loser}"
+  result_refused: "{loser} не принял сечи и отошёл перед {winner}"
+  days: "{n} дн. боя"
+  side_att: Нападающие
+  side_def: Защитники
+  commander: "Полководец: {name}"
+  no_commander: "Без полководца"
+  morale: Дух
+  men: Войско
+  lost: Потери
+  fled: "бежали"
+  course: Ход битвы
+  units: Войска
+  knights: Рыцари в гуще
+  turns: Переломы
+  close: Закрыть
+  levy: Ополчение
+  phase:
+    skirmish: Перестрелка
+    melee: "День {n}"
+    pursuit: Погоня
+  ev:
+    skirmish: "Перестрелку взяли {side}: врагу на {n} павших больше"
+    charge: "{side}: конница пошла в натиск"
+    duel: "{a} одолел {b}"
+    levy_fled: "{side}: ополчение бежит ({n})"
+    broke: "{side} дрогнули и бегут"
+    refused: "{side} не приняли сечи и отошли"
+    withdrew: "{side} отошли с поля"
+    pursuit: "{side} гонят бегущих: ещё {n} павших"
+    commander_fell: "Пал полководец — {a}"
+  fate:
+    killed: "пал от руки {by}"
+    wounded: "ранен — {by}"
+    captured: "взят в плен — {by}"
+    driven_off: "отбит — {by}"
+  no_melee: "без сечи"
+  cmd_fate_short:
+    wounded: "ранен в первых рядах"
+    killed: "пал в бою"
+  cmd_fate:
+    wounded: "{name} ранен в первых рядах"
+    killed: "{name} пал в бою"
+  field: "Поле битвы"
+  field_tip: "{date}: {winner} разбил {loser}. Пало {a} и {b}."
+  field_open: "Нажмите — отчёт о битве"
+  open: "Отчёт о битве"

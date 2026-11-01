@@ -2,7 +2,8 @@ extends TestCase
 ## Сражение в ядре: перестрелка, сеча по дням, слом и погоня. Большее войско
 ## побеждает; пикинёры держат тяжёлую конницу; втрое меньшее войско сечи не
 ## принимает; трус ломается раньше; бой в войне оставляет отчёт с потерями по
-## видам войск, а рыцари, сошедшиеся в поединке, получают свои судьбы.
+## видам войск и поле битвы на карте, а рыцари, сошедшиеся в поединке,
+## получают свои судьбы.
 
 
 func _game() -> Game:
@@ -116,7 +117,13 @@ func test_battle_in_war() -> void:
 			check(k.death != null, "рыцарь, павший в поединке, мёртв")
 		elif f.fate == "captured":
 			check(k.get("prison") != null or k.death != null, "взятый в плен рыцарь в темнице")
+	# поле битвы на карте — с отчётом; через field_years лет его не будет
+	var fields: Array = g.state.get("battlefields", [])
+	check(not fields.is_empty() and fields[-1].get("report") != null and Battle.field(g, fields[-1].id) != null, "поле битвы на карте")
 	var res := g.engine.load_game(SaveGame.serialize(g))
 	check(res.error == "", res.error)
 	var w2: Variant = res.game.state.wars.get(war.id)
 	check(w2 == null or w2.battles[-1].get("report") != null, "отчёт битвы переживает сохранение")
+	g.state.date += int(Data.num(g.defines.battle.field_years) * GameDate.DAYS_PER_YEAR) + 1
+	Battle.prune_fields(g)
+	check(g.state.battlefields.is_empty(), "старое поле битвы зарастает")

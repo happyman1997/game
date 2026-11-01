@@ -997,7 +997,10 @@ regiment_types:
 Отчёт битвы — в войне (`war.battles[].report`) и в хуке `battle` (поле
 `report`): ход по дням, дух, потери по видам войск, судьбы рыцарей и
 полководцев, переломы (`events`: skirmish, charge, duel, levy_fled, broke,
-refused, withdrew, pursuit, commander_fell). Бонусы механик и модов к силе
+refused, withdrew, pursuit, commander_fell). Поле битвы остаётся на карте
+(`state.battlefields`, `defines.battle.field_years` лет, не больше
+`field_max`): метка со скрещёнными мечами, подсказка с итогом, по нажатию —
+окно битвы (`BattleWindow`; его же открывает строка битвы в окне войны). Бонусы механик и модов к силе
 армии (хук `army.power_bonus`) в сражении становятся множителем силы стороны;
 в оценках ИИ — прибавкой, как прежде. `defines.battle.core: no` — прежний
 расчёт по силе сторон.
