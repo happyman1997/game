@@ -3,6 +3,7 @@
 
 use godot::prelude::*;
 
+mod battle;
 mod cells;
 mod land;
 mod rng;

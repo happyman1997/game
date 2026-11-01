@@ -1,4 +1,8 @@
-# Профессиональные войска. power — сколько ополченцев стоит один воин;
+# Профессиональные войска. power — сколько ополченцев стоит один воин (оценки
+# силы для ИИ); battle — как отряд бьётся в сражении (за одного воина):
+# melee — сила в сече, ranged — в перестрелке, toughness — стойкость (урон на
+# одного павшего), morale — дух, pursuit — погоня, screen — прикрытие отхода,
+# charge — натиск конницы в день атаки; ополчение — defines.battle.levy;
 # counters — кого этот тип контрит (до какой доли силы снимает, если
 # контрящих не меньше, чем контримых); terrain — бонус к силе на местности.
 # upkeep — жалованье в месяц (в поднятой армии — × raised_upkeep_mult).
@@ -9,6 +13,7 @@ regiment_types:
     order: 1
     size: 100
     power: 2.0
+    battle: { melee: 2.0, ranged: 0.2, toughness: 1.2, morale: 70, pursuit: 0.6, screen: 1.0 }
     cost: { gold: 35 }
     upkeep: 0.25
     terrain: { forest: 0.25, hills: 0.15, wetlands: 0.15 }
@@ -19,6 +24,7 @@ regiment_types:
     order: 2
     size: 100
     power: 2.0
+    battle: { melee: 0.8, ranged: 2.2, toughness: 1.0, morale: 60, pursuit: 0.3, screen: 0.5 }
     cost: { gold: 45 }
     upkeep: 0.3
     counters: { light_footmen: 0.4, heavy_infantry: 0.3 }
@@ -30,6 +36,7 @@ regiment_types:
     order: 3
     size: 100
     power: 2.4
+    battle: { melee: 2.4, toughness: 1.5, morale: 75, pursuit: 0.2, screen: 0.9 }
     cost: { gold: 50 }
     upkeep: 0.35
     counters: { heavy_cavalry: 0.6, light_cavalry: 0.5, chevaliers: 0.5 }
@@ -40,6 +47,7 @@ regiment_types:
     order: 4
     size: 100
     power: 3.0
+    battle: { melee: 3.0, toughness: 1.4, morale: 70, pursuit: 2.2, screen: 1.4, charge: 0.6 }
     cost: { gold: 60 }
     upkeep: 0.45
     counters: { archers: 0.6, longbowmen: 0.5 }
@@ -51,6 +59,7 @@ regiment_types:
     order: 5
     size: 100
     power: 4.0
+    battle: { melee: 4.0, toughness: 2.0, morale: 85, pursuit: 0.3, screen: 0.8 }
     cost: { gold: 80 }
     upkeep: 0.6
     counters: { pikemen: 0.4, light_footmen: 0.3 }
@@ -62,6 +71,7 @@ regiment_types:
     order: 6
     size: 50
     power: 6.5
+    battle: { melee: 6.5, toughness: 2.2, morale: 85, pursuit: 1.6, screen: 0.8, charge: 1.0 }
     cost: { gold: 140 }
     upkeep: 1.0
     counters: { archers: 0.4, light_footmen: 0.5 }
@@ -75,6 +85,7 @@ regiment_types:
     order: 10
     size: 100
     power: 5.0
+    battle: { melee: 5.0, toughness: 2.2, morale: 92, pursuit: 0.4, screen: 1.0 }
     cost: { gold: 90 }
     upkeep: 0.6
     counters: { pikemen: 0.4, light_footmen: 0.4 }
@@ -86,6 +97,7 @@ regiment_types:
     order: 11
     size: 50
     power: 7.5
+    battle: { melee: 7.5, toughness: 2.4, morale: 90, pursuit: 1.7, screen: 0.8, charge: 1.2 }
     cost: { gold: 160 }
     upkeep: 1.1
     counters: { archers: 0.5, light_footmen: 0.6, heavy_infantry: 0.2 }
@@ -98,6 +110,7 @@ regiment_types:
     order: 12
     size: 100
     power: 4.5
+    battle: { melee: 4.5, toughness: 1.8, morale: 85, pursuit: 0.5, screen: 1.0 }
     cost: { gold: 80 }
     upkeep: 0.55
     counters: { heavy_infantry: 0.3, light_cavalry: 0.3 }
@@ -110,6 +123,7 @@ regiment_types:
     order: 13
     size: 100
     power: 2.8
+    battle: { melee: 1.0, ranged: 3.0, toughness: 1.0, morale: 65, pursuit: 0.3, screen: 0.5 }
     cost: { gold: 55 }
     upkeep: 0.35
     counters: { heavy_infantry: 0.4, heavy_cavalry: 0.3, light_footmen: 0.3 }

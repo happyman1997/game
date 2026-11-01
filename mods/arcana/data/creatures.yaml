@@ -155,6 +155,7 @@ regiment_types:
     order: 20
     size: 120
     power: 1.7
+    battle: { melee: 1.7, toughness: 1.2, morale: 100, pursuit: 0.2, screen: 0.4 }
     cost: { gold: 15 }
     upkeep: 0
     terrain: { wetlands: 0.2 }
@@ -166,6 +167,7 @@ regiment_types:
     order: 21
     size: 80
     power: 3.2
+    battle: { melee: 3.2, toughness: 1.8, morale: 90, pursuit: 0.5, screen: 0.8 }
     cost: { gold: 170 }
     upkeep: 0.5
     counters: { risen_dead: 0.8 }

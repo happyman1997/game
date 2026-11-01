@@ -64,14 +64,24 @@ static func main_army_of(game: Game, owner_id: String) -> Variant:
 	return best
 
 
-static func _battle_casualties(game: Game, owner_id: String, won: bool) -> void:
+## Судьбы рыцарей после боя: сошедшиеся в поединке — по его исходу (отчёт
+## ядра: killed, wounded, captured, driven_off), прочие — по шансам рыцарей.
+static func _battle_casualties(game: Game, owner_id: String, won: bool, report: Variant = null) -> void:
 	var owner: Variant = game.ch(owner_id)
 	if owner == null:
 		return
 	var death := game.def_num("knights.winner_death_chance", 0.01) if won else game.def_num("knights.loser_death_chance", 0.04)
 	var wound := game.def_num("knights.winner_wound_chance", 0.05) if won else game.def_num("knights.loser_wound_chance", 0.12)
+	var dueled := {}
+	if report is Dictionary:
+		for f in Data.as_array(report.get("knights")):
+			dueled[str(f.id)] = f
 	for k in knights_of(game, owner):
 		if k.death != null:
+			continue
+		var df: Variant = dueled.get(k.id)
+		if df != null:
+			_duel_fate(game, k, df, report)
 			continue
 		if game.rng.chance(death * Military._death_mult(game, k)):
 			Succession.kill_character(game, k, "battle")
@@ -85,8 +95,29 @@ static func _battle_casualties(game: Game, owner_id: String, won: bool) -> void:
 	game.month_cache.erase("kpow:" + owner.id)
 
 
+static func _duel_fate(game: Game, k: Dictionary, f: Dictionary, report: Dictionary) -> void:
+	var by: Variant = game.ch(f.get("by"))
+	match str(f.fate):
+		"killed":
+			Succession.kill_character(game, k, "battle", by.id if by != null else null)
+		"wounded":
+			Chars.add_trait(game, k, str(game.def_val("knights.wound_trait", "wounded")))
+		"captured":
+			var side := 1 - int(f.side)
+			var owners: Array = report.sides[side].owners if side < report.sides.size() else []
+			var captor: Variant = game.ch(owners[0]) if not owners.is_empty() else null
+			if captor != null and game.engine.has_feature("prison") and k.get("prison") == null:
+				Prison.imprison(game, captor, k, "battle")
+	if by != null and by.death == null:
+		by.prestige += game.def_num("knights.prestige_per_duel", 15)
+		game.touch(by)
+
+
 func install(engine: GameEngine) -> void:
 	engine.hooks.on("army.power_bonus", func(p):
+		# в сражении ядра рыцари бьются сами и сходятся поединками (native_battle)
+		if p.get("native_battle", false):
+			return null
 		var main: Variant = Knights.main_army_of(p.game, p.army.owner)
 		if main == null or main.id != p.army.id:
 			return null
@@ -97,8 +128,8 @@ func install(engine: GameEngine) -> void:
 		return null if Knights.main_army_of(p.game, p.character.id) != null else Knights.power(p.game, p.character)
 	, 0, OWNER)
 	engine.hooks.on("battle", func(p):
-		Knights._battle_casualties(p.game, p.winner, true)
-		Knights._battle_casualties(p.game, p.loser, false)
+		Knights._battle_casualties(p.game, p.winner, true, p.get("report"))
+		Knights._battle_casualties(p.game, p.loser, false, p.get("report"))
 	, -20, OWNER)
 
 

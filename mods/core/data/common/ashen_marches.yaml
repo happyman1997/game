@@ -131,6 +131,7 @@ regiment_types:
     order: 14
     size: 100
     power: 3.2
+    battle: { melee: 3.2, toughness: 1.6, morale: 80, pursuit: 0.3, screen: 1.0 }
     cost: { gold: 60 }
     upkeep: 0.4
     counters: { heavy_cavalry: 0.6, light_cavalry: 0.5, chevaliers: 0.5 }
@@ -144,6 +145,7 @@ regiment_types:
     order: 15
     size: 100
     power: 2.4
+    battle: { melee: 2.4, toughness: 1.4, morale: 75, pursuit: 0.3, screen: 1.1 }
     cost: { gold: 35 }
     upkeep: 0.25
     counters: { heavy_cavalry: 0.5, chevaliers: 0.5 }
@@ -157,6 +159,7 @@ regiment_types:
     order: 16
     size: 50
     power: 9.0
+    battle: { melee: 9.0, toughness: 3.0, morale: 95, pursuit: 0.2, screen: 0.6 }
     cost: { gold: 150 }
     upkeep: 0.9
     counters: { pikemen: 0.5, light_footmen: 0.5, heavy_infantry: 0.3 }

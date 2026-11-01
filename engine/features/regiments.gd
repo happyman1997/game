@@ -299,7 +299,8 @@ func install(engine: GameEngine) -> void:
 			Regiments._sync_from_army(p.game, a)
 	, -10, OWNER)
 	# Сила в бою и в оценках ИИ.
-	engine.hooks.on("army.power_bonus", func(p): return Regiments.army_bonus(p.game, p.army, p.get("enemies", []), p.get("location")), 0, OWNER)
+	# в сражении ядра отряды — отдельные войска со своими свойствами (native_battle)
+	engine.hooks.on("army.power_bonus", func(p): return null if p.get("native_battle", false) else Regiments.army_bonus(p.game, p.army, p.get("enemies", []), p.get("location")), 0, OWNER)
 	engine.hooks.on("military.strength_bonus", func(p): return Regiments.idle_power(p.game, p.character), 0, OWNER)
 	# Отряды переходят к основному наследнику.
 	engine.hooks.on("succession", func(p):

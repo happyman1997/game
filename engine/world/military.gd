@@ -259,25 +259,42 @@ static func _side_power(game: Game, armies: Array, defending: bool, loc: String,
 static func _battle(game: Game, w: Dictionary, loc: String, att: Array, def: Array) -> void:
 	var ctrl: Variant = Titles.province_controller(game, loc)
 	var ctrl_side: Variant = Wars.side_of(game, w, ctrl.id if ctrl != null else null)
-	var A := _side_power(game, att, ctrl_side == "att", loc, def)
-	var D := _side_power(game, def, ctrl_side == "def", loc, att)
-	var att_wins: bool = A.power >= D.power
-	var win: Dictionary = A if att_wins else D
-	var lose: Dictionary = D if att_wins else A
+	# Сражение считает ядро (Battle, native/src/battle.rs): перестрелка, сеча
+	# по дням, слом и погоня; без ядра — прежний расчёт по силе сторон.
+	var report: Variant = Battle.fight(game, loc, att, def, ctrl_side)
+	var att_wins: bool
+	var win := {}
+	var lose := {}
+	var win_loss := 0
+	var lose_loss := 0
+	if report != null:
+		att_wins = int(report.winner) == 0
+		var wi := 0 if att_wins else 1
+		Battle.apply_losses(game, report, att + def)
+		win = {"men": float(report.start[wi]), "commander": game.ch(report.sides[wi].commander)}
+		lose = {"men": float(report.start[1 - wi]), "commander": game.ch(report.sides[1 - wi].commander)}
+		win_loss = int(report.lost[wi])
+		lose_loss = int(report.lost[1 - wi])
+	else:
+		var A := _side_power(game, att, ctrl_side == "att", loc, def)
+		var D := _side_power(game, def, ctrl_side == "def", loc, att)
+		att_wins = A.power >= D.power
+		win = A if att_wins else D
+		lose = D if att_wins else A
+		var ratio = minf(1.0, lose.power / maxf(1.0, win.power))
+		# преследование победителя против порядка при отходе у проигравшего
+		var chase := 1.0
+		if win.commander != null:
+			chase += Stats.stat(game, win.commander, "pursuit")
+		if lose.commander != null:
+			chase -= Stats.stat(game, lose.commander, "orderly_retreat")
+		chase = clampf(chase, game.def_num("military.chase_min", 0.5), game.def_num("military.chase_max", 1.8))
+		lose_loss = roundi(minf(lose.men * 0.95, lose.men * (game.def_num("military.loser_loss_base", 0.25) + game.def_num("military.loser_loss_scale", 0.4) * (1.0 - ratio)) * chase))
+		win_loss = roundi(win.men * (game.def_num("military.winner_loss_base", 0.05) + game.def_num("military.winner_loss_scale", 0.2) * ratio))
+		_distribute(att if att_wins else def, win_loss, win.men)
+		_distribute(def if att_wins else att, lose_loss, lose.men)
 	var win_armies: Array = att if att_wins else def
 	var lose_armies: Array = def if att_wins else att
-	var ratio = minf(1.0, lose.power / maxf(1.0, win.power))
-	# преследование победителя против порядка при отходе у проигравшего
-	var chase := 1.0
-	if win.commander != null:
-		chase += Stats.stat(game, win.commander, "pursuit")
-	if lose.commander != null:
-		chase -= Stats.stat(game, lose.commander, "orderly_retreat")
-	chase = clampf(chase, game.def_num("military.chase_min", 0.5), game.def_num("military.chase_max", 1.8))
-	var lose_loss = roundi(minf(lose.men * 0.95, lose.men * (game.def_num("military.loser_loss_base", 0.25) + game.def_num("military.loser_loss_scale", 0.4) * (1.0 - ratio)) * chase))
-	var win_loss = roundi(win.men * (game.def_num("military.winner_loss_base", 0.05) + game.def_num("military.winner_loss_scale", 0.2) * ratio))
-	_distribute(win_armies, win_loss, win.men)
-	_distribute(lose_armies, lose_loss, lose.men)
 
 	var loser_max := 0.0
 	for a in lose_armies:
@@ -302,29 +319,48 @@ static func _battle(game: Game, w: Dictionary, loc: String, att: Array, def: Arr
 	# летопись битв войны (последние) — для окна войны
 	if not (w.get("battles") is Array):
 		w["battles"] = []
-	w.battles.append({"date": game.date, "location": loc, "winner": win_owner.id, "loser": lose_owner.id, "win_loss": win_loss, "lose_loss": lose_loss, "att_won": att_wins})
+	var rec := {"date": game.date, "location": loc, "winner": win_owner.id, "loser": lose_owner.id, "win_loss": win_loss, "lose_loss": lose_loss, "att_won": att_wins}
+	if report != null:
+		rec["report"] = report
+	w.battles.append(rec)
 	if w.battles.size() > 12:
 		w.battles = w.battles.slice(w.battles.size() - 12)
 	game.emit("battle", {"war": w, "location": loc, "winner": win_owner.id, "loser": lose_owner.id, "win_loss": win_loss, "lose_loss": lose_loss,
-		"win_commander": win.commander.id if win.commander != null else null, "lose_commander": lose.commander.id if lose.commander != null else null})
+		"win_commander": win.commander.id if win.commander != null else null, "lose_commander": lose.commander.id if lose.commander != null else null,
+		"report": report})
 	game.on_action("on_battle_won", {"type": "character", "id": win_owner.id}, {"enemy": {"type": "character", "id": lose_owner.id}})
 	game.on_action("on_battle_lost", {"type": "character", "id": lose_owner.id}, {"enemy": {"type": "character", "id": win_owner.id}})
 
 	# Гибель полководцев
 	var lc: Variant = lose.commander
 	var wc: Variant = win.commander
-	# личный пример даром не даётся: в первых рядах легко получить рану
-	for cm in [lc, wc]:
-		if cm != null and game.rng.chance(maxf(0.0, Stats.stat(game, cm, "personal_example") - game.def_num("military.personal_example_safe", 0.03)) * game.def_num("military.personal_example_wound", 2)):
-			Military._wound(game, cm)
-	# battle_survival — доблестным реже достаётся смертельный удар
-	if lc != null and game.rng.chance(game.def_num("military.loser_commander_death", 0.04) * _death_mult(game, lc)):
-		Succession.kill_character(game, lc, "battle", wc.id if wc != null else null)
-	else:
-		if wc != null and game.rng.chance(game.def_num("military.winner_commander_death", 0.01) * _death_mult(game, wc)):
-			Succession.kill_character(game, wc, "battle", lc.id if lc != null else null)
+	if report != null:
+		# судьбы решило ядро: рана в первых рядах, гибель
+		var wi2 := 0 if att_wins else 1
+		var fates: Array = report.commander
+		for pair in [[wc, fates[wi2], lc], [lc, fates[1 - wi2], wc]]:
+			var cm: Variant = pair[0]
+			if cm == null or cm.death != null:
+				continue
+			if pair[1] == "wounded":
+				Military._wound(game, cm)
+			elif pair[1] == "killed":
+				Succession.kill_character(game, cm, "battle", pair[2].id if pair[2] != null else null)
 		if lc != null and lc.death == null:
 			game.emit("battle.commander_survived", {"war": w, "commander": lc.id, "captor": win_owner.id})
+	else:
+		# личный пример даром не даётся: в первых рядах легко получить рану
+		for cm in [lc, wc]:
+			if cm != null and game.rng.chance(maxf(0.0, Stats.stat(game, cm, "personal_example") - game.def_num("military.personal_example_safe", 0.03)) * game.def_num("military.personal_example_wound", 2)):
+				Military._wound(game, cm)
+		# battle_survival — доблестным реже достаётся смертельный удар
+		if lc != null and game.rng.chance(game.def_num("military.loser_commander_death", 0.04) * _death_mult(game, lc)):
+			Succession.kill_character(game, lc, "battle", wc.id if wc != null else null)
+		else:
+			if wc != null and game.rng.chance(game.def_num("military.winner_commander_death", 0.01) * _death_mult(game, wc)):
+				Succession.kill_character(game, wc, "battle", lc.id if lc != null else null)
+			if lc != null and lc.death == null:
+				game.emit("battle.commander_survived", {"war": w, "commander": lc.id, "captor": win_owner.id})
 
 	# Отступление проигравших
 	var min_army = game.def_num("military.min_army", 50)
