@@ -94,7 +94,10 @@ static func is_special_building(game: Game, b: String) -> bool:
 
 
 ## [{def, blockers}]
-static func building_candidates(game: Game, c: Dictionary, prov_id: String) -> Array:
+## quick — для ИИ: без текстов причин; постройки, которым мешает не только
+## нехватка золота и престижа, сразу отбрасываются, условие и цена считаются
+## только для прошедших дешёвые проверки.
+static func building_candidates(game: Game, c: Dictionary, prov_id: String, quick := false) -> Array:
 	var p: Variant = game.state.provinces.get(prov_id)
 	var pdef: Variant = game.content.get_def("provinces", prov_id)
 	if p == null or pdef == null:
@@ -115,6 +118,11 @@ static func building_candidates(game: Game, c: Dictionary, prov_id: String) -> A
 		var did: Variant = Districts.building_district(game, b.id) if districts_on else null
 		# постройки района видны, когда район заложен
 		if did != null and Districts.level(game, prov_id, did) <= 0:
+			continue
+		if quick:
+			var qc: Variant = _quick_candidate(game, c, prov_id, p, b, did, full)
+			if qc != null:
+				out.append(qc)
 			continue
 		var bl := []
 		var t: Variant = game.state.titles.get(prov_id)
@@ -144,6 +152,34 @@ static func building_candidates(game: Game, c: Dictionary, prov_id: String) -> A
 		# cost_only — мешает только нехватка золота (на это ИИ может накопить)
 		out.append({"def": b, "blockers": bl + cb, "cost": cost, "cost_only": bl.is_empty() and not cb.is_empty() and float(c.prestige) >= float(cost.prestige)})
 	return out
+
+
+## Кандидат для ИИ (building_candidates quick): null — мешает не только цена.
+static func _quick_candidate(game: Game, c: Dictionary, prov_id: String, p: Dictionary, b: Dictionary, did: Variant, full: bool) -> Variant:
+	var t: Variant = game.state.titles.get(prov_id)
+	if t == null or t.holder != c.id or p.construction != null or p.occupant != null:
+		return null
+	if did != null:
+		if Districts.level(game, prov_id, did) < int(Data.num(b.get("level"), 1)):
+			return null
+		if Districts.buildings_in(game, prov_id, did).size() >= Districts.slots(game, prov_id, did):
+			return null
+	elif full:
+		return null
+	if b.get("unique") != null and unique_taken(game, b.id, str(b.unique), c) != null:
+		return null
+	var ctx = ScriptContext.make(game, {"type": "province", "id": prov_id}, {"builder": {"type": "character", "id": c.id}})
+	if not Interp.eval_trigger(ctx, ctx.root, b.get("trigger")):
+		return null
+	var cost := building_cost(game, b, c, prov_id)
+	var cb := []
+	if float(cost.gold) > 0 and c.gold < float(cost.gold):
+		cb.append("gold")
+	if float(cost.prestige) > 0 and c.prestige < float(cost.prestige):
+		cb.append("prestige")
+	if float(cost.get("piety", 0)) > 0 and c.piety < float(cost.get("piety", 0)):
+		cb.append("piety")
+	return {"def": b, "blockers": cb, "cost": cost, "cost_only": not cb.is_empty() and float(c.prestige) >= float(cost.prestige)}
 
 
 ## Где уже стоит (или строится) единственная постройка: графство или null.
@@ -232,7 +268,7 @@ static func domain_build_options(game: Game, c: Dictionary, with_unaffordable :=
 		var st: Variant = game.state.provinces.get(p)
 		if st == null or st.construction != null or st.occupant != null:
 			continue
-		for x in building_candidates(game, c, p):
+		for x in building_candidates(game, c, p, true):
 			if x.blockers.is_empty() or (with_unaffordable and x.cost_only):
 				out.append({"province": p, "def": x.def, "cost": x.cost})
 	return out

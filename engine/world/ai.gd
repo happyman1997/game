@@ -611,7 +611,7 @@ static func _goal_ok(game: Game, c: Dictionary, gl: Dictionary) -> bool:
 		return false
 	if p.construction != null:
 		return true
-	for x in Decisions.building_candidates(game, c, pid):
+	for x in Decisions.building_candidates(game, c, pid, true):
 		if x.def.id == gl.id:
 			if x.blockers.is_empty() or x.cost_only:
 				gl.cost = float(x.cost.gold)
