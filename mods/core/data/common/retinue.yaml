@@ -1,0 +1,89 @@
+# Дружина: имена отрядов и наёмные роты.
+#
+# regiment_names — части имён отрядов: part: adj (определение) или noun
+# (кто они); у noun — categories: для каких видов войск (нет — для всех).
+# Имя отряда — определение + существительное: «Вересковые луки». Тексты —
+# localization: regiment_name.<id>.
+#
+# mercenary_companies — наёмные роты мира (по одной на запись):
+#   icon        — значок
+#   regiments   — состав: { вид войск: сколько отрядов }
+#   xp          — опыт отрядов на старте (ранги — defines.regiments.ranks)
+#   captain     — навыки капитана: { martial, prowess } (± разброс)
+#   culture     — культура капитана (нет — культура графства, откуда рота)
+# Цена найма и плата в месяц — defines.mercenaries (от цены и жалованья отрядов).
+regiment_names:
+  black: { part: adj }
+  grey: { part: adj }
+  iron: { part: adj }
+  heather: { part: adj }
+  rusty: { part: adj }
+  stone: { part: adj }
+  ashen: { part: adj }
+  free: { part: adj }
+  northern: { part: adj }
+  crimson: { part: adj }
+  silent: { part: adj }
+  old: { part: adj }
+  wild: { part: adj }
+  thorn: { part: adj }
+  wolf: { part: adj }
+  grim: { part: adj }
+  shields: { part: noun, categories: [infantry, special] }
+  blades: { part: noun, categories: [infantry, special] }
+  axes: { part: noun, categories: [infantry, special] }
+  spears: { part: noun, categories: [infantry] }
+  boars: { part: noun, categories: [infantry, special] }
+  arrows: { part: noun, categories: [ranged] }
+  bows: { part: noun, categories: [ranged] }
+  falcons: { part: noun, categories: [ranged, cavalry] }
+  hornets: { part: noun, categories: [ranged] }
+  riders: { part: noun, categories: [cavalry] }
+  hooves: { part: noun, categories: [cavalry] }
+  whirlwinds: { part: noun, categories: [cavalry] }
+  hounds: { part: noun, categories: [cavalry, infantry] }
+  ravens: { part: noun }
+  sworn: { part: noun, categories: [special] }
+  bannermen: { part: noun, categories: [special, infantry] }
+
+mercenary_companies:
+  grey_lances:
+    icon: "🐎"
+    regiments: { light_cavalry: 3, light_footmen: 2 }
+    xp: 220
+    captain: { martial: 13, prowess: 14 }
+  heather_bows:
+    icon: "🏹"
+    regiments: { archers: 3, light_footmen: 2 }
+    xp: 180
+    captain: { martial: 11, prowess: 12 }
+  rusted_oath:
+    icon: "🪓"
+    regiments: { heavy_infantry: 2, pikemen: 2, light_footmen: 1 }
+    xp: 320
+    captain: { martial: 15, prowess: 16 }
+  ash_wolves:
+    icon: "🐺"
+    regiments: { light_footmen: 3, light_cavalry: 1, archers: 1 }
+    xp: 260
+    captain: { martial: 12, prowess: 17 }
+  stone_shields:
+    icon: "🛡"
+    regiments: { pikemen: 3, heavy_infantry: 1 }
+    xp: 200
+    captain: { martial: 14, prowess: 12 }
+  crimson_hooves:
+    icon: "🏇"
+    regiments: { heavy_cavalry: 2, light_cavalry: 2 }
+    xp: 280
+    captain: { martial: 14, prowess: 15 }
+  sons_of_the_waste:
+    icon: "🌫"
+    regiments: { light_footmen: 4, archers: 2 }
+    xp: 120
+    captain: { martial: 10, prowess: 13 }
+  lantern_company:
+    icon: "🏮"
+    regiments: { pikemen: 2, archers: 2, heavy_infantry: 1 }
+    xp: 240
+    captain: { martial: 16, prowess: 11 }

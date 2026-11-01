@@ -155,12 +155,17 @@ static func _course(app: App, r: Dictionary) -> Control:
 	return grid
 
 
-## Войска стороны по видам: сколько было, сколько осталось, сколько бежало.
+## Войска стороны: ополчение и безымянные — по видам, отряды дружины — по
+## именам (ранг, сколько сразили, капитан); сколько было, осталось, бежало.
 static func _units(app: App, r: Dictionary, i: int) -> Control:
 	var g := app.game
 	var by := {}
 	var order := []
+	var named := []
 	for u in r.units[i]:
+		if u.get("name") is Array:
+			named.append(u)
+			continue
 		var t := str(u.type)
 		if not by.has(t):
 			by[t] = {"men": 0, "left": 0, "fled": 0}
@@ -179,6 +184,24 @@ static func _units(app: App, r: Dictionary, i: int) -> Control:
 		if int(x.fled) > 0:
 			txt += " " + BB.muted("(%s %s)" % [K.fmt(x.fled), app.t("battle.fled")])
 		rows.add_child(K.rich(txt, false))
+	named.sort_custom(func(a, b): return int(a.men) > int(b.men))
+	for u in named:
+		var def: Variant = g.content.get_def("regiment_types", u.type)
+		var icon: String = str(def.get("icon", "👥")) if def != null else "👥"
+		var lost := int(u.men) - int(u.left)
+		var txt := "%s %s %s  %s → %s  %s  %s" % [icon, BB.gold(BB.esc(Retinue.name_from_parts(g, u.name))),
+			BB.muted(BB.esc(g.name_of("regiment_ranks", u.get("rank", "")))), K.fmt(u.men), K.fmt(u.left),
+			BB.bad("−" + K.fmt(lost)) if lost > 0 else "", ("⚔ " + K.fmt(float(u.get("kills", 0)))) if float(u.get("kills", 0)) >= 1.0 else ""]
+		var line := K.rich(txt, false)
+		var uu: Dictionary = u
+		K.tip(line, func():
+			var bb := BB.title(Retinue.name_from_parts(g, uu.name)) + "\n" + BB.muted(g.name_of("regiment_types", uu.type))
+			if uu.get("captain") != null and g.ch(uu.captain) != null:
+				bb += "\n" + app.t("retinue.captain") + ": " + BB.char_link(g, uu.captain)
+			if uu.get("xp_gain") != null:
+				bb += "\n" + BB.good(app.t("retinue.xp_gain", {"n": int(uu.xp_gain)}))
+			return bb)
+		rows.add_child(line)
 	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	return rows
 
@@ -207,9 +230,11 @@ static func _turns(app: App, r: Dictionary) -> Control:
 		var b_name := ""
 		if kind == "learned":
 			b_name = g.name_of("traits", str(e.get("b", "")))
+		elif kind == "rank_up":
+			b_name = g.name_of("regiment_ranks", str(e.get("b", "")))
 		elif e.get("b") != null and g.ch(e.b) != null:
 			b_name = Chars.full_name(g, g.ch(e.b), false)
-		var params := {"side": side, "n": K.fmt(Data.num(e.get("n"))),
+		var params := {"side": side, "n": K.fmt(Data.num(e.get("n"))), "u": Retinue.name_from_parts(g, e.get("name")),
 			"a": Chars.full_name(g, g.ch(e.a), false) if e.get("a") != null and g.ch(e.a) != null else "",
 			"b": b_name}
 		var day := app.t("battle.phase.skirmish") if int(e.day) == 0 else app.t("battle.phase.melee", {"n": int(e.day)})

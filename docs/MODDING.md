@@ -974,6 +974,51 @@ regiment_types:
 Поднятая армия забирает отряды правителя, потери в бою переносятся на
 отряды, после роспуска они пополняются (`reinforce_rate`).
 
+**Дружина** (`engine/features/retinue.gd`): у отряда имя (части —
+`regiment_names` в `common/retinue.yaml`: `part: adj` и `part: noun` с
+`categories` — для каких видов войск; тексты — `regiment_name.<id>`), опыт и
+ранг (`defines.regiments.ranks`: `xp` порог, `quality` — сила в бою ×,
+`morale` — дух, `upkeep_mult` — жалованье, `reinforce_mult` — пополнение),
+счёт боёв, побед и сражённых и летопись последних боёв (`chronicle_max`).
+Опыт за бой: `xp_battle` + `xp_win` победителю + `xp_kills` × сражённые /
+воинов отряда (бой без сечи — × `xp_refused`); ядро считает, кого сразил
+каждый отряд (поле `kills` в `report.units`). Пополнение разбавляет опыт:
+новобранец приносит долю `reinforce_keep`. **Капитан** — рыцарь или
+придворный хозяина: сила отряда + `captain_prowess` за очко доблести (не
+больше `captain_quality_max`), дух + `captain_martial` за очко военного дела;
+гибнет с шансом `captain_death` × доля потерь отряда (у проигравших × 2). ИИ
+ставит капитанов сам (`ai_captain_min`). В долгах дольше `unpaid_months`
+дружина уходит по отряду в месяц; ветераны с капитаном — вольной ротой.
+После смерти господина ветераны, чей капитан относится к наследнику хуже
+`desert_opinion`, уходят вольной ротой. Отчёт битвы: у отрядов дружины
+`reg`, `name`, `rank`, `captain`, `xp_gain`; события `rank_up`, `captain_fell`.
+Хуки: `regiment.captain`, `regiment.deserted`. Скрипт: значение
+`num_veteran_regiments`, условие `is_regiment_captain`.
+
+**Наёмные роты** (`engine/features/mercenaries.gd`, `state.mercenaries`):
+
+```yaml
+mercenary_companies:
+  stone_shields:
+    icon: "🛡"
+    regiments: { pikemen: 3, heavy_infantry: 1 }   # состав
+    xp: 200                                        # опыт отрядов на старте
+    captain: { martial: 14, prowess: 12 }          # навыки капитана (± разброс)
+    culture: my_culture                            # необязательно: иначе — культура родного графства
+```
+
+Капитан роты — живой человек без двора (флаг `merc_captain`); погиб —
+рота выбирает нового. Найм (`defines.mercenaries`): разовая цена — цена
+отрядов × `hire_mult` × (1 + опыт / `xp_price`), плата в месяц — жалованье ×
+`fee_mult` (строка «Плата наёмным ротам» в доходах). Отряды роты встают в
+дружину нанимателя (поле `merc`, вне предела отрядов) и сразу догоняют его
+поднятую армию. Срок — `contract_months`; на войне продлевается, пока
+платят; в долгах рота уходит, уходит и после смерти нанимателя. Свободная
+рота пополняется (`reinforce_rate`). ИИ на войне нанимает роту
+(`ai_hire_chance`), если его сила меньше вражеской × `ai_hire_ratio` и хватает
+золота. Хуки: `mercenaries.hired`, `mercenaries.released`,
+`mercenaries.founded`. Скрипт: значение `num_hired_companies`.
+
 **Сражение** считает ядро (`native/src/battle.rs`, класс `Battle` в
 `engine/world/battle.gd`) — само, без решений во время боя:
 1. **перестрелка** — бьют те, у кого `ranged` (лучники, длинные луки; немного —

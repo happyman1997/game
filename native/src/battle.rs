@@ -35,6 +35,8 @@ struct Unit {
     levy: bool,
     counters: Vec<(GString, f64)>,
     fled: f64,
+    /// Сколько врагов сразил отряд (перестрелка, сеча, погоня) — для опыта.
+    dealt: f64,
 }
 
 struct Commander {
@@ -215,6 +217,7 @@ fn read_side(d: &VarDictionary) -> Side {
             levy: ud.get("levy").map(|v| v.booleanize()).unwrap_or(false),
             counters: pairs(&dict(&ud, "counters")),
             fled: 0.0,
+            dealt: 0.0,
         });
     }
     let cmd = d.get("commander").and_then(|v| v.try_to::<VarDictionary>().ok()).map(|c| Commander {
@@ -308,16 +311,21 @@ fn roll(rng: &mut Rng) -> f64 {
 }
 
 /// Урон стороны `from` по стороне `to`: потери по отрядам `to` (людей).
-fn strike(sides: &[Side; 2], from: usize, to: usize, ranged: bool, day: i64, p: &P, rng: &mut Rng) -> Vec<f64> {
+/// Удар стороны from по стороне to: потери защищающихся по отрядам и сколько
+/// из них сразил каждый отряд нападающих.
+fn strike(sides: &[Side; 2], from: usize, to: usize, ranged: bool, day: i64, p: &P, rng: &mut Rng) -> (Vec<f64>, Vec<f64>) {
     let att = &sides[from];
     let def = &sides[to];
     let mut lost = vec![0.0; def.units.len()];
+    let mut dealt = vec![0.0; att.units.len()];
     let exp_list = if ranged { &p.exposure_ranged } else { &p.exposure_melee };
     let weights: Vec<f64> = def.units.iter().map(|u| u.men * exposure(exp_list, u)).collect();
     let wsum: f64 = weights.iter().sum();
     if wsum <= 0.0 {
-        return lost;
+        return (lost, dealt);
     }
+    // вклад каждого отряда нападающих в потери каждого отряда защищающихся
+    let mut by: Vec<Vec<f64>> = vec![vec![0.0; def.units.len()]; att.units.len()];
     // противовесы: сколько у противника тех, кто контрит отряд (по людям)
     let men_of = |s: &Side, kind: &GString| -> f64 { s.units.iter().filter(|u| u.kind == *kind).map(|u| u.men).sum() };
     let cmult = att.cmd_mult(def, p) * att.mult * luck(rng, p, att.cmd_f(|c| c.luck));
@@ -327,7 +335,7 @@ fn strike(sides: &[Side; 2], from: usize, to: usize, ranged: bool, day: i64, p: 
     let ranged_mult = 1.0 + att.cmd_f(|c| c.ranged);
     let charge_mult = 1.0 + att.cmd_f(|c| c.charge);
     let guard = 1.0 - def.cmd_f(|c| c.losses);
-    for u in att.units.iter() {
+    for (j, u) in att.units.iter().enumerate() {
         if u.men <= 0.0 {
             continue;
         }
@@ -356,13 +364,27 @@ fn strike(sides: &[Side; 2], from: usize, to: usize, ranged: bool, day: i64, p: 
             }
             let bonus = u.counters.iter().find(|(k, _)| *k == v.kind).map(|(_, c)| *c).unwrap_or(0.0);
             let dmg = base * weights[i] / wsum * (1.0 + bonus);
-            lost[i] += dmg * guard / (v.toughness * (1.0 + def.defense));
+            let k = dmg * guard / (v.toughness * (1.0 + def.defense));
+            lost[i] += k;
+            by[j][i] += k;
         }
     }
     for (i, v) in def.units.iter().enumerate() {
-        lost[i] = lost[i].min(v.men);
+        let capped = lost[i].min(v.men);
+        let f = if lost[i] > 0.0 { capped / lost[i] } else { 0.0 };
+        for j in 0..att.units.len() {
+            dealt[j] += by[j][i] * f;
+        }
+        lost[i] = capped;
     }
-    lost
+    (lost, dealt)
+}
+
+/// Засчитать отрядам стороны сражённых врагов.
+fn credit(side: &mut Side, dealt: &[f64]) {
+    for (u, d) in side.units.iter_mut().zip(dealt) {
+        u.dealt += d;
+    }
 }
 
 fn apply(side: &mut Side, lost: &[f64]) -> f64 {
@@ -457,10 +479,12 @@ impl CoreBattle {
         let volleys = [sides[0].cmd_f(|c| c.volleys as f64) as i64, sides[1].cmd_f(|c| c.volleys as f64) as i64];
         let (mut l0, mut l1) = (0.0, 0.0);
         for round in 0..=volleys[0].max(volleys[1]) {
-            let r0 = if round <= volleys[0] { strike(&sides, 0, 1, true, 0, &p, &mut rng) } else { vec![0.0; sides[1].units.len()] };
-            let r1 = if round <= volleys[1] { strike(&sides, 1, 0, true, 0, &p, &mut rng) } else { vec![0.0; sides[0].units.len()] };
+            let (r0, k0) = if round <= volleys[0] { strike(&sides, 0, 1, true, 0, &p, &mut rng) } else { (vec![0.0; sides[1].units.len()], vec![0.0; sides[0].units.len()]) };
+            let (r1, k1) = if round <= volleys[1] { strike(&sides, 1, 0, true, 0, &p, &mut rng) } else { (vec![0.0; sides[0].units.len()], vec![0.0; sides[1].units.len()]) };
             l1 += apply(&mut sides[1], &r0);
             l0 += apply(&mut sides[0], &r1);
+            credit(&mut sides[0], &k0);
+            credit(&mut sides[1], &k1);
         }
         for s in 0..2 {
             if volleys[s] > 0 {
@@ -504,8 +528,10 @@ impl CoreBattle {
                     evs.push(Ev { day, kind: "charge", side: s, n: 0.0, a: Variant::nil(), b: Variant::nil() });
                 }
             }
-            let m0 = strike(&sides, 0, 1, false, day, &p, &mut rng);
-            let m1 = strike(&sides, 1, 0, false, day, &p, &mut rng);
+            let (m0, c0) = strike(&sides, 0, 1, false, day, &p, &mut rng);
+            let (m1, c1) = strike(&sides, 1, 0, false, day, &p, &mut rng);
+            credit(&mut sides[0], &c0);
+            credit(&mut sides[1], &c1);
             // рыцари бьются в гуще и бьют сами
             let k0: f64 = sides[0].knights.iter().filter(|k| !k.out).map(|k| k.prowess).sum::<f64>() * p.knight_melee * p.melee_scale;
             let k1: f64 = sides[1].knights.iter().filter(|k| !k.out).map(|k| k.prowess).sum::<f64>() * p.knight_melee * p.melee_scale;
@@ -616,6 +642,13 @@ impl CoreBattle {
             let lost: Vec<f64> = ws.iter().map(|w| chase_loss * w / wsum).collect();
             let got = apply(&mut sides[loser], &lost);
             lost_total[loser] += got;
+            // сражённых в погоне — гнавшим, по их доле в погоне
+            let ps: Vec<f64> = sides[winner].units.iter().map(|u| u.men * u.pursuit * u.quality).collect();
+            let psum: f64 = ps.iter().sum::<f64>();
+            if psum > 0.0 {
+                let d: Vec<f64> = ps.iter().map(|x| got * x / psum).collect();
+                credit(&mut sides[winner], &d);
+            }
             evs.push(Ev { day, kind: "pursuit", side: winner, n: got.round(), a: Variant::nil(), b: Variant::nil() });
             let mut ll = [0.0; 2];
             ll[loser] = got;
@@ -661,6 +694,7 @@ impl CoreBattle {
                 e.set("men", u.start.round());
                 e.set("left", u.men.round());
                 e.set("fled", u.fled.round());
+                e.set("kills", u.dealt.round());
                 list.push(&e.to_variant());
             }
             units.push(&list.to_variant());

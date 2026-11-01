@@ -26,6 +26,9 @@ static func build(app: App) -> Control:
 	var regs: Variant = FeatureSections.regiments(app, p)
 	if regs != null:
 		root.add_child(regs)
+	var mercs: Variant = RetinueSections.mercenaries(app, p)
+	if mercs != null:
+		root.add_child(mercs)
 	var kn: Variant = FeatureSections.knights(app, p)
 	if kn != null:
 		root.add_child(kn)

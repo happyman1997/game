@@ -113,8 +113,14 @@ static func _units(game: Game, armies: Array, loc: String) -> Array:
 			var def: Variant = game.content.get_def("regiment_types", r.type)
 			var u := profile(game, str(r.type)).duplicate()
 			var terr := 1.0 + Data.num(game.terrain_pick(def.get("terrain"), loc, 0.0)) if def != null else 1.0
+			# дружина: опыт отряда и его капитан (запись — у хозяина)
+			var rec: Variant = Retinue.record(owner, r.id)
+			if rec == null:
+				rec = r
+			var rm: Dictionary = Retinue.unit_mods(game, owner, rec) if game.engine.has_feature("retinue") else {"quality": 1.0, "morale": 0.0}
 			u.merge({"key": a.id + ":" + str(r.id), "type": str(r.type), "category": str(def.get("category", "special")) if def != null else "special",
-				"men": int(r.size), "quality": maxf(0.1, terr) * drill, "counters": def.get("counters", {}) if def != null else {}}, true)
+				"men": int(r.size), "quality": maxf(0.1, terr) * drill * float(rm.quality), "counters": def.get("counters", {}) if def != null else {}}, true)
+			u["morale"] = Data.num(u.get("morale"), 70.0) + float(rm.morale)
 			out.append(u)
 	return out
 
@@ -185,6 +191,24 @@ static func fight(game: Game, loc: String, att: Array, def: Array, defender_side
 		"sides": [_side(game, att, def, loc, defender_side == "att", true), _side(game, def, att, loc, defender_side == "def", false)],
 	}
 	var r: Dictionary = cb.fight(input)
+	# отряды дружины в отчёте — по имени, с рангом и капитаном (на день боя)
+	for side in r.units:
+		for u in side:
+			var k := str(u.key)
+			if k.ends_with(":levy"):
+				continue
+			var found := Retinue.by_key(game, k)
+			var rec: Variant = found[1]
+			if rec == null:
+				continue
+			u["reg"] = rec.id
+			u["name"] = Retinue.name_parts(game, rec)
+			u["rank"] = str(Retinue.rank_of(game, rec).id)
+			var cap: Variant = Retinue.captain_of(game, found[0], rec)
+			if cap != null:
+				u["captain"] = cap.id
+			if rec.get("merc") != null:
+				u["merc"] = rec.merc
 	r["sides"] = []
 	for i in 2:
 		var armies: Array = att if i == 0 else def

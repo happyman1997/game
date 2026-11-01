@@ -8,6 +8,7 @@ ledger:
   army_upkeep: Содержание армий
   hook_income: Плата за молчание
   regiment_wages: Жалованье отрядов
+  mercenary_fees: Плата наёмным ротам
   district_upkeep: Содержание районов
   construction: Стройка
   land_works: Работы на земле

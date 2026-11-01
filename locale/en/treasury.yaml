@@ -8,6 +8,7 @@ ledger:
   army_upkeep: Army upkeep
   hook_income: Hush money
   regiment_wages: Regiment wages
+  mercenary_fees: Mercenary fees
   district_upkeep: District upkeep
   construction: Construction
   land_works: Land works

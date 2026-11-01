@@ -461,6 +461,10 @@ static func regiments(app: App, p: Dictionary) -> Variant:
 		if def == null:
 			continue
 		var raised: bool = raised_ids.has(r.id)
+		# дружина: именной отряд с рангом, капитаном и летописью
+		if g.engine.has_feature("retinue"):
+			list.add_child(RetinueSections.regiment_row(app, p, r, raised))
+			continue
 		var status := ""
 		if raised:
 			status = " · " + app.t("ui.regiment_in_army")
@@ -492,8 +496,12 @@ static func regiments(app: App, p: Dictionary) -> Variant:
 			app.mark_dirty(true), {"icon": def.get("icon", "spear"), "disabled": not blockers.is_empty(),
 			"tip": func(): return regiment_tip(app, def) + "\n" + BB.cost(g, cost) + ("\n" + BB.reasons(blockers) if not blockers.is_empty() else "")})])
 	var shop := W.grouped(app, "regiment_types", shop_items, true)
-	return K.section("%s — %s" % [app.t("ui.regiments"), app.t("ui.regiments_n", {"n": regs.size(), "cap": cap})],
-		[K.para(app.t("ui.regiments_hint"), "SmallLabel"), list, K.label(app.t("ui.recruit_regiment"), "GoldLabel"), shop], "shield")
+	var top: Array = [K.para(app.t("ui.regiments_hint"), "SmallLabel")]
+	var unpaid := int(p.flags.get("retinue_unpaid", 0))
+	if unpaid > 0:
+		top.append(K.para(app.t("retinue.unpaid", {"n": unpaid}), "BadLabel"))
+	return K.section("%s — %s" % [app.t("ui.regiments"), app.t("ui.regiments_n", {"n": Regiments.own_count(p), "cap": cap})],
+		top + [list, K.label(app.t("ui.recruit_regiment"), "GoldLabel"), shop], "shield")
 
 
 static func army_regiments(app: App, a: Dictionary) -> Variant:
@@ -501,10 +509,17 @@ static func army_regiments(app: App, a: Dictionary) -> Variant:
 	if not (a.get("regiments") is Array) or a.regiments.is_empty():
 		return null
 	var rows := []
+	var owner: Variant = g.ch(a.owner)
 	for r in a.regiments:
 		var def: Variant = g.content.get_def("regiment_types", r.type)
-		var row := K.hbox([K.icon(def.get("icon", "spear") if def != null else "spear", 20), K.label("%s — %s" % [g.name_of("regiment_types", r.type), K.fmt(r.size)])], 6)
-		if def != null:
+		var rec: Variant = Retinue.record(owner, r.id)
+		var named: bool = rec != null and g.engine.has_feature("retinue")
+		var title := Retinue.name_of(g, rec) if named else g.name_of("regiment_types", r.type)
+		var row := K.hbox([K.icon(def.get("icon", "spear") if def != null else "spear", 20), K.label("%s — %s" % [title, K.fmt(r.size)])], 6)
+		if named:
+			row.add_child(RetinueSections.rank_chip(app, rec))
+			K.tip(row, func(): return RetinueSections.tip(app, owner, rec))
+		elif def != null:
 			K.tip(row, func(): return regiment_tip(app, def))
 		rows.append(row)
 	return K.section(app.t("ui.army_regiments"), rows, "shield")

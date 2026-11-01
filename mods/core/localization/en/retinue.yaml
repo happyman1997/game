@@ -1,0 +1,57 @@
+# Retinue: regiment name parts, ranks, mercenary companies.
+regiment_name:
+  black: Black
+  grey: Grey
+  iron: Iron
+  heather: Heather
+  rusty: Rusted
+  stone: Stone
+  ashen: Ashen
+  free: Free
+  northern: Northern
+  crimson: Crimson
+  silent: Silent
+  old: Old
+  wild: Wild
+  thorn: Thorn
+  wolf: Wolf
+  grim: Grim
+  shields: Shields
+  blades: Blades
+  axes: Axes
+  spears: Spears
+  boars: Boars
+  arrows: Arrows
+  bows: Bows
+  falcons: Falcons
+  hornets: Hornets
+  riders: Riders
+  hooves: Hooves
+  whirlwinds: Whirlwinds
+  hounds: Hounds
+  ravens: Ravens
+  sworn: Sworn
+  bannermen: Bannermen
+regiment_rank:
+  recruits: Recruits
+  seasoned: Seasoned
+  veterans: Veterans
+  renowned: Renowned
+mercenary_company:
+  grey_lances: Grey Lances
+  heather_bows: Heather Bows
+  rusted_oath: Brotherhood of the Rusted Oath
+  ash_wolves: Ash Wolves
+  stone_shields: Stone Shields
+  crimson_hooves: Crimson Hooves
+  sons_of_the_waste: Sons of the Waste
+  lantern_company: Lantern Company
+mercenary_company_desc:
+  grey_lances: Light horse from the far pastures; they come dear, but they come first.
+  heather_bows: Archers from the heather hills — they strike from afar and dislike the melee.
+  rusted_oath: Heavy foot bound by an old oath; never once have they fled a field.
+  ash_wolves: Rabble from the ashlands; they fight hard and take no prisoners.
+  stone_shields: Pikemen whose line breaks any cavalry.
+  crimson_hooves: Heavy riders in crimson caparisons — costly and terrible.
+  sons_of_the_waste: Exiles of the wastes; cheap and green, but many.
+  lantern_company: An old company with a lantern on its banner; they march by night and keep their word.

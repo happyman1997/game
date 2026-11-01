@@ -337,6 +337,41 @@ defines:
     ai_recruit_chance: 0.15
     ai_gold_reserve: 60
     ai_disband_below_gold: -30
+    # дружина (Retinue): опыт отрядов — новобранцы → бывалые → ветераны →
+    # прославленные; quality — сила отряда в бою (×), morale — дух,
+    # upkeep_mult — жалованье (×), reinforce_mult — пополнение (×: тянет добровольцев)
+    ranks:
+      - { id: recruits, xp: 0, quality: 1.0, morale: 0 }
+      - { id: seasoned, xp: 100, quality: 1.08, morale: 4 }
+      - { id: veterans, xp: 250, quality: 1.16, morale: 8, upkeep_mult: 1.2 }
+      - { id: renowned, xp: 500, quality: 1.25, morale: 12, upkeep_mult: 1.5, reinforce_mult: 1.6 }
+    xp_battle: 12            # за бой
+    xp_win: 18               # за победу
+    xp_kills: 60             # за сражённых: kills / воинов отряда × xp_kills
+    xp_refused: 0.4          # бой без сечи — доля опыта
+    xp_max: 800
+    reinforce_keep: 0.3      # пополнение разбавляет опыт: новобранец приносит эту долю опыта отряда
+    start_xp: [0, 200]       # опыт стартовых отрядов
+    chronicle_max: 10        # строк летописи отряда
+    captain_prowess: 0.012   # капитан: сила отряда за очко доблести (×)
+    captain_quality_max: 0.25
+    captain_martial: 0.6     # дух отряда за очко военного дела капитана
+    captain_death: 0.15      # гибель капитана: × доля потерь отряда (у проигравших × 2)
+    ai_captain_min: 14       # ИИ ставит капитаном того, у кого доблесть + военное дело не меньше
+    unpaid_months: 3         # столько месяцев в долгах — и дружина начинает уходить
+    desert_opinion: -20      # капитан ветеранов уводит отряд от наследника, если мнение ниже
+
+  mercenaries:
+    hire_mult: 0.45          # найм: цена отрядов роты × hire_mult × (1 + опыт/xp_price)
+    fee_mult: 3.0            # плата в месяц: жалованье отрядов × fee_mult
+    xp_price: 500
+    contract_months: 12      # срок; на войне продлевается сам, пока платят
+    max_hired: 2             # рот на службе у одного правителя
+    min_tier: 1              # нанимают правители от этого ранга (1 — граф)
+    reinforce_rate: 0.08     # свободная рота пополняется в месяц
+    ai_hire_chance: 0.5      # ИИ на войне нанимает, если его сила меньше вражеской × ai_hire_ratio
+    ai_hire_ratio: 1.15
+    ai_gold_reserve: 20
 
   knights:
     cap_by_tier: [0, 3, 5, 8, 12]

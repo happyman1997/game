@@ -1,0 +1,57 @@
+# Дружина: части имён отрядов, ранги, наёмные роты.
+regiment_name:
+  black: Чёрные
+  grey: Серые
+  iron: Железные
+  heather: Вересковые
+  rusty: Ржавые
+  stone: Каменные
+  ashen: Пепельные
+  free: Вольные
+  northern: Северные
+  crimson: Багровые
+  silent: Молчаливые
+  old: Старые
+  wild: Дикие
+  thorn: Терновые
+  wolf: Волчьи
+  grim: Хмурые
+  shields: щиты
+  blades: клинки
+  axes: секиры
+  spears: копья
+  boars: вепри
+  arrows: стрелы
+  bows: луки
+  falcons: соколы
+  hornets: шершни
+  riders: всадники
+  hooves: копыта
+  whirlwinds: вихри
+  hounds: псы
+  ravens: вороны
+  sworn: побратимы
+  bannermen: знаменосцы
+regiment_rank:
+  recruits: Новобранцы
+  seasoned: Бывалые
+  veterans: Ветераны
+  renowned: Прославленные
+mercenary_company:
+  grey_lances: Серые копья
+  heather_bows: Вересковые луки
+  rusted_oath: Братство Ржавой Клятвы
+  ash_wolves: Пепельные волки
+  stone_shields: Каменные щиты
+  crimson_hooves: Багровые копыта
+  sons_of_the_waste: Сыны Пустоши
+  lantern_company: Рота Фонаря
+mercenary_company_desc:
+  grey_lances: Лёгкая конница с дальних пастбищ; берут дорого, но приходят первыми.
+  heather_bows: Стрелки с вересковых холмов — бьют издали и не любят сечи.
+  rusted_oath: Тяжёлая пехота, связанная старой клятвой; ни разу не бежала с поля.
+  ash_wolves: Сброд с пепелища; дерутся зло и не берут пленных.
+  stone_shields: Копейщики, о чей строй разбивается любая конница.
+  crimson_hooves: Тяжёлые всадники в багровых попонах — дорогие и страшные.
+  sons_of_the_waste: Изгнанники с пустошей; дёшевы и неопытны, зато их много.
+  lantern_company: Старая рота с фонарём на знамени; ходят ночью и держат слово.

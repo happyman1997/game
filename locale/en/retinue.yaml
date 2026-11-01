@@ -1,0 +1,50 @@
+# Retinue and mercenary companies (engine/features/retinue.gd, mercenaries.gd)
+retinue:
+  rank: "{rank}"
+  xp: "Experience {xp} · to “{next}” {need}"
+  xp_max: "Experience {xp} · highest rank"
+  xp_gain: "+{n} experience"
+  record: "Battles {b} · won {w} · slain {k}"
+  since: "Serving since {y}"
+  chronicle: Chronicle
+  chronicle_row: "{date} · {place}: {result}, slain {k}, lost {l}"
+  won: victory
+  lost: defeat
+  rank_up: "became “{rank}”"
+  captain: Captain
+  no_captain: No captain
+  set_captain: Captain…
+  captain_title: "Captain of “{name}”"
+  captain_hint: "The captain is a living courtier: prowess gives the regiment strength, martial gives it morale. In a hard battle the captain may fall."
+  captain_fx: "Strength +{q}% · morale +{m}"
+  appoint: Appoint
+  remove: Remove captain
+  current: Captain
+  rank_fx: "Rank: strength ×{q}, morale +{m}"
+  merc_tag: mercenaries
+  unpaid: "The retinue is unpaid: {n} months in debt — regiments will start leaving."
+merc:
+  title: Mercenary companies
+  hint: "Companies arrive at once and join your raised army; hiring is costly and there is a monthly fee. Unpaid, a company leaves; at war the contract extends while you pay."
+  hire: Hire
+  dismiss: Dismiss
+  busy: Serving someone else
+  max_hired: "No more than {n} companies at once"
+  no_men: The company has no one left
+  no_gold: "Needs {n} gold"
+  fee_line: Mercenary fees
+  cost: "Hire {hire} · {fee} per month"
+  men: "{men} soldiers"
+  serves: "Serves: {who}"
+  yours_until: "In your service until {date}"
+  free: Free
+  captain: "Captain: {who}"
+  composition: Composition
+msg:
+  regiment_rank_up: "Regiment “{name}” is now “{rank}”."
+  regiment_deserted: "Regiment “{name}” has left: the retinue is unpaid."
+  regiment_left_heir: "Regiment “{name}” would not follow the heir: {captain} led it away as a free company."
+  merc_left:
+    contract: "Company “{name}” has left: the contract is over."
+    unpaid: "Company “{name}” has left: it was not paid."
+    employer: "Company “{name}” has left: its employer is dead."

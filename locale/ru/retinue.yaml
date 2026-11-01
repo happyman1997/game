@@ -1,0 +1,50 @@
+# Дружина и наёмные роты (engine/features/retinue.gd, mercenaries.gd)
+retinue:
+  rank: "{rank}"
+  xp: "Опыт {xp} · до ранга «{next}» {need}"
+  xp_max: "Опыт {xp} · высший ранг"
+  xp_gain: "+{n} опыта"
+  record: "Боёв {b} · побед {w} · сражено {k}"
+  since: "В строю с {y} г."
+  chronicle: Летопись
+  chronicle_row: "{date} · {place}: {result}, сражено {k}, потеряно {l}"
+  won: победа
+  lost: поражение
+  rank_up: "стали «{rank}»"
+  captain: Капитан
+  no_captain: Нет капитана
+  set_captain: Капитан…
+  captain_title: "Капитан отряда «{name}»"
+  captain_hint: "Капитан — живой человек при дворе: доблесть прибавляет отряду силы, военное дело — духа. В тяжёлом бою капитан может пасть."
+  captain_fx: "Сила +{q}% · дух +{m}"
+  appoint: Поставить
+  remove: Снять капитана
+  current: Капитан
+  rank_fx: "Ранг: сила ×{q}, дух +{m}"
+  merc_tag: наёмники
+  unpaid: "Дружине не платят: {n} мес. в долгах — отряды начнут уходить."
+merc:
+  title: Наёмные роты
+  hint: "Роты приходят сразу — догоняют поднятую армию; найм дорог, плата каждый месяц. В долгах рота уходит; на войне контракт продлевается, пока платят."
+  hire: Нанять
+  dismiss: Отпустить
+  busy: Рота служит другому
+  max_hired: "Не больше {n} рот на службе"
+  no_men: В роте никого не осталось
+  no_gold: "Нужно {n} золота"
+  fee_line: Плата наёмным ротам
+  cost: "Найм {hire} · {fee} в месяц"
+  men: "{men} воинов"
+  serves: "Служит: {who}"
+  yours_until: "У вас на службе до {date}"
+  free: Свободна
+  captain: "Капитан: {who}"
+  composition: Состав
+msg:
+  regiment_rank_up: "Отряд «{name}» — теперь «{rank}»."
+  regiment_deserted: "Отряд «{name}» ушёл: дружине не платят."
+  regiment_left_heir: "Отряд «{name}» не пошёл за наследником: {captain} увёл его вольной ротой."
+  merc_left:
+    contract: "Рота «{name}» ушла: срок службы вышел."
+    unpaid: "Рота «{name}» ушла: ей не платят."
+    employer: "Рота «{name}» ушла: наниматель мёртв."

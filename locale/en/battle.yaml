@@ -36,6 +36,8 @@ battle:
     volley: "{side}: extra volleys ({n})"
     rearguard: "The {side} fall back in order: {n} saved"
     learned: "{a} gained a commander skill — “{b}”"
+    rank_up: "“{u}” ({side}) are now “{b}”"
+    captain_fell: "The captain of “{u}” has fallen — {a}"
   fate:
     killed: "slain by {by}"
     wounded: "wounded — {by}"

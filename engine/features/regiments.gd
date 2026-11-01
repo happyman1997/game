@@ -24,8 +24,17 @@ static func types(game: Game) -> Array:
 	return game.engine.sorted_content("regiment_types")
 
 
-static func regs_of(c: Dictionary) -> Array:
-	return c.regiments if c.get("regiments") != null else []
+static func regs_of(c: Variant) -> Array:
+	return c.regiments if c is Dictionary and c.get("regiments") != null else []
+
+
+## Свои отряды (без наёмных рот) — их держит предел.
+static func own_count(c: Dictionary) -> int:
+	var n := 0
+	for r in regs_of(c):
+		if r.get("merc") == null:
+			n += 1
+	return n
 
 
 static func cap(game: Game, c: Dictionary) -> int:
@@ -58,10 +67,13 @@ static func upkeep(game: Game, c: Dictionary) -> float:
 	var raised := _raised_ids(game, c.id)
 	var total := 0.0
 	for r in regs_of(c):
+		# наёмным ротам — своя плата (Mercenaries.fee)
+		if r.get("merc") != null:
+			continue
 		var def: Variant = game.content.get_def("regiment_types", r.type)
 		if def == null:
 			continue
-		total += Data.num(def.get("upkeep")) * (mult if raised.has(r.id) else 1.0)
+		total += Data.num(def.get("upkeep")) * (mult if raised.has(r.id) else 1.0) * Retinue.upkeep_mult(game, r)
 	return total * maxf(0.0, 1.0 + Stats.stat(game, c, "army_upkeep_mult"))
 
 
@@ -76,7 +88,7 @@ static func recruit_blockers(game: Game, c: Dictionary, def: Dictionary) -> Arra
 		out.append(game.loc.t("tr.is_ruler"))
 	var ctx := ScriptContext.make(game, {"type": "character", "id": c.id})
 	out.append_array(Interp.failed_triggers(ctx, ctx.root, def.get("can_recruit")))
-	if regs_of(c).size() >= cap(game, c):
+	if own_count(c) >= cap(game, c):
 		out.append(game.loc.t("ui.regiment_cap_reached", {"n": cap(game, c)}))
 	out.append_array(Economy.cost_blockers(game, c, cost(game, c, def)))
 	return out
@@ -172,7 +184,7 @@ static func idle_power(game: Game, c: Dictionary) -> float:
 
 ## То же, что recruit_blockers(...).is_empty(), но без текстов причин (для ИИ).
 static func _can_recruit_fast(game: Game, c: Dictionary, def: Dictionary, ctx: ScriptContext) -> bool:
-	if c.titles.is_empty() or regs_of(c).size() >= cap(game, c):
+	if c.titles.is_empty() or own_count(c) >= cap(game, c):
 		return false
 	if not Interp.eval_trigger(ctx, ctx.root, def.get("can_recruit")):
 		return false
@@ -209,28 +221,32 @@ static func monthly_char(game: Game, c: Dictionary) -> void:
 		var def: Variant = game.content.get_def("regiment_types", r.type)
 		var mx: int = int(Data.num(def.get("size"), r.size)) if def != null else int(r.size)
 		if r.size < mx:
-			r.size = mini(mx, roundi(r.size + mx * rate))
+			# прославленных пополнять легче; новобранцы разбавляют опыт (Retinue)
+			var before := int(r.size)
+			r.size = mini(mx, roundi(r.size + mx * rate * Retinue.reinforce_mult(game, r)))
+			Retinue.on_reinforced(game, r, before)
 	# лишние отряды (например, после потери титулов) распускаются
 	var cp := cap(game, c)
-	while regs_of(c).size() > cp:
+	while own_count(c) > cp:
+		var own := regs_of(c).filter(func(x): return x.get("merc") == null)
 		var victim: Variant = null
-		for x in regs_of(c):
+		for x in own:
 			if not in_army.has(x.id):
 				victim = x
 				break
 		if victim == null:
-			victim = regs_of(c)[regs_of(c).size() - 1]
+			victim = own[own.size() - 1]
 		disband(game, c, victim.id)
 	if not game.ai_controls(c.id) or c.get("prison") != null:
 		return
 	# ИИ: нанять или распустить
-	if c.gold < game.def_num("regiments.ai_disband_below_gold", -30) and not regs_of(c).is_empty():
+	if c.gold < game.def_num("regiments.ai_disband_below_gold", -30) and own_count(c) > 0:
 		for x in regs_of(c):
-			if not in_army.has(x.id):
+			if not in_army.has(x.id) and x.get("merc") == null:
 				disband(game, c, x.id)
 				break
 		return
-	if regs_of(c).size() >= cp or not game.rng.chance(game.def_num("regiments.ai_recruit_chance", 0.15)):
+	if own_count(c) >= cp or not game.rng.chance(game.def_num("regiments.ai_recruit_chance", 0.15)):
 		return
 	var pick: Variant = _ai_pick_type(game, c)
 	if pick == null:

@@ -36,6 +36,8 @@ battle:
     volley: "{side}: лишние залпы ({n})"
     rearguard: "{side} отходят в порядке: сбережено {n}"
     learned: "{a} обрёл навык полководца — «{b}»"
+    rank_up: "«{u}» ({side}) — теперь «{b}»"
+    captain_fell: "Пал капитан отряда «{u}» — {a}"
   fate:
     killed: "пал от руки {by}"
     wounded: "ранен — {by}"
