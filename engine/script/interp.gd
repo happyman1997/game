@@ -11,6 +11,15 @@ extends RefCounted
 
 const MAX_DEPTH := 60
 
+## Условия и значения-словари считает ядро (CoreRules, native/src/rules.rs);
+## false — всё считает GDScript (замеры, отладка).
+static var use_core := true
+## Двойная проверка: результат ядра сверяется с GDScript (тесты,
+## tools/sim.gd --check-rules); расхождение — ошибка с блоком и обоими ответами.
+static var check_core := false
+## Идёт эталонный расчёт GDScript — вложенные блоки тоже без ядра.
+static var _in_check := false
+
 const PREFIXED := {
 	"character:": "character",
 	"title:": "title",
@@ -159,10 +168,55 @@ static func resolve_scope(ctx: ScriptContext, scope: Variant, path: Variant) -> 
 	return cur
 
 
+# ---------------------------------------------------------------- ядро
+
+## Существует ли объект скоупа (для ядра: character:id, title:id…).
+static func scope_exists(ctx: ScriptContext, ref: Variant) -> bool:
+	return ctx.game.exists(ref)
+
+
+static func _check_trigger(ctx: ScriptContext, scope: Variant, block: Variant, core_r: bool, core: Variant) -> void:
+	if core.is_impure(block):
+		return
+	_in_check = true
+	var gd := eval_trigger_gd(ctx, scope, block)
+	_in_check = false
+	if gd != core_r:
+		push_error("Ядро и GDScript разошлись в условии (ядро %s, GDScript %s, скоуп %s): %s" % [core_r, gd, scope, var_to_str(block).left(300)])
+
+
+static func _check_value(ctx: ScriptContext, scope: Variant, expr: Variant, core_v: float, core: Variant) -> void:
+	if core.is_impure(expr):
+		return
+	_in_check = true
+	var gd := eval_value_gd(ctx, scope, expr)
+	_in_check = false
+	if absf(gd - core_v) > 1e-6 and not (is_nan(gd) and is_nan(core_v)):
+		push_error("Ядро и GDScript разошлись в значении (ядро %s, GDScript %s, скоуп %s): %s" % [core_v, gd, scope, var_to_str(expr).left(300)])
+
+
 # ---------------------------------------------------------------- значения
 
 ## parts — необязательный массив, куда складываются слагаемые [{label, value}] для подсказок.
 static func eval_value(ctx: ScriptContext, scope: Variant, expr: Variant, parts: Variant = null) -> float:
+	if expr == null:
+		return 0.0
+	if expr is int or expr is float:
+		return float(expr)
+	if parts == null and (expr is Dictionary or expr is Array) and use_core and not _in_check:
+		var g := ctx.game
+		var core: Variant = g.core_rules
+		if core != null:
+			var v: float = core.value(expr, ctx, scope, g._world, g.state.date)
+			if not is_nan(v):
+				if check_core:
+					_check_value(ctx, scope, expr, v, core)
+				return v
+	return eval_value_gd(ctx, scope, expr, parts)
+
+
+## Значение целиком в GDScript (эталон и запасной путь ядра).
+static func eval_value_gd(ctx: ScriptContext, scope: Variant, expr: Variant, parts: Variant = null) -> float:
 	if expr == null:
 		return 0.0
 	if expr is int or expr is float:
@@ -397,6 +451,24 @@ static func _cmp_op(op: String, a: float, b: float) -> bool:
 # ---------------------------------------------------------------- триггеры
 
 static func eval_trigger(ctx: ScriptContext, scope: Variant, block: Variant) -> bool:
+	if block == null:
+		return true
+	if block is bool:
+		return block
+	if (block is Dictionary or block is Array) and use_core and not _in_check:
+		var g := ctx.game
+		var core: Variant = g.core_rules
+		if core != null:
+			var r: int = core.trigger(block, ctx, scope, g._world, g.state.date)
+			if r >= 0:
+				if check_core:
+					_check_trigger(ctx, scope, block, r == 1, core)
+				return r == 1
+	return eval_trigger_gd(ctx, scope, block)
+
+
+## Условие целиком в GDScript (эталон и запасной путь ядра).
+static func eval_trigger_gd(ctx: ScriptContext, scope: Variant, block: Variant) -> bool:
 	if block == null:
 		return true
 	if block is bool:

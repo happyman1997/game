@@ -7,6 +7,10 @@
 //! режим сверки (diff, verify) сравнивает копию со словарями и называет
 //! расходящиеся поля — так ловятся места, которые забыли сообщить.
 //!
+//! Сообщение об изменении дёшево: mark() только помечает персонажа, а
+//! запись перечитывается из словаря при первом обращении ядра к ней
+//! (fresh) — частые правки (казна, мнения) не разбирают запись каждый раз.
+//!
 //! Все методы берут &self: данные под RwLock, ядро можно звать и из потока
 //! симуляции, и из интерфейса.
 
@@ -94,6 +98,11 @@ pub(crate) struct Data {
     pub(crate) opinion_mods: Names,
     /// Записи по номеру персонажа (None — ещё не сообщён или удалён).
     pub(crate) recs: Vec<Option<Rec>>,
+    /// Помеченные персонажи: запись устарела, перечитать при обращении.
+    pub(crate) dirty: Vec<bool>,
+    pub(crate) any_dirty: bool,
+    /// state.characters — откуда перечитывать.
+    pub(crate) source: Option<VarDictionary>,
 }
 
 // ------------------------------------------------------------ чтение значений
@@ -309,7 +318,46 @@ impl Data {
         let rec = self.read(k, c);
         if let Some(i) = self.slot(k, c) {
             self.recs[i] = Some(rec);
+            if i < self.dirty.len() {
+                self.dirty[i] = false;
+            }
         }
+    }
+
+    pub(crate) fn is_dirty(&self, i: u32) -> bool {
+        self.any_dirty && self.dirty.get(i as usize).copied().unwrap_or(false)
+    }
+
+    /// Перечитать помеченного персонажа из state.characters.
+    pub(crate) fn refresh(&mut self, k: &Keys, i: u32) {
+        let iu = i as usize;
+        if iu >= self.dirty.len() || !self.dirty[iu] {
+            return;
+        }
+        self.dirty[iu] = false;
+        let name = self.chars.name(i);
+        let c = self.source.as_ref().and_then(|s| s.get(&name)).and_then(|v| v.try_to::<VarDictionary>().ok());
+        match c {
+            Some(c) => self.sync(k, &c),
+            None => {
+                if iu < self.recs.len() {
+                    self.recs[iu] = None;
+                }
+            }
+        }
+    }
+
+    /// Перечитать всех помеченных.
+    pub(crate) fn refresh_all(&mut self, k: &Keys) {
+        if !self.any_dirty {
+            return;
+        }
+        for i in 0..self.dirty.len() {
+            if self.dirty[i] {
+                self.refresh(k, i as u32);
+            }
+        }
+        self.any_dirty = false;
     }
 
     /// Поля, в которых копия расходится со словарём.
@@ -335,6 +383,25 @@ pub struct CoreWorld {
     base: Base<RefCounted>,
 }
 
+impl CoreWorld {
+    /// Данные для чтения, где записи персонажей ids свежие.
+    pub(crate) fn fresh(&self, ids: &[u32]) -> std::sync::RwLockReadGuard<'_, Data> {
+        {
+            let d = self.data.read().unwrap();
+            if !ids.iter().any(|i| d.is_dirty(*i)) {
+                return d;
+            }
+        }
+        {
+            let mut d = self.data.write().unwrap();
+            for i in ids {
+                d.refresh(&self.keys, *i);
+            }
+        }
+        self.data.read().unwrap()
+    }
+}
+
 #[godot_api]
 impl IRefCounted for CoreWorld {
     fn init(base: Base<RefCounted>) -> Self {
@@ -351,16 +418,34 @@ impl CoreWorld {
         d.skills = skills.as_slice().to_vec();
     }
 
-    /// Сообщить ядру о персонаже (после любого изменения его словаря).
+    /// Сообщить ядру о персонаже: сразу перечитать запись.
     #[func]
     fn sync(&self, c: VarDictionary) {
         self.data.write().unwrap().sync(&self.keys, &c);
     }
 
-    /// Все персонажи разом (state.characters) — при создании и загрузке.
+    /// Персонаж изменился: пометить (перечитается при обращении).
+    #[func]
+    fn mark(&self, id: GString) {
+        let mut d = self.data.write().unwrap();
+        let i = d.chars.intern(id) as usize;
+        if d.dirty.len() <= i {
+            d.dirty.resize(i + 1, false);
+        }
+        d.dirty[i] = true;
+        d.any_dirty = true;
+    }
+
+    /// Все персонажи разом (state.characters) — при создании и загрузке;
+    /// словарь запоминается, чтобы перечитывать помеченных.
     #[func]
     fn sync_all(&self, chars: VarDictionary) {
         let mut d = self.data.write().unwrap();
+        d.source = Some(chars.clone());
+        for v in d.dirty.iter_mut() {
+            *v = false;
+        }
+        d.any_dirty = false;
         for (_, c) in chars.iter_shared() {
             if c.get_type() == VariantType::DICTIONARY {
                 d.sync(&self.keys, &c.to::<VarDictionary>());
@@ -390,6 +475,7 @@ impl CoreWorld {
     #[func]
     fn verify(&self, chars: VarDictionary) -> VarDictionary {
         let mut d = self.data.write().unwrap();
+        d.refresh_all(&self.keys);
         let mut out = VarDictionary::new();
         let mut seen = vec![false; d.recs.len()];
         for (id, c) in chars.iter_shared() {
@@ -427,6 +513,7 @@ impl CoreWorld {
     /// Запись персонажа словарём (для отладки и тестов).
     #[func]
     fn record(&self, id: GString) -> VarDictionary {
+        self.data.write().unwrap().refresh_all(&self.keys);
         let d = self.data.read().unwrap();
         let mut out = VarDictionary::new();
         let i = d.chars.find(&id);

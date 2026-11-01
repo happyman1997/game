@@ -3,6 +3,8 @@ extends SceneTree
 ##   godot --headless --path . -s tools/sim.gd -- --years 50 --seed 1 [--verbose] [--mods core,my_mod] [--bookmark b1066]
 ##     [--days N] — вместо лет прогнать N дней;
 ##     [--check-world] — сверять копию персонажей в ядре каждый день (--check-world-systems — после каждой системы)
+##     [--check-rules] — каждое условие и значение считать и ядром, и GDScript и сверять;
+##     [--no-core] — правила целиком в GDScript (для сравнения скорости)
 ## Печатает итоги по годам: живые персонажи, державы, войны, крупнейшие державы.
 
 
@@ -15,6 +17,8 @@ func _init() -> void:
 	var bm: String = a.get("bookmark", e.bookmarks()[0].id if not e.bookmarks().is_empty() else "")
 	Game.check_world = a.has("check-world") or a.has("check-world-systems")
 	Game.check_world_systems = a.has("check-world-systems")
+	Interp.check_core = a.has("check-rules")
+	Interp.use_core = not a.has("no-core")
 	var g := e.new_game(bm, seed)
 	var stats := {"deaths": 0, "wars": 0}
 	e.hooks.on("character.death", func(_p): stats.deaths += 1)

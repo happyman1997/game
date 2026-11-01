@@ -35,6 +35,8 @@ var quiet := false
 ## симуляции в Rust. Создаётся при первом обращении из state.characters;
 ## каждое изменение словаря персонажа сообщается ядру через touch().
 var _world: Variant = null
+## Разбор правил в ядре (engine.rules()) — заводится вместе с копией персонажей.
+var core_rules: Variant = null
 ## Режим сверки (тесты, tools/sim.gd --check-world): после каждого дня копия
 ## в ядре сравнивается с персонажами, расхождение — ошибка с именами полей.
 static var check_world := false
@@ -213,20 +215,23 @@ func new_id(prefix: String) -> String:
 
 # ------------------------------------------------------------ ядро
 
-## Копия персонажей в ядре (null — ядро не собрано).
+## Копия персонажей в ядре (null — ядро не собрано или мир ещё строится:
+## пока идёт генерация, персонажей правят напрямую, копия собирается после).
 func world() -> Variant:
-	if _world == null and ClassDB.class_exists("CoreWorld"):
+	if _world == null and not quiet and ClassDB.class_exists("CoreWorld"):
 		var w: Variant = ClassDB.instantiate("CoreWorld")
 		w.setup(PackedStringArray(Chars.skill_ids(self)))
 		w.sync_all(state.characters)
 		_world = w
+		core_rules = engine.rules()
 	return _world
 
 
 ## Персонаж изменился — сообщить ядру (зовите после любой правки словаря).
+## Дёшево: ядро только помечает его и перечитает запись, когда она понадобится.
 func touch(c: Variant) -> void:
 	if _world != null and c is Dictionary:
-		_world.sync(c)
+		_world.mark(c.id)
 
 
 ## Несколько персонажей разом (по словарям или id).
@@ -234,9 +239,10 @@ func touch_all(list: Array) -> void:
 	if _world == null:
 		return
 	for x in list:
-		var c: Variant = ch(x) if (x is String or x is StringName) else x
-		if c is Dictionary:
-			_world.sync(c)
+		if x is String or x is StringName:
+			_world.mark(x)
+		elif x is Dictionary:
+			_world.mark(x.id)
 
 
 ## Персонаж удалён из state.characters.

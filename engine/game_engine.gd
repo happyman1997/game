@@ -30,6 +30,9 @@ var mods: Array = []
 var issues: Array = []
 ## Кэш производных данных контента (не состояния партии).
 var cache := {}
+## Разбор правил в ядре (CoreRules, native/src/rules.rs) — см. rules().
+var _rules: Variant = null
+var _rules_ready := false
 var _map: MapData = null
 var _children: Variant = null
 var _dist_cache := {}
@@ -339,6 +342,66 @@ func find_path(a: String, b: String) -> Variant:
 	return path
 
 
+# ------------------------------------------------------------ ядро правил
+
+## Родные проверки ядра и владельцы, которые их зарегистрировали: если мод
+## заменил проверку своей, ядро зовёт его версию из GDScript.
+const CORE_NATIVES := {
+	"triggers": {
+		"is_alive": "core", "is_female": "core", "is_male": "core", "is_adult": "core", "is_child": "core",
+		"is_ruler": "core", "is_landed": "core", "is_independent": "core", "is_vassal": "core", "is_courtier": "core",
+		"is_married": "core", "is_lowborn": "core", "has_any_claim": "core", "has_trait": "core", "has_modifier": "core",
+		"culture": "core", "faith": "core", "same_culture_as": "core", "same_faith_as": "core", "is_spouse_of": "core",
+		"is_parent_of": "core", "is_child_of": "core", "is_sibling_of": "core", "is_vassal_of": "core",
+		"is_liege_of": "core", "is_courtier_of": "core",
+		"is_imprisoned": "core/prison", "has_perk": "core/lifestyles",
+	},
+	"values": {
+		"gold": "core", "prestige": "core", "piety": "core", "stress": "core", "stress_level": "core", "age": "core",
+		"num_spouses": "core", "num_claims": "core", "num_traits": "core", "tier": "core",
+	},
+	"links": {"liege": "core", "employer": "core", "father": "core", "mother": "core", "spouse": "core", "primary_title": "core"},
+}
+
+
+## Разбор правил в ядре (null — ядро не собрано). Готовится при первом
+## обращении, когда моды уже загружены: реестры скриптового языка, именованные
+## условия и значения, определения.
+func rules() -> Variant:
+	if _rules_ready:
+		return _rules
+	_rules_ready = true
+	if not ClassDB.class_exists("CoreRules"):
+		return null
+	var r: Variant = ClassDB.instantiate("CoreRules")
+	var natives := {}
+	var regs := {"triggers": scripting.triggers, "values": scripting.values, "links": scripting.links}
+	for kind in CORE_NATIVES:
+		var on := {}
+		for n in CORE_NATIVES[kind]:
+			if regs[kind].owner_of(n) == CORE_NATIVES[kind][n]:
+				on[n] = true
+		natives[kind] = on
+	var tiers := {}
+	for t in content.all("titles"):
+		tiers[str(t.id)] = Titles.tier_rank(t.get("tier"))
+	var defs := content.singleton("defines")
+	var ch_defs: Variant = defs.get("character")
+	r.setup({
+		"triggers": scripting.triggers._map, "values": scripting.values._map,
+		"links": scripting.links._map, "lists": scripting.lists._map, "constants": scripting.constants._map,
+		"natives": natives, "title_tiers": tiers, "defines": defs,
+		"scripted_triggers": content.collection("scripted_triggers"),
+		"script_values": content.collection("script_values"),
+		"adult_age": Data.num(ch_defs.get("adult_age"), 16) if ch_defs is Dictionary else 16.0,
+		"gd_key": Interp.eval_trigger_key, "gd_value": Interp.eval_value_gd, "gd_named": Interp.get_named_value,
+		"gd_trigger": Interp.eval_trigger_gd, "gd_exists": Interp.scope_exists,
+		"impure": ["random_chance"],
+	})
+	_rules = r
+	return _rules
+
+
 func ordered_systems() -> Array:
 	var list := systems.values()
 	Data.sort_by(list, func(s): return Data.num(s.get("order"), 100))
@@ -366,14 +429,16 @@ func bookmarks() -> Array:
 
 func new_game(bookmark_id: String, seed: int = -1) -> Game:
 	var g := WorldSetup.setup_new_game(self, bookmark_id, seed)
-	if Game.check_world:
-		g.world()
+	# копия персонажей в ядре — с готового мира (хуки генерации правят напрямую)
+	var w: Variant = g.world()
+	if w != null:
+		w.sync_all(g.state.characters)
 	return g
 
 
 ## {game, warnings, error}
 func load_game(json: String) -> Dictionary:
 	var res := SaveGame.deserialize(self, json)
-	if Game.check_world and res.get("game") != null:
+	if res.get("game") != null:
 		res.game.world()
 	return res

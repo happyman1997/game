@@ -22,8 +22,10 @@ class ErrorCatcher extends Logger:
 func _init() -> void:
 	var catcher := ErrorCatcher.new()
 	OS.add_logger(catcher)
-	# копия персонажей в ядре сверяется со словарями после каждого дня и теста
+	# копия персонажей в ядре сверяется со словарями после каждого дня и теста,
+	# а каждое условие и значение ядра — с интерпретатором GDScript
 	Game.check_world = true
+	Interp.check_core = true
 	var filter := ""
 	var args := OS.get_cmdline_user_args()
 	if args.size() > 0:

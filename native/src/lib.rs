@@ -7,6 +7,7 @@ mod cells;
 mod land;
 mod rng;
 mod roads;
+mod rules;
 mod world;
 
 struct KoronaCore;
