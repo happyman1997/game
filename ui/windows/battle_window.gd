@@ -26,7 +26,7 @@ static func build(app: App, rec: Dictionary, on_close: Callable) -> Control:
 	var scene := EventWindow.EventScene.new()
 	scene.color = THEME
 	scene.icon_name = Icons.resolve("swords")
-	scene.custom_minimum_size = Vector2(0, 250)
+	scene.custom_minimum_size = Vector2(0, 268)
 	var row := K.hbox([_side(app, r, 0), _center(app, r), _side(app, r, 1)], 24, BoxContainer.ALIGNMENT_CENTER)
 	row.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -78,6 +78,17 @@ static func _side(app: App, r: Dictionary, i: int) -> Control:
 		var cn := K.label(Chars.full_name(g, cmd, false), "SmallLabel")
 		cn.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		items.append(cn)
+		# перевес полководца (разбор — в подсказке) и значки его навыков
+		var adv := K.label(app.t("battle.advantage", {"n": roundi(float(s.get("adv", 0.0)))}), "GoldLabel")
+		var parts: Array = Data.as_array(s.get("adv_parts"))
+		K.tip(adv, func(): return MilitaryPanel.advantage_tip(app, parts))
+		var adv_row := K.hbox([adv], 4, BoxContainer.ALIGNMENT_CENTER)
+		for d in Command.traits_of(g, cmd):
+			var ic := K.icon(d.get("icon"), 16)
+			var tid: String = d.id
+			K.tip(ic, func(): return BB.title(g.name_of("traits", tid)) + "\n" + Command.describe(g, Chars.trait_def(g, tid)))
+			adv_row.add_child(ic)
+		items.append(adv_row)
 		var fate := str(r.commander[i]) if i < r.commander.size() else ""
 		if fate != "":
 			var fl := K.label(app.t("battle.cmd_fate_short." + fate), "BadLabel")
@@ -193,9 +204,14 @@ static func _turns(app: App, r: Dictionary) -> Control:
 	for e in r.events:
 		var kind := str(e.kind)
 		var side := _side_word(app, int(e.side))
+		var b_name := ""
+		if kind == "learned":
+			b_name = g.name_of("traits", str(e.get("b", "")))
+		elif e.get("b") != null and g.ch(e.b) != null:
+			b_name = Chars.full_name(g, g.ch(e.b), false)
 		var params := {"side": side, "n": K.fmt(Data.num(e.get("n"))),
 			"a": Chars.full_name(g, g.ch(e.a), false) if e.get("a") != null and g.ch(e.a) != null else "",
-			"b": Chars.full_name(g, g.ch(e.b), false) if e.get("b") != null and g.ch(e.b) != null else ""}
+			"b": b_name}
 		var day := app.t("battle.phase.skirmish") if int(e.day) == 0 else app.t("battle.phase.melee", {"n": int(e.day)})
 		box.add_child(K.rich("%s  %s" % [BB.muted(day), BB.esc(app.t("battle.ev." + kind, params))], false))
 	return box

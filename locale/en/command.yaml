@@ -1,0 +1,35 @@
+# Commanders (engine/features/command.gd)
+command:
+  title: Commander
+  advantage: "Advantage {n}"
+  advantage_tip: "In battle the difference matters: every point of advantage over the enemy commander is strength for the army."
+  change: Change
+  appoint: Appoint
+  current: Leading the army
+  appoint_title: Who will lead the army
+  appoint_hint: "The commander decides a battle as much as numbers do: martial skill, bonuses and skills give advantage, terrain skills — on their own ground."
+  part:
+    martial: Martial
+    commander_advantage: Command experience
+    personal_example: Personal example
+    home: Home ground
+    trait: Skill
+  fx:
+    advantage: "Advantage {n}"
+    terrain: "{terrain}: advantage {n}"
+    attacking: "When attacking: advantage {n}"
+    defending: "When defending: advantage {n}"
+    charge: "Cavalry charge {pct}% stronger"
+    charge_day: "Charges {abs} days earlier"
+    ranged: "Skirmish {pct}% stronger"
+    volleys: "Extra volleys: {abs}"
+    pursuit: "Pursuit {pct}% stronger"
+    rearguard: "Loses {pct}% less in retreat"
+    morale: "Army morale {n}"
+    steady: "Losses hurt morale {pct}% less"
+    levy_steady: "Levies flee later ({abs} morale)"
+    losses: "Own losses {pct}% lower"
+    luck: "Luck swings {pct}% less"
+    risk: "Risks his own life: ×{n} chance of death"
+msg:
+  command_learned: "{who} gained a commander skill in battle — “{skill}”."

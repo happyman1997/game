@@ -15,6 +15,7 @@ battle:
   course: Course of battle
   units: Troops
   knights: Knights in the melee
+  advantage: "Advantage {n}"
   turns: Turning points
   close: Close
   levy: Levies
@@ -32,6 +33,9 @@ battle:
     withdrew: "The {side} withdrew from the field"
     pursuit: "The {side} cut down the fleeing: {n} more dead"
     commander_fell: "A commander fell — {a}"
+    volley: "{side}: extra volleys ({n})"
+    rearguard: "The {side} fall back in order: {n} saved"
+    learned: "{a} gained a commander skill — “{b}”"
   fate:
     killed: "slain by {by}"
     wounded: "wounded — {by}"

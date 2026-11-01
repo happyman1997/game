@@ -441,10 +441,14 @@ static func _progress_sieges(game: Game) -> void:
 		var fort = maxf(1.0, province_fort(game, a.location))
 		var liberation: bool = p.occupant != null and Wars.participant_side(war, p.occupant) != side
 		var daily = float(a.size) / (fort * game.def_num("military.siege_per_fort", 800) + game.def_num("military.siege_base", 400)) * game.def_num("military.siege_speed", 3) * (2.0 if liberation else 1.0)
-		# siege_speed владельца армии (военное дело ускоряет осады)
+		# siege_speed: лучший из хозяина и полководца (военное дело, Мастер осад)
 		var owner: Variant = game.ch(a.owner)
 		if owner != null:
-			daily *= maxf(0.2, 1.0 + Stats.stat(game, owner, "siege_speed"))
+			var ss := Stats.stat(game, owner, "siege_speed")
+			var cm: Variant = commander_of(game, a)
+			if cm != null and cm.id != owner.id:
+				ss = maxf(ss, Stats.stat(game, cm, "siege_speed"))
+			daily *= maxf(0.2, 1.0 + ss)
 		# capital_defense владельца (кастелян): его столица держится дольше
 		var holder_id: Variant = game.state.titles[a.location].holder if game.state.titles.has(a.location) else null
 		var hc: Variant = game.ch(holder_id) if holder_id != null else null

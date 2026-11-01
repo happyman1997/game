@@ -1,0 +1,30 @@
+trait:
+  forest_leader: Forest Leader
+  hill_leader: Hill Leader
+  marsh_leader: Marsh Walker
+  plains_leader: Plains Leader
+  shock_master: Master of the Charge
+  volley_master: Master of Volleys
+  shield_wall: Shield Wall
+  unstoppable: Unstoppable
+  hound_of_war: Hound of War
+  rearguard: Keeper of the Retreat
+  inspirer: Inspirer
+  cautious_strategist: Cautious Strategist
+  reckless_brawler: Reckless Brawler
+  siege_master: Siege Master
+trait_desc:
+  forest_leader: Knows how to lead an army among trees: ambushes, narrow paths, fighting without formation.
+  hill_leader: Holds the heights and strikes from above; in the mountains his army is at home.
+  marsh_leader: Leads the army where others sink, and loses fewer men in the bogs.
+  plains_leader: On open ground he deploys the line and lets the cavalry loose.
+  shock_master: Picks the moment for the charge — the cavalry strikes earlier and twice as hard.
+  volley_master: Places the archers so that the skirmish decides half the battle.
+  shield_wall: His line holds, however many men fall.
+  unstoppable: Leads the attack without letting the enemy recover.
+  hound_of_war: Never lets the fleeing go — under him the pursuit reaps a terrible harvest.
+  rearguard: Even beaten, he leads the army off in order and loses little in the retreat.
+  inspirer: Lifts spirits by his mere presence; the levies hold longer around him.
+  cautious_strategist: Takes no needless risks: luck swings less, losses are lower, the charge comes later.
+  reckless_brawler: Throws himself into the thick of it: the army follows, but pays in blood — and he risks his life.
+  siege_master: Knows mines, rams and hunger: fortresses fall faster under him.

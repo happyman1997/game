@@ -1,0 +1,90 @@
+# Навыки полководца — черты категории commander. Действуют в сражении через
+# ядро (native/src/battle.rs), поле command:
+#   advantage  — очки перевеса (перевес полководцев сторон: каждое очко разницы —
+#                defines.battle.advantage_effect силы стороны в бою)
+#   terrain    — перевес на местности, по доле клеток графства: { forest: 8 }
+#   attacking / defending — перевес, когда сторона нападает / защищается
+#   charge     — натиск конницы сильнее на эту долю; charge_day — раньше на столько
+#                дней (отрицательное — позже)
+#   ranged     — перестрелка сильнее на эту долю; volleys — ещё залпов
+#   pursuit    — погоня сильнее на эту долю; rearguard — свои потери в погоне
+#                меньше на эту долю
+#   morale     — дух в начале боя; steady — потери бьют по духу меньше (доля);
+#                levy_steady — ополчение бежит позже на столько духа
+#   losses     — свои потери меньше на эту долю (отрицательное — больше)
+#   luck       — разброс удачи уже на эту долю
+#   risk       — шанс гибели самого полководца × (1 + risk)
+# learn — при каком бое полководец может обрести навык (Command.learn):
+#   terrain: <местность> (доля клеток не меньше learn_terrain_share), charge,
+#   volley, defending, attacking, pursuit, rearguard, morale, cautious, reckless.
+traits:
+  forest_leader:
+    category: commander
+    icon: "🌲"
+    command: { terrain: { forest: 9 } }
+    learn: { terrain: forest }
+  hill_leader:
+    category: commander
+    icon: "⛰"
+    command: { terrain: { hills: 8, mountains: 9 } }
+    learn: { terrain: hills }
+  marsh_leader:
+    category: commander
+    icon: "🌾"
+    command: { terrain: { wetlands: 9 }, losses: 0.05 }
+    learn: { terrain: wetlands }
+  plains_leader:
+    category: commander
+    icon: "🐎"
+    command: { terrain: { plains: 6, farmlands: 6 }, charge: 0.25 }
+    learn: { terrain: plains }
+  shock_master:
+    category: commander
+    icon: "⚡"
+    command: { charge: 0.6, charge_day: 1 }
+    learn: { charge: yes }
+  volley_master:
+    category: commander
+    icon: "🏹"
+    command: { ranged: 0.5, volleys: 1 }
+    learn: { volley: yes }
+  shield_wall:
+    category: commander
+    icon: "🛡"
+    command: { defending: 8, steady: 0.2 }
+    learn: { defending: yes }
+  unstoppable:
+    category: commander
+    icon: "🔥"
+    command: { attacking: 8 }
+    learn: { attacking: yes }
+  hound_of_war:
+    category: commander
+    icon: "🐺"
+    command: { pursuit: 0.6 }
+    learn: { pursuit: yes }
+  rearguard:
+    category: commander
+    icon: "🏳"
+    command: { rearguard: 0.5, steady: 0.1 }
+    learn: { rearguard: yes }
+  inspirer:
+    category: commander
+    icon: "📯"
+    command: { morale: 10, levy_steady: 10 }
+    learn: { morale: yes }
+  cautious_strategist:
+    category: commander
+    icon: "♟"
+    command: { losses: 0.15, luck: 0.5, charge_day: -1 }
+    learn: { cautious: yes }
+  reckless_brawler:
+    category: commander
+    icon: "🪓"
+    command: { advantage: 6, losses: -0.15, risk: 1.0 }
+    learn: { reckless: yes }
+  siege_master:
+    category: commander
+    icon: "🏰"
+    modifiers: { siege_speed: 0.5 }
+    command: {}

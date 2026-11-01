@@ -62,6 +62,92 @@ static func build(app: App) -> Control:
 	return root
 
 
+## Полководец армии: перевес с разбором, навыки; хозяину — «Сменить».
+static func command_block(app: App, a: Dictionary, cmd: Dictionary) -> Control:
+	var g := app.game
+	var box := K.vbox([], 4)
+	var adv := K.label(app.t("command.advantage", {"n": roundi(_adv_total(g, cmd))}), "GoldLabel")
+	K.tip(adv, func(): return advantage_tip(app, Command.advantage_parts(g, cmd)))
+	var row := K.hbox([W.portrait(app, cmd, 44), K.vbox([W.char_link(app, cmd.id), adv], 2)], 8)
+	if g.is_player(a.owner):
+		row.add_child(K.expand())
+		row.add_child(K.button(app.t("command.change"), func(): open_appoint(app, a), {"variation": "FlatButton"}))
+	box.add_child(row)
+	var sk: Variant = skill_chips(app, cmd)
+	if sk != null:
+		box.add_child(sk)
+	return K.section(app.t("command.title"), [box], "swords")
+
+
+static func _adv_total(g: Game, c: Dictionary) -> float:
+	var v := 0.0
+	for p in Command.advantage_parts(g, c):
+		v += float(p.value)
+	return v
+
+
+## Разбор очков перевеса (для подсказки).
+static func advantage_tip(app: App, parts: Array) -> String:
+	var g := app.game
+	var rows := []
+	var total := 0.0
+	for p in parts:
+		total += float(p.value)
+		var name: String = g.name_of("traits", p.trait) if p.get("trait") != null else app.t("command.part." + str(p.key))
+		rows.append([BB.esc(name), BB.signed(float(p.value))])
+	return BB.title(app.t("command.advantage", {"n": roundi(total)})) + "\n" + BB.rows(rows) + "\n" + BB.small(BB.muted(app.t("command.advantage_tip")))
+
+
+## Навыки полководца — значки с подсказками.
+static func skill_chips(app: App, c: Dictionary) -> Variant:
+	var g := app.game
+	var ts := Command.traits_of(g, c)
+	if ts.is_empty():
+		return null
+	var f := K.flow([], 4)
+	for d in ts:
+		var chip := K.panel(K.hbox([K.icon(d.get("icon"), 14), K.label(g.name_of("traits", d.id), "SmallLabel")], 3))
+		chip.add_theme_stylebox_override("panel", UiArt.flat(Color("#3a2a1a"), Color(UiArt.BRONZE, 0.7), 1, 3, 3))
+		var tid: String = d.id
+		K.tip(chip, func(): return BB.title(g.name_of("traits", tid)) + "\n" + BB.i(g.loc.t_or("trait_desc." + tid, "")) + "\n" + Command.describe(g, Chars.trait_def(g, tid)))
+		f.add_child(chip)
+	return f
+
+
+## Окно выбора полководца: кандидаты с перевесом и навыками.
+static func open_appoint(app: App, a: Dictionary) -> void:
+	var g := app.game
+	var owner: Variant = g.ch(a.owner)
+	if owner == null:
+		return
+	var close := [Callable()]
+	var list := K.vbox([], 6)
+	var cands := Command.candidates(g, owner, a.id)
+	cands.sort_custom(func(x, y): return Command.score(g, x) > Command.score(g, y))
+	var cur: Variant = Military.commander_of(g, a)
+	for c in cands.slice(0, 24):
+		var cid: String = c.id
+		var adv := K.label(app.t("command.advantage", {"n": roundi(_adv_total(g, c))}), "GoldLabel")
+		K.tip(adv, func(): return advantage_tip(app, Command.advantage_parts(g, g.ch(cid))))
+		var info := K.vbox([W.char_link(app, cid), adv], 2)
+		var sk: Variant = skill_chips(app, c)
+		if sk != null:
+			info.add_child(sk)
+		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var is_cur: bool = cur != null and cur.id == cid
+		var btn := K.button(app.t("command.current") if is_cur else app.t("command.appoint"), func():
+			Command.appoint(g, a, cid)
+			close[0].call()
+			app.mark_dirty(true), {"variation": "GoldButton", "disabled": is_cur})
+		list.add_child(K.panel(K.hbox([W.portrait(app, c, 48), info, btn], 8), "RowPanel"))
+	var head := K.label(app.t("command.appoint_title"), "SubheaderLabel")
+	var scroll := K.scroll(list)
+	scroll.custom_minimum_size = Vector2(520, 420)
+	var body := K.vbox([head, K.para(app.t("command.appoint_hint"), "SmallLabel"), scroll,
+		K.center(K.button(app.t("battle.close"), func(): close[0].call()))], 8)
+	close[0] = app.modal(K.panel(K.margin(body, 10)), {"closable": true})
+
+
 static func build_army(app: App, id: String) -> Control:
 	var g := app.game
 	if not g.state.armies.has(id):
@@ -93,6 +179,8 @@ static func build_army(app: App, id: String) -> Control:
 		[app.t("ui.location"), W.prov_link(app, a.location)],
 		[app.t("ui.status"), status],
 	]))
+	if cmd != null and g.engine.has_feature("command"):
+		root.add_child(command_block(app, a, cmd))
 	var regs: Variant = FeatureSections.army_regiments(app, a)
 	if regs != null:
 		root.add_child(regs)

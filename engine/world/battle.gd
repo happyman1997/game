@@ -36,39 +36,58 @@ static func profile(game: Game, type: String) -> Dictionary:
 	return {"melee": pw, "toughness": 1.0 + (pw - 1.0) * 0.4, "morale": 70, "pursuit": 0.5, "screen": 0.7}
 
 
-## Полководец стороны (лучший по военному делу) и его свойства для ядра.
-static func _commander(game: Game, armies: Array, loc: String) -> Variant:
+## Полководец стороны: из полководцев её армий — с наибольшим перевесом на
+## этом поле (военное дело, навыки, местность).
+static func _commander(game: Game, armies: Array, loc: String, attacking: bool, defending: bool) -> Variant:
 	var best: Variant = null
+	var best_v := -INF
 	for a in armies:
 		var c: Variant = Military.commander_of(game, a)
-		if c != null and (best == null or Stats.skill(game, c, "martial") > Stats.skill(game, best, "martial")):
+		if c == null:
+			continue
+		var v := 0.0
+		for p in Command.advantage_parts(game, c, loc, attacking, defending):
+			v += float(p.value)
+		if v > best_v:
 			best = c
+			best_v = v
 	return best
 
 
-static func _commander_input(game: Game, c: Dictionary, armies: Array, loc: String) -> Dictionary:
-	var adv := Stats.stat(game, c, "commander_advantage")
-	var front := Stats.stat(game, c, "personal_example")
-	adv += front * 100.0
+## Полководец для ядра: очки перевеса с разбором (parts — для окна битвы),
+## нрав и навыки (черты command, Command.skills).
+static func _commander_input(game: Game, c: Dictionary, armies: Array, loc: String, attacking: bool, defending: bool) -> Dictionary:
+	var parts := Command.advantage_parts(game, c, loc, attacking, defending)
 	# home_advantage (мастер засад): бой на земле своей державы
 	var ha := Stats.stat(game, c, "home_advantage")
 	if ha != 0.0 and not armies.is_empty():
 		var owner: Variant = game.ch(armies[0].owner)
 		var holder: Variant = Titles.province_controller(game, loc)
 		if owner != null and holder != null and (holder.id == owner.id or Titles.top_liege(game, holder).id == Titles.top_liege(game, owner).id):
-			adv += ha
+			parts.append({"key": "home", "value": ha * Command.stat_mult(game)})
+	var adv := 0.0
+	for p in parts:
+		adv += float(p.value)
+	var sk := Command.skills(game, c)
 	var has := func(key: String) -> bool:
 		for t in Data.as_array(_d(game, key, [])):
 			if c.traits.has(t):
 				return true
 		return false
 	return {
-		"id": c.id, "martial": Stats.skill(game, c, "martial"), "adv": adv,
+		"id": c.id, "adv": adv, "parts": parts,
 		"aggression": 1.0 if has.call("aggressive") else 0.0,
 		"caution": 1.0 if has.call("cautious") else 0.0,
 		"craven": has.call("craven"),
-		"pursuit": Stats.stat(game, c, "pursuit"), "orderly": Stats.stat(game, c, "orderly_retreat"),
-		"death_mult": Military._death_mult(game, c), "front": front,
+		"pursuit": Stats.stat(game, c, "pursuit") + float(sk.get("pursuit", 0.0)),
+		"orderly": Stats.stat(game, c, "orderly_retreat"),
+		"death_mult": Military._death_mult(game, c) * (1.0 + float(sk.get("risk", 0.0))),
+		"front": Stats.stat(game, c, "personal_example"),
+		"charge": sk.get("charge", 0.0), "charge_day": sk.get("charge_day", 0.0),
+		"ranged": sk.get("ranged", 0.0), "volleys": sk.get("volleys", 0.0),
+		"rearguard": sk.get("rearguard", 0.0), "steady": sk.get("steady", 0.0),
+		"levy_steady": sk.get("levy_steady", 0.0), "losses": sk.get("losses", 0.0), "luck": sk.get("luck", 0.0),
+		"morale": sk.get("morale", 0.0),
 	}
 
 
@@ -134,17 +153,19 @@ static func _mult(game: Game, armies: Array, enemies: Array, loc: String) -> flo
 	return clampf((men + extra) / men, 0.1, 5.0)
 
 
-static func _side(game: Game, armies: Array, enemies: Array, loc: String, defending: bool) -> Dictionary:
-	var c: Variant = _commander(game, armies, loc)
+static func _side(game: Game, armies: Array, enemies: Array, loc: String, defending: bool, attacking: bool) -> Dictionary:
+	var c: Variant = _commander(game, armies, loc, attacking, defending)
 	var s := {
 		"units": _units(game, armies, loc),
 		"knights": _knights(game, armies),
 		"mult": _mult(game, armies, enemies, loc),
 		"defense": game.terrain_num(loc, "defense") if defending else 0.0,
-		"morale_bonus": Stats.skill(game, c, "martial") * Data.num(_d(game, "morale_per_martial", 1)) if c != null else 0.0,
+		"morale_bonus": 0.0,
 	}
 	if c != null:
-		s["commander"] = _commander_input(game, c, armies, loc)
+		var ci := _commander_input(game, c, armies, loc, attacking, defending)
+		s["commander"] = ci
+		s.morale_bonus = Stats.skill(game, c, "martial") * Data.num(_d(game, "morale_per_martial", 1)) + float(ci.morale)
 	return s
 
 
@@ -161,7 +182,7 @@ static func fight(game: Game, loc: String, att: Array, def: Array, defender_side
 	var input := {
 		"seed": game.rng.range_int(1, 2000000000),
 		"params": params,
-		"sides": [_side(game, att, def, loc, defender_side == "att"), _side(game, def, att, loc, defender_side == "def")],
+		"sides": [_side(game, att, def, loc, defender_side == "att", true), _side(game, def, att, loc, defender_side == "def", false)],
 	}
 	var r: Dictionary = cb.fight(input)
 	r["sides"] = []
@@ -169,7 +190,8 @@ static func fight(game: Game, loc: String, att: Array, def: Array, defender_side
 		var armies: Array = att if i == 0 else def
 		var cm: Variant = input.sides[i].get("commander")
 		r.sides.append({"owners": Data.uniq(armies.map(func(a): return a.owner)), "armies": armies.map(func(a): return a.id),
-			"commander": cm.id if cm != null else null})
+			"commander": cm.id if cm != null else null, "adv": cm.adv if cm != null else 0.0, "adv_parts": cm.parts if cm != null else [],
+			"defending": defender_side == ("att" if i == 0 else "def")})
 	return r
 
 

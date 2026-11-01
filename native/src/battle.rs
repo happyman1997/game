@@ -39,7 +39,7 @@ struct Unit {
 
 struct Commander {
     id: Variant,
-    martial: f64,
+    /// Очки перевеса (военное дело, прибавки, навыки, местность) — считает GDScript.
     adv: f64,
     aggression: f64,
     caution: f64,
@@ -48,6 +48,16 @@ struct Commander {
     orderly: f64,
     death_mult: f64,
     front: f64,
+    // навыки полководца (черты command)
+    charge: f64,
+    charge_day: f64,
+    ranged: f64,
+    volleys: i64,
+    rearguard: f64,
+    steady: f64,
+    levy_steady: f64,
+    losses: f64,
+    luck: f64,
 }
 
 struct Knight {
@@ -88,7 +98,9 @@ struct P {
     charge_day: f64,
     luck_min: f64,
     luck_max: f64,
-    martial_bonus: f64,
+    morale_noise: f64,
+    advantage_effect: f64,
+    advantage_cap: f64,
     max_counter: f64,
     knight_melee: f64,
     duels_per_day: i64,
@@ -149,7 +161,9 @@ impl P {
             charge_day: f(d, "charge_day", 2.0),
             luck_min: f(d, "luck_min", 0.85),
             luck_max: f(d, "luck_max", 1.15),
-            martial_bonus: f(d, "martial_bonus", 0.03),
+            morale_noise: f(d, "morale_noise", 0.0),
+            advantage_effect: f(d, "advantage_effect", 0.03),
+            advantage_cap: f(d, "advantage_cap", 25.0),
             max_counter: f(d, "max_counter", 0.75),
             knight_melee: f(d, "knight_melee", 8.0),
             duels_per_day: f(d, "duels_per_day", 2.0) as i64,
@@ -205,7 +219,6 @@ fn read_side(d: &VarDictionary) -> Side {
     }
     let cmd = d.get("commander").and_then(|v| v.try_to::<VarDictionary>().ok()).map(|c| Commander {
         id: c.get("id").unwrap_or_default(),
-        martial: f(&c, "martial", 0.0),
         adv: f(&c, "adv", 0.0),
         aggression: f(&c, "aggression", 0.0),
         caution: f(&c, "caution", 0.0),
@@ -214,6 +227,15 @@ fn read_side(d: &VarDictionary) -> Side {
         orderly: f(&c, "orderly", 0.0),
         death_mult: f(&c, "death_mult", 1.0),
         front: f(&c, "front", 0.0),
+        charge: f(&c, "charge", 0.0),
+        charge_day: f(&c, "charge_day", 0.0),
+        ranged: f(&c, "ranged", 0.0),
+        volleys: f(&c, "volleys", 0.0) as i64,
+        rearguard: f(&c, "rearguard", 0.0).clamp(0.0, 0.9),
+        steady: f(&c, "steady", 0.0).clamp(0.0, 0.8),
+        levy_steady: f(&c, "levy_steady", 0.0),
+        losses: f(&c, "losses", 0.0).clamp(-0.9, 0.6),
+        luck: f(&c, "luck", 0.0).clamp(0.0, 1.0),
     });
     let knights = arr(d, "knights")
         .iter_shared()
@@ -239,11 +261,18 @@ impl Side {
         self.units.iter().map(|u| u.men).sum()
     }
 
-    fn cmd_mult(&self, p: &P) -> f64 {
-        match &self.cmd {
-            Some(c) => 1.0 + c.martial * p.martial_bonus + c.adv / 100.0,
-            None => 1.0,
-        }
+    fn adv(&self) -> f64 {
+        self.cmd.as_ref().map(|c| c.adv).unwrap_or(0.0)
+    }
+
+    /// Сила стороны от перевеса полководцев: каждое очко разницы — advantage_effect.
+    fn cmd_mult(&self, enemy: &Side, p: &P) -> f64 {
+        let d = (self.adv() - enemy.adv()).clamp(-p.advantage_cap, p.advantage_cap);
+        (1.0 + d * p.advantage_effect).max(0.2)
+    }
+
+    fn cmd_f(&self, f: impl Fn(&Commander) -> f64) -> f64 {
+        self.cmd.as_ref().map(f).unwrap_or(0.0)
     }
 
     fn break_at(&self, p: &P) -> f64 {
@@ -253,8 +282,8 @@ impl Side {
 
     /// День натиска конницы: горячий раньше, осторожный позже.
     fn charge_day(&self, p: &P) -> i64 {
-        let (a, c) = self.cmd.as_ref().map(|c| (c.aggression, c.caution)).unwrap_or((0.0, 0.0));
-        ((p.charge_day - a + c).round() as i64).clamp(1, p.max_days.max(1))
+        let (a, c, s) = self.cmd.as_ref().map(|c| (c.aggression, c.caution, c.charge_day)).unwrap_or((0.0, 0.0, 0.0));
+        ((p.charge_day - a + c - s).round() as i64).clamp(1, p.max_days.max(1))
     }
 }
 
@@ -267,9 +296,11 @@ struct Ev {
     b: Variant,
 }
 
-fn luck(rng: &mut Rng, p: &P) -> f64 {
+/// Удача дня; narrow — насколько уже разброс (осторожный стратег).
+fn luck(rng: &mut Rng, p: &P, narrow: f64) -> f64 {
     let r = (rng.next_u64() >> 11) as f64 / (1u64 << 53) as f64;
-    p.luck_min + (p.luck_max - p.luck_min) * r
+    let l = p.luck_min + (p.luck_max - p.luck_min) * r;
+    1.0 + (l - 1.0) * (1.0 - narrow)
 }
 
 fn roll(rng: &mut Rng) -> f64 {
@@ -289,9 +320,13 @@ fn strike(sides: &[Side; 2], from: usize, to: usize, ranged: bool, day: i64, p: 
     }
     // противовесы: сколько у противника тех, кто контрит отряд (по людям)
     let men_of = |s: &Side, kind: &GString| -> f64 { s.units.iter().filter(|u| u.kind == *kind).map(|u| u.men).sum() };
-    let cmult = att.cmd_mult(p) * att.mult * luck(rng, p);
+    let cmult = att.cmd_mult(def, p) * att.mult * luck(rng, p, att.cmd_f(|c| c.luck));
     let charge_day = att.charge_day(p);
     let scale = if ranged { p.skirmish_scale } else { p.melee_scale };
+    // навыки: залпы сильнее, натиск страшнее; свои потери защищающейся стороны меньше
+    let ranged_mult = 1.0 + att.cmd_f(|c| c.ranged);
+    let charge_mult = 1.0 + att.cmd_f(|c| c.charge);
+    let guard = 1.0 - def.cmd_f(|c| c.losses);
     for u in att.units.iter() {
         if u.men <= 0.0 {
             continue;
@@ -301,7 +336,10 @@ fn strike(sides: &[Side; 2], from: usize, to: usize, ranged: bool, day: i64, p: 
             continue;
         }
         if !ranged && u.charge > 0.0 && day == charge_day {
-            power *= 1.0 + u.charge;
+            power *= 1.0 + u.charge * charge_mult;
+        }
+        if ranged {
+            power *= ranged_mult;
         }
         // ослабление от вражеских противовесов
         let mut pen = 0.0;
@@ -318,7 +356,7 @@ fn strike(sides: &[Side; 2], from: usize, to: usize, ranged: bool, day: i64, p: 
             }
             let bonus = u.counters.iter().find(|(k, _)| *k == v.kind).map(|(_, c)| *c).unwrap_or(0.0);
             let dmg = base * weights[i] / wsum * (1.0 + bonus);
-            lost[i] += dmg / (v.toughness * (1.0 + def.defense));
+            lost[i] += dmg * guard / (v.toughness * (1.0 + def.defense));
         }
     }
     for (i, v) in def.units.iter().enumerate() {
@@ -415,16 +453,27 @@ impl CoreBattle {
         };
 
         // ---------------------------------------------- перестрелка
-        let r0 = strike(&sides, 0, 1, true, 0, &p, &mut rng);
-        let r1 = strike(&sides, 1, 0, true, 0, &p, &mut rng);
-        let l1 = apply(&mut sides[1], &r0);
-        let l0 = apply(&mut sides[0], &r1);
+        // мастер залпов даёт своим лишние залпы
+        let volleys = [sides[0].cmd_f(|c| c.volleys as f64) as i64, sides[1].cmd_f(|c| c.volleys as f64) as i64];
+        let (mut l0, mut l1) = (0.0, 0.0);
+        for round in 0..=volleys[0].max(volleys[1]) {
+            let r0 = if round <= volleys[0] { strike(&sides, 0, 1, true, 0, &p, &mut rng) } else { vec![0.0; sides[1].units.len()] };
+            let r1 = if round <= volleys[1] { strike(&sides, 1, 0, true, 0, &p, &mut rng) } else { vec![0.0; sides[0].units.len()] };
+            l1 += apply(&mut sides[1], &r0);
+            l0 += apply(&mut sides[0], &r1);
+        }
+        for s in 0..2 {
+            if volleys[s] > 0 {
+                evs.push(Ev { day: 0, kind: "volley", side: s, n: volleys[s] as f64, a: Variant::nil(), b: Variant::nil() });
+            }
+        }
         lost_total[0] += l0;
         lost_total[1] += l1;
         for (i, l) in [l0, l1].iter().enumerate() {
             let s = &mut sides[i];
+            let steady = 1.0 - s.cmd_f(|c| c.steady);
             if s.start_men > 0.0 {
-                s.morale -= p.morale_per_loss * l / s.start_men;
+                s.morale -= p.morale_per_loss * l / s.start_men * steady;
             }
         }
         if l0 > 0.0 || l1 > 0.0 {
@@ -436,7 +485,8 @@ impl CoreBattle {
         // войско втрое меньше вражеского не принимает сечи и отходит
         let mut refused: Option<usize> = None;
         if p.refuse_ratio > 0.0 {
-            let (m0, m1) = (sides[0].men(), sides[1].men());
+            // по силе с перевесом полководцев: малое войско с сильным вождём может принять сечу
+            let (m0, m1) = (sides[0].men() * sides[0].cmd_mult(&sides[1], &p), sides[1].men() * sides[1].cmd_mult(&sides[0], &p));
             if m0 * p.refuse_ratio < m1 {
                 refused = Some(0);
             } else if m1 * p.refuse_ratio < m0 {
@@ -470,16 +520,24 @@ impl CoreBattle {
             for (i, l) in [l0, l1].iter().enumerate() {
                 let other = if i == 0 { l1 } else { l0 };
                 let s = &mut sides[i];
+                let steady = 1.0 - s.cmd_f(|c| c.steady);
                 if s.start_men > 0.0 {
-                    s.morale -= p.morale_per_loss * l / s.start_men;
+                    s.morale -= p.morale_per_loss * l / s.start_men * steady;
                     // проигранный размен бьёт по духу сильнее
-                    s.morale -= (p.exchange_shock * (l - other).max(0.0) / s.start_men).min(p.exchange_cap);
+                    s.morale -= (p.exchange_shock * (l - other).max(0.0) / s.start_men).min(p.exchange_cap) * steady;
                 }
             }
             duels(&mut sides, day, &p, &mut rng, &mut evs, &mut fates);
+            // слухи, знамения, сумятица: дух колеблется (у осторожного — меньше)
+            if p.morale_noise > 0.0 {
+                for s in 0..2 {
+                    let narrow = 1.0 - sides[s].cmd_f(|c| c.luck);
+                    sides[s].morale += (roll(&mut rng) * 2.0 - 1.0) * p.morale_noise * narrow;
+                }
+            }
             // ополчение бежит, когда дух низок
             for s in 0..2 {
-                if sides[s].morale < p.levy_flee_morale {
+                if sides[s].morale < p.levy_flee_morale - sides[s].cmd_f(|c| c.levy_steady) {
                     let mut fled = 0.0;
                     for u in sides[s].units.iter_mut().filter(|u| u.levy && u.men > 0.0) {
                         let x = u.men * p.levy_flee_rate;
@@ -546,6 +604,12 @@ impl CoreBattle {
         let routed = if broke.is_some() { 1.0 } else { 0.4 };
         let mut chase_loss = pursuers * p.pursuit_scale * chase * routed * (1.0 - (screen / (screen + pursuers).max(1.0)) * 0.5);
         chase_loss = chase_loss.min(lmen * p.pursuit_cap);
+        // хранитель отхода уводит разбитых в порядке
+        let rg = sides[loser].cmd_f(|c| c.rearguard);
+        if rg > 0.0 && chase_loss >= 1.0 {
+            evs.push(Ev { day, kind: "rearguard", side: loser, n: (chase_loss * rg).round(), a: Variant::nil(), b: Variant::nil() });
+            chase_loss *= 1.0 - rg;
+        }
         if chase_loss >= 1.0 {
             let ws: Vec<f64> = sides[loser].units.iter().map(|u| u.men * exposure(&p.exposure_melee, u)).collect();
             let wsum: f64 = ws.iter().sum::<f64>().max(1.0);
