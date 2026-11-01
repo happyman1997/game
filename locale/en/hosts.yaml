@@ -1,0 +1,41 @@
+# Hosts (engine/features/hosts.gd)
+host:
+  title: Host
+  none: "An army with no special path. A host is what the army is: what it can do in battle, who joins it and what it needs to stay itself."
+  devotion: "Devotion {n} / {max}"
+  devotion_tip: "Devotion falls when you break what the host stands on; at zero it dissolves."
+  month: "Per month: {n}"
+  adopt: Raise
+  abandon: Disband the host
+  already: This host is already raised
+  available: What army to raise
+  abilities: In battle
+  keep: What it needs
+  regiments: "Special regiments: {list}"
+  on:
+    battle_won: "Victory: {n}"
+    battle_lost: "Defeat: {n}"
+    forest_felled: "Felled forest: {n}"
+  where: " (on terrain: {terrain})"
+  when: " (when the condition holds)"
+  enemy: " (against: when the condition holds)"
+  ab:
+    levy_hold: The levy does not flee
+    terror: "Enemy levy flees sooner ({n} morale)"
+    guard: The leader neither dies nor is captured while the army does not flee
+    ambush: "Ambush: skirmish and the first day of melee {pct}% stronger"
+    slip: When beaten, slips away unpursued
+    spells: "Spells before the volleys (power {n})"
+    bane: "{pct}% stronger"
+    morale: "Morale {n}"
+    pursuit: "Pursuit {pct}% stronger"
+    pack_leader: The leader leads by prowess when it beats martial
+    rise: "{pct}% of the battle's fallen rise"
+    allies_dread: "Living allies beside it lose {n} morale"
+msg:
+  host_dissolved:
+    devotion: "The host “{host}” has dissolved: it stopped being itself."
+    abandoned: "The host “{host}” has been disbanded."
+fx:
+  set_host: "Raise the host: {value}"
+  add_host_devotion: "Host devotion {value}"

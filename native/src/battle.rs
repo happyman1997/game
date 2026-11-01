@@ -77,6 +77,20 @@ struct Side {
     mult: f64,
     defense: f64,
     start_men: f64,
+    host: Host,
+}
+
+/// Умения воинства стороны (специализация войска; считает GDScript, когда они
+/// действуют): ополчение не бежит, страх врагу, вождь под охраной, засада,
+/// уход без погони, заклинания в перестрелке.
+#[derive(Default)]
+struct Host {
+    levy_hold: bool,
+    terror: f64,
+    guard: bool,
+    ambush: f64,
+    slip: bool,
+    spells: f64,
 }
 
 /// Настройки боя (defines.battle).
@@ -256,6 +270,17 @@ fn read_side(d: &VarDictionary) -> Side {
         mult: f(d, "mult", 1.0).max(0.0),
         defense: f(d, "defense", 0.0),
         start_men,
+        host: {
+            let h = dict(d, "host");
+            Host {
+                levy_hold: h.get("levy_hold").map(|v| v.booleanize()).unwrap_or(false),
+                terror: f(&h, "terror", 0.0).max(0.0),
+                guard: h.get("guard").map(|v| v.booleanize()).unwrap_or(false),
+                ambush: f(&h, "ambush", 0.0).max(0.0),
+                slip: h.get("slip").map(|v| v.booleanize()).unwrap_or(false),
+                spells: f(&h, "spells", 0.0).max(0.0),
+            }
+        },
     }
 }
 
@@ -328,7 +353,11 @@ fn strike(sides: &[Side; 2], from: usize, to: usize, ranged: bool, day: i64, p: 
     let mut by: Vec<Vec<f64>> = vec![vec![0.0; def.units.len()]; att.units.len()];
     // противовесы: сколько у противника тех, кто контрит отряд (по людям)
     let men_of = |s: &Side, kind: &GString| -> f64 { s.units.iter().filter(|u| u.kind == *kind).map(|u| u.men).sum() };
-    let cmult = att.cmd_mult(def, p) * att.mult * luck(rng, p, att.cmd_f(|c| c.luck));
+    let mut cmult = att.cmd_mult(def, p) * att.mult * luck(rng, p, att.cmd_f(|c| c.luck));
+    // засада: перестрелка и первый день сечи — из укрытия
+    if att.host.ambush > 0.0 && day <= 1 {
+        cmult *= 1.0 + att.host.ambush;
+    }
     let charge_day = att.charge_day(p);
     let scale = if ranged { p.skirmish_scale } else { p.melee_scale };
     // навыки: залпы сильнее, натиск страшнее; свои потери защищающейся стороны меньше
@@ -378,6 +407,27 @@ fn strike(sides: &[Side; 2], from: usize, to: usize, ranged: bool, day: i64, p: 
         lost[i] = capped;
     }
     (lost, dealt)
+}
+
+/// Заклинания боевых магов (умение воинства spells): удар по войскам врага в
+/// перестрелке — сила в «воинах-стрелках», по открытости для стрел.
+fn magic(sides: &[Side; 2], from: usize, to: usize, p: &P, rng: &mut Rng) -> Vec<f64> {
+    let att = &sides[from];
+    let def = &sides[to];
+    let mut lost = vec![0.0; def.units.len()];
+    if att.host.spells <= 0.0 {
+        return lost;
+    }
+    let weights: Vec<f64> = def.units.iter().map(|u| u.men * exposure(&p.exposure_ranged, u)).collect();
+    let wsum: f64 = weights.iter().sum();
+    if wsum <= 0.0 {
+        return lost;
+    }
+    let dmg = att.host.spells * p.skirmish_scale * att.mult * luck(rng, p, 0.0);
+    for (i, v) in def.units.iter().enumerate() {
+        lost[i] = (dmg * weights[i] / wsum / (v.toughness * (1.0 + def.defense))).min(v.men);
+    }
+    lost
 }
 
 /// Засчитать отрядам стороны сражённых врагов.
@@ -478,6 +528,30 @@ impl CoreBattle {
         // мастер залпов даёт своим лишние залпы
         let volleys = [sides[0].cmd_f(|c| c.volleys as f64) as i64, sides[1].cmd_f(|c| c.volleys as f64) as i64];
         let (mut l0, mut l1) = (0.0, 0.0);
+        // страх: воинство, перед которым бежит ополчение, бьёт по духу врага до боя
+        for s in 0..2 {
+            let t = sides[s].host.terror;
+            if t > 0.0 {
+                sides[1 - s].morale -= t * 0.5;
+                evs.push(Ev { day: 0, kind: "terror", side: s, n: 0.0, a: Variant::nil(), b: Variant::nil() });
+            }
+            if sides[s].host.ambush > 0.0 {
+                evs.push(Ev { day: 0, kind: "ambush", side: s, n: 0.0, a: Variant::nil(), b: Variant::nil() });
+            }
+        }
+        // заклинания боевых магов — до первых залпов
+        {
+            let m0 = magic(&sides, 0, 1, &p, &mut rng);
+            let m1 = magic(&sides, 1, 0, &p, &mut rng);
+            let (g1, g0) = (apply(&mut sides[1], &m0), apply(&mut sides[0], &m1));
+            l1 += g1;
+            l0 += g0;
+            for (s, g) in [(0usize, g1), (1usize, g0)] {
+                if g >= 1.0 {
+                    evs.push(Ev { day: 0, kind: "spells", side: s, n: g.round(), a: Variant::nil(), b: Variant::nil() });
+                }
+            }
+        }
         for round in 0..=volleys[0].max(volleys[1]) {
             let (r0, k0) = if round <= volleys[0] { strike(&sides, 0, 1, true, 0, &p, &mut rng) } else { (vec![0.0; sides[1].units.len()], vec![0.0; sides[0].units.len()]) };
             let (r1, k1) = if round <= volleys[1] { strike(&sides, 1, 0, true, 0, &p, &mut rng) } else { (vec![0.0; sides[0].units.len()], vec![0.0; sides[1].units.len()]) };
@@ -563,7 +637,9 @@ impl CoreBattle {
             }
             // ополчение бежит, когда дух низок
             for s in 0..2 {
-                if sides[s].morale < p.levy_flee_morale - sides[s].cmd_f(|c| c.levy_steady) {
+                // страх перед вражеским воинством гонит ополчение раньше; стойкое воинство не бежит
+                let terror = sides[1 - s].host.terror;
+                if !sides[s].host.levy_hold && sides[s].morale < p.levy_flee_morale - sides[s].cmd_f(|c| c.levy_steady) + terror {
                     let mut fled = 0.0;
                     for u in sides[s].units.iter_mut().filter(|u| u.levy && u.men > 0.0) {
                         let x = u.men * p.levy_flee_rate;
@@ -632,6 +708,11 @@ impl CoreBattle {
         chase_loss = chase_loss.min(lmen * p.pursuit_cap);
         // хранитель отхода уводит разбитых в порядке
         let rg = sides[loser].cmd_f(|c| c.rearguard);
+        // лесное воинство уходит тропами, погоне его не догнать
+        if sides[loser].host.slip && chase_loss >= 1.0 {
+            evs.push(Ev { day, kind: "slipped", side: loser, n: chase_loss.round(), a: Variant::nil(), b: Variant::nil() });
+            chase_loss = 0.0;
+        }
         if rg > 0.0 && chase_loss >= 1.0 {
             evs.push(Ev { day, kind: "rearguard", side: loser, n: (chase_loss * rg).round(), a: Variant::nil(), b: Variant::nil() });
             chase_loss *= 1.0 - rg;
@@ -663,17 +744,27 @@ impl CoreBattle {
                 cmd_fate[s] = "wounded".into();
             }
         }
+        // родовая дружина: пока она стоит (сторона не бежит), вождь не гибнет
+        let guarded = |s: usize| sides[s].host.guard && broke != Some(s);
         if let Some(c) = sides[loser].cmd.as_ref() {
             if roll(&mut rng) < p.loser_cmd_death * c.death_mult {
-                cmd_fate[loser] = "killed".into();
-                evs.push(Ev { day, kind: "commander_fell", side: loser, n: 0.0, a: c.id.clone(), b: Variant::nil() });
+                if guarded(loser) {
+                    evs.push(Ev { day, kind: "guarded", side: loser, n: 0.0, a: c.id.clone(), b: Variant::nil() });
+                } else {
+                    cmd_fate[loser] = "killed".into();
+                    evs.push(Ev { day, kind: "commander_fell", side: loser, n: 0.0, a: c.id.clone(), b: Variant::nil() });
+                }
             }
         }
         if cmd_fate[loser] != GString::from("killed") {
             if let Some(c) = sides[winner].cmd.as_ref() {
                 if roll(&mut rng) < p.winner_cmd_death * c.death_mult {
-                    cmd_fate[winner] = "killed".into();
-                    evs.push(Ev { day, kind: "commander_fell", side: winner, n: 0.0, a: c.id.clone(), b: Variant::nil() });
+                    if guarded(winner) {
+                        evs.push(Ev { day, kind: "guarded", side: winner, n: 0.0, a: c.id.clone(), b: Variant::nil() });
+                    } else {
+                        cmd_fate[winner] = "killed".into();
+                        evs.push(Ev { day, kind: "commander_fell", side: winner, n: 0.0, a: c.id.clone(), b: Variant::nil() });
+                    }
                 }
             }
         }

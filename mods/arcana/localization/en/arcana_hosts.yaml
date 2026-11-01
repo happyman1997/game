@@ -1,0 +1,13 @@
+army_specialization:
+  battle_mages: Battle Mages
+  dead_host: The Dead Host
+army_specialization_desc:
+  battle_mages: "An army with sorcerers before its ranks. Before the first volleys lightning and fire strike the enemy — the harder, the more skilled the leader. The Temple frowns on it: under the solar rite the host loses devotion."
+  dead_host: "A host led by a necromancer. Those who fall in battle — its own and the enemy's — rise into its ranks, the dead need no food, the enemy trembles. But living allies will not stand beside it, and without a necromancer it falls apart."
+host_rule:
+  battle_mages:
+    temple: The Temple opposes
+    mastery: The leader's art
+  dead_host:
+    master: Led by a necromancer
+    no_master: No necromancer

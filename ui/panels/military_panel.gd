@@ -23,6 +23,9 @@ static func build(app: App) -> Control:
 			app.map_view.focus(a.location)
 		app.mark_dirty(true), {"icon": "swords", "variation": "GoldButton", "disabled": not Military.can_raise_army(g, p), "tip": app.t("ui.raise_army_tip"), "min_h": 42}))
 	root.add_child(K.para(app.t("ui.move_hint"), "SmallLabel"))
+	var host: Variant = HostSection.build(app, p)
+	if host != null:
+		root.add_child(host)
 	var regs: Variant = FeatureSections.regiments(app, p)
 	if regs != null:
 		root.add_child(regs)

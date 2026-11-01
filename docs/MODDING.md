@@ -1052,6 +1052,60 @@ refused, withdrew, pursuit, commander_fell, volley, rearguard, learned) и
 расчёт по силе сторон.
 Скрипт: `has_regiment`, `num_regiments`, `regiment_cap`, `regiment_power`, `add_regiment`.
 
+### Воинства (специализации войска)
+
+Воинство — какое это войско: что оно умеет в бою (умения, а не прибавки),
+кто в него идёт (особые отряды) и что ему нужно, чтобы оставаться собой
+(`engine/features/hosts.gd`, данные — `army_specializations` в
+`common/hosts.yaml`; мод «Тайные искусства» добавляет боевых магов и мёртвую
+рать). У правителя одно воинство (`c.host = {id, devotion, since}`); оно
+действует, пока стойкость выше нуля.
+
+```yaml
+army_specializations:
+  forest_host:
+    icon: "🌲"
+    potential: { any_domain_province: { has_terrain: { terrain: forest, above: 0.3 } } }
+    can_adopt: { prestige: ">= 120" }      # причины видны игроку
+    cost: { prestige: 120 }
+    on_adopt: { … }                        # эффект при сборе
+    modifiers: { … }                       # правителю, пока воинство стоит
+    abilities:
+      ambush: { value: 0.35, where: { terrain: forest, share: 0.3 } }
+      slip: { where: { terrain: forest, share: 0.3 } }
+    keep:                                  # стойкость в месяц
+      - { monthly: 2, key: woods }         # без trigger — всегда
+      - { trigger: { … }, monthly: -8, key: … }
+    on: { forest_felled: -25, battle_won: 4 }
+    ai_will_do: 10
+```
+
+Умения (значение — число, скриптовое значение с root = правитель, или
+`{ value, when, enemy, where }`: `when` — условие на правителя со
+`scope:enemy` и `scope:location`, `enemy` — на вражеского вождя, `where` —
+доля местности в графстве боя): `levy_hold` (ополчение не бежит), `terror`
+(ополчение врага бежит раньше на столько духа, его дух ниже на половину),
+`guard` (вождь не гибнет и не попадает в плен, пока сторона не бежит),
+`ambush` (перестрелка и первый день сечи сильнее на долю), `slip` (проиграв,
+уходит без погони), `spells` (заклинания до залпов, сила в «стрелках»),
+`bane` (сила стороны больше на долю), `morale`, `pursuit` (погоня
+полководца), `pack_leader` (полководец берёт перевес доблестью, если она
+выше военного дела), `rise` (доля павших обеих сторон встаёт в войско),
+`allies_dread` (живые союзники на той же стороне теряют дух). Первые шесть
+исполняет ядро сражений (`sides[].host`), прочие — `Battle` перед боем и
+после него. Умения воинства — у вождя стороны (хозяина самой большой армии).
+
+Стойкость: `keep` — правила раз в месяц (тексты `host_rule.<воинство>.<key>`),
+`on` — события `battle_won`, `battle_lost`, `forest_felled` (работы из
+`defines.hosts.forest_works`). На нуле воинство распадается. Особые отряды —
+`regiment_types` с `can_recruit: { has_host: <воинство> }`. ИИ собирает
+воинство с шансом `defines.hosts.ai_adopt_chance` в месяц (по `ai_will_do`).
+Отчёт битвы: `sides[].host`, `guard`, `rise`; события `terror`, `ambush`,
+`spells`, `slipped`, `guarded`, `risen`. Скрипт: условия `has_host`,
+`is_strongest_of_court`; значение `host_devotion`; эффекты `set_host`
+(`none` — распустить), `add_host_devotion`; хуки `host.adopted`,
+`host.dissolved`, `host.risen`.
+
 ### Полководцы
 
 Сила полководца — **очки перевеса**: военное дело (`defines.command.per_martial`

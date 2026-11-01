@@ -56,8 +56,13 @@ static func _commander(game: Game, armies: Array, loc: String, attacking: bool, 
 
 ## Полководец для ядра: очки перевеса с разбором (parts — для окна битвы),
 ## нрав и навыки (черты command, Command.skills).
-static func _commander_input(game: Game, c: Dictionary, armies: Array, loc: String, attacking: bool, defending: bool) -> Dictionary:
+static func _commander_input(game: Game, c: Dictionary, armies: Array, loc: String, attacking: bool, defending: bool, host: Dictionary = {}) -> Dictionary:
 	var parts := Command.advantage_parts(game, c, loc, attacking, defending)
+	# стая: вожак ведёт доблестью, если она выше военного дела
+	if host.has("pack_leader"):
+		var extra := float(Stats.skill(game, c, "prowess") - Stats.skill(game, c, "martial")) * game.def_num("command.per_martial", 1.0)
+		if extra > 0.0:
+			parts.append({"key": "pack", "value": extra})
 	# home_advantage (мастер засад): бой на земле своей державы
 	var ha := Stats.stat(game, c, "home_advantage")
 	if ha != 0.0 and not armies.is_empty():
@@ -79,7 +84,7 @@ static func _commander_input(game: Game, c: Dictionary, armies: Array, loc: Stri
 		"aggression": 1.0 if has.call("aggressive") else 0.0,
 		"caution": 1.0 if has.call("cautious") else 0.0,
 		"craven": has.call("craven"),
-		"pursuit": Stats.stat(game, c, "pursuit") + float(sk.get("pursuit", 0.0)),
+		"pursuit": Stats.stat(game, c, "pursuit") + float(sk.get("pursuit", 0.0)) + float(host.get("pursuit", 0.0)),
 		"orderly": Stats.stat(game, c, "orderly_retreat"),
 		"death_mult": Military._death_mult(game, c) * (1.0 + float(sk.get("risk", 0.0))),
 		"front": Stats.stat(game, c, "personal_example"),
@@ -168,10 +173,31 @@ static func _side(game: Game, armies: Array, enemies: Array, loc: String, defend
 		"defense": game.terrain_num(loc, "defense") if defending else 0.0,
 		"morale_bonus": 0.0,
 	}
+	# воинство вождя стороны: умения в бою (Hosts)
+	var ab := {}
+	if game.engine.has_feature("hosts"):
+		var lead: Variant = Hosts.lead_owner(game, armies)
+		ab = Hosts.abilities(game, lead, Hosts.lead_owner(game, enemies), loc)
+		if lead != null:
+			s["host_owner"] = lead.id
+			var hd: Variant = Hosts.active(game, lead)
+			if hd != null:
+				s["host_id"] = hd.id
+		s["host"] = Hosts.core_input(ab)
+		s.mult = float(s.mult) * (1.0 + float(ab.get("bane", 0.0)))
+		s.morale_bonus = float(ab.get("morale", 0.0))
+		s["rise"] = float(ab.get("rise", 0.0))
+		# мёртвая рать: живые союзники рядом с ней теряют дух
+		var owners := Data.uniq(armies.map(func(a): return a.owner))
+		if owners.size() > 1:
+			for o in owners:
+				var dread := float(Hosts.abilities(game, game.ch(o)).get("allies_dread", 0.0))
+				if dread > 0.0:
+					s.morale_bonus = float(s.morale_bonus) - dread
 	if c != null:
-		var ci := _commander_input(game, c, armies, loc, attacking, defending)
+		var ci := _commander_input(game, c, armies, loc, attacking, defending, ab)
 		s["commander"] = ci
-		s.morale_bonus = Stats.skill(game, c, "martial") * Data.num(_d(game, "morale_per_martial", 1)) + float(ci.morale)
+		s.morale_bonus = float(s.morale_bonus) + Stats.skill(game, c, "martial") * Data.num(_d(game, "morale_per_martial", 1)) + float(ci.morale)
 	return s
 
 
@@ -215,8 +241,19 @@ static func fight(game: Game, loc: String, att: Array, def: Array, defender_side
 		var cm: Variant = input.sides[i].get("commander")
 		r.sides.append({"owners": Data.uniq(armies.map(func(a): return a.owner)), "armies": armies.map(func(a): return a.id),
 			"commander": cm.id if cm != null else null, "adv": cm.adv if cm != null else 0.0, "adv_parts": cm.parts if cm != null else [],
-			"defending": defender_side == ("att" if i == 0 else "def")})
+			"defending": defender_side == ("att" if i == 0 else "def"),
+			"host": input.sides[i].get("host_id"), "host_owner": input.sides[i].get("host_owner"),
+			"guard": bool((input.sides[i].get("host", {}) as Dictionary).get("guard", false)), "rise": input.sides[i].get("rise", 0.0)})
 	return r
+
+
+## Вождь стороны под охраной родовой дружины: сторона не бежала — он не в плену.
+static func guarded(r: Variant, side: int) -> bool:
+	if not (r is Dictionary) or side >= Data.as_array(r.get("sides")).size():
+		return false
+	if not bool(r.sides[side].get("guard", false)):
+		return false
+	return not (int(r.winner) != side and bool(r.get("broke", false)))
 
 
 ## Поле битвы на карте (state.battlefields): остаётся defines.battle.field_years

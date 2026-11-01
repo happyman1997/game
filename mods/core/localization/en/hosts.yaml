@@ -1,0 +1,41 @@
+# Hosts — army specializations.
+army_specialization:
+  sun_host: Host of the Sun
+  ash_host: Ashen Host
+  kin_host: Kin Retinue
+  forest_host: Forest Host
+  wolf_pack: The Pack
+army_specialization_desc:
+  sun_host: "An army that marches under the solar banner with a priest at its head. While a lightbearer is with the host, the levy does not flee; it strikes harder at heretics and those sold to the Ash. It will not fight its own faith — such a war dims its fire."
+  ash_host: "An army the Ash whispers to. Enemy levies flee at the very sight of it, but the host needs blood: without victories it wanes month by month."
+  kin_host: "A retinue of kin and those sworn to the house. While it stands, its leader neither dies nor falls captive. They ransom their own: a kinsman in a foreign dungeon shames the retinue; without knights of its blood it weakens."
+  forest_host: "An army of forest trails. In the woods it strikes from ambush and slips away unpursued. Do not fell the forest: every cleared patch wounds its spirit."
+  wolf_pack: "The pack of the Winter Wolf. Its leader leads by prowess and runs the fleeing down without mercy; in forests and on heights the pack strikes from ambush. The leader must be the strongest — or the pack leaves."
+host_rule:
+  sun_host:
+    kin_war: War against the same faith
+    devout: The ruler's piety
+    impious: A ruler without piety
+  ash_host:
+    thirst: Thirst for blood
+  kin_host:
+    kin_captive: A kinsman in a foreign dungeon
+    kin_knights: Knights of its blood
+    no_kin_knights: No knights of its blood
+  forest_host:
+    woods: The forest stands
+  wolf_pack:
+    alpha: The leader is the strongest
+    not_alpha: Someone is stronger than the leader
+regiment_type:
+  sun_guard: Sun Guard
+  ash_reavers: Ash Reavers
+  kin_sworn: Kin Sworn
+  wood_stalkers: Wood Stalkers
+  wolf_brothers: Wolf Brothers
+regiment_type_desc:
+  sun_guard: Temple men-at-arms; they do not give ground while they see the solar banner.
+  ash_reavers: Those the Ash has touched; they cut without fear and without pity.
+  kin_sworn: Kin and sworn brothers of the leader; they stand like a wall around their own.
+  wood_stalkers: Archers of the forest trails; they shoot from behind the trees and melt into the thicket.
+  wolf_brothers: Warriors of the Winter Wolf; they run the fleeing down as wolves run a deer.

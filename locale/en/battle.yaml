@@ -38,6 +38,12 @@ battle:
     learned: "{a} gained a commander skill — “{b}”"
     rank_up: "“{u}” ({side}) are now “{b}”"
     captain_fell: "The captain of “{u}” has fallen — {a}"
+    terror: "{side}: the enemy levy wavers in fear"
+    ambush: "{side} strike from ambush"
+    spells: "{side}: spells before the volleys — {n} fallen"
+    slipped: "{side} slipped away by forest trails — the pursuit fell short ({n} saved)"
+    guarded: "The kin retinue shielded its leader — {a}"
+    risen: "{side}: the fallen rose into the ranks ({n})"
   fate:
     killed: "slain by {by}"
     wounded: "wounded — {by}"

@@ -100,6 +100,13 @@ static func _side(app: App, r: Dictionary, i: int) -> Control:
 		if o != null:
 			items.append(K.center(W.portrait(app, o, 76, {"coa": true})))
 		items.append(K.label(app.t("battle.no_commander"), "MutedLabel"))
+	# воинство стороны
+	var hd: Variant = Hosts.def_of(g, s.get("host"))
+	if hd != null:
+		var hl := K.hbox([K.icon(hd.get("icon", "banner"), 16), K.label(g.name_of("army_specializations", hd.id), "SmallLabel")], 4, BoxContainer.ALIGNMENT_CENTER)
+		var hdd: Dictionary = hd
+		K.tip(hl, func(): return HostSection.tip(app, hdd))
+		items.append(hl)
 	var men := int(r.start[i])
 	var left := men - int(r.lost[i])
 	var bar := _meter(left, maxi(1, men), col, "%s → %s" % [K.fmt(men), K.fmt(left)], 180)

@@ -1,0 +1,195 @@
+# Воинства — специализации войска (engine/features/hosts.gd). Какое это
+# войско: что оно умеет (умение, а не прибавка), кто в него идёт (особые
+# отряды), что ему нужно, чтобы оставаться собой (стойкость воинства).
+# У правителя одно воинство; оно действует, пока стойкость выше нуля.
+#
+#   potential  — кому оно вообще по пути (условие на правителя)
+#   can_adopt  — что нужно, чтобы собрать его (условие, причины видны)
+#   cost       — { gold, prestige, piety }
+#   on_adopt   — эффект при сборе
+#   modifiers  — характеристики правителя, пока воинство стоит
+#   abilities  — умения в бою; значение — число (или скриптовое значение,
+#                root — правитель) либо { value, when, enemy, where }:
+#                  when  — условие на правителя (scope:enemy — вражеский
+#                          вождь, scope:location — графство боя)
+#                  enemy — условие на вражеского вождя
+#                  where — { terrain: <местность или группа>, share: доля }
+#     levy_hold    — ополчение не бежит
+#     terror       — ополчение врага бежит раньше на столько духа, его дух
+#                    ниже на половину этого с начала боя
+#     guard        — вождь не гибнет и не попадает в плен, пока сторона не бежит
+#     ambush       — перестрелка и первый день сечи сильнее на долю
+#     slip         — проиграв, уходит без погони
+#     spells       — заклинания до залпов: сила в «стрелках»
+#     bane         — сила стороны больше на долю (обычно с enemy)
+#     morale       — дух стороны
+#     pursuit      — погоня полководца сильнее на долю
+#     pack_leader  — полководец берёт перевес доблестью, если она выше военного дела
+#     rise         — доля павших в бою (обеих сторон) встаёт в войско
+#     allies_dread — живые союзники на той же стороне теряют столько духа
+#   keep       — условия стойкости, раз в месяц: [{ trigger, monthly, key }]
+#                (без trigger — всегда); тексты — host_rule.<воинство>.<key>
+#   on         — стойкость от событий: battle_won, battle_lost, forest_felled
+#   devotion   — стойкость при сборе (иначе defines.hosts.start_devotion)
+#   ai_will_do — вес для ИИ
+army_specializations:
+  sun_host:
+    icon: "☀"
+    color: "#e0c070"
+    order: 1
+    potential: { faith: [sun_rite, ash_penitence] }
+    can_adopt: { piety: ">= 150", faith_heretic: no }
+    cost: { piety: 150 }
+    abilities:
+      # не бегут, пока при войске жрец (капеллан в совете)
+      levy_hold: { when: { any_councillor: { is_councillor: court_chaplain } } }
+      # сильнее против еретиков и тех, кто продался Пеплу
+      bane: { value: 0.2, enemy: { OR: { faith_heretic: yes, has_trait: [ash_pact, ash_viceroy] } } }
+      morale: 5
+    keep:
+      # не воюют с единоверцами
+      - { trigger: { any_war_enemy: { same_faith_as: root } }, monthly: -12, key: kin_war }
+      - { trigger: { piety: ">= 50" }, monthly: 2, key: devout }
+      - { trigger: { piety: "< 0" }, monthly: -5, key: impious }
+    on: { battle_won: 6, battle_lost: -4 }
+    ai_will_do: 12
+  ash_host:
+    icon: "🔥"
+    color: "#7a3a1a"
+    order: 2
+    potential: { has_trait: [ash_marked, ash_pact, ash_viceroy] }
+    can_adopt: { prestige: ">= 100" }
+    cost: { prestige: 100 }
+    on_adopt: { add_dread: 15 }
+    abilities:
+      # перед ним бежит ополчение врага
+      terror: 18
+      morale: 4
+    keep:
+      # нужна кровь: без побед и разорения воинство тает
+      - { monthly: -6, key: thirst }
+    on: { battle_won: 20, battle_lost: -2 }
+    ai_will_do: 15
+  kin_host:
+    icon: "🛡"
+    color: "#8a6a3a"
+    order: 3
+    potential: { is_lowborn: no }
+    can_adopt: { prestige: ">= 200", any_dynasty_member: { count: ">= 4" } }
+    cost: { prestige: 200 }
+    abilities:
+      # вождь не гибнет и не в плену, пока дружина стоит
+      guard: yes
+      morale: 6
+    keep:
+      # своих выкупают: родич в чужой темнице — позор дружине
+      - { trigger: { any_dynasty_member: { is_imprisoned: yes, NOT: { is_imprisoned_by: root } } }, monthly: -8, key: kin_captive }
+      - { trigger: { any_knight: { same_dynasty_as: root } }, monthly: 2, key: kin_knights }
+      - { trigger: { NOT: { any_knight: { same_dynasty_as: root } } }, monthly: -3, key: no_kin_knights }
+    on: { battle_won: 4, battle_lost: -3 }
+    ai_will_do: 8
+  forest_host:
+    icon: "🌲"
+    color: "#3a6a3a"
+    order: 4
+    potential: { any_domain_province: { has_terrain: { terrain: forest, above: 0.3 } } }
+    can_adopt: { prestige: ">= 120" }
+    cost: { prestige: 120 }
+    abilities:
+      # засады и уход без погони — только в лесу
+      ambush: { value: 0.35, where: { terrain: forest, share: 0.3 } }
+      slip: { where: { terrain: forest, share: 0.3 } }
+    keep:
+      - { monthly: 2, key: woods }
+    # лес не рубить
+    on: { forest_felled: -25, battle_won: 4 }
+    ai_will_do: 10
+  wolf_pack:
+    icon: "🐺"
+    color: "#5a6a8a"
+    order: 5
+    potential: { faith: wolf_cult }
+    can_adopt: { prestige: ">= 120" }
+    cost: { prestige: 120 }
+    abilities:
+      # вожак — сильнейший: ведёт доблестью
+      pack_leader: yes
+      pursuit: 0.5
+      # ночь и лес: стая бьёт из чащи и с высот
+      ambush: { value: 0.25, where: { terrain: [forest, hills, mountains], share: 0.3 } }
+    keep:
+      # вожак должен быть сильнейшим при дворе
+      - { trigger: { is_strongest_of_court: yes }, monthly: 3, key: alpha }
+      - { trigger: { is_strongest_of_court: no }, monthly: -8, key: not_alpha }
+    on: { battle_won: 6, battle_lost: -6 }
+    ai_will_do: 12
+
+# Кто в него идёт: особые отряды воинств.
+regiment_types:
+  sun_guard:
+    category: special
+    icon: "☀"
+    order: 20
+    size: 100
+    power: 4.2
+    battle: { melee: 4.2, toughness: 2.0, morale: 95, pursuit: 0.4, screen: 1.0 }
+    cost: { gold: 85 }
+    upkeep: 0.55
+    counters: { light_footmen: 0.3 }
+    can_recruit: { has_host: sun_host }
+    ai_will_do: 50
+  ash_reavers:
+    category: special
+    icon: "🔥"
+    order: 21
+    size: 100
+    power: 4.6
+    battle: { melee: 4.6, toughness: 1.6, morale: 90, pursuit: 1.0, screen: 0.6 }
+    cost: { gold: 80 }
+    upkeep: 0.5
+    counters: { light_footmen: 0.4, archers: 0.2 }
+    can_recruit: { has_host: ash_host }
+    ai_will_do: 50
+  kin_sworn:
+    category: special
+    icon: "🛡"
+    order: 22
+    size: 100
+    power: 4.5
+    battle: { melee: 4.5, toughness: 2.1, morale: 92, pursuit: 0.4, screen: 1.2 }
+    cost: { gold: 90 }
+    upkeep: 0.6
+    counters: { pikemen: 0.3 }
+    can_recruit: { has_host: kin_host }
+    ai_will_do: 50
+  wood_stalkers:
+    category: ranged
+    icon: "🌲"
+    order: 23
+    size: 100
+    power: 2.6
+    battle: { melee: 1.2, ranged: 2.4, toughness: 1.1, morale: 72, pursuit: 0.8, screen: 1.4 }
+    cost: { gold: 55 }
+    upkeep: 0.35
+    terrain: { forest: 0.35, wetlands: 0.15 }
+    can_recruit: { has_host: forest_host }
+    ai_will_do: 50
+  wolf_brothers:
+    category: infantry
+    icon: "🐺"
+    order: 24
+    size: 100
+    power: 4.2
+    battle: { melee: 4.2, toughness: 1.6, morale: 88, pursuit: 1.4, screen: 0.8 }
+    cost: { gold: 75 }
+    upkeep: 0.5
+    terrain: { forest: 0.2, hills: 0.2 }
+    can_recruit: { has_host: wolf_pack }
+    ai_will_do: 50
+
+defines:
+  hosts:
+    start_devotion: 60       # стойкость нового воинства
+    max_devotion: 100
+    ai_adopt_chance: 0.04    # ИИ в месяц пробует собрать воинство
+    forest_works: [clear_forest, thin_old_forest]

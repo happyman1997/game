@@ -14,6 +14,7 @@ command:
     personal_example: Personal example
     home: Home ground
     trait: Skill
+    pack: Pack leader (prowess)
   fx:
     advantage: "Advantage {n}"
     terrain: "{terrain}: advantage {n}"

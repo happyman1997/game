@@ -1,0 +1,38 @@
+# «Тайные искусства»: воинства магии и смерти (специализации войска,
+# engine/features/hosts.gd; поля — mods/core/data/common/hosts.yaml).
+army_specializations:
+  battle_mages:
+    icon: "⚡"
+    color: "#b0602a"
+    order: 6
+    potential: { OR: { has_trait: battlemage, sorcery: ">= 8" } }
+    can_adopt: { sorcery: ">= 6" }
+    cost: { gold: 150 }
+    abilities:
+      # заклинания в перестрелке: сила — от колдовства вождя
+      spells: { value: { value: sorcery, multiply: 25 } }
+    keep:
+      # Храм против: под солнечным обрядом боевые маги на подозрении
+      - { trigger: { faith: sun_rite }, monthly: -4, key: temple }
+      - { trigger: { sorcery: ">= 10" }, monthly: 2, key: mastery }
+    on: { battle_won: 5, battle_lost: -3 }
+    ai_will_do: 8
+  dead_host:
+    icon: "💀"
+    color: "#3a6a4a"
+    order: 7
+    potential: { has_trait: [necromancer, lich] }
+    can_adopt: { prestige: ">= 80" }
+    cost: { prestige: 80 }
+    # мёртвым не нужна еда
+    modifiers: { attrition_mult: -1 }
+    abilities:
+      # павшие встают в строй; живые не стоят рядом; враг дрожит
+      rise: 0.12
+      allies_dread: 15
+      terror: 8
+    keep:
+      - { trigger: { has_trait: [necromancer, lich] }, monthly: 1, key: master }
+      - { trigger: { NOT: { has_trait: [necromancer, lich] } }, monthly: -20, key: no_master }
+    on: { battle_won: 5 }
+    ai_will_do: 10

@@ -347,7 +347,8 @@ static func _battle(game: Game, w: Dictionary, loc: String, att: Array, def: Arr
 				Military._wound(game, cm)
 			elif pair[1] == "killed":
 				Succession.kill_character(game, cm, "battle", pair[2].id if pair[2] != null else null)
-		if lc != null and lc.death == null:
+		# родовая дружина: пока она стоит, вождя не взять в плен
+		if lc != null and lc.death == null and not Battle.guarded(report, 1 - wi2):
 			game.emit("battle.commander_survived", {"war": w, "commander": lc.id, "captor": win_owner.id})
 	else:
 		# личный пример даром не даётся: в первых рядах легко получить рану
