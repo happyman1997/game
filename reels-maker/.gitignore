@@ -9,3 +9,6 @@ fonts/*
 sources.csv
 demo/
 __pycache__/
+# ключи и токены — никогда не коммитить
+config.json
+state/

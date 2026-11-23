@@ -1,0 +1,30 @@
+{
+  "output_dir": "output",
+
+  "instagram": {
+    "enabled": false,
+    "mode": "local",
+    "api_version": "v27.0",
+    "ig_user_id": "",
+    "access_token": "",
+    "public_base_url": ""
+  },
+
+  "tiktok": {
+    "enabled": false,
+    "mode": "inbox",
+    "client_key": "",
+    "client_secret": "",
+    "redirect_port": 3455,
+    "privacy_level": "PUBLIC_TO_EVERYONE"
+  },
+
+  "autopilot": {
+    "post_times": ["11:40", "16:20", "20:50"],
+    "jitter_minutes": 15,
+    "source": "absurd",
+    "min_queue": 3,
+    "absurd_args": ["--min-dur", "8", "--max-dur", "16"],
+    "reels_args": []
+  }
+}
