@@ -384,7 +384,7 @@ def build_command(clip: Media, src: SourceInfo, reaction: Media, laughs: list[tu
 
     cmd += ["-filter_complex", ";".join(g), "-map", "[vout]", "-map", "[aout]",
             "-t", f"{total:.3f}", "-r", str(FPS),
-            "-c:v", "libx264", "-preset", args.preset, "-crf", str(args.crf),
+            "-c:v", "libx264", "-preset", args.preset, "-crf", str(args.crf), "-maxrate", "10M", "-bufsize", "20M",
             "-profile:v", "high", "-pix_fmt", "yuv420p",
             "-c:a", "aac", "-b:a", "160k", "-ar", "48000",
             "-movflags", "+faststart", str(out)]
