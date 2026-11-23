@@ -1,0 +1,11 @@
+# медиа и личные данные не кладём в репозиторий
+input/*
+output/*
+assets/reactions/*
+assets/laughs/*
+fonts/*
+!*/.gitkeep
+!assets/*/.gitkeep
+sources.csv
+demo/
+__pycache__/
