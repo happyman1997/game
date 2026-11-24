@@ -22,8 +22,9 @@
   "autopilot": {
     "post_times": ["11:40", "16:20", "20:50"],
     "jitter_minutes": 15,
-    "source": "absurd",
+    "source": "fakegame",
     "min_queue": 3,
+    "fakegame_args": [],
     "absurd_args": ["--min-dur", "8", "--max-dur", "16"],
     "reels_args": []
   }

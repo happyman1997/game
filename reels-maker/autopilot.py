@@ -18,6 +18,7 @@ import traceback
 from pathlib import Path
 
 import make_absurd as ma
+import make_fakegame as fg
 import make_reels as mr
 import upload as up
 
@@ -36,8 +37,18 @@ def queue_size(uploader: up.Uploader) -> int:
 
 
 def make_one(uploader: up.Uploader, cfg: dict) -> bool:
-    """Собирает один ролик. source: absurd — генератор, reels — клипы из input/, both — сначала клипы."""
-    source = cfg.get("source", "absurd")
+    """Собирает один ролик.
+
+    source: fakegame — несуществующие игры, absurd — абсурд, mix — 70/30 игры и абсурд,
+            reels — клипы из input/, both — сначала клипы, потом абсурд.
+    """
+    source = cfg.get("source", "fakegame")
+    if source == "mix":
+        source = random.choices(["fakegame", "absurd"], [0.7, 0.3])[0]
+    if source == "fakegame":
+        fargs = fg.parse_args(["--output", str(uploader.output), *cfg.get("fakegame_args", [])])
+        fg.prepare(fargs)
+        return bool(fg.generate(1, fargs))
     if source in ("reels", "both"):
         try:
             rargs = mr.parse_args(["--output", str(uploader.output), "--limit", "1", *cfg.get("reels_args", [])])
